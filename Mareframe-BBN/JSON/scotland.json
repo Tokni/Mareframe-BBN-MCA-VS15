@@ -1,0 +1,27 @@
+{
+    "elements": [
+    { "posX": 100, "posY": 150, "elmtID": "elmtDec2", "elmtName": "Decision", "elmtDesc": "write description here", "elmtType": 1, "defData": [["c0"],
+        																																		["c1"]]},
+    { "posX": 600, "posY": 150, "elmtID": "elmtChance3", "elmtName": "Chance", "elmtDesc": "write description here", "elmtType": 0, "defData": [["S0", 0.3],
+        																																		["S1", 0.7]]},
+     { "posX": 500, "posY": 96, "elmtID": "elmtChance1", "elmtName": "Success of venture", "elmtDesc": "write description here", "elmtType": 0, "defData": [["Success", 0.2],
+        																																						["Failure", 0.8]]},
+        { "posX": 500, "posY": 224, "elmtID": "elmtChance2", "elmtName": "Expert forecast", "elmtDesc": "write description here", "elmtType": 0, "defData": [["Good", 0.4, 0.7, 0.1, 0.4],
+        																																					["Moderate", 0.4, 0.2, 0.3, 0.1],
+        																																					["Poor", 0.2, 0.1, 0.6,0.5] ]},
+        { "posX": 300, "posY": 96, "elmtID": "elmtDec1", "elmtName": "Investment decision", "elmtDesc": "write description here", "elmtType": 1, "defData": [["Invest"], ["DoNotInvest"]]},
+        { "posX": 300, "posY": 224, "elmtID": "elmtValue1", "elmtName": "Financial Gain", "elmtDesc": "write description here", "elmtType": 2, "defData": [["Value", 10000, -5000, 500, 500,10000, -5000, 500, 500]]}
+    ],
+    "connections": [
+        { "connInput": "elmtChance1", "connOutput": "elmtChance2", "connID": "conn1" },
+        { "connInput": "elmtChance1", "connOutput": "elmtValue1", "connID": "conn2" },
+        { "connInput": "elmtDec1", "connOutput": "elmtValue1", "connID": "conn3" },
+         { "connInput": "elmtChance3", "connOutput": "elmtChance2", "connID": "conn4" },
+         { "connInput": "elmtDec2", "connOutput": "elmtValue1", "connID": "conn5" }
+    ],
+    "mdlName": "The West Coast of Scotland",
+    "mdlDesc": "",
+    "dataMat": [
+        
+    ]
+}
