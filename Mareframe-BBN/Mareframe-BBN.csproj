@@ -23,20 +23,26 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="BBN.html" />
-    <Content Include="js\Mareframe.js" />
-    <Content Include="js\MareframeGUI.js" />
     <Content Include="js\math.min.js" />
+    <Content Include="MCA.html" />
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include=".settings\settings.json" />
-    <Content Include="JSON\baltic.json" />
-    <Content Include="JSON\blackSea.json" />
-    <Content Include="JSON\cadiz.json" />
-    <Content Include="JSON\iceland.json" />
-    <Content Include="JSON\northSea.json" />
-    <Content Include="JSON\scotland.json" />
-    <Content Include="JSON\sicily.json" />
+    <Content Include="JSON\BBN\baltic.json" />
+    <Content Include="JSON\BBN\blackSea.json" />
+    <Content Include="JSON\BBN\cadiz.json" />
+    <Content Include="JSON\BBN\iceland.json" />
+    <Content Include="JSON\BBN\northSea.json" />
+    <Content Include="JSON\BBN\scotland.json" />
+    <Content Include="JSON\BBN\sicily.json" />
+    <Content Include="JSON\MCA\baltic.json" />
+    <Content Include="JSON\MCA\blackSea.json" />
+    <Content Include="JSON\MCA\cadiz.json" />
+    <Content Include="JSON\MCA\Iceland.json" />
+    <Content Include="JSON\MCA\northSea.json" />
+    <Content Include="JSON\MCA\scotland.json" />
+    <Content Include="JSON\MCA\sicily.json" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -44,6 +50,23 @@
       <DependentUpon>web.config</DependentUpon>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="ts\Connection.ts" />
+    <TypeScriptCompile Include="ts\Declarations\createjs-lib.d.ts" />
+    <TypeScriptCompile Include="ts\Declarations\easeljs.d.ts" />
+    <TypeScriptCompile Include="ts\Declarations\google.visualization.d.ts" />
+    <TypeScriptCompile Include="ts\Declarations\jquery.d.ts" />
+    <TypeScriptCompile Include="ts\Declarations\jqueryui.d.ts" />
+    <TypeScriptCompile Include="ts\Declarations\math.min.d.ts" />
+    <TypeScriptCompile Include="ts\Declarations\tweenjs.d.ts" />
+    <TypeScriptCompile Include="ts\Element.ts" />
+    <TypeScriptCompile Include="ts\FileIO.ts" />
+    <TypeScriptCompile Include="ts\Handler.ts" />
+    <TypeScriptCompile Include="ts\MareframeGUI.ts" />
+    <TypeScriptCompile Include="ts\Model.ts" />
+    <TypeScriptCompile Include="ts\Tools.ts" />
+  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
   </PropertyGroup>

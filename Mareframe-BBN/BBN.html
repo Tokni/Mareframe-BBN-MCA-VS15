@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="us">
 <head>
     <meta charset="utf-8">
@@ -15,18 +15,23 @@
 </head>
 <body>
     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
     <script src="https://code.createjs.com/createjs-2014.12.12.min.js"></script>
-<script src="https://www.google.com/jsapi"></script>
-
-<script src="http://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
-
-
+    <script src="https://www.google.com/jsapi"></script>
     <script>
         google.load("visualization", "1.0", { "packages": ["corechart","table"] });
     </script>
-    <script src="js/Mareframe.js" type="text/javascript"></script>
-    <script src="js/MareframeGUI.js" type="text/javascript"></script>
      <script src="js/math.min.js" type="text/javascript"></script>
+    <script src="ts/Model.js" type="text/javascript"></script>
+    <script src="ts/MareframeGUI.js" type="text/javascript"></script>
+    <script src="ts/FileIO.js" type="text/javascript"></script>
+    <script src="ts/Element.js" type="text/javascript"></script>
+    <script src="ts/Connection.js" type="text/javascript"></script>
+    <script src="ts/Handler.js" type="text/javascript"></script>
+    <script src="ts/Tools.js" type="text/javascript"></script>
+    
+
 
     <div class="container">
 		<div class="row">
@@ -82,10 +87,9 @@
            <div id="defTable_div"></div> 		
     	</div>
         <button class="dialogButton" id="submit" onclick="h.gui.saveDefTable()">Submit changes</button>
-        <button class="dialogButton" id="values" 'disabled'=false onclick="h.gui.showValues();">Show values</button>
+        <button class="dialogButton" id="values" onclick="h.gui.showValues();">Show values</button>
         <div id="valuesTable_div"></div>
     </div>
-    <script src="jQueryUI\jquery-ui.js"></script>
     <script>
         $("input[type=checkbox]").button();
         $("#newDcmt").button({ icons: { primary: "ui-icon-document" } });
@@ -118,7 +122,19 @@
         });
         $("#description_div").hide();
 		$("#valuesTable_div").hide();
+		$(document).ready(function () {
+		    var MareFrame = MareFrame || {};
+		    MareFrame.DST = MareFrame.DST || {};
 
+
+
+
+		    new Mareframe.DST.Handler();
+
+		    $("#button").bind("click", function (e) {
+
+		    });
+		});
     
     </script>
 
