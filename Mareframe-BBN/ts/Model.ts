@@ -2,6 +2,7 @@
     export module DST {
         export class Model {
             public m_bbnMode: boolean = false;
+            private m_modelIdent: string = "temp";
             private m_counter: number = 0;
             private m_elementArr: Element[] = [];
             private m_connectionArr: Connection[] = [];
@@ -25,6 +26,10 @@
                         p_elmt.update();
                     }
                 });
+            }
+
+            getIdent(): string {
+                return this.m_modelIdent;
             }
 
             setMainObj(p_goalElmt: Element): void {
@@ -207,6 +212,20 @@
                 }
                 return key;
             }
+
+            getEaselElementsInBox(p_x1: number, p_y1: number, p_x2: number, p_y2: number): createjs.Container[]{
+
+                var selection: createjs.Container[] = [];
+
+                this.m_elementArr.forEach(function (elmt: Element) {
+                    if (((elmt.m_easelElmt.x > p_x1 && elmt.m_easelElmt.x < p_x2) || (elmt.m_easelElmt.x < p_x1 && elmt.m_easelElmt.x > p_x2)) && ((elmt.m_easelElmt.y > p_y1 && elmt.m_easelElmt.y < p_y2) || (elmt.m_easelElmt.y < p_y1 && elmt.m_easelElmt.y > p_y2))) {
+                        selection.push(elmt.m_easelElmt);
+                    }
+                });
+
+                return selection;
+            }
+
             getConnectionArr(): Connection[] {
                 return this.m_connectionArr;
             }
@@ -246,17 +265,26 @@
                 }
             }
             toJSON(): any {
-                return { elements: this.m_elementArr, connections: this.m_connectionArr, mdlName: this.m_modelName, mainObj: this.m_mainObjective, dataMat: this.m_dataMatrix };
+                return { elements: this.m_elementArr, connections: this.m_connectionArr, mdlName: this.m_modelName, mainObj: this.m_mainObjective, dataMat: this.m_dataMatrix, mdlIdent: this.m_modelIdent };
 
             }
             fromJSON(p_jsonObject: any): void {
 
                 $("#modelHeader").html(p_jsonObject.mdlName);
-                $("#model_header").append(p_jsonObject.mdlName);
-                console.log(p_jsonObject);
+                var header = $("#model_header").html();
+                //Only append if model name has not been added
+                if (header.indexOf(">", header.length - 1) !== -1) {
+                    $("#model_header").append(p_jsonObject.mdlName);
+                }
+
+                
                 this.m_modelName = p_jsonObject.mdlName;
+                this.m_modelIdent = p_jsonObject.mdlIdent;
 
                 this.m_dataMatrix = p_jsonObject.dataMat;
+
+                this.m_elementArr = [];
+                this.m_connectionArr = [];
 
 
                 var maxX = 0;

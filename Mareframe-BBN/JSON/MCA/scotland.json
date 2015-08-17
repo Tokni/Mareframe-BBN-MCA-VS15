@@ -26,7 +26,9 @@
         { "connInput": "elmtAttr4", "connOutput": "elmtEnv", "connID": "conn7" },
         { "connInput": "elmtAttr5", "connOutput": "elmtEnv", "connID": "conn8" }
     ],
-    "mdlName": "The West Coast of Scotland",
+  "mdlName": "The West Coast of Scotland",
+    "mdlIdent": "scotland",
+
     "mdlDesc": "",
     "mainObj": "elmtGoal",
     "dataMat": [

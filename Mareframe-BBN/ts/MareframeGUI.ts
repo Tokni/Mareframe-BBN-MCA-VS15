@@ -1,11 +1,10 @@
-﻿/// <reference path="Declarations\easeljs.d.ts" />
-/// <reference path="Declarations\createjs-lib.d.ts" />
-
+﻿
 
 module Mareframe {
     export module DST {
         export class GUIHandler {
             public m_editorMode: boolean = false;
+            private m_handler: Handler;
             private m_mcaStage: createjs.Stage = new createjs.Stage("MCATool");
             private m_valueFnStage: createjs.Stage = new createjs.Stage("valueFn_canvas");
             private m_controlP: createjs.Shape = new createjs.Shape();
@@ -13,6 +12,7 @@ module Mareframe {
             private m_valueFnLineCont: createjs.Container = new createjs.Container();
             private m_valueFnSize: number = 100;
             private m_mcaStageCanvas: HTMLCanvasElement = <HTMLCanvasElement> this.m_mcaStage.canvas;
+            private m_selectionBox: createjs.Shape = new createjs.Shape();
             private m_mcaSizeX: number = 800;
             private m_mcaSizeY: number = 480;
             private m_mcaContainer: createjs.Container = new createjs.Container()
@@ -23,6 +23,8 @@ module Mareframe {
             private m_chartsLoaded: boolean = false;
             private m_oldX: number = 0;
             private m_oldY: number = 0;
+            private m_originalPressX: number = 0;
+            private m_originalPressY: number = 0;
             private m_selectedItems: any[] = [];
             private m_finalScoreChart: google.visualization.ColumnChart = new google.visualization.ColumnChart($("#finalScore_div").get(0));
             private m_finalScoreChartOptions: Object = {
@@ -40,12 +42,16 @@ module Mareframe {
             private m_model: Model;
 
 
-            constructor(p_model: Model) {
+            constructor(p_model: Model, p_handler: Handler) {
+                this.m_handler = p_handler;
 
                 if (p_model.m_bbnMode) {
                     $("#detailsDialog").on('dialogclose', function (event) {
                         $("#valuesTable_div").hide();
                     });
+                    $("#submit").on("click", this.saveDefTable);
+                    $("#values").on("click", this.showValues);
+                    this.setEditorMode = this.setEditorMode.bind(this);
                 }
 
 
@@ -66,7 +72,11 @@ module Mareframe {
                 this.updateConnection = this.updateConnection.bind(this);
                 this.createNewElement = this.createNewElement.bind(this);
                 this.deleteElement = this.deleteElement.bind(this);
-
+                this.quickLoad = this.quickLoad.bind(this);
+                this.updateModel = this.updateModel.bind(this);
+                this.mouseUp = this.mouseUp.bind(this);
+                this.selectAll = this.selectAll.bind(this);
+                window.addEventListener("keydown",this.selectAll);
 
 
 
@@ -74,26 +84,26 @@ module Mareframe {
 
                 this.m_model = p_model;
                 this.m_mcaBackground.name = "hitarea";
-                if (this.m_editorMode) {
-                    this.m_mcaBackground.addEventListener("pressmove", this.pressMove);
-                    $(".header-bar").show();
-                    $("#editableDataTable").on("focusout", function () {
-                        //TODO: needs work
-                    });
-                } else {
-                    $(".header-bar").hide();
-                    $("#reset").hide();
-                }
+
+                this.updateEditorMode();
                 this.m_mcaBackground.addEventListener("mousedown", this.mouseDown);
 
                 this.m_controlP.graphics.f("#0615b4").s("#2045ff").rr(0, 0, 6, 6, 2);
                 this.m_valFnBackground.addEventListener("pressmove", this.moveValFnCP);
                 this.m_valFnBackground.addEventListener("mousedown", this.downValFnCP);
+                this.m_mcaBackground.addEventListener("pressmove", this.pressMove);
                 this.m_controlP.mouseChildren = false;
                 $("#valueFn_Linear").on("click", this.linearizeValFn);
                 $("#valueFn_Flip").on("click", this.flipValFn);
                 $("#newElmt").on("click", this.createNewElement);
                 $("#delete").on("click", this.deleteElement);
+                $("#editorMode").on("click", this.setEditorMode);
+                $("#resetDcmt").on("click", this.quickLoad);
+                $("#updateMdl").on("click", this.updateModel);
+
+                this.m_mcaBackground.addEventListener("pressup", this.mouseUp);
+
+                
 
 
 
@@ -114,9 +124,29 @@ module Mareframe {
 
             }
 
+            selectAll(p_evt: KeyboardEvent) {
+                console.log(p_evt);
+                if (p_evt.charCode == 97 && p_evt.ctrlKey) {
+                    for (var i = 0; i < this.m_model.getElementArr().length; i++) {
+                        this.addToSelection(this.m_model.getElementArr()[i].m_easelElmt);
+                    }
+                }
+            }
+
+            
+
+            updateModel() {
+                this.m_model.update();
+            }
+
             setSize(p_width: number, p_height: number): void {
                 this.m_mcaStageCanvas.height = p_height;
                 this.m_mcaStageCanvas.width = p_width;
+            }
+
+            quickLoad() {
+                this.m_model.fromJSON(this.m_handler.getFileIO().quickLoad());
+                this.importStage();
             }
 
             importStage(): void {
@@ -139,8 +169,13 @@ module Mareframe {
 
                 this.m_updateMCAStage = true
 
-
+                this.m_handler.getFileIO().quickSave(this.m_model);
             };
+
+            private mouseUp(p_evt: createjs.MouseEvent) {
+                console.log("mouse up");
+                this.m_updateMCAStage = true;
+            }
 
             updateElement(p_elmt: Element) {
                 p_elmt.m_easelElmt.removeAllChildren();
@@ -182,30 +217,31 @@ module Mareframe {
 
             updateEditorMode() {
                 if (this.m_editorMode) {
-                    $(".header-bar").show();
+                    $(".advButton").show();
                     $("#reset").show();
-                    this.m_mcaBackground.addEventListener("pressmove", this.pressMove);
                 } else {
-                    $(".header-bar").hide();
+                    $(".advButton").hide();
                     $("#reset").hide();
                     $("#cnctTool").prop("checked", false);
-                    this.m_mcaBackground.removeEventListener("pressmove", this.pressMove);
                 }
                 var elementArr = this.m_model.getElementArr();
-                for (var i = 0; i < elementArr.length; i++) {
-                    if (this.m_editorMode) {
-                        elementArr[i].m_easelElmt.addEventListener("pressmove", this.pressMove);
-                    } else {
-                        elementArr[i].m_easelElmt.removeEventListener("pressmove", this.pressMove);
+                if (elementArr) {
+                    for (var i = 0; i < elementArr.length; i++) {
+                        if (this.m_editorMode) {
+                            elementArr[i].m_easelElmt.addEventListener("pressmove", this.pressMove);
+                        } else {
+                            elementArr[i].m_easelElmt.removeEventListener("pressmove", this.pressMove);
+                        }
                     }
                 }
             }
 
 
             setEditorMode = function (cb) {
-                this.m_editorMode = cb.checked;
+                console.log(cb);
+                this.m_editorMode = cb.currentTarget.checked;
                 this.updateEditorMode();
-                console.log("editormode: " + this.m_editorMode);
+                console.log("editormode: " + this);
             }
 
             createNewElement(p_evt: Event) {
@@ -532,7 +568,7 @@ module Mareframe {
                 });
                 //Remove header row with title the "Definition"
                 newTable.splice(0, 1);
-                if (!this.columnSumsAreValid(newTable, Tools.numOfHeaderRows(elmt.getData())) && elmt.getType() == 0) {
+                if (!Tools.columnSumsAreValid(newTable, Tools.numOfHeaderRows(elmt.getData())) && elmt.getType() == 0) {
                     //Should also show which row is unvalid (maybe right after the user has changed the value)
                     alert("The values in each column must add up to 1");
                 } else {
@@ -544,19 +580,7 @@ module Mareframe {
                 console.log(elmt.getData());
             }
 
-            columnSumsAreValid(data, numOfHeaderRows) {
-                var sum = 0;
-                for (var i = 1; i < data[data.length - 1].length; i++) {
-                    for (var j = numOfHeaderRows; j < data.length; j++) {
-                        sum += parseFloat(data[j][i]);
-                    }
-                    if (sum < 0.9999 || sum > 1.0001) {
-                        return false;
-                    }
-                    sum = 0;
-                }
-                return true;
-            }
+            
 
             private updateValFnCP(p_controlPointX: number, p_controlPointY: number, p_flipped_numBool: number): void {
                 //var functionSegments = 10;
@@ -673,6 +697,8 @@ module Mareframe {
                 //console.log("mouse down at: ("+e.stageX+","+e.stageY+")");
                 this.m_oldX = p_evt.stageX;
                 this.m_oldY = p_evt.stageY;
+                this.m_originalPressX = p_evt.stageX;
+                this.m_originalPressY = p_evt.stageY;
                 //console.log("cnctool options: "+$("#cnctTool").button("option","checked"));
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
                     var cnctChkbox: HTMLInputElement = <HTMLInputElement>document.getElementById("cnctTool")
@@ -701,9 +727,17 @@ module Mareframe {
                 //console.log("press move");
 
                 if (p_evt.target.name === "hitarea") {
-                    //console.log("panning");
-                    this.m_mcaContainer.x += p_evt.stageX - this.m_oldX;
-                    this.m_mcaContainer.y += p_evt.stageY - this.m_oldY;
+                    if (p_evt.nativeEvent.ctrlKey) {
+                        console.log("orig: " + this.m_originalPressX + ", " + this.m_originalPressY + ". curr: " + p_evt.stageX + ", " + p_evt.stageY);
+                        this.setSelection(this.m_model.getEaselElementsInBox(this.m_originalPressX, this.m_originalPressY, p_evt.stageX, p_evt.stageY));
+                        this.m_selectionBox.graphics.clear().s("rgba(0,0,0,0.7)").setStrokeDash([2, 2], createjs.Ticker.getTime()).drawRect(this.m_originalPressX, this.m_originalPressY, p_evt.stageX - this.m_originalPressX, p_evt.stageY - this.m_originalPressY);
+                        this.m_mcaContainer.addChild(this.m_selectionBox)
+                    } else if (this.m_editorMode){
+
+                        //console.log("panning");
+                        this.m_mcaContainer.x += p_evt.stageX - this.m_oldX;
+                        this.m_mcaContainer.y += p_evt.stageY - this.m_oldY;
+                    }
                 } else if (p_evt.target.name.substr(0, 4) === "elmt") {
                     for (var i = 0; i < this.m_selectedItems.length; i++) {
                         var elmt = this.m_selectedItems[i];
@@ -729,6 +763,9 @@ module Mareframe {
                     this.m_updateMCAStage = false;
                     this.m_mcaStage.update();
                     this.m_valueFnStage.update();
+                    this.m_selectionBox.graphics.clear();
+
+
                 }
             }
 
@@ -838,9 +875,12 @@ module Mareframe {
                 }
             }
 
-            setSelection(p_easelElmt: createjs.Container): void {
+            setSelection(p_easelElmt: createjs.Container[]): void {
                 this.clearSelection();
-                this.addToSelection(p_easelElmt);
+                console.log(p_easelElmt);
+                for (var i = 0; i < p_easelElmt.length; i++) {
+                    this.addToSelection(p_easelElmt[i]);
+                }
             }
 
             getSelected(): any[] {
@@ -874,9 +914,10 @@ module Mareframe {
                             break;
 
                     }
-                    this.m_selectedItems = [];
-                    this.m_updateMCAStage = true;
+                    
                 }
+                this.m_selectedItems = [];
+                this.m_updateMCAStage = true;
             }
 
             

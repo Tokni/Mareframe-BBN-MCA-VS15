@@ -17,7 +17,7 @@
     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 
-    <script src="https://code.createjs.com/createjs-2014.12.12.min.js"></script>
+    <script src="https://code.createjs.com/createjs-2015.05.21.min.js"></script>
     <script src="https://www.google.com/jsapi"></script>
     <script>
         google.load("visualization", "1.0", { "packages": ["corechart","table"] });
@@ -53,21 +53,24 @@
 			 </div>
 		</div>
 		</div>
-		<input class="advbutton" type="checkbox" id="editorMode" onClick="h.gui.setEditorMode(this);">
-		<label for="editorMode">Editor Mode</label>
-		<button class="advButton" id="reset" onclick="h.reset()">Reset</button>
-		<button class="advButton" id="update" onclick="h.getActiveModel().update()">Update</button>
+		
     <div class="ui-widget ui-dialog ui-corner-all ui-widget-content header-bar" style="position: static">
         <div class="ui-widget-header ui-corner-all ui-dialog-titlebar" id="modelHeader">Model</div>
 
  
         <div style="padding: 1em 1em 0.5em 1.4em; font-size: 0.7em">
-            <button class="advButton" id="newDcmt" onclick="h.addNewModel()">New Document</button>
-            <button class="advButton" id="lodDcmt" onclick="h.fileHandler.QuickLoad();">Open Document</button>
-            <button class="advButton" id="savDcmt" onclick="h.fileHandler.QuickSave();">Save Document</button>
-            <button class="advbutton" id="newElmt" onclick="h.gui.addElementToStage();">New Element</button>
-            <button class="advbutton" id="delete">Delete Element</button>
-            <input class="advbutton" type="checkbox" id="cnctTool"><label for="cnctTool">Connect Tool</label>
+            <button class="advButton" id="newDcmt">New Document</button>
+            <button class="advButton" id="lodDcmt">Open Document</button>
+            <button class="advButton" id="savDcmt">Save Document</button>
+            <button class="advButton" id="resetDcmt">Reset</button>
+            <button class="advButton" id="newElmt">New Element</button>
+            <button class="advButton" id="deleteElmt">Delete Element</button>
+            <input class="advButton" type="checkbox" id="cnctTool"><label for="cnctTool" class="advButton">Connect Tool</label>
+            <div style="float:right">
+                <input class="button" type="checkbox" id="editorMode">
+                <label for="editorMode" class="button">Editor Mode</label>
+                <button class="button" id="updateMdl">Update</button>
+            </div>
         </div>
     </div>
     <div id="MCAContainer" style="text-align:center">
@@ -86,8 +89,8 @@
     	<div class="editable ">
            <div id="defTable_div"></div> 		
     	</div>
-        <button class="dialogButton" id="submit" onclick="h.gui.saveDefTable()">Submit changes</button>
-        <button class="dialogButton" id="values" onclick="h.gui.showValues();">Show values</button>
+        <button class="dialogButton" id="submit">Submit changes</button>
+        <button class="dialogButton" id="values">Show values</button>
         <div id="valuesTable_div"></div>
     </div>
     <script>
@@ -96,9 +99,11 @@
         $("#lodDcmt").button({ icons: { primary: "ui-icon-folder-open" } });
         $("#savDcmt").button({ icons: { primary: "ui-icon-disk" } });
         $("#newElmt").button({ icons: { primary: "ui-icon-plus" } });
-        $("#delete").button({ icons: { primary: "ui-icon-trash" } });
+        $("#deleteElmt").button({ icons: { primary: "ui-icon-trash" } });
         $("#cnctTool").button({ icons: { primary: "ui-icon-link" } });
-        $(".header-bar").hide();
+        $("#editorMode").button({ icons: { primary: "ui-icon-link" } });
+        $("#updateMdl").button({ icons: { primary: "ui-icon-refresh" } });
+        $("#resetDcmt").button({ icons: { primary: "ui-icon-arrowreturnthick-1-w" } })
         $("#detailsDialog").dialog({
             autoOpen: false,
             resizable: true,
@@ -131,9 +136,7 @@
 
 		    new Mareframe.DST.Handler();
 
-		    $("#button").bind("click", function (e) {
-
-		    });
+		    
 		});
     
     </script>

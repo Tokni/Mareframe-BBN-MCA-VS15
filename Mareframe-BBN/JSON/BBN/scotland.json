@@ -19,7 +19,8 @@
          { "connInput": "elmtChance3", "connOutput": "elmtChance2", "connID": "conn4" },
          { "connInput": "elmtDec2", "connOutput": "elmtValue1", "connID": "conn5" }
     ],
-    "mdlName": "The West Coast of Scotland",
+  "mdlName": "The West Coast of Scotland",
+  "mdlIdent": "scotland",
     "mdlDesc": "",
     "dataMat": [
         

@@ -2,16 +2,26 @@
 module Mareframe {
     export module DST {
         export class FileIO {
+
+            private m_handler: Handler;
             private m_lastPath: string = "";
-            saveModel(p_model):void {
+
+            constructor(p_handler: Handler) {
+                this.m_handler = p_handler;
+
+                this.quickLoad = this.quickLoad.bind(this);
+            }
+            saveModel(p_model: Model): void {
 
             }
-            quickSave(p_model): void {
+            quickSave(p_model: Model): void {
                 var json: string = JSON.stringify(p_model);
-                localStorage.setItem("temp", json);
+                localStorage.setItem(p_model.getIdent(), json);
             }
             quickLoad(): any {
-                var jsonMdl: any = JSON.parse(localStorage.getItem("temp"));
+
+                var modelIdent: string = this.m_handler.m_activeModel.getIdent();
+                var jsonMdl: any = JSON.parse(localStorage.getItem(modelIdent));
                 if (jsonMdl) {
                     return jsonMdl;
                 }
@@ -54,7 +64,6 @@ module Mareframe {
                 }
                 console.log("resulting path is: " + path);
                 jQuery.getJSON(path, function (data) {
-
                     p_activeModelInstance.fromJSON(data);
                     p_updateGui();
                 });

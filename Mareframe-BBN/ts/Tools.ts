@@ -66,6 +66,20 @@
                 }
             }//borrowed code
 
+            static columnSumsAreValid(data, numOfHeaderRows) {
+                var sum = 0;
+                for (var i = 1; i < data[data.length - 1].length; i++) {
+                    for (var j = numOfHeaderRows; j < data.length; j++) {
+                        sum += parseFloat(data[j][i]);
+                    }
+                    if (sum < 0.9999 || sum > 1.0001) {
+                        return false;
+                    }
+                    sum = 0;
+                }
+                return true;
+            }
+
             static getWeights(p_elmt: Element, p_model: Model): number[][]{
                 var weightsArr: number[][]=[];
 
