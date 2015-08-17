@@ -332,13 +332,13 @@
                             if (!elmt.isUpdated()) {
                                 elmt.update();
                             }
-                            var parentValuesMatrix = this.getMatrixWithoutHeader(elmt.getValues());
+                            var parentValuesMatrix = Tools.getMatrixWithoutHeader(elmt.getValues());
                             //For each submatrix calculate new values
-                            var result = this.makeSureItsAnArray([math.multiply(submatrices[0], parentValuesMatrix)]);
+                            var result = Tools.makeSureItsAnArray([math.multiply(submatrices[0], parentValuesMatrix)]);
                             for (var i = 1; i < submatrices.length; i++) {
-                                result.push(this.makeSureItsAnArray(math.multiply(submatrices[i], parentValuesMatrix)));
+                                result.push(Tools.makeSureItsAnArray(math.multiply(submatrices[i], parentValuesMatrix)));
                             }
-                            newValues = this.concatMatrices(result);
+                            newValues = Tools.concatMatrices(result);
                         } else if (elmt.getType() === 1) {//If Parent is a decision
                             headerRows = Tools.addNewHeaderRow(elmt.getMainValues(), headerRows, element.getData());
                         }

@@ -59,7 +59,7 @@
 
             copyDefArray(): any[] {
                 var valueArray = [];
-
+                console.log(this);
                 for (var i = 0; i < this.m_data.length; i++) {
                     valueArray[i] = [];
                     for (var j = 0; j < this.m_data[0].length; j++) {
@@ -110,10 +110,11 @@
             
 
 	        //returns the different variables (conditions or choices) that belong to the element
-            getMainValues():any[] {
+            getMainValues(): any[]{
+                console.log(this.m_data);
                 var row = [];
-                var data = this.getData();
-                row.push(this.getName());
+                var data = this.m_data;
+                row.push(this.m_name);
                 for (var i = 0; i < data.length; i++) {
                     // console.log("i: " + i);
                     // console.log("check data: " + data[i][1]);
@@ -225,15 +226,16 @@
             }
 
             fromJSON(p_jsonElmt: any): void {
+                console.log("element.fromJSON()");
+                console.log(p_jsonElmt);
                 this.m_easelElmt.x = p_jsonElmt.posX;
                 this.m_easelElmt.y = p_jsonElmt.posY;
-                this.setID(p_jsonElmt.elmtID);
-                this.setName(p_jsonElmt.elmtName);
-                this.setName(p_jsonElmt.elmtName);
-                this.setDescription(p_jsonElmt.elmtDesc);
-                this.setType(p_jsonElmt.elmtType);
-                this.setData(p_jsonElmt.elmtData);
-                this.setMethod(p_jsonElmt.elmtWghtMthd);
+                this.m_id = p_jsonElmt.elmtID;
+                this.m_name = p_jsonElmt.elmtName;
+                this.m_description = p_jsonElmt.elmtDesc;
+                this.m_type = p_jsonElmt.elmtType;
+                this.m_data = p_jsonElmt.elmtData;
+                this.m_weightingMethod = p_jsonElmt.elmtWghtMthd;
             }
         }
     }

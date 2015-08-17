@@ -120,6 +120,7 @@ module Mareframe {
             }
 
             importStage(): void {
+                console.log("importing stage");
                 this.m_mcaContainer.removeAllChildren();
                 console.log(this);
                 var elmts = this.m_model.getElementArr();
@@ -133,7 +134,8 @@ module Mareframe {
                     this.addConnectionToStage(conns[i]);
                 }
                 this.updateTable(this.m_model.getDataMatrix());
-                this.updateFinalScores();
+                if (!this.m_model.m_bbnMode)
+                    this.updateFinalScores();
 
                 this.m_updateMCAStage = true
 

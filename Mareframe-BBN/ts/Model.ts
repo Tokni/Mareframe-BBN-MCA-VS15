@@ -14,7 +14,8 @@
                 this.m_bbnMode = p_bbnMode;
                 this.createNewElement = this.createNewElement.bind(this);
                 this.deleteElement = this.deleteElement.bind(this);
-
+                console.log("model loaded")
+                console.log(this);
 
             };
 
@@ -180,7 +181,7 @@
                 return this.m_elementArr[this.getObjectIndex(p_elmtStringId)];
             }
             private getObjectIndex(p_objectStringId: string): number {
-                
+                console.log(p_objectStringId);
                 var key = 0;
                 if (p_objectStringId.substr(0, 4) === "elmt") {
                     this.m_elementArr.every(function (p_elmt) {
@@ -255,7 +256,7 @@
                 console.log(p_jsonObject);
                 this.m_modelName = p_jsonObject.mdlName;
 
-
+                this.m_dataMatrix = p_jsonObject.dataMat;
 
 
                 var maxX = 0;
@@ -270,8 +271,7 @@
                     //if (JsonElmt.posY > maxY)
                     //    maxY = JsonElmt.posY;
                     elmt.fromJSON(JsonElmt);
-                    if (this.m_bbnMode)
-                        elmt.update();
+                    
 
                 }
 
@@ -284,14 +284,18 @@
                     c.fromJSON(conn);
                     this.addConnection(c);
                 }
-                this.m_mainObjective = this.getElement(p_jsonObject.mainObj);
+                if (!this.m_bbnMode)
+                    this.m_mainObjective = this.getElement(p_jsonObject.mainObj);
 
-                
-
+                for (var i = 0; i < p_jsonObject.elements.length; i++) {
+                    if (this.m_bbnMode)
+                        elmt.update();
+                }
                 //h.gui.setSize(maxX + 80, maxY + 20);
 
-                this.m_dataMatrix = p_jsonObject.dataMat;
                 //h.gui.updateTable(this.dataMatrix);
+                console.log("model.fromJSON()");
+                console.log(this);
             }
 
             createNewConnection(p_inputElmt: Element, p_outputElmt: Element): Connection {

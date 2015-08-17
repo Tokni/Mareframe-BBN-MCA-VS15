@@ -26,39 +26,39 @@ module Mareframe {
                     path += "BBN/";
                 } else {
                     path += "MCA/";
-                    switch (p_modelStringIdent) {
-                        case "baltic":
-                            path += "baltic.json";
-                            break;
-                        case "blackSea":
-                            path += "blackSea.json";
-                            break;
-                        case "cadiz":
-                            path += "cadiz.json";
-                            break;
-                        case "iceland":
-                            path += "iceland.json";
-                            break;
-                        case "northSea":
-                            path += "northSea.json";
-                            break;
-                        case "scotland":
-                            path += "scotland.json";
-                            //path = "../JSON/scotland.json";
-                            break;
-                        case "sicily":
-                            path += "sicily.json";
-                            break;
-                        default:
-                            break;
-                    }
-                    console.log("resulting path is: " + path);
-                    jQuery.getJSON(path, function (data) {
-
-                        p_activeModelInstance.fromJSON(data);
-                        p_updateGui();
-                    });
                 }
+                switch (p_modelStringIdent) {
+                    case "baltic":
+                        path += "baltic.json";
+                        break;
+                    case "blackSea":
+                        path += "blackSea.json";
+                        break;
+                    case "cadiz":
+                        path += "cadiz.json";
+                        break;
+                    case "iceland":
+                        path += "iceland.json";
+                        break;
+                    case "northSea":
+                        path += "northSea.json";
+                        break;
+                    case "scotland":
+                        path += "scotland.json";
+                        break;
+                    case "sicily":
+                        path += "sicily.json";
+                        break;
+                    default:
+                        break;
+                }
+                console.log("resulting path is: " + path);
+                jQuery.getJSON(path, function (data) {
+
+                    p_activeModelInstance.fromJSON(data);
+                    p_updateGui();
+                });
+
             }
         }
     }
