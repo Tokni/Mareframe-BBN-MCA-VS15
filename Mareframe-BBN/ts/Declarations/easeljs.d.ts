@@ -331,6 +331,7 @@ declare module createjs {
         drawRoundRectComplex(x: number, y: number, w: number, h: number, radiusTL: number, radiusTR: number, radiusBR: number, radisBL: number): Graphics;
         endFill(): Graphics;
         endStroke(): Graphics;
+        setStrokeDash(array: number[],offset:number): Graphics;
         static getHSL(hue: number, saturation: number, lightness: number, alpha?: number): string;
         /**
          * @deprecated - use the instructions property instead

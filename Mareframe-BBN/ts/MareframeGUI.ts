@@ -75,9 +75,6 @@ module Mareframe {
                 this.quickLoad = this.quickLoad.bind(this);
                 this.updateModel = this.updateModel.bind(this);
                 this.mouseUp = this.mouseUp.bind(this);
-                this.selectAll = this.selectAll.bind(this);
-                window.addEventListener("keydown",this.selectAll);
-
 
 
 
@@ -123,15 +120,7 @@ module Mareframe {
 
 
             }
-
-            selectAll(p_evt: KeyboardEvent) {
-                console.log(p_evt);
-                if (p_evt.charCode == 97 && p_evt.ctrlKey) {
-                    for (var i = 0; i < this.m_model.getElementArr().length; i++) {
-                        this.addToSelection(this.m_model.getElementArr()[i].m_easelElmt);
-                    }
-                }
-            }
+            
 
             
 

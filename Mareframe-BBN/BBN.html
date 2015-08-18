@@ -10,13 +10,12 @@
 	<link href="css/body.css" rel="stylesheet">
 	<link href="css/footer.css" rel="stylesheet">
 	<link href="css/dialog.css" rel="stylesheet">
-        
+
     <link href="jQueryUI/jquery-ui.css" rel="stylesheet">
 </head>
 <body>
     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-
     <script src="https://code.createjs.com/createjs-2015.05.21.min.js"></script>
     <script src="https://www.google.com/jsapi"></script>
     <script>
@@ -65,6 +64,7 @@
             <button class="advButton" id="resetDcmt">Reset</button>
             <button class="advButton" id="newElmt">New Element</button>
             <button class="advButton" id="deleteElmt">Delete Element</button>
+            <button class="advButton" id="selectAllElmt">Select All</button>
             <input class="advButton" type="checkbox" id="cnctTool"><label for="cnctTool" class="advButton">Connect Tool</label>
             <div style="float:right">
                 <input class="button" type="checkbox" id="editorMode">
@@ -104,6 +104,7 @@
         $("#editorMode").button({ icons: { primary: "ui-icon-link" } });
         $("#updateMdl").button({ icons: { primary: "ui-icon-refresh" } });
         $("#resetDcmt").button({ icons: { primary: "ui-icon-arrowreturnthick-1-w" } })
+        $("#selectAllElmt").button({ icons: { primary: "ui-icon-star" } });
         $("#detailsDialog").dialog({
             autoOpen: false,
             resizable: true,
