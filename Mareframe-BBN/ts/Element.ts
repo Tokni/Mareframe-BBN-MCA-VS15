@@ -205,6 +205,7 @@
                     return false;
                 else {
                     this.m_connections.splice(key, 1);
+                    this.m_model.deleteConnection(p_connID);
                     return true;
                 }
             }

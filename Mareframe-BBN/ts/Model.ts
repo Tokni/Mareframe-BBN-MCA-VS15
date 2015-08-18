@@ -236,7 +236,40 @@
             getElementArr(): Element[] {
                 return this.m_elementArr;
             }
-            deleteElement(p_elementStringId): void {
+            deleteElement(p_elementStringId:string): boolean {
+                var key = 0;
+                this.m_elementArr.every(function (p_elmt: Element) {
+                    if (p_elmt.getID() === p_elementStringId)
+                        return false;
+                    else {
+                        key++
+                        return true;
+                    }
+                });
+                if (key >= this.m_elementArr.length)
+                    return false;
+                else {
+                    this.m_elementArr.splice(key, 1);
+                    return true;
+                }
+            }
+
+            deleteConnection(p_connID: string): boolean {
+                var key = 0;
+                this.m_connectionArr.every(function (p_conn: Connection) {
+                    if (p_conn.getID() === p_connID)
+                        return false;
+                    else {
+                        key++
+                        return true;
+                    }
+                });
+                if (key >= this.m_connectionArr.length)
+                    return false;
+                else {
+                    this.m_connectionArr.splice(key, 1);
+                    return true;
+                }
             }
             setName(name: string): void {
                 this.m_modelName = name;

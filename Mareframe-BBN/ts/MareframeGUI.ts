@@ -25,7 +25,7 @@ module Mareframe {
             private m_oldY: number = 0;
             private m_originalPressX: number = 0;
             private m_originalPressY: number = 0;
-            private m_selectedItems: any[] = [];
+            private m_selectedItems: createjs.Container[] = [];
             private m_finalScoreChart: google.visualization.ColumnChart = new google.visualization.ColumnChart($("#finalScore_div").get(0));
             private m_finalScoreChartOptions: Object = {
                 width: 1024,
@@ -40,6 +40,7 @@ module Mareframe {
             };
             private m_elementColors: string[][] = [["#efefff", "#15729b", "#dfdfff"], ["#ffefef", "#c42f33", "#ffdfdf"], ["#fff6e0", "#f6a604", "#fef4c6"], ["#efffef", "#2fc433", "#dfffdf"]];
             private m_model: Model;
+            private m_trashBin: Element[] = [];
 
 
             constructor(p_model: Model, p_handler: Handler) {
@@ -71,10 +72,11 @@ module Mareframe {
                 this.connectTo = this.connectTo.bind(this);
                 this.updateConnection = this.updateConnection.bind(this);
                 this.createNewElement = this.createNewElement.bind(this);
-                this.deleteElement = this.deleteElement.bind(this);
+                this.deleteSelected = this.deleteSelected.bind(this);
                 this.quickLoad = this.quickLoad.bind(this);
                 this.updateModel = this.updateModel.bind(this);
                 this.mouseUp = this.mouseUp.bind(this);
+                this.selectAll = this.selectAll.bind(this);
 
 
 
@@ -93,10 +95,11 @@ module Mareframe {
                 $("#valueFn_Linear").on("click", this.linearizeValFn);
                 $("#valueFn_Flip").on("click", this.flipValFn);
                 $("#newElmt").on("click", this.createNewElement);
-                $("#delete").on("click", this.deleteElement);
+                $("#deleteElmt").on("click", this.deleteSelected);
                 $("#editorMode").on("click", this.setEditorMode);
                 $("#resetDcmt").on("click", this.quickLoad);
                 $("#updateMdl").on("click", this.updateModel);
+                $("#selectAllElmt").on("click", this.selectAll);
 
                 this.m_mcaBackground.addEventListener("pressup", this.mouseUp);
 
@@ -120,20 +123,26 @@ module Mareframe {
 
 
             }
+
+            private selectAll(p_evt: Event) {
+                for (var i = 0; i < this.m_model.getElementArr().length; i++) {
+                    this.addToSelection(this.m_model.getElementArr()[i].m_easelElmt);
+                }
+            }
             
 
             
 
-            updateModel() {
+            private updateModel() {
                 this.m_model.update();
             }
 
-            setSize(p_width: number, p_height: number): void {
+            private setSize(p_width: number, p_height: number): void {
                 this.m_mcaStageCanvas.height = p_height;
                 this.m_mcaStageCanvas.width = p_width;
             }
 
-            quickLoad() {
+            private quickLoad() {
                 this.m_model.fromJSON(this.m_handler.getFileIO().quickLoad());
                 this.importStage();
             }
@@ -166,7 +175,7 @@ module Mareframe {
                 this.m_updateMCAStage = true;
             }
 
-            updateElement(p_elmt: Element) {
+            private updateElement(p_elmt: Element) {
                 p_elmt.m_easelElmt.removeAllChildren();
 
                 var shape = new createjs.Shape();
@@ -204,7 +213,7 @@ module Mareframe {
                 p_elmt.m_easelElmt.addChild(label);
             }
 
-            updateEditorMode() {
+            private updateEditorMode() {
                 if (this.m_editorMode) {
                     $(".advButton").show();
                     $("#reset").show();
@@ -226,22 +235,63 @@ module Mareframe {
             }
 
 
-            setEditorMode = function (cb) {
+            private setEditorMode = function (cb) {
                 console.log(cb);
                 this.m_editorMode = cb.currentTarget.checked;
                 this.updateEditorMode();
                 console.log("editormode: " + this);
             }
 
-            createNewElement(p_evt: Event) {
+            private createNewElement(p_evt: Event) {
                 var elmt = this.m_model.createNewElement()
                 this.addElementToStage(elmt);
             }
 
-            deleteElement(p_evt: Event) {
+            private deleteSelected(p_evt: Event) {
+                
+                console.log("deleting");
+                for (var i = 0; i < this.m_selectedItems.length; i++) {
+                    var elmt: Element = this.m_model.getElement(this.m_selectedItems[i].name);
+
+                    if (this.addToTrash(elmt)) {
+                        console.log(this.m_trashBin);
+                        for (var j = 0; j < elmt.getConnections().length; j++) {
+                            var conn: Connection = elmt.getConnections()[j];
+                            if (conn.getOutputElement().getID() === elmt.getID()) {
+                                conn.getInputElement().deleteConnection(conn.getID());
+                            } else {
+                                conn.getOutputElement().deleteConnection(conn.getID());
+                            }
+
+                        }
+                    }
+                }
+                this.clearSelection();
+                for (var i = 0; i < this.m_trashBin.length; i++) {
+                    this.m_model.deleteElement(this.m_trashBin[i].getID());
+                }
+
+                this.importStage();
+
+
+                console.log(this.m_model.getConnectionArr());
             }
 
-            addElementToStage(p_elmt: Element) {
+            private addToTrash(p_obj: any): boolean {
+                console.log(this.m_trashBin.indexOf(p_obj));
+                if (this.m_trashBin.indexOf(p_obj) === -1) {
+                    this.m_trashBin.push(p_obj);
+                    return true;
+
+                } else {
+                    return false;
+                }
+
+                
+
+            }
+
+            private addElementToStage(p_elmt: Element) {
                 this.updateElement(p_elmt);
 
 
@@ -277,7 +327,7 @@ module Mareframe {
                 }
             }
 
-            populateElmtDetails(p_elmt: Element): void {
+            private populateElmtDetails(p_elmt: Element): void {
 
                 console.log(p_elmt)
                 //set dialog title
@@ -464,7 +514,7 @@ module Mareframe {
                 }
             };
 
-            addEditFunction() {
+            private addEditFunction() {
 
                 $(function () {
                     $("td").dblclick(function () {
@@ -525,14 +575,14 @@ module Mareframe {
 
             };
 
-            showValues() {
+            private showValues() {
                 var elmt: Element = $("#detailsDialog").data("element");
                 $("#valuesTable_div").html(Tools.htmlTableFromArray("Values", elmt.getData()));
                 $("#valuesTable_div").show();
                 $("#values").prop("disabled", true);
             }
 
-            saveDefTable() {
+            private saveDefTable() {
                 var elmt: Element = $("#detailsDialog").data("element");
                 var table = $("#defTable_div");
                 var newTable = [];
@@ -619,13 +669,13 @@ module Mareframe {
             }
 
 
-            linearizeValFn(): void {
+            private linearizeValFn(): void {
 
                 this.moveValFnCP(<createjs.MouseEvent>{ stageX: 50, stageY: 50, target: { name: $("#valueFn_Linear").data("name") } });
 
             }
 
-            flipValFn(): void {
+            private flipValFn(): void {
 
 
                 var elmt = this.m_model.getElement($("#valueFn_Flip").data("name"));
@@ -644,14 +694,14 @@ module Mareframe {
 
 
 
-            updateFinalScores(): void {
+            private updateFinalScores(): void {
                 var data = google.visualization.arrayToDataTable(this.m_model.getFinalScore());
                 data.removeRow(data.getNumberOfRows() - 1);
                 this.m_finalScoreChart.draw(data, this.m_finalScoreChartOptions);
             }
 
 
-            updateTable(p_matrix: any[][]): void {
+            private updateTable(p_matrix: any[][]): void {
                 var tableHTML = "";
 
                 var topRow = true;
@@ -703,7 +753,7 @@ module Mareframe {
                 }
             }
 
-            select(p_evt: createjs.MouseEvent): void {
+            private select(p_evt: createjs.MouseEvent): void {
                 //console.log("ctrl key: " + e.nativeEvent.ctrlKey);
                 if (!p_evt.nativeEvent.ctrlKey && this.m_selectedItems.indexOf(p_evt.target) === -1) {
                     this.clearSelection();
@@ -758,13 +808,13 @@ module Mareframe {
                 }
             }
 
-            clear(): void {
+            private clear(): void {
                 this.m_mcaContainer.removeAllChildren();
                 this.m_updateMCAStage = true;
             }
 
 
-            connectTo(p_evt: createjs.MouseEvent): void {
+            private connectTo(p_evt: createjs.MouseEvent): void {
                 var elmtIdent = p_evt.target.name;
                 var connected = false;
                 //console.log("attempting connection "+elmtIdent);
@@ -789,7 +839,7 @@ module Mareframe {
                 //this.select(elmtIdent);
             }
 
-            addConnectionToStage(p_connection: Connection): void {
+            private addConnectionToStage(p_connection: Connection): void {
                 var line = new createjs.Graphics().beginStroke(p_connection.getColor()).mt(p_connection.getInputElement().m_easelElmt.x, p_connection.getInputElement().m_easelElmt.y).lt(p_connection.getOutputElement().m_easelElmt.x, p_connection.getOutputElement().m_easelElmt.y);
                 var conn = new createjs.Shape(line);
                 var arrow = new createjs.Graphics().beginFill(p_connection.getColor()).mt(-5, 0).lt(5, 5).lt(5, -5).cp();
@@ -817,7 +867,7 @@ module Mareframe {
 
             }
 
-            updateConnection(p_connection: Connection): void {
+            private updateConnection(p_connection: Connection): void {
                 //stage.removeChild(c.easelElmt);
                 var temp: createjs.Shape = <createjs.Shape>p_connection.m_easelElmt.getChildAt(1);
                 temp.graphics.clear().beginStroke(p_connection.getColor()).mt(p_connection.getInputElement().m_easelElmt.x, p_connection.getInputElement().m_easelElmt.y).lt(p_connection.getOutputElement().m_easelElmt.x, p_connection.getOutputElement().m_easelElmt.y);
@@ -832,7 +882,7 @@ module Mareframe {
             }
 
 
-            addToSelection(p_easelElmt: createjs.Container): void {
+            private addToSelection(p_easelElmt: createjs.Container): void {
                 if (this.m_selectedItems.indexOf(p_easelElmt) === -1 && p_easelElmt.name.substr(0, 4) === "elmt") {
                     this.m_selectedItems.push(p_easelElmt);
                     var elmtType = this.m_model.getElement(p_easelElmt.name).getType();
@@ -864,7 +914,7 @@ module Mareframe {
                 }
             }
 
-            setSelection(p_easelElmt: createjs.Container[]): void {
+            private setSelection(p_easelElmt: createjs.Container[]): void {
                 this.clearSelection();
                 console.log(p_easelElmt);
                 for (var i = 0; i < p_easelElmt.length; i++) {
@@ -876,11 +926,11 @@ module Mareframe {
                 return this.m_selectedItems;
             }
 
-            clearSelection(): void {
+            private clearSelection(): void {
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
                     var easelElmt = this.m_selectedItems[i];
                     var elmtType = this.m_model.getElement(easelElmt.name).getType();
-                    var shape = easelElmt.getChildAt(0);
+                    var shape: any = easelElmt.getChildAt(0);
                     shape.graphics.clear().f(this.m_elementColors[elmtType][0]).s(this.m_elementColors[elmtType][1]);
 
                     var elmtShapeType: number = 2;
