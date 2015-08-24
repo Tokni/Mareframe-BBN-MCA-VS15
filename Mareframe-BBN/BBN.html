@@ -81,6 +81,7 @@
 
         <div id="finalScore_div" style="display:inline-block"></div>
     </div>
+    <div id="saveFile_div"><a id="downloadLink"></a></div>
 
 
     <!--Popup Dialog-->
@@ -127,7 +128,8 @@
         
         });
         $("#description_div").hide();
-		$("#valuesTable_div").hide();
+        $("#valuesTable_div").hide();
+        $("#saveFile_div").hide();
 		$(document).ready(function () {
 		    var MareFrame = MareFrame || {};
 		    MareFrame.DST = MareFrame.DST || {};

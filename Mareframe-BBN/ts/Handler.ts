@@ -1,13 +1,15 @@
 ﻿/// <reference path = "Declarations/math.min.d.ts"/>
 /// <reference path = "Declarations/easeljs.d.ts" />
 /// <reference path = "Declarations/createjs-lib.d.ts" />
+/// <reference path="declarations/jquery.d.ts"/>
+
 
 
 module Mareframe {
     export module DST {
         export class Handler {
             private m_modelArr: Model[]=[];
-            public m_activeModel: Model;
+            private m_activeModel: Model;
             private m_fileHandler: FileIO;
             private m_gui: GUIHandler;
             constructor() {
@@ -49,6 +51,9 @@ module Mareframe {
             }
             setActiveModel(p_mdl: Model): void {
                 this.m_activeModel = p_mdl;
+            }
+            getActiveModel(): Model {
+                return this.m_activeModel;
             }
         }
     }

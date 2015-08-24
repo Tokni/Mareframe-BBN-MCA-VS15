@@ -77,6 +77,7 @@ module Mareframe {
                 this.updateModel = this.updateModel.bind(this);
                 this.mouseUp = this.mouseUp.bind(this);
                 this.selectAll = this.selectAll.bind(this);
+                this.saveModel = this.saveModel.bind(this);
 
 
 
@@ -100,7 +101,10 @@ module Mareframe {
                 $("#resetDcmt").on("click", this.quickLoad);
                 $("#updateMdl").on("click", this.updateModel);
                 $("#selectAllElmt").on("click", this.selectAll);
-
+                $("#savDcmt").on("click", this.saveModel);
+                $("#downloadLink").on("click", function (evt) {
+                    $("#saveFile_div").hide();
+                });
                 this.m_mcaBackground.addEventListener("pressup", this.mouseUp);
 
                 
@@ -124,6 +128,12 @@ module Mareframe {
 
             }
 
+            private saveModel(p_evt: Event) {
+                $("#saveFile_div").show();
+                this.m_handler.getFileIO().saveModel(this.m_model);
+                
+            }
+
             private selectAll(p_evt: Event) {
                 for (var i = 0; i < this.m_model.getElementArr().length; i++) {
                     this.addToSelection(this.m_model.getElementArr()[i].m_easelElmt);
@@ -143,7 +153,7 @@ module Mareframe {
             }
 
             private quickLoad() {
-                this.m_model.fromJSON(this.m_handler.getFileIO().quickLoad());
+                this.m_model.fromJSON(this.m_handler.getFileIO().reset());
                 this.importStage();
             }
 

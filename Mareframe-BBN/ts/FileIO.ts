@@ -1,5 +1,4 @@
-﻿/// <reference path="declarations\jquery.d.ts"/>
-module Mareframe {
+﻿module Mareframe {
     export module DST {
         export class FileIO {
 
@@ -9,30 +8,31 @@ module Mareframe {
             constructor(p_handler: Handler) {
                 this.m_handler = p_handler;
 
-                this.quickLoad = this.quickLoad.bind(this);
+                this.reset = this.reset.bind(this);
             }
             saveModel(p_model: Model): void {
-
+                console.log("generating download link");
                 // encode the data into base64
-                var base64: string = window.btoa(p_model.saveModel());
+                var datastream = p_model.saveModel();
+                var base64: string = window.btoa(datastream);
                 
 
                 // create an a tag
-                var a = document.createElement('a');
-                a.href = 'data:application/octet-stream;base64,' + base64;
-                a.innerHTML = 'Download';
+                var a: HTMLAnchorElement = <HTMLAnchorElement> $("#downloadLink").get(0);
 
-                // add to the body
-                document.body.appendChild(a);
+                a.href = 'data:application/octet-stream;base64,' + base64;
+                a.download = "test.xdsl";
+                a.innerHTML = 'Download';
+                
 
             }
             quickSave(p_model: Model): void {
                 var json: string = JSON.stringify(p_model);
                 localStorage.setItem(p_model.getIdent(), json);
             }
-            quickLoad(): any {
+            reset(): any {
 
-                var modelIdent: string = this.m_handler.m_activeModel.getIdent();
+                var modelIdent: string = this.m_handler.getActiveModel().getIdent();
                 var jsonMdl: any = JSON.parse(localStorage.getItem(modelIdent));
                 if (jsonMdl) {
                     return jsonMdl;
@@ -41,6 +41,7 @@ module Mareframe {
                     return null;
                 }
             }
+            
             loadModel(p_modelStringIdent: string, p_activeModelInstance: Model, p_updateGui: Function): any {
                 console.log("attempting to load " + p_modelStringIdent);
                 var path: string = "JSON/";

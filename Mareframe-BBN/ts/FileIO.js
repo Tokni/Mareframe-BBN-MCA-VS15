@@ -1,4 +1,3 @@
-/// <reference path="declarations\jquery.d.ts"/>
 var Mareframe;
 (function (Mareframe) {
     var DST;
@@ -7,24 +6,25 @@ var Mareframe;
             function FileIO(p_handler) {
                 this.m_lastPath = "";
                 this.m_handler = p_handler;
-                this.quickLoad = this.quickLoad.bind(this);
+                this.reset = this.reset.bind(this);
             }
             FileIO.prototype.saveModel = function (p_model) {
+                console.log("generating download link");
                 // encode the data into base64
-                var base64 = window.btoa(p_model.saveModel());
+                var datastream = p_model.saveModel();
+                var base64 = window.btoa(datastream);
                 // create an a tag
-                var a = document.createElement('a');
+                var a = $("#downloadLink").get(0);
                 a.href = 'data:application/octet-stream;base64,' + base64;
+                a.download = "test.xdsl";
                 a.innerHTML = 'Download';
-                // add to the body
-                document.body.appendChild(a);
             };
             FileIO.prototype.quickSave = function (p_model) {
                 var json = JSON.stringify(p_model);
                 localStorage.setItem(p_model.getIdent(), json);
             };
-            FileIO.prototype.quickLoad = function () {
-                var modelIdent = this.m_handler.m_activeModel.getIdent();
+            FileIO.prototype.reset = function () {
+                var modelIdent = this.m_handler.getActiveModel().getIdent();
                 var jsonMdl = JSON.parse(localStorage.getItem(modelIdent));
                 if (jsonMdl) {
                     return jsonMdl;

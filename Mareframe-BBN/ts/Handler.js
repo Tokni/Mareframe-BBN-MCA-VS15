@@ -1,6 +1,7 @@
 /// <reference path = "Declarations/math.min.d.ts"/>
 /// <reference path = "Declarations/easeljs.d.ts" />
 /// <reference path = "Declarations/createjs-lib.d.ts" />
+/// <reference path="declarations/jquery.d.ts"/>
 var Mareframe;
 (function (Mareframe) {
     var DST;
@@ -40,6 +41,9 @@ var Mareframe;
             };
             Handler.prototype.setActiveModel = function (p_mdl) {
                 this.m_activeModel = p_mdl;
+            };
+            Handler.prototype.getActiveModel = function () {
+                return this.m_activeModel;
             };
             return Handler;
         })();

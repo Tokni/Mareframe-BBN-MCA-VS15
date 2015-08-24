@@ -74,6 +74,7 @@ var Mareframe;
                 this.updateModel = this.updateModel.bind(this);
                 this.mouseUp = this.mouseUp.bind(this);
                 this.selectAll = this.selectAll.bind(this);
+                this.saveModel = this.saveModel.bind(this);
                 this.m_model = p_model;
                 this.m_mcaBackground.name = "hitarea";
                 this.updateEditorMode();
@@ -91,6 +92,10 @@ var Mareframe;
                 $("#resetDcmt").on("click", this.quickLoad);
                 $("#updateMdl").on("click", this.updateModel);
                 $("#selectAllElmt").on("click", this.selectAll);
+                $("#savDcmt").on("click", this.saveModel);
+                $("#downloadLink").on("click", function (evt) {
+                    $("#saveFile_div").hide();
+                });
                 this.m_mcaBackground.addEventListener("pressup", this.mouseUp);
                 this.m_mcaStage.addChild(this.m_mcaBackground);
                 this.m_mcaStage.addChild(this.m_mcaContainer);
@@ -101,6 +106,10 @@ var Mareframe;
                 createjs.Ticker.addEventListener("tick", this.tick);
                 createjs.Ticker.setFPS(60);
             }
+            GUIHandler.prototype.saveModel = function (p_evt) {
+                $("#saveFile_div").show();
+                this.m_handler.getFileIO().saveModel(this.m_model);
+            };
             GUIHandler.prototype.selectAll = function (p_evt) {
                 for (var i = 0; i < this.m_model.getElementArr().length; i++) {
                     this.addToSelection(this.m_model.getElementArr()[i].m_easelElmt);
@@ -114,7 +123,7 @@ var Mareframe;
                 this.m_mcaStageCanvas.width = p_width;
             };
             GUIHandler.prototype.quickLoad = function () {
-                this.m_model.fromJSON(this.m_handler.getFileIO().quickLoad());
+                this.m_model.fromJSON(this.m_handler.getFileIO().reset());
                 this.importStage();
             };
             GUIHandler.prototype.importStage = function () {

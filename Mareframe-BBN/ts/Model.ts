@@ -25,9 +25,9 @@
                 var dataStream: string = "";
 
                 if (this.m_bbnMode) {
-                    this.getBBNDataStream();
+                    dataStream = this.getBBNDataStream();
                 } else {
-                    this.getMCADataStream();
+                    dataStream = this.getMCADataStream();
                 }
 
 
@@ -36,46 +36,76 @@
                 return dataStream;
             }
 
-            getBBNDataStream(): string {
+            private getBBNDataStream(): string {
                 var dataStream: string = '<?xml version="1.0" encoding="ISO-8859-1"?>\n<smile version="1.0" id="' + this.m_modelIdent + '" numsamples="1000">\n<nodes>\n';
 
                 this.m_elementArr.forEach(function (elmt: Element) {
                     switch (elmt.getType()) {
                         case 0:
-                            dataStream += '<cps id="' + elmt.getID() + '">\n';
+                            dataStream += '<cpt id="' + elmt.getID() + '">\n';
                             for (var i = 0; i < elmt.getData().length; i++) {
-                                dataStream += '<state id="' + elmt.getData(i, 1) + ' />\n';
+                                dataStream += '<state id="' + elmt.getData(1, i) + '" />\n';
                             }
                             if (elmt.getParentElements().length > 0) {
                                 dataStream += '<parents>'
                                 elmt.getParentElements().forEach(function (parElmt) {
                                     dataStream += parElmt.getID() + ' ';
                                 });
-                                dataStream = dataStream.slice(0, dataStream.length) + '</parents>\n';
+                                dataStream = dataStream.slice(0, dataStream.length-1) + '</parents>\n';
                             }
-                            dataStream += '<probabilities>'
 
+
+                            dataStream += '<probabilities>'
                             for (var i = 1; i < elmt.getData(1).length; i++) {
                                 for (var j = 0; j < elmt.getData().length; j++)
-                                    dataStream += elmt.getData(j, i);
+                                    dataStream += elmt.getData(j, i)+' ';
                             }
-                            dataStream = dataStream.slice(0, dataStream.length) + '</probabilities>\n';
+                            dataStream = dataStream.slice(0, dataStream.length-1) + '</probabilities>\n';
 
                             dataStream += '</cpt>\n';
                             break;
                         case 1:
                             dataStream += '<decision id="' + elmt.getID() + '">\n';
+                            for (var i = 0; i < elmt.getData().length; i++) {
+                                dataStream += '<state id="' + elmt.getData(i) + '" />\n';
+                            }
+                            dataStream += '</decision>\n';
+                            break;
+                        case 2:
+                            dataStream += '<utility id="' + elmt.getID() + '">\n';
+                            if (elmt.getParentElements().length > 0) {
+                                dataStream += '<parents>'
+                                elmt.getParentElements().forEach(function (parElmt) {
+                                    dataStream += parElmt.getID() + ' ';
+                                });
+                                dataStream = dataStream.slice(0, dataStream.length-1) + '</parents>\n';
+                            }
+                            dataStream += '<utilities>'
+                            for (var i = 1; i < elmt.getData(1).length; i++) {
 
+                                dataStream += elmt.getData(elmt.getData().length - 1, i) + ' ';
+                            }
+                            dataStream = dataStream.slice(0, dataStream.length) + '</utilities>\n';
 
+                            dataStream += '</utility>\n';
                     }
+                    
                 });
 
-
-
+                dataStream += '</nodes>\n<extensions>\n<genie version="1.0" name="' + this.getName() + '" faultnameformat="nodestate"><comment></comment>\n'
+                this.m_elementArr.forEach(function (elmt: Element) {
+                    dataStream += '<node id="' + elmt.getID() + '">\n' +
+                    '<name>' + elmt.getName() + '</name>\n' +
+                    '<interior color="aaaaaa" />\n' +
+                    '<outline color="000080" />\n' +
+                    '<font color="000000" name="Arial" size="8" />\n' +
+                    '<position>' + (elmt.m_easelElmt.x-70) + ' ' + (elmt.m_easelElmt.y-30) + ' ' + (elmt.m_easelElmt.x+70) + ' ' + (elmt.m_easelElmt.y+30) + '</position>\n</node>\n';
+                });
+                dataStream+='</genie>\n</extensions>\n</smile>\n'
                 return dataStream;
             }
 
-            getMCADataStream(): string {
+            private getMCADataStream(): string {
                 return JSON.stringify(this);
             }
 
