@@ -20,6 +20,54 @@
 
             };
 
+
+            saveModel(): string {
+                var dataStream: string = "";
+
+                if (this.m_bbnMode) {
+                    this.getBBNDataStream();
+                } else {
+                    this.getMCADataStream();
+                }
+
+
+
+
+                return dataStream;
+            }
+
+            getBBNDataStream(): string {
+                var dataStream: string = '<?xml version="1.0" encoding="ISO-8859-1"?>\n<smile version="1.0" id="' + this.m_modelIdent + '" numsamples="1000">\n<nodes>\n';
+
+                this.m_elementArr.forEach(function (elmt) {
+                    switch (elmt.getType()) {
+                        case 0:
+                            dataStream += '<cps id="' + elmt.getID() + '">\n';
+                            for (var i = 0; i < elmt.getData().length; i++) {
+                                dataStream += '<state id="' + elmt.getData(i, 1) + ' />\n';
+                            }
+                            if (elmt.getParentElements().length > 0) {
+                                dataStream += '<parents>'
+                                elmt.getParentElements().forEach(function (parElmt) {
+                                    dataStream += parElmt.getID() + ' ';
+                                });
+                                dataStream = dataStream.slice(0, dataStream.length)+'</parents>\n';
+                            }
+
+                            dataStream += '</cpt>\n'
+
+                    }
+                });
+
+
+
+                return dataStream;
+            }
+
+            getMCADataStream(): string {
+                return JSON.stringify(this);
+            }
+
             update() {
                 this.m_elementArr.forEach(function (p_elmt: Element) {
                     if (p_elmt.isUpdated()) {

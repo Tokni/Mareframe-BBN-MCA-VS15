@@ -28,6 +28,7 @@
     <Content Include="jQueryUI\jquery-ui.theme.css" />
     <Content Include="js\math.min.js" />
     <Content Include="MCA.html" />
+    <Content Include="saveFile.php" />
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>

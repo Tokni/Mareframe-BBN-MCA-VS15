@@ -1,0 +1,43 @@
+
+#defTable_div, #valuesTable_div {
+	margin-top: 10px;
+	border-collapse: collapse;
+	vertical-align: middle;
+	}
+	
+#defTable_div td, th {
+    border: 1px solid #000000; 
+    padding: 3px;
+}
+
+#defTable_div th {
+    background-color: #AFD9EE;
+}
+#defTable_div td {
+    background-color: #E1EDF7;
+}
+
+#description_div {
+	margin-top: 10px;
+}
+
+
+#valuesTable_div td, th {
+    border: 1px solid #000000; 
+    padding: 3px;
+}
+
+#valuesTable_div th {
+    background-color: #C1E2B3;
+}
+#valuesTable_div td {
+    background-color: #DFF0D8;
+}
+.dialogButton {
+	
+	margin-top: 10px;
+}
+
+.editableTable .editable input[type=text]{
+     
+}

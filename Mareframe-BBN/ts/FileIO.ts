@@ -13,6 +13,18 @@ module Mareframe {
             }
             saveModel(p_model: Model): void {
 
+                // encode the data into base64
+                var base64: string = window.btoa(p_model.saveModel());
+                
+
+                // create an a tag
+                var a = document.createElement('a');
+                a.href = 'data:application/octet-stream;base64,' + base64;
+                a.innerHTML = 'Download';
+
+                // add to the body
+                document.body.appendChild(a);
+
             }
             quickSave(p_model: Model): void {
                 var json: string = JSON.stringify(p_model);
