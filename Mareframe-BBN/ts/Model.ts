@@ -10,6 +10,7 @@
             private m_modelChanged: boolean = true;
             private m_dataMatrix: any[][] = [];
             private m_mainObjective: Element;
+            
             constructor(p_bbnMode: boolean) {
                 this.m_bbnMode = p_bbnMode;
                 this.createNewElement = this.createNewElement.bind(this);
@@ -137,7 +138,9 @@
 
                             var toAdd = [this.getElement(this.m_dataMatrix[i][0]).getName(), this.m_dataMatrix[i][p_elmt.getData(0)]];
                             if (!p_addHeader) {
-                                toAdd.push(Mareframe.DST.Tools.getValueFn(Math.abs(p_elmt.getData(3) - ((this.m_dataMatrix[i][p_elmt.getData(0)] - minVal) / (maxVal - minVal))), Math.abs(p_elmt.getData(3) - ((p_elmt.getData(1) / 100))), 1 - (p_elmt.getData(2) / 100)));
+
+                                //toAdd.push(Mareframe.DST.Tools.getValueFn(Math.abs(p_elmt.getData(3) - ((this.m_dataMatrix[i][p_elmt.getData(0)] - minVal) / (maxVal - minVal))), Math.abs(p_elmt.getData(3) - ((p_elmt.getData(1) / 100))), 1 - (p_elmt.getData(2) / 100)));
+                                toAdd.push(Tools.getValueFn(Math.abs(p_elmt.getData(3) - ((this.m_dataMatrix[i][p_elmt.getData(0)] - minVal) / (maxVal - minVal))), Math.abs(p_elmt.getData(3) - ((p_elmt.getData(1) / 100))), 1 - (p_elmt.getData(2) / 100)));
                             }
                             //console.log(elmt.getData()[1]);
                             tempMatrix.push(toAdd);
@@ -170,18 +173,22 @@
             }
 
             createNewElement(): Element {
-                console.log(this.m_counter);
+                //console.log(this.m_counter);
                 var e = new Element("elmt" + this.m_counter,this);
                 this.m_counter++;
                 this.m_elementArr.push(e);
                 return e;
 
             }
+
             getElement(p_elmtStringId: string): Element {
+                //console.log("index: " + this.getObjectIndex(p_elmtStringId));
+                //console.log(this.m_elementArr[this.getObjectIndex(p_elmtStringId)]);
                 return this.m_elementArr[this.getObjectIndex(p_elmtStringId)];
             }
+
             private getObjectIndex(p_objectStringId: string): number {
-                console.log(p_objectStringId);
+                //console.log(p_objectStringId);
                 var key = 0;
                 if (p_objectStringId.substr(0, 4) === "elmt") {
                     this.m_elementArr.every(function (p_elmt) {
@@ -253,7 +260,7 @@
 
                 $("#modelHeader").html(p_jsonObject.mdlName);
                 $("#model_header").append(p_jsonObject.mdlName);
-                console.log(p_jsonObject);
+                //console.log(p_jsonObject);
                 this.m_modelName = p_jsonObject.mdlName;
 
                 this.m_dataMatrix = p_jsonObject.dataMat;

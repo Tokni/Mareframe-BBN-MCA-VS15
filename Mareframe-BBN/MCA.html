@@ -28,6 +28,7 @@
     <script src="ts/Element.js"></script>
     <script src="ts/Connection.js"></script>
     <script src="ts/MareframeGUI.js"></script>
+    <script src="ts/ElementDialog.js"></script>
     
 
     <div class="container">
@@ -48,6 +49,12 @@
             </div>
         </div>
     </div>
+
+    <div id="dd"></div>
+   
+        
+    
+
     <div class="ui-widget ui-dialog ui-corner-all ui-widget-content header-bar" style="position: static">
         <div class="ui-widget-header ui-corner-all ui-dialog-titlebar" id="modelHeader">Model</div>
 
@@ -90,18 +97,24 @@
 
 
     <!--Popup Dialog-->
-    <div id="detailsDialog">
-        <div id="weightingMethodSelector"></div>
-        <div id="valueFn_div">
-            <canvas id="valueFn_canvas" width="100" height="100"></canvas>
-            <button class="button" id="valueFn_Linear">Linearize</button>
-            <button class="button" id="valueFn_Flip">Flip Direction</button>
+    <!--
+    <div class="detailsDialog">
+        <div>
+            <div id="weightingMethodSelector"></div>
+            <div id="valueFn_div">
+                <canvas id="valueFn_canvas" width="100" height="100"></canvas>
+                <button class="button" id="valueFn_Linear">Linearize</button>
+                <button class="button" id="valueFn_Flip">Flip Direction</button>
+            </div>
+            <div id="sliders_div"></div>
+            <div id="datatable_div"></div>
+            <div id="description_div"></div>
+            <div id="chart_div"></div>
         </div>
-        <div id="sliders_div"></div>
-        <div id="datatable_div"></div>
-        <div id="description_div"></div>
-        <div id="chart_div"></div>
     </div>
+        -->
+
+    
     <script>
         console.log("something");
         $("#valueFn_Linear").button();
@@ -114,7 +127,7 @@
         $("#delete").button({ icons: { primary: "ui-icon-trash" } });
         $("#cnctTool").button({ icons: { primary: "ui-icon-link" } });
         $(".header-bar").hide();
-        $("#detailsDialog").dialog({
+        $(".detafilsDialog").dialog({
             autoOpen: false,
             resizable: true,
             height: 600,
@@ -146,6 +159,10 @@
         $("#datatable_div").hide();
         $("#description_div").hide();
         $("#chart_div").hide();
+        
+        $(".open").dblclick(function (p_evt) {
+            console.log("dcElem");
+        });
 
 
 
@@ -172,7 +189,7 @@
                     <img src="img/logo_eu.png" class="center-block img-responsive">
                 </div>
                 <div class="col-xs-10 col-sm-10 col-md-6">
-                    <p class="text-muted">This project has receive funding from the European Union's Seventh Framework Programme for research, technological development and demonstration under grant agreement no. 613571.</p>
+                    <p class="text-muted">This project has received funding from the European Union's Seventh Framework Programme for research, technological development and demonstration under grant agreement no. 613571.</p>
                 </div>
             </div>
         </div>

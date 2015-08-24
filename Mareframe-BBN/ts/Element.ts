@@ -226,8 +226,8 @@
             }
 
             fromJSON(p_jsonElmt: any): void {
-                console.log("element.fromJSON()");
-                console.log(p_jsonElmt);
+                //console.log("element.fromJSON()");
+                //console.log(p_jsonElmt);
                 this.m_easelElmt.x = p_jsonElmt.posX;
                 this.m_easelElmt.y = p_jsonElmt.posY;
                 this.m_id = p_jsonElmt.elmtID;

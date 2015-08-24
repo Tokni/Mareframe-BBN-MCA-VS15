@@ -60,6 +60,7 @@
     <TypeScriptCompile Include="ts\Declarations\math.min.d.ts" />
     <TypeScriptCompile Include="ts\Declarations\tweenjs.d.ts" />
     <TypeScriptCompile Include="ts\Element.ts" />
+    <TypeScriptCompile Include="ts\ElementDialog.ts" />
     <TypeScriptCompile Include="ts\FileIO.ts" />
     <TypeScriptCompile Include="ts\Handler.ts" />
     <TypeScriptCompile Include="ts\MareframeGUI.ts" />
@@ -83,7 +84,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>57950</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:57950/</IISUrl>
+          <IISUrl>http://localhost:57955/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
