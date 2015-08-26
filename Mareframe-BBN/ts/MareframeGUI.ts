@@ -4,6 +4,8 @@ module Mareframe {
     export module DST {
         export class GUIHandler {
             public m_editorMode: boolean = false;
+            public m_autoUpdate: boolean = false;
+            public m_showDescription: boolean = true;
             private m_handler: Handler;
             private m_mcaStage: createjs.Stage = new createjs.Stage("MCATool");
             private m_valueFnStage: createjs.Stage = new createjs.Stage("valueFn_canvas");
@@ -50,9 +52,10 @@ module Mareframe {
                     $("#detailsDialog").on('dialogclose', function (event) {
                         $("#valuesTable_div").hide();
                     });
-                    $("#submit").on("click", this.saveDefTable);
+                    $("#submit").on("click", this.saveChanges);
                     $("#values").on("click", this.showValues);
                     this.setEditorMode = this.setEditorMode.bind(this);
+                    this.setAutoUpdate = this.setAutoUpdate.bind(this);
                 }
 
 
@@ -98,6 +101,8 @@ module Mareframe {
                 $("#newElmt").on("click", this.createNewElement);
                 $("#deleteElmt").on("click", this.deleteSelected);
                 $("#editorMode").on("click", this.setEditorMode);
+                $("#showDescription").on("click", this.setShowDescription);
+                $("#autoUpdate").on("click", this.setAutoUpdate);
                 $("#resetDcmt").on("click", this.quickLoad);
                 $("#updateMdl").on("click", this.updateModel);
                 $("#selectAllElmt").on("click", this.selectAll);
@@ -244,6 +249,16 @@ module Mareframe {
                 }
             }
 
+            private setShowDescription = function (cb) {
+                this.m_showDescription = cb.currentTarget.checked;
+                if (this.m_showDescription) {
+                    $("#description_div").show();
+                }
+                else {
+                    $("#description_div").hide();
+                }
+            }
+
 
             private setEditorMode = function (cb) {
                 console.log(cb);
@@ -251,7 +266,11 @@ module Mareframe {
                 this.updateEditorMode();
                 console.log("editormode: " + this);
             }
-
+            private setAutoUpdate = function (cb) {
+                console.log(cb);
+                this.m_autoUpdate = cb.currentTarget.checked;
+                console.log("auto update: " + this);
+            }
             private createNewElement(p_evt: Event) {
                 var elmt = this.m_model.createNewElement()
                 this.addElementToStage(elmt);
@@ -357,10 +376,11 @@ module Mareframe {
                     if (this.m_editorMode) {
                         this.addEditFunction();
                     }
-
+                    if (this.m_showDescription) {
                     //set description
                     document.getElementById("description_div").innerHTML = p_elmt.getDescription();
                     $("#description_div").show();
+                    }
                     if (p_elmt.isUpdated()) {
                         $("#values").prop('disabled', false);
                     } else {
@@ -525,6 +545,29 @@ module Mareframe {
             };
 
             private addEditFunction() {
+                $(function () {
+                    $("#description_div").dblclick(function () {
+                        var originalValue = $(this).text();
+                        $(this).addClass("editable");
+                        $(this).html("<input type='text' value='" + originalValue + "' />");
+                        $(this).children().first().focus();
+                        $(this).children().first().keypress(function (e) {
+                            if (e.which == 13) {
+                                var newText = $(this).val();
+                                $(this).parent().text(newText);
+                            }
+
+                            $(this).parent().removeClass("editable");
+                        });
+                        $(this).children().first().blur(function () {
+                            var newText = $(this).val();
+                            $(this).parent().text(newText);
+                                $(this).parent().text(newText);
+                            
+                            $(this).parent().removeClass("editable");
+                        });
+                    });
+                });
 
                 $(function () {
                     $("td").dblclick(function () {
@@ -592,8 +635,12 @@ module Mareframe {
                 $("#values").prop("disabled", true);
             }
 
-            private saveDefTable() {
+            private saveChanges() {
+                //Save description
                 var elmt: Element = $("#detailsDialog").data("element");
+                var description = $("#description_div").text();
+                elmt.setDescription(description);
+                //Save def table
                 var table = $("#defTable_div");
                 var newTable = [];
                 var newRow = [];
@@ -622,8 +669,13 @@ module Mareframe {
                     alert("The values in each column must add up to 1");
                 } else {
                     elmt.setData(newTable);
-                    elmt.setUpdated(false);
-                    //TODO set all elements which are affected by this change to updated = false
+                    if (this.m_autoUpdate) {
+                        this.m_model.update();
+                    }
+                    else {
+                        elmt.setUpdated(false);
+                        //TODO set all elements which are affected by this change to updated = false
+                    }
                 }
                 console.log("new table after submit:");
                 console.log(elmt.getData());

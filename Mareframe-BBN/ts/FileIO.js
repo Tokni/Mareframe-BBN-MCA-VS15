@@ -16,7 +16,7 @@ var Mareframe;
                 // create an a tag
                 var a = $("#downloadLink").get(0);
                 a.href = 'data:application/octet-stream;base64,' + base64;
-                a.download = "test.xdsl";
+                //a.download = "test.xdsl";
                 a.innerHTML = 'Download';
             };
             FileIO.prototype.quickSave = function (p_model) {

@@ -21,7 +21,7 @@
                 var a: HTMLAnchorElement = <HTMLAnchorElement> $("#downloadLink").get(0);
 
                 a.href = 'data:application/octet-stream;base64,' + base64;
-                a.download = "test.xdsl";
+                //a.download = "test.xdsl";
                 a.innerHTML = 'Download';
                 
 

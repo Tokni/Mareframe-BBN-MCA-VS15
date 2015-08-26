@@ -5,6 +5,8 @@ var Mareframe;
         var GUIHandler = (function () {
             function GUIHandler(p_model, p_handler) {
                 this.m_editorMode = false;
+                this.m_autoUpdate = false;
+                this.m_showDescription = true;
                 this.m_mcaStage = new createjs.Stage("MCATool");
                 this.m_valueFnStage = new createjs.Stage("valueFn_canvas");
                 this.m_controlP = new createjs.Shape();
@@ -39,20 +41,35 @@ var Mareframe;
                 };
                 this.m_elementColors = [["#efefff", "#15729b", "#dfdfff"], ["#ffefef", "#c42f33", "#ffdfdf"], ["#fff6e0", "#f6a604", "#fef4c6"], ["#efffef", "#2fc433", "#dfffdf"]];
                 this.m_trashBin = [];
+                this.setShowDescription = function (cb) {
+                    this.m_showDescription = cb.currentTarget.checked;
+                    if (this.m_showDescription) {
+                        $("#description_div").show();
+                    }
+                    else {
+                        $("#description_div").hide();
+                    }
+                };
                 this.setEditorMode = function (cb) {
                     console.log(cb);
                     this.m_editorMode = cb.currentTarget.checked;
                     this.updateEditorMode();
                     console.log("editormode: " + this);
                 };
+                this.setAutoUpdate = function (cb) {
+                    console.log(cb);
+                    this.m_autoUpdate = cb.currentTarget.checked;
+                    console.log("auto update: " + this);
+                };
                 this.m_handler = p_handler;
                 if (p_model.m_bbnMode) {
                     $("#detailsDialog").on('dialogclose', function (event) {
                         $("#valuesTable_div").hide();
                     });
-                    $("#submit").on("click", this.saveDefTable);
+                    $("#submit").on("click", this.saveChanges);
                     $("#values").on("click", this.showValues);
                     this.setEditorMode = this.setEditorMode.bind(this);
+                    this.setAutoUpdate = this.setAutoUpdate.bind(this);
                 }
                 this.pressMove = this.pressMove.bind(this);
                 this.mouseDown = this.mouseDown.bind(this);
@@ -89,6 +106,8 @@ var Mareframe;
                 $("#newElmt").on("click", this.createNewElement);
                 $("#deleteElmt").on("click", this.deleteSelected);
                 $("#editorMode").on("click", this.setEditorMode);
+                $("#showDescription").on("click", this.setShowDescription);
+                $("#autoUpdate").on("click", this.setAutoUpdate);
                 $("#resetDcmt").on("click", this.quickLoad);
                 $("#updateMdl").on("click", this.updateModel);
                 $("#selectAllElmt").on("click", this.selectAll);
@@ -288,9 +307,11 @@ var Mareframe;
                     if (this.m_editorMode) {
                         this.addEditFunction();
                     }
-                    //set description
-                    document.getElementById("description_div").innerHTML = p_elmt.getDescription();
-                    $("#description_div").show();
+                    if (this.m_showDescription) {
+                        //set description
+                        document.getElementById("description_div").innerHTML = p_elmt.getDescription();
+                        $("#description_div").show();
+                    }
                     if (p_elmt.isUpdated()) {
                         $("#values").prop('disabled', false);
                     }
@@ -421,6 +442,27 @@ var Mareframe;
             ;
             GUIHandler.prototype.addEditFunction = function () {
                 $(function () {
+                    $("#description_div").dblclick(function () {
+                        var originalValue = $(this).text();
+                        $(this).addClass("editable");
+                        $(this).html("<input type='text' value='" + originalValue + "' />");
+                        $(this).children().first().focus();
+                        $(this).children().first().keypress(function (e) {
+                            if (e.which == 13) {
+                                var newText = $(this).val();
+                                $(this).parent().text(newText);
+                            }
+                            $(this).parent().removeClass("editable");
+                        });
+                        $(this).children().first().blur(function () {
+                            var newText = $(this).val();
+                            $(this).parent().text(newText);
+                            $(this).parent().text(newText);
+                            $(this).parent().removeClass("editable");
+                        });
+                    });
+                });
+                $(function () {
                     $("td").dblclick(function () {
                         var originalValue = $(this).text();
                         $(this).addClass("editable");
@@ -482,8 +524,12 @@ var Mareframe;
                 $("#valuesTable_div").show();
                 $("#values").prop("disabled", true);
             };
-            GUIHandler.prototype.saveDefTable = function () {
+            GUIHandler.prototype.saveChanges = function () {
+                //Save description
                 var elmt = $("#detailsDialog").data("element");
+                var description = $("#description_div").text();
+                elmt.setDescription(description);
+                //Save def table
                 var table = $("#defTable_div");
                 var newTable = [];
                 var newRow = [];
@@ -513,7 +559,12 @@ var Mareframe;
                 }
                 else {
                     elmt.setData(newTable);
-                    elmt.setUpdated(false);
+                    if (this.m_autoUpdate) {
+                        this.m_model.update();
+                    }
+                    else {
+                        elmt.setUpdated(false);
+                    }
                 }
                 console.log("new table after submit:");
                 console.log(elmt.getData());
