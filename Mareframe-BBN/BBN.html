@@ -1,17 +1,18 @@
 ﻿<!DOCTYPE html>
 <html lang="us">
 <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>BBN Tool</title>
     
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link href="css/lib/bootstrap.min.css" rel="stylesheet">
-	<link href="css/body.css" rel="stylesheet">
-	<link href="css/footer.css" rel="stylesheet">
-	<link href="css/dialog.css" rel="stylesheet">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link href="css/lib/bootstrap.min.css" rel="stylesheet" />
+	<link href="css/body.css" rel="stylesheet" />
+	<link href="css/footer.css" rel="stylesheet" />
+	<link href="css/dialog.css" rel="stylesheet" />
 
-    <link href="jQueryUI/jquery-ui.css" rel="stylesheet">
+    <link href="jQueryUI/jquery-ui.css" rel="stylesheet" />
+    <link href="css/DST.css" rel="stylesheet" />
 </head>
 <body>
     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
@@ -59,7 +60,8 @@
  
         <div style="padding: 1em 1em 0.5em 1.4em; font-size: 0.7em">
             <button class="advButton" id="newDcmt">New Document</button>
-            <button class="advButton" id="lodDcmt">Open Document</button>
+            <div class="LoadFileBtn advButton" id="lodDcmtDiv"><span class="advButton">Open Document</span><input class="advButton upload" type="file" id="lodDcmt" /></div>
+            
             <button class="advButton" id="savDcmt">Save Document</button>
             <button class="advButton" id="resetDcmt">Reset</button>
             <button class="advButton" id="newElmt">New Element</button>
@@ -68,7 +70,7 @@
             <input class="advButton" type="checkbox" id="cnctTool"><label for="cnctTool" class="advButton">Connect Tool</label>
             <div style="float:right">
                 <input class="button" type="checkbox" id="editorMode">
-                <label for="editorMode" class="button">Editor Mode</label>
+                <label for="editorMode" class="button" >Editor Mode</label>
                 <button class="button" id="updateMdl">Update</button>
             </div>
         </div>
@@ -97,7 +99,7 @@
     <script>
         $("input[type=checkbox]").button();
         $("#newDcmt").button({ icons: { primary: "ui-icon-document" } });
-        $("#lodDcmt").button({ icons: { primary: "ui-icon-folder-open" } });
+        $("#lodDcmtDiv").button({ icons: { primary: "ui-icon-folder-open" } });
         $("#savDcmt").button({ icons: { primary: "ui-icon-disk" } });
         $("#newElmt").button({ icons: { primary: "ui-icon-plus" } });
         $("#deleteElmt").button({ icons: { primary: "ui-icon-trash" } });

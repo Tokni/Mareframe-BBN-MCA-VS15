@@ -23,6 +23,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="BBN.html" />
+    <Content Include="css\body.css" />
+    <Content Include="css\dialog.css" />
+    <Content Include="css\DST.css" />
+    <Content Include="css\footer.css" />
+    <Content Include="css\lib\bootstrap.min.css" />
     <Content Include="jQueryUI\jquery-ui.css" />
     <Content Include="jQueryUI\jquery-ui.structure.css" />
     <Content Include="jQueryUI\jquery-ui.theme.css" />

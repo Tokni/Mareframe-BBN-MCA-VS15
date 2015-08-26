@@ -15,8 +15,8 @@
                 this.m_bbnMode = p_bbnMode;
                 this.createNewElement = this.createNewElement.bind(this);
                 this.deleteElement = this.deleteElement.bind(this);
-                console.log("model loaded")
-                console.log(this);
+                ////console.log("model loaded")
+                ////console.log(this);
 
             };
 
@@ -44,7 +44,7 @@
                         case 0:
                             dataStream += '<cpt id="' + elmt.getID() + '">\n';
                             for (var i = 0; i < elmt.getData().length; i++) {
-                                dataStream += '<state id="' + elmt.getData(1, i) + '" />\n';
+                                dataStream += '<state id="' + elmt.getData(i, 0) + '" />\n';
                             }
                             if (elmt.getParentElements().length > 0) {
                                 dataStream += '<parents>'
@@ -76,7 +76,7 @@
                             if (elmt.getParentElements().length > 0) {
                                 dataStream += '<parents>'
                                 elmt.getParentElements().forEach(function (parElmt) {
-                                    dataStream += parElmt.getID() + ' ';
+                                    dataStream = dataStream.substring(0, dataStream.lastIndexOf(">") + 1) + parElmt.getID() + ' ' + dataStream.substring(dataStream.lastIndexOf(">") + 1);
                                 });
                                 dataStream = dataStream.slice(0, dataStream.length-1) + '</parents>\n';
                             }
@@ -85,7 +85,7 @@
 
                                 dataStream += elmt.getData(elmt.getData().length - 1, i) + ' ';
                             }
-                            dataStream = dataStream.slice(0, dataStream.length) + '</utilities>\n';
+                            dataStream = dataStream.slice(0, dataStream.length-1) + '</utilities>\n';
 
                             dataStream += '</utility>\n';
                     }
@@ -111,7 +111,7 @@
 
             update() {
                 this.m_elementArr.forEach(function (p_elmt: Element) {
-                    if (p_elmt.isUpdated()) {
+                    if (!p_elmt.isUpdated()) {
                         p_elmt.update();
                     }
                 });
@@ -149,7 +149,7 @@
                 var weightsArr = Tools.getWeights(this.m_mainObjective, this);
     	
 
-                //console.log(tempMatrix);
+                ////console.log(tempMatrix);
                 for (var i = 0; i < weightsArr.length; i++) {
                     var elmtData = this.getElement(this.m_dataMatrix[0][i + 1]).getData();
 
@@ -181,8 +181,8 @@
 
 
                         tempMatrix[j][i + 1] = Mareframe.DST.Tools.getValueFn(Math.abs(elmtData[3] - ((tempMatrix[j][i + 1] - minVal) / (maxVal - minVal))), Math.abs(elmtData[3] - ((elmtData[1] / 100))), 1 - (elmtData[2] / 100));
-                        //console.log(getValueFn(tempMatrix[j][i + 1] / currentMax, elmtData[1]/100, elmtData[2]/100));
-                        //console.log(tempMatrix[j][i + 1] / currentMax);
+                        ////console.log(getValueFn(tempMatrix[j][i + 1] / currentMax, elmtData[1]/100, elmtData[2]/100));
+                        ////console.log(tempMatrix[j][i + 1] / currentMax);
                         tempMatrix[j][i + 1] *= weightsArr[i][1];
                         tempMatrix[j][i + 1] = (Math.round(1000 * tempMatrix[j][i + 1])) / 1000;
                     }
@@ -233,20 +233,20 @@
                             if (!p_addHeader) {
                                 toAdd.push(Mareframe.DST.Tools.getValueFn(Math.abs(p_elmt.getData(3) - ((this.m_dataMatrix[i][p_elmt.getData(0)] - minVal) / (maxVal - minVal))), Math.abs(p_elmt.getData(3) - ((p_elmt.getData(1) / 100))), 1 - (p_elmt.getData(2) / 100)));
                             }
-                            //console.log(elmt.getData()[1]);
+                            ////console.log(elmt.getData()[1]);
                             tempMatrix.push(toAdd);
                         }
                         break;
                     case 1: //sub-objective
                         var total = 0.0;
                         p_elmt.getData(1).forEach(function (val) { total += val; });
-                        //console.log(total + " : " + elmt.getName());
+                        ////console.log(total + " : " + elmt.getName());
                         for (var i = 0; i < p_elmt.getData(0).length; i++) {
-                            //console.log(elmt.getData());
+                            ////console.log(elmt.getData());
                             var tempEl = this.getConnection(p_elmt.getData(0,i)).getInputElement();
 
                             var tempArr = this.getWeightedData(tempEl, false);
-                            //console.log(tempArr);
+                            ////console.log(tempArr);
 
 
                             var result = 0;
@@ -255,7 +255,7 @@
                                 result += tempArr[j][1];
 
                             }
-                            //console.log(result + " " + elmt.getName()+"; "+tempArr+" "+tempEl.getName());
+                            ////console.log(result + " " + elmt.getName()+"; "+tempArr+" "+tempEl.getName());
                             tempMatrix.push([tempEl.getName(), result * (p_elmt.getData(1,i) / total)]);
                         }
                         break;
@@ -264,7 +264,7 @@
             }
 
             createNewElement(): Element {
-                console.log(this.m_counter);
+                ////console.log(this.m_counter);
                 var e = new Element("elmt" + this.m_counter,this);
                 this.m_counter++;
                 this.m_elementArr.push(e);
@@ -275,7 +275,7 @@
                 return this.m_elementArr[this.getObjectIndex(p_elmtStringId)];
             }
             private getObjectIndex(p_objectStringId: string): number {
-                console.log(p_objectStringId);
+                ////console.log(p_objectStringId);
                 var key = 0;
                 if (p_objectStringId.substr(0, 4) === "elmt") {
                     this.m_elementArr.every(function (p_elmt) {
@@ -296,7 +296,7 @@
                         }
                     });
                 } else {
-                    console.log(p_objectStringId);
+                    ////console.log(p_objectStringId);
                     throw DOMException.NOT_FOUND_ERR;
                 }
                 return key;
@@ -356,7 +356,22 @@
                 if (key >= this.m_connectionArr.length)
                     return false;
                 else {
+                    var states:number = this.m_connectionArr[key].getInputElement().getData().length;
+                    var data = this.m_connectionArr[key].getOutputElement().getData();
+                    var splicePos = 1 + Math.floor((data[data.length - 1].length / states));
+                    //console.log(states);
+                    //console.log(splicePos);
+                    for (var row = 0; row < data.length;row++) {
+                        if(data[row].length-1 > splicePos)
+                            data[row].splice(splicePos);
+                    }
+                    //console.log(data);
+                    //console.log(this.m_connectionArr[key]);
+                    this.m_connectionArr[key].getOutputElement().setData(data);
+
                     this.m_connectionArr.splice(key, 1);
+
+                    //console.log(this.m_elementArr);
                     return true;
                 }
             }
@@ -444,8 +459,8 @@
                 //h.gui.setSize(maxX + 80, maxY + 20);
 
                 //h.gui.updateTable(this.dataMatrix);
-                console.log("model.fromJSON()");
-                console.log(this);
+                ////console.log("model.fromJSON()");
+                ////console.log(this);
             }
 
             createNewConnection(p_inputElmt: Element, p_outputElmt: Element): Connection {

@@ -40,12 +40,13 @@ var Mareframe;
                 this.m_elementColors = [["#efefff", "#15729b", "#dfdfff"], ["#ffefef", "#c42f33", "#ffdfdf"], ["#fff6e0", "#f6a604", "#fef4c6"], ["#efffef", "#2fc433", "#dfffdf"]];
                 this.m_trashBin = [];
                 this.setEditorMode = function (cb) {
-                    console.log(cb);
+                    ////console.log(cb);
                     this.m_editorMode = cb.currentTarget.checked;
                     this.updateEditorMode();
-                    console.log("editormode: " + this);
+                    ////console.log("editormode: " + this);
                 };
                 this.m_handler = p_handler;
+                ////console.log(this.m_handler);
                 if (p_model.m_bbnMode) {
                     $("#detailsDialog").on('dialogclose', function (event) {
                         $("#valuesTable_div").hide();
@@ -75,6 +76,7 @@ var Mareframe;
                 this.mouseUp = this.mouseUp.bind(this);
                 this.selectAll = this.selectAll.bind(this);
                 this.saveModel = this.saveModel.bind(this);
+                this.loadModel = this.loadModel.bind(this);
                 this.m_model = p_model;
                 this.m_mcaBackground.name = "hitarea";
                 this.updateEditorMode();
@@ -97,6 +99,7 @@ var Mareframe;
                     $("#saveFile_div").hide();
                 });
                 this.m_mcaBackground.addEventListener("pressup", this.mouseUp);
+                $("#lodDcmt").on("change", this.loadModel);
                 this.m_mcaStage.addChild(this.m_mcaBackground);
                 this.m_mcaStage.addChild(this.m_mcaContainer);
                 this.m_valueFnStage.addChild(this.m_valFnBackground);
@@ -106,6 +109,11 @@ var Mareframe;
                 createjs.Ticker.addEventListener("tick", this.tick);
                 createjs.Ticker.setFPS(60);
             }
+            GUIHandler.prototype.loadModel = function (p_evt) {
+                ////console.log(this);
+                ////console.log(this.m_handler);
+                this.m_handler.getFileIO().loadfromGenie(this.m_model, this.importStage);
+            };
             GUIHandler.prototype.saveModel = function (p_evt) {
                 $("#saveFile_div").show();
                 this.m_handler.getFileIO().saveModel(this.m_model);
@@ -129,12 +137,12 @@ var Mareframe;
             GUIHandler.prototype.importStage = function () {
                 console.log("importing stage");
                 this.m_mcaContainer.removeAllChildren();
-                console.log(this);
+                console.log(this.m_model);
                 var elmts = this.m_model.getElementArr();
                 var conns = this.m_model.getConnectionArr();
                 for (var i = 0; i < elmts.length; i++) {
-                    //console.log("adding to stage:")
-                    //console.log(elmts[i]);
+                    //////console.log("adding to stage:")
+                    //////console.log(elmts[i]);
                     this.addElementToStage(elmts[i]);
                 }
                 for (var i = 0; i < conns.length; i++) {
@@ -148,7 +156,7 @@ var Mareframe;
             };
             ;
             GUIHandler.prototype.mouseUp = function (p_evt) {
-                console.log("mouse up");
+                ////console.log("mouse up");
                 this.m_updateMCAStage = true;
             };
             GUIHandler.prototype.updateElement = function (p_elmt) {
@@ -209,11 +217,11 @@ var Mareframe;
                 this.addElementToStage(elmt);
             };
             GUIHandler.prototype.deleteSelected = function (p_evt) {
-                console.log("deleting");
+                ////console.log("deleting");
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
                     var elmt = this.m_model.getElement(this.m_selectedItems[i].name);
                     if (this.addToTrash(elmt)) {
-                        console.log(this.m_trashBin);
+                        ////console.log(this.m_trashBin);
                         for (var j = 0; j < elmt.getConnections().length; j++) {
                             var conn = elmt.getConnections()[j];
                             if (conn.getOutputElement().getID() === elmt.getID()) {
@@ -230,10 +238,10 @@ var Mareframe;
                     this.m_model.deleteElement(this.m_trashBin[i].getID());
                 }
                 this.importStage();
-                console.log(this.m_model.getConnectionArr());
+                ////console.log(this.m_model.getConnectionArr());
             };
             GUIHandler.prototype.addToTrash = function (p_obj) {
-                console.log(this.m_trashBin.indexOf(p_obj));
+                ////console.log(this.m_trashBin.indexOf(p_obj));
                 if (this.m_trashBin.indexOf(p_obj) === -1) {
                     this.m_trashBin.push(p_obj);
                     return true;
@@ -261,7 +269,7 @@ var Mareframe;
                 this.m_updateMCAStage = true;
             };
             GUIHandler.prototype.dblClick = function (p_evt) {
-                console.log(this);
+                ////console.log(this);
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
                     this.populateElmtDetails(this.m_model.getElement(p_evt.target.name));
                     if (this.m_editorMode && this.m_model.m_bbnMode) {
@@ -274,7 +282,7 @@ var Mareframe;
                 }
             };
             GUIHandler.prototype.populateElmtDetails = function (p_elmt) {
-                console.log(p_elmt);
+                ////console.log(p_elmt)
                 //set dialog title
                 $("#detailsDialog").dialog({
                     title: p_elmt.getName()
@@ -300,7 +308,7 @@ var Mareframe;
                 }
                 else {
                     //MCA mode only
-                    //console.log(tableMat);
+                    //////console.log(tableMat);
                     var chartOptions = {
                         width: 700,
                         height: 400,
@@ -365,7 +373,7 @@ var Mareframe;
                                         else {
                                             val = 0;
                                         }
-                                        console.log(p_elmt.getData(1));
+                                        ////console.log(p_elmt.getData(1));
                                     });
                                 }
                                 makeSlider(i, childEl.getID(), this);
@@ -376,7 +384,7 @@ var Mareframe;
                             var tableMat = this.m_model.getWeightedData(p_elmt, false);
                             var cPX = p_elmt.getData(1);
                             var cPY = p_elmt.getData(2);
-                            console.log("draw line");
+                            ////console.log("draw line");
                             this.m_valueFnLineCont.removeAllChildren();
                             this.m_controlP.regX = 3;
                             this.m_controlP.regY = 3;
@@ -405,7 +413,7 @@ var Mareframe;
                                 }
                             }
                             for (var i = 1; i < tableMat.length; i++) {
-                                console.log(tableMat[i][1]);
+                                ////console.log(tableMat[i][1]);
                                 var vertLine = new createjs.Shape(this.getValueFnLine((tableMat[i][1] - minVal) / (maxVal - minVal) * this.m_valueFnSize, this.m_googleColors[i - 1]));
                                 this.m_valueFnLineCont.addChild(vertLine);
                             }
@@ -487,10 +495,11 @@ var Mareframe;
                 var table = $("#defTable_div");
                 var newTable = [];
                 var newRow = [];
+                ////console.log(table);
                 table.find("tr").each(function () {
                     $(this).find("th,td").each(function () {
-                        // console.log("text to be added: " + $(this).text());
-                        // console.log("does it exsist: " + $.inArray($(this).text(), newRow) === -1)
+                        // ////console.log("text to be added: " + $(this).text());
+                        // ////console.log("does it exsist: " + $.inArray($(this).text(), newRow) === -1)
                         var value = $(this).text();
                         //Don't add the same value twice if it is in one of the header cells
                         //(Better solution: check before the text is saved in the cell)
@@ -505,6 +514,7 @@ var Mareframe;
                     newTable.push(newRow);
                     newRow = [];
                 });
+                ////console.log(newTable);
                 //Remove header row with title the "Definition"
                 newTable.splice(0, 1);
                 if (!DST.Tools.columnSumsAreValid(newTable, DST.Tools.numOfHeaderRows(elmt.getData())) && elmt.getType() == 0) {
@@ -515,8 +525,8 @@ var Mareframe;
                     elmt.setData(newTable);
                     elmt.setUpdated(false);
                 }
-                console.log("new table after submit:");
-                console.log(elmt.getData());
+                ////console.log("new table after submit:");
+                ////console.log(elmt.getData());
             };
             GUIHandler.prototype.updateValFnCP = function (p_controlPointX, p_controlPointY, p_flipped_numBool) {
                 //var functionSegments = 10;
@@ -592,20 +602,20 @@ var Mareframe;
                     topRow = false;
                 }
                 $("#editableDataTable").html(tableHTML);
-                console.log("original datamatrix");
-                console.log(this.m_model.getDataMatrix());
+                ////console.log("original datamatrix");
+                ////console.log(this.m_model.getDataMatrix());
             };
             GUIHandler.prototype.mouseDown = function (p_evt) {
-                //console.log("mouse down at: ("+e.stageX+","+e.stageY+")");
+                //////console.log("mouse down at: ("+e.stageX+","+e.stageY+")");
                 this.m_oldX = p_evt.stageX;
                 this.m_oldY = p_evt.stageY;
                 this.m_originalPressX = p_evt.stageX;
                 this.m_originalPressY = p_evt.stageY;
-                //console.log("cnctool options: "+$("#cnctTool").button("option","checked"));
+                //////console.log("cnctool options: "+$("#cnctTool").button("option","checked"));
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
                     var cnctChkbox = document.getElementById("cnctTool");
                     if (cnctChkbox.checked) {
-                        console.log("cnctTool enabled");
+                        ////console.log("cnctTool enabled");
                         this.connectTo(p_evt);
                     }
                     else {
@@ -617,24 +627,24 @@ var Mareframe;
                 }
             };
             GUIHandler.prototype.select = function (p_evt) {
-                //console.log("ctrl key: " + e.nativeEvent.ctrlKey);
+                //////console.log("ctrl key: " + e.nativeEvent.ctrlKey);
                 if (!p_evt.nativeEvent.ctrlKey && this.m_selectedItems.indexOf(p_evt.target) === -1) {
                     this.clearSelection();
                 }
-                //console.log("adding to selection");
+                //////console.log("adding to selection");
                 this.addToSelection(p_evt.target);
             };
             GUIHandler.prototype.pressMove = function (p_evt) {
-                //console.log("press move");
+                //////console.log("press move");
                 if (p_evt.target.name === "hitarea") {
                     if (p_evt.nativeEvent.ctrlKey) {
-                        console.log("orig: " + this.m_originalPressX + ", " + this.m_originalPressY + ". curr: " + p_evt.stageX + ", " + p_evt.stageY);
+                        ////console.log("orig: " + this.m_originalPressX + ", " + this.m_originalPressY + ". curr: " + p_evt.stageX + ", " + p_evt.stageY);
                         this.setSelection(this.m_model.getEaselElementsInBox(this.m_originalPressX, this.m_originalPressY, p_evt.stageX, p_evt.stageY));
                         this.m_selectionBox.graphics.clear().s("rgba(0,0,0,0.7)").setStrokeDash([2, 2], createjs.Ticker.getTime()).drawRect(this.m_originalPressX, this.m_originalPressY, p_evt.stageX - this.m_originalPressX, p_evt.stageY - this.m_originalPressY);
                         this.m_mcaContainer.addChild(this.m_selectionBox);
                     }
                     else if (this.m_editorMode) {
-                        //console.log("panning");
+                        //////console.log("panning");
                         this.m_mcaContainer.x += p_evt.stageX - this.m_oldX;
                         this.m_mcaContainer.y += p_evt.stageY - this.m_oldY;
                     }
@@ -669,13 +679,13 @@ var Mareframe;
             GUIHandler.prototype.connectTo = function (p_evt) {
                 var elmtIdent = p_evt.target.name;
                 var connected = false;
-                //console.log("attempting connection "+elmtIdent);
+                //////console.log("attempting connection "+elmtIdent);
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
                     var e = this.m_selectedItems[i];
                     if (e.name.substr(0, 4) === "elmt" && e.name !== elmtIdent) {
                         var outputElmt = this.m_model.getElement(elmtIdent);
                         var c = this.m_model.createNewConnection(this.m_model.getElement(e.name), outputElmt);
-                        //console.log("connection: " + c);
+                        //////console.log("connection: " + c);
                         if (this.m_model.addConnection(c)) {
                             this.addConnectionToStage(c);
                             connected = true;
@@ -730,7 +740,7 @@ var Mareframe;
                 if (this.m_selectedItems.indexOf(p_easelElmt) === -1 && p_easelElmt.name.substr(0, 4) === "elmt") {
                     this.m_selectedItems.push(p_easelElmt);
                     var elmtType = this.m_model.getElement(p_easelElmt.name).getType();
-                    //console.log(e);
+                    //////console.log(e);
                     var shape = p_easelElmt.getChildAt(0);
                     shape.graphics.clear().f(this.m_elementColors[elmtType][2]).s(this.m_elementColors[elmtType][1]);
                     var elmtShapeType = 2;
@@ -756,7 +766,7 @@ var Mareframe;
             };
             GUIHandler.prototype.setSelection = function (p_easelElmt) {
                 this.clearSelection();
-                console.log(p_easelElmt);
+                ////console.log(p_easelElmt);
                 for (var i = 0; i < p_easelElmt.length; i++) {
                     this.addToSelection(p_easelElmt[i]);
                 }

@@ -34,6 +34,7 @@
             }
 
             update(): void {
+                //console.log(this);
                 if (this.m_type !== 1) {
                     //Definition table in decision nodes does not rely on parents
                     this.updateData();
@@ -50,7 +51,7 @@
                         parents.push(c.getInputElement());
                     }
                 })
-                //console.log(elmt.getName() + " parents: " + parents);
+                ////console.log(elmt.getName() + " parents: " + parents);
                 return parents;
 
 
@@ -59,7 +60,7 @@
 
             copyDefArray(): any[] {
                 var valueArray = [];
-                console.log(this);
+                ////console.log(this);
                 for (var i = 0; i < this.m_data.length; i++) {
                     valueArray[i] = [];
                     for (var j = 0; j < this.m_data[0].length; j++) {
@@ -75,26 +76,31 @@
             
 
             updateData() {
-                console.log("updateData " + this.m_name);
+                ////console.log("updateData " + this.m_name);
                 this.m_data = this.updateHeaderRows(this.m_data);
             }
 
             updateHeaderRows(p_originalData: any[][]): any[][] {
-                // console.log("updating header rows")
-                
+                // //console.log("updating header rows")
+                //console.log(this);
                 var data: any[][] = [];
                 var parents: Element[] = this.getParentElements();
+                
                 for (var i = 0; i < parents.length; i++) {
                     var elmt: Element = parents[i];
-                    console.log("Parent: " + elmt.getName());
+                    ////console.log("Parent: " + elmt.getName());
                     data = Tools.addNewHeaderRow(elmt.getMainValues(), data, this.m_data);
+                    //console.log(data);
+
                 }
+
                 //Add original values to the table
                 for (var i = Tools.numOfHeaderRows(this.m_data); i < p_originalData.length; i++) {
-                    // console.log("i: " + i);
-                    // console.log("new data: " + originalData[i]);
+                    // //console.log("i: " + i);
+                    // //console.log("new data: " + originalData[i]);
                     data.push(p_originalData[i]);
                 }
+                //console.log(data);
                 return data;
 
             }
@@ -111,19 +117,19 @@
 
 	        //returns the different variables (conditions or choices) that belong to the element
             getMainValues(): any[]{
-                console.log(this.m_data);
+                ////console.log(this.m_data);
                 var row = [];
                 var data = this.m_data;
                 row.push(this.m_name);
                 for (var i = 0; i < data.length; i++) {
-                    // console.log("i: " + i);
-                    // console.log("check data: " + data[i][1]);
+                    // //console.log("i: " + i);
+                    // //console.log("check data: " + data[i][1]);
                     if (!isNaN(parseFloat(data[i][1])) || data[i][1] === undefined) {
                         row.push(data[i][0]);
-                        //console.log("push data " + data[i][0]);
+                        ////console.log("push data " + data[i][0]);
                     }
                 }
-                //console.log("new row: " + row);
+                ////console.log("new row: " + row);
                 return row;
             }
 
@@ -154,6 +160,7 @@
                 } else {
                     this.m_data = p_data;
                 }
+                this.m_updated = false;
             }
             getID(): string {
                 return this.m_id;
@@ -227,8 +234,8 @@
             }
 
             fromJSON(p_jsonElmt: any): void {
-                console.log("element.fromJSON()");
-                console.log(p_jsonElmt);
+                ////console.log("element.fromJSON()");
+                ////console.log(p_jsonElmt);
                 this.m_easelElmt.x = p_jsonElmt.posX;
                 this.m_easelElmt.y = p_jsonElmt.posY;
                 this.m_id = p_jsonElmt.elmtID;

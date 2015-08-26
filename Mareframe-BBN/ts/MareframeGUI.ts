@@ -45,6 +45,7 @@ module Mareframe {
 
             constructor(p_model: Model, p_handler: Handler) {
                 this.m_handler = p_handler;
+                ////console.log(this.m_handler);
 
                 if (p_model.m_bbnMode) {
                     $("#detailsDialog").on('dialogclose', function (event) {
@@ -78,6 +79,7 @@ module Mareframe {
                 this.mouseUp = this.mouseUp.bind(this);
                 this.selectAll = this.selectAll.bind(this);
                 this.saveModel = this.saveModel.bind(this);
+                this.loadModel = this.loadModel.bind(this);
 
 
 
@@ -107,6 +109,8 @@ module Mareframe {
                 });
                 this.m_mcaBackground.addEventListener("pressup", this.mouseUp);
 
+                $("#lodDcmt").on("change", this.loadModel);
+
                 
 
 
@@ -126,6 +130,12 @@ module Mareframe {
 
 
 
+            }
+
+            private loadModel(p_evt: Event) {
+                ////console.log(this);
+                ////console.log(this.m_handler);
+                this.m_handler.getFileIO().loadfromGenie(this.m_model, this.importStage);
             }
 
             private saveModel(p_evt: Event) {
@@ -160,12 +170,12 @@ module Mareframe {
             importStage(): void {
                 console.log("importing stage");
                 this.m_mcaContainer.removeAllChildren();
-                console.log(this);
+                console.log(this.m_model);
                 var elmts = this.m_model.getElementArr();
                 var conns = this.m_model.getConnectionArr();
                 for (var i = 0; i < elmts.length; i++) {
-                    //console.log("adding to stage:")
-                    //console.log(elmts[i]);
+                    //////console.log("adding to stage:")
+                    //////console.log(elmts[i]);
                     this.addElementToStage(elmts[i]);
                 }
                 for (var i = 0; i < conns.length; i++) {
@@ -181,7 +191,7 @@ module Mareframe {
             };
 
             private mouseUp(p_evt: createjs.MouseEvent) {
-                console.log("mouse up");
+                ////console.log("mouse up");
                 this.m_updateMCAStage = true;
             }
 
@@ -246,10 +256,10 @@ module Mareframe {
 
 
             private setEditorMode = function (cb) {
-                console.log(cb);
+                ////console.log(cb);
                 this.m_editorMode = cb.currentTarget.checked;
                 this.updateEditorMode();
-                console.log("editormode: " + this);
+                ////console.log("editormode: " + this);
             }
 
             private createNewElement(p_evt: Event) {
@@ -259,12 +269,12 @@ module Mareframe {
 
             private deleteSelected(p_evt: Event) {
                 
-                console.log("deleting");
+                ////console.log("deleting");
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
                     var elmt: Element = this.m_model.getElement(this.m_selectedItems[i].name);
 
                     if (this.addToTrash(elmt)) {
-                        console.log(this.m_trashBin);
+                        ////console.log(this.m_trashBin);
                         for (var j = 0; j < elmt.getConnections().length; j++) {
                             var conn: Connection = elmt.getConnections()[j];
                             if (conn.getOutputElement().getID() === elmt.getID()) {
@@ -284,11 +294,11 @@ module Mareframe {
                 this.importStage();
 
 
-                console.log(this.m_model.getConnectionArr());
+                ////console.log(this.m_model.getConnectionArr());
             }
 
             private addToTrash(p_obj: any): boolean {
-                console.log(this.m_trashBin.indexOf(p_obj));
+                ////console.log(this.m_trashBin.indexOf(p_obj));
                 if (this.m_trashBin.indexOf(p_obj) === -1) {
                     this.m_trashBin.push(p_obj);
                     return true;
@@ -324,7 +334,7 @@ module Mareframe {
             }
 
             private dblClick(p_evt: createjs.MouseEvent) {
-                console.log(this);
+                ////console.log(this);
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
                     this.populateElmtDetails(this.m_model.getElement(p_evt.target.name));
                     if (this.m_editorMode && this.m_model.m_bbnMode) {
@@ -339,7 +349,7 @@ module Mareframe {
 
             private populateElmtDetails(p_elmt: Element): void {
 
-                console.log(p_elmt)
+                ////console.log(p_elmt)
                 //set dialog title
                 $("#detailsDialog").dialog({
                     title: p_elmt.getName()
@@ -370,7 +380,7 @@ module Mareframe {
                 } else {
                     //MCA mode only
 
-                    //console.log(tableMat);
+                    //////console.log(tableMat);
                     var chartOptions: Object = {
                         width: 700,
                         height: 400,
@@ -445,7 +455,7 @@ module Mareframe {
                                             val = 0;
                                         }
 
-                                        console.log(p_elmt.getData(1));
+                                        ////console.log(p_elmt.getData(1));
                                     });
                                 }
                                 makeSlider(i, childEl.getID(), this);
@@ -458,7 +468,7 @@ module Mareframe {
                             var tableMat = this.m_model.getWeightedData(p_elmt, false);
                             var cPX: number = p_elmt.getData(1);
                             var cPY: number = p_elmt.getData(2);
-                            console.log("draw line");
+                            ////console.log("draw line");
                             this.m_valueFnLineCont.removeAllChildren();
 
 
@@ -494,7 +504,7 @@ module Mareframe {
 
 
                             for (var i = 1; i < tableMat.length; i++) {
-                                console.log(tableMat[i][1]);
+                                ////console.log(tableMat[i][1]);
                                 var vertLine = new createjs.Shape(this.getValueFnLine((tableMat[i][1] - minVal) / (maxVal - minVal) * this.m_valueFnSize, this.m_googleColors[i - 1]));
 
                                 this.m_valueFnLineCont.addChild(vertLine);
@@ -597,10 +607,12 @@ module Mareframe {
                 var table = $("#defTable_div");
                 var newTable = [];
                 var newRow = [];
+
+                ////console.log(table);
                 table.find("tr").each(function () {
                     $(this).find("th,td").each(function () {
-                        // console.log("text to be added: " + $(this).text());
-                        // console.log("does it exsist: " + $.inArray($(this).text(), newRow) === -1)
+                        // ////console.log("text to be added: " + $(this).text());
+                        // ////console.log("does it exsist: " + $.inArray($(this).text(), newRow) === -1)
                         var value: any = $(this).text();
                         //Don't add the same value twice if it is in one of the header cells
                         //(Better solution: check before the text is saved in the cell)
@@ -615,6 +627,7 @@ module Mareframe {
                     newTable.push(newRow);
                     newRow = [];
                 });
+                ////console.log(newTable);
                 //Remove header row with title the "Definition"
                 newTable.splice(0, 1);
                 if (!Tools.columnSumsAreValid(newTable, Tools.numOfHeaderRows(elmt.getData())) && elmt.getType() == 0) {
@@ -625,8 +638,8 @@ module Mareframe {
                     elmt.setUpdated(false);
                     //TODO set all elements which are affected by this change to updated = false
                 }
-                console.log("new table after submit:");
-                console.log(elmt.getData());
+                ////console.log("new table after submit:");
+                ////console.log(elmt.getData());
             }
 
             
@@ -734,8 +747,8 @@ module Mareframe {
 
                 $("#editableDataTable").html(tableHTML);
 
-                console.log("original datamatrix");
-                console.log(this.m_model.getDataMatrix());
+                ////console.log("original datamatrix");
+                ////console.log(this.m_model.getDataMatrix());
 
 
 
@@ -743,17 +756,17 @@ module Mareframe {
             }
 
             private mouseDown(p_evt: createjs.MouseEvent): void {
-                //console.log("mouse down at: ("+e.stageX+","+e.stageY+")");
+                //////console.log("mouse down at: ("+e.stageX+","+e.stageY+")");
                 this.m_oldX = p_evt.stageX;
                 this.m_oldY = p_evt.stageY;
                 this.m_originalPressX = p_evt.stageX;
                 this.m_originalPressY = p_evt.stageY;
-                //console.log("cnctool options: "+$("#cnctTool").button("option","checked"));
+                //////console.log("cnctool options: "+$("#cnctTool").button("option","checked"));
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
                     var cnctChkbox: HTMLInputElement = <HTMLInputElement>document.getElementById("cnctTool")
                     if (cnctChkbox.checked) //check if connect tool is enabled
                     {
-                        console.log("cnctTool enabled");
+                        ////console.log("cnctTool enabled");
                         this.connectTo(p_evt);
                     } else {
                         this.select(p_evt);
@@ -764,26 +777,26 @@ module Mareframe {
             }
 
             private select(p_evt: createjs.MouseEvent): void {
-                //console.log("ctrl key: " + e.nativeEvent.ctrlKey);
+                //////console.log("ctrl key: " + e.nativeEvent.ctrlKey);
                 if (!p_evt.nativeEvent.ctrlKey && this.m_selectedItems.indexOf(p_evt.target) === -1) {
                     this.clearSelection();
                 }
-                //console.log("adding to selection");
+                //////console.log("adding to selection");
                 this.addToSelection(p_evt.target);
             }
 
             private pressMove(p_evt: createjs.MouseEvent): void {
-                //console.log("press move");
+                //////console.log("press move");
 
                 if (p_evt.target.name === "hitarea") {
                     if (p_evt.nativeEvent.ctrlKey) {
-                        console.log("orig: " + this.m_originalPressX + ", " + this.m_originalPressY + ". curr: " + p_evt.stageX + ", " + p_evt.stageY);
+                        ////console.log("orig: " + this.m_originalPressX + ", " + this.m_originalPressY + ". curr: " + p_evt.stageX + ", " + p_evt.stageY);
                         this.setSelection(this.m_model.getEaselElementsInBox(this.m_originalPressX, this.m_originalPressY, p_evt.stageX, p_evt.stageY));
                         this.m_selectionBox.graphics.clear().s("rgba(0,0,0,0.7)").setStrokeDash([2, 2], createjs.Ticker.getTime()).drawRect(this.m_originalPressX, this.m_originalPressY, p_evt.stageX - this.m_originalPressX, p_evt.stageY - this.m_originalPressY);
                         this.m_mcaContainer.addChild(this.m_selectionBox)
                     } else if (this.m_editorMode){
 
-                        //console.log("panning");
+                        //////console.log("panning");
                         this.m_mcaContainer.x += p_evt.stageX - this.m_oldX;
                         this.m_mcaContainer.y += p_evt.stageY - this.m_oldY;
                     }
@@ -827,13 +840,13 @@ module Mareframe {
             private connectTo(p_evt: createjs.MouseEvent): void {
                 var elmtIdent = p_evt.target.name;
                 var connected = false;
-                //console.log("attempting connection "+elmtIdent);
+                //////console.log("attempting connection "+elmtIdent);
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
                     var e = this.m_selectedItems[i];
                     if (e.name.substr(0, 4) === "elmt" && e.name !== elmtIdent) {
                         var outputElmt: Element = this.m_model.getElement(elmtIdent);
                         var c = this.m_model.createNewConnection(this.m_model.getElement(e.name), outputElmt);
-                        //console.log("connection: " + c);
+                        //////console.log("connection: " + c);
                         if (this.m_model.addConnection(c)) {
                             this.addConnectionToStage(c);
                             connected = true;
@@ -896,7 +909,7 @@ module Mareframe {
                 if (this.m_selectedItems.indexOf(p_easelElmt) === -1 && p_easelElmt.name.substr(0, 4) === "elmt") {
                     this.m_selectedItems.push(p_easelElmt);
                     var elmtType = this.m_model.getElement(p_easelElmt.name).getType();
-                    //console.log(e);
+                    //////console.log(e);
                     var shape: createjs.Shape = <createjs.Shape>p_easelElmt.getChildAt(0);
                     shape.graphics.clear().f(this.m_elementColors[elmtType][2]).s(this.m_elementColors[elmtType][1]);
 
@@ -926,7 +939,7 @@ module Mareframe {
 
             private setSelection(p_easelElmt: createjs.Container[]): void {
                 this.clearSelection();
-                console.log(p_easelElmt);
+                ////console.log(p_easelElmt);
                 for (var i = 0; i < p_easelElmt.length; i++) {
                     this.addToSelection(p_easelElmt[i]);
                 }
