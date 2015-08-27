@@ -80,6 +80,7 @@ module Mareframe {
                 this.selectAll = this.selectAll.bind(this);
                 this.saveModel = this.saveModel.bind(this);
                 this.loadModel = this.loadModel.bind(this);
+                this.clickedDecision = this.clickedDecision.bind(this);
 
 
 
@@ -110,7 +111,9 @@ module Mareframe {
                 this.m_mcaBackground.addEventListener("pressup", this.mouseUp);
 
                 $("#lodDcmt").on("change", this.loadModel);
-
+                $("#lodDcmt").on("click", function () {
+                    this.value = null;
+                });
                 
 
 
@@ -202,9 +205,9 @@ module Mareframe {
                 shape.graphics.f(this.m_elementColors[p_elmt.getType()][0]).s(this.m_elementColors[p_elmt.getType()][1]);
 
                 var elmtShapeType: number = 2;
-                if (this.m_model.m_bbnMode)
+                if (this.m_model.m_bbnMode) {
                     elmtShapeType = p_elmt.getType();
-
+                }
                 switch (elmtShapeType) {
                     case 0:
                         //chance
@@ -216,7 +219,7 @@ module Mareframe {
                         break;
                     case 2:
                         //Value
-                        shape.graphics.drawRoundRect(0, 0, 150, 30, 4);
+                        shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
                     default:
                         break;
                 }
@@ -231,7 +234,64 @@ module Mareframe {
 
                 p_elmt.m_easelElmt.addChild(shape);
                 p_elmt.m_easelElmt.addChild(label);
+
+                if (this.m_model.m_bbnMode) {
+                    var backgroundColors = ["#b6b6b6", "#afafd0"]
+                    var decisionCont: createjs.Container = new createjs.Container();
+                    for (var i = 0; i < p_elmt.getData().length; i++) {
+                        
+                        
+
+                        var decisRect: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
+                        
+                        var decisName: createjs.Text = new createjs.Text(p_elmt.getData(i, 0).substr(0, 12), "0.8em trebuchet", "#303030");
+                        decisName.textBaseline = "middle";
+                        decisName.maxWidth = 68;
+                        decisName.x = 2;
+                        decisName.y = 6 + (i * 12);
+
+                        decisionCont.addChild(decisRect);
+                        decisionCont.addChild(decisName);
+                        if (elmtShapeType === 0) {
+                            var percentageData: number = p_elmt.getData(i, 1)
+
+                            var decisBarBackgr: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
+                            var decisBar: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * percentageData, 10));
+
+
+                            var decisPercVal: createjs.Text = new createjs.Text(Math.floor(percentageData * 100) + "%", "0.8em trebuchet", "#303030");
+                            decisPercVal.textBaseline = "middle";
+                            decisPercVal.maxWidth = 22;
+                            decisPercVal.x = 71;
+                            decisPercVal.y = 6 + (i * 12);
+
+                            decisionCont.addChild(decisBarBackgr);
+                            decisionCont.addChild(decisBar);
+                            decisionCont.addChild(decisPercVal);
+                        }
+
+
+
+                    }
+                    decisionCont.addEventListener("click", this.clickedDecision);
+                    decisionCont.x = p_elmt.m_easelElmt.x + 75;
+                    decisionCont.y = p_elmt.m_easelElmt.y - 15;
+                    decisionCont.name = p_elmt.getID();
+                    p_elmt.m_decisEaselElmt = decisionCont;
+                    this.m_mcaContainer.addChild(decisionCont);
+
+                    if (p_elmt.getType() == 2) {
+                        decisionCont.visible = false;
+                    }
+                }
             }
+
+            private clickedDecision(p_evt: createjs.MouseEvent) {
+                console.log("clicked a decision");
+                console.log(p_evt);
+                this.m_model.setDecision(p_evt.currentTarget.name, Math.floor(p_evt.localY/12));
+            }
+
 
             private updateEditorMode() {
                 if (this.m_editorMode) {
@@ -806,6 +866,8 @@ module Mareframe {
 
                         elmt.x += p_evt.stageX - this.m_oldX;
                         elmt.y += p_evt.stageY - this.m_oldY;
+
+
                         for (var j = 0; j < this.m_model.getElement(elmt.name).getConnections().length; j++) {
                             var c = this.m_model.getElement(elmt.name).getConnections()[j];
 
@@ -907,8 +969,9 @@ module Mareframe {
 
             private addToSelection(p_easelElmt: createjs.Container): void {
                 if (this.m_selectedItems.indexOf(p_easelElmt) === -1 && p_easelElmt.name.substr(0, 4) === "elmt") {
-                    this.m_selectedItems.push(p_easelElmt);
-                    var elmtType = this.m_model.getElement(p_easelElmt.name).getType();
+                    var elmt = this.m_model.getElement(p_easelElmt.name)
+                    this.m_selectedItems.push(p_easelElmt, elmt.m_decisEaselElmt);
+                    var elmtType = elmt.getType();
                     //////console.log(e);
                     var shape: createjs.Shape = <createjs.Shape>p_easelElmt.getChildAt(0);
                     shape.graphics.clear().f(this.m_elementColors[elmtType][2]).s(this.m_elementColors[elmtType][1]);
@@ -952,29 +1015,31 @@ module Mareframe {
             private clearSelection(): void {
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
                     var easelElmt = this.m_selectedItems[i];
-                    var elmtType = this.m_model.getElement(easelElmt.name).getType();
-                    var shape: any = easelElmt.getChildAt(0);
-                    shape.graphics.clear().f(this.m_elementColors[elmtType][0]).s(this.m_elementColors[elmtType][1]);
+                    if (easelElmt.id != this.m_model.getElement(easelElmt.name).m_decisEaselElmt.id) {
+                        var elmtType = this.m_model.getElement(easelElmt.name).getType();
+                        var shape: any = easelElmt.getChildAt(0);
+                        shape.graphics.clear().f(this.m_elementColors[elmtType][0]).s(this.m_elementColors[elmtType][1]);
 
-                    var elmtShapeType: number = 2;
-                    if (this.m_model.m_bbnMode)
-                        elmtShapeType = elmtType;
+                        var elmtShapeType: number = 2;
+                        if (this.m_model.m_bbnMode)
+                            elmtShapeType = elmtType;
 
-                    switch (elmtShapeType) {
-                        case 0:
-                            //chance
-                            shape.graphics.drawEllipse(0, 0, 150, 30);
-                            break;
-                        case 1:
-                            //decision
-                            shape.graphics.drawRect(0, 0, 150, 30);
-                            break;
-                        case 2:
-                            //Value
-                            shape.graphics.drawRoundRect(0, 0, 150, 30, 4);
-                        default:
-                            break;
+                        switch (elmtShapeType) {
+                            case 0:
+                                //chance
+                                shape.graphics.drawEllipse(0, 0, 150, 30);
+                                break;
+                            case 1:
+                                //decision
+                                shape.graphics.drawRect(0, 0, 150, 30);
+                                break;
+                            case 2:
+                                //Value
+                                shape.graphics.drawRoundRect(0, 0, 150, 30, 4);
+                            default:
+                                break;
 
+                        }
                     }
                     
                 }

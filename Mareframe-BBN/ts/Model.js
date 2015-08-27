@@ -85,7 +85,7 @@ var Mareframe;
                         '<interior color="aaaaaa" />\n' +
                         '<outline color="000080" />\n' +
                         '<font color="000000" name="Arial" size="8" />\n' +
-                        '<position>' + (elmt.m_easelElmt.x - 70) + ' ' + (elmt.m_easelElmt.y - 30) + ' ' + (elmt.m_easelElmt.x + 70) + ' ' + (elmt.m_easelElmt.y + 30) + '</position>\n</node>\n';
+                        '<position>' + (elmt.m_easelElmt.x - 75) + ' ' + (elmt.m_easelElmt.y - 15) + ' ' + (elmt.m_easelElmt.x + 75) + ' ' + (elmt.m_easelElmt.y + 15) + '</position>\n</node>\n';
                 });
                 dataStream += '</genie>\n</extensions>\n</smile>\n';
                 return dataStream;
@@ -365,6 +365,7 @@ var Mareframe;
                 this.m_dataMatrix = p_jsonObject.dataMat;
                 this.m_elementArr = [];
                 this.m_connectionArr = [];
+                this.m_counter = 0;
                 var maxX = 0;
                 var maxY = 0;
                 for (var i = 0; i < p_jsonObject.elements.length; i++) {
@@ -398,6 +399,10 @@ var Mareframe;
             Model.prototype.createNewConnection = function (p_inputElmt, p_outputElmt) {
                 var c = new DST.Connection(p_inputElmt, p_outputElmt, this.m_bbnMode, "conn" + this.m_counter);
                 return c;
+            };
+            Model.prototype.setDecision = function (p_elmtIdent, p_decisNumb) {
+                var elmt = this.getElement(p_elmtIdent);
+                console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
             };
             return Model;
         })();

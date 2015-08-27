@@ -11,6 +11,7 @@
             private m_values: number[][] = [];
             private m_updated: boolean = false;
             public m_easelElmt: createjs.Container = new createjs.Container();
+            public m_decisEaselElmt: createjs.Container = new createjs.Container();
             private m_model: Model;
 
             constructor(p_id: string, p_model: Model) {

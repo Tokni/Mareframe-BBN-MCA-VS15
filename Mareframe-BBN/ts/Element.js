@@ -14,6 +14,7 @@ var Mareframe;
                 this.m_values = [];
                 this.m_updated = false;
                 this.m_easelElmt = new createjs.Container();
+                this.m_decisEaselElmt = new createjs.Container();
                 if (p_id.substr(0, 4) == "elmt") {
                     this.m_id = p_id;
                 }

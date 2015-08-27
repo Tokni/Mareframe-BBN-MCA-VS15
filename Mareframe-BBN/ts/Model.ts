@@ -99,7 +99,7 @@
                     '<interior color="aaaaaa" />\n' +
                     '<outline color="000080" />\n' +
                     '<font color="000000" name="Arial" size="8" />\n' +
-                    '<position>' + (elmt.m_easelElmt.x-70) + ' ' + (elmt.m_easelElmt.y-30) + ' ' + (elmt.m_easelElmt.x+70) + ' ' + (elmt.m_easelElmt.y+30) + '</position>\n</node>\n';
+                    '<position>' + (elmt.m_easelElmt.x-75) + ' ' + (elmt.m_easelElmt.y-15) + ' ' + (elmt.m_easelElmt.x+75) + ' ' + (elmt.m_easelElmt.y+15) + '</position>\n</node>\n';
                 });
                 dataStream+='</genie>\n</extensions>\n</smile>\n'
                 return dataStream;
@@ -422,6 +422,7 @@
 
                 this.m_elementArr = [];
                 this.m_connectionArr = [];
+                this.m_counter = 0;
 
 
                 var maxX = 0;
@@ -468,6 +469,11 @@
                 return c;
 
 
+            }
+
+            setDecision(p_elmtIdent: string, p_decisNumb: number): void {
+                var elmt: Element = this.getElement(p_elmtIdent);
+                console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
             }
 
 
