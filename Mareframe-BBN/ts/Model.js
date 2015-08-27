@@ -13,6 +13,7 @@ var Mareframe;
                 this.m_modelPath = "./";
                 this.m_modelChanged = true;
                 this.m_dataMatrix = [];
+                this.m_autoUpdate = false;
                 this.m_bbnMode = p_bbnMode;
                 this.createNewElement = this.createNewElement.bind(this);
                 this.deleteElement = this.deleteElement.bind(this);
@@ -102,6 +103,12 @@ var Mareframe;
             };
             Model.prototype.getIdent = function () {
                 return this.m_modelIdent;
+            };
+            Model.prototype.setAutoUpdate = function (p_bool) {
+                this.m_autoUpdate = p_bool;
+            };
+            Model.prototype.getAutoUpdate = function () {
+                return this.m_autoUpdate;
             };
             Model.prototype.setMainObj = function (p_goalElmt) {
                 this.m_mainObjective = p_goalElmt;

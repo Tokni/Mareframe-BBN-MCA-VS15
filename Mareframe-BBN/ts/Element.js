@@ -8,6 +8,7 @@ var Mareframe;
                 this.m_id = "elmtbroken";
                 this.m_name = "Element";
                 this.m_description = "write description here";
+                this.m_userDescription = "write your own description or comments here";
                 this.m_type = 0;
                 this.m_weightingMethod = 1;
                 this.m_connections = [];
@@ -150,6 +151,12 @@ var Mareframe;
             };
             Element.prototype.setDescription = function (p_description) {
                 this.m_description = p_description;
+            };
+            Element.prototype.getUserDescription = function () {
+                return this.m_userDescription;
+            };
+            Element.prototype.setUserDescription = function (p_description) {
+                this.m_userDescription = p_description;
             };
             Element.prototype.getType = function () {
                 return this.m_type;

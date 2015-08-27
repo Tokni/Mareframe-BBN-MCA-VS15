@@ -5,7 +5,6 @@ var Mareframe;
         var GUIHandler = (function () {
             function GUIHandler(p_model, p_handler) {
                 this.m_editorMode = false;
-                this.m_autoUpdate = false;
                 this.m_showDescription = true;
                 this.m_mcaStage = new createjs.Stage("MCATool");
                 this.m_valueFnStage = new createjs.Stage("valueFn_canvas");
@@ -54,12 +53,12 @@ var Mareframe;
                     console.log(cb);
                     this.m_editorMode = cb.currentTarget.checked;
                     this.updateEditorMode();
-                    console.log("editormode: " + this);
+                    console.log("editormode: " + this.m_editorMode);
                 };
                 this.setAutoUpdate = function (cb) {
                     console.log(cb);
-                    this.m_autoUpdate = cb.currentTarget.checked;
-                    console.log("auto update: " + this);
+                    this.m_model.setAutoUpdate(cb.currentTarget.checked);
+                    console.log("auto update: " + this.m_model.getAutoUpdate);
                 };
                 this.m_handler = p_handler;
                 if (p_model.m_bbnMode) {
@@ -283,7 +282,7 @@ var Mareframe;
                 console.log(this);
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
                     this.populateElmtDetails(this.m_model.getElement(p_evt.target.name));
-                    if (this.m_editorMode && this.m_model.m_bbnMode) {
+                    if (this.m_model.m_bbnMode) {
                         $("#submit").show();
                     }
                     else {
@@ -301,6 +300,7 @@ var Mareframe;
                 if (this.m_model.m_bbnMode) {
                     //bbn mode only
                     $("#detailsDialog").data("element", p_elmt);
+                    $("#detailsDialog").data("model", this.m_model);
                     var s = DST.Tools.htmlTableFromArray("Definition", p_elmt.getData());
                     $("#defTable_div").html(s);
                     $("#defTable_div").show();
@@ -312,6 +312,9 @@ var Mareframe;
                         document.getElementById("description_div").innerHTML = p_elmt.getDescription();
                         $("#description_div").show();
                     }
+                    //set user description
+                    document.getElementById("userDescription_div").innerHTML = p_elmt.getUserDescription();
+                    $("#userDescription_div").show();
                     if (p_elmt.isUpdated()) {
                         $("#values").prop('disabled', false);
                     }
@@ -525,8 +528,12 @@ var Mareframe;
                 $("#values").prop("disabled", true);
             };
             GUIHandler.prototype.saveChanges = function () {
-                //Save description
                 var elmt = $("#detailsDialog").data("element");
+                var model = $("#detailsDialog").data("model");
+                //Save user description
+                var userDescription = $("#userDescription_div").text();
+                elmt.setUserDescription(userDescription);
+                //Save description
                 var description = $("#description_div").text();
                 elmt.setDescription(description);
                 //Save def table
@@ -559,8 +566,8 @@ var Mareframe;
                 }
                 else {
                     elmt.setData(newTable);
-                    if (this.m_autoUpdate) {
-                        this.m_model.update();
+                    if (model.getAutoUpdate()) {
+                        model.update();
                     }
                     else {
                         elmt.setUpdated(false);

@@ -4,7 +4,6 @@ module Mareframe {
     export module DST {
         export class GUIHandler {
             public m_editorMode: boolean = false;
-            public m_autoUpdate: boolean = false;
             public m_showDescription: boolean = true;
             private m_handler: Handler;
             private m_mcaStage: createjs.Stage = new createjs.Stage("MCATool");
@@ -264,12 +263,12 @@ module Mareframe {
                 console.log(cb);
                 this.m_editorMode = cb.currentTarget.checked;
                 this.updateEditorMode();
-                console.log("editormode: " + this);
+                console.log("editormode: " + this.m_editorMode);
             }
             private setAutoUpdate = function (cb) {
                 console.log(cb);
-                this.m_autoUpdate = cb.currentTarget.checked;
-                console.log("auto update: " + this);
+                this.m_model.setAutoUpdate(cb.currentTarget.checked);
+                console.log("auto update: " + this.m_model.getAutoUpdate);
             }
             private createNewElement(p_evt: Event) {
                 var elmt = this.m_model.createNewElement()
@@ -346,7 +345,7 @@ module Mareframe {
                 console.log(this);
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
                     this.populateElmtDetails(this.m_model.getElement(p_evt.target.name));
-                    if (this.m_editorMode && this.m_model.m_bbnMode) {
+                    if (this.m_model.m_bbnMode) {
                         $("#submit").show();
                     } else {
                         $("#submit").hide();
@@ -357,7 +356,6 @@ module Mareframe {
             }
 
             private populateElmtDetails(p_elmt: Element): void {
-
                 console.log(p_elmt)
                 //set dialog title
                 $("#detailsDialog").dialog({
@@ -368,6 +366,7 @@ module Mareframe {
                 if (this.m_model.m_bbnMode) {
                     //bbn mode only
                     $("#detailsDialog").data("element", p_elmt);
+                    $("#detailsDialog").data("model", this.m_model);
 
 
                     var s = Tools.htmlTableFromArray("Definition", p_elmt.getData());
@@ -377,10 +376,14 @@ module Mareframe {
                         this.addEditFunction();
                     }
                     if (this.m_showDescription) {
-                    //set description
-                    document.getElementById("description_div").innerHTML = p_elmt.getDescription();
-                    $("#description_div").show();
+                        //set description
+                        document.getElementById("description_div").innerHTML = p_elmt.getDescription();
+                        $("#description_div").show();
                     }
+                    //set user description
+                    document.getElementById("userDescription_div").innerHTML = p_elmt.getUserDescription();
+                    $("#userDescription_div").show();
+                    
                     if (p_elmt.isUpdated()) {
                         $("#values").prop('disabled', false);
                     } else {
@@ -636,8 +639,12 @@ module Mareframe {
             }
 
             private saveChanges() {
-                //Save description
                 var elmt: Element = $("#detailsDialog").data("element");
+                var model: Model = $("#detailsDialog").data("model");
+                //Save user description
+                var userDescription = $("#userDescription_div").text();
+                elmt.setUserDescription(userDescription);
+                //Save description
                 var description = $("#description_div").text();
                 elmt.setDescription(description);
                 //Save def table
@@ -669,8 +676,9 @@ module Mareframe {
                     alert("The values in each column must add up to 1");
                 } else {
                     elmt.setData(newTable);
-                    if (this.m_autoUpdate) {
-                        this.m_model.update();
+
+                    if (model.getAutoUpdate()) {
+                        model.update();
                     }
                     else {
                         elmt.setUpdated(false);

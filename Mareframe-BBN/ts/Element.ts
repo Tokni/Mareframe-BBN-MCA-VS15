@@ -5,6 +5,7 @@
             private m_id: string = "elmtbroken"
             private m_name: string = "Element";
             private m_description: string = "write description here";
+            private m_userDescription: string = "write your own description or comments here";
             private m_type: number = 0;
             private m_weightingMethod: number = 1;
             private m_connections: Connection[] = [];
@@ -19,7 +20,7 @@
                 else { this.m_id = "elmt" + p_id; }
                 this.m_model = p_model;
             }
-
+            
             getValues(): any[][] {
                 return this.m_values;
             }
@@ -177,6 +178,12 @@
             }
             setDescription(p_description: string): void {
                 this.m_description = p_description
+            }
+            getUserDescription(): string {
+                return this.m_userDescription;
+            }
+            setUserDescription(p_description: string): void {
+                this.m_userDescription = p_description
             }
             getType(): number {
                 return this.m_type;
