@@ -241,13 +241,14 @@ module Mareframe {
                 if (this.m_model.m_bbnMode) {
                     var backgroundColors = ["#b6b6b6", "#afafd0"]
                     var decisionCont: createjs.Container = new createjs.Container();
-                    for (var i = 0; i < p_elmt.getData().length; i++) {
+                    for (var i = 0; i < p_elmt.getValues().length; i++) {
                         
                         
 
                         var decisRect: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
-                        
-                        var decisName: createjs.Text = new createjs.Text(p_elmt.getData(i, 0).substr(0, 12), "0.8em trebuchet", "#303030");
+                        console.log(p_elmt.getName());
+                        console.log(p_elmt.getValues());
+                        var decisName: createjs.Text = new createjs.Text(p_elmt.getValues()[i][0].substr(0, 12), "0.8em trebuchet", "#303030");
                         decisName.textBaseline = "middle";
                         decisName.maxWidth = 68;
                         decisName.x = 2;
@@ -256,7 +257,7 @@ module Mareframe {
                         decisionCont.addChild(decisRect);
                         decisionCont.addChild(decisName);
                         if (elmtShapeType === 0) {
-                            var percentageData: number = p_elmt.getData(i, 1)
+                            var percentageData: number = p_elmt.getValues()[i][1];
 
                             var decisBarBackgr: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
                             var decisBar: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * percentageData, 10));
@@ -283,9 +284,9 @@ module Mareframe {
                     p_elmt.m_decisEaselElmt = decisionCont;
                     this.m_mcaContainer.addChild(decisionCont);
 
-                    if (p_elmt.getType() == 2) {
-                        decisionCont.visible = false;
-                    }
+                    //if (p_elmt.getType() == 2) {
+                    //    decisionCont.visible = false;
+                    //}
                 }
             }
 
@@ -1028,7 +1029,10 @@ module Mareframe {
             private addToSelection(p_easelElmt: createjs.Container): void {
                 if (this.m_selectedItems.indexOf(p_easelElmt) === -1 && p_easelElmt.name.substr(0, 4) === "elmt") {
                     var elmt = this.m_model.getElement(p_easelElmt.name)
-                    this.m_selectedItems.push(p_easelElmt, elmt.m_decisEaselElmt);
+                    this.m_selectedItems.push(p_easelElmt);
+                    if (this.m_model.m_bbnMode) {
+                        this.m_selectedItems.push(elmt.m_decisEaselElmt);
+                    }
                     var elmtType = elmt.getType();
                     //////console.log(e);
                     var shape: createjs.Shape = <createjs.Shape>p_easelElmt.getChildAt(0);
@@ -1049,7 +1053,7 @@ module Mareframe {
                             break;
                         case 2:
                             //Value
-                            shape.graphics.drawRoundRect(0, 0, 150, 30, 4);
+                            shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
                         default:
                             break;
                     }
@@ -1093,7 +1097,7 @@ module Mareframe {
                             break;
                         case 2:
                             //Value
-                            shape.graphics.drawRoundRect(0, 0, 150, 30, 4);
+                            shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
                         default:
                             break;
 
