@@ -241,9 +241,10 @@ module Mareframe {
                 if (this.m_model.m_bbnMode) {
                     var backgroundColors = ["#b6b6b6", "#afafd0"]
                     var decisionCont: createjs.Container = new createjs.Container();
+                    
                     for (var i = 0; i < p_elmt.getValues().length; i++) {
-                        
-                        
+
+
 
                         var decisRect: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
                         console.log(p_elmt.getName());
@@ -256,23 +257,33 @@ module Mareframe {
 
                         decisionCont.addChild(decisRect);
                         decisionCont.addChild(decisName);
+
+                        var valueData: number = p_elmt.getValues()[i][1];
+
+
+
+
+                        var decisBarBackgr: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
+                        var decisBar: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
+                        
                         if (elmtShapeType === 0) {
-                            var percentageData: number = p_elmt.getValues()[i][1];
+                            var decisPercVal: createjs.Text = new createjs.Text(Math.floor(valueData * 100) + "%", "0.8em trebuchet", "#303030");
+                        } else {
+                            decisBar.visible = false;
+                            var decisPercVal: createjs.Text = new createjs.Text(""+valueData, "0.8em trebuchet", "#303030");
 
-                            var decisBarBackgr: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
-                            var decisBar: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * percentageData, 10));
+                        }
 
 
-                            var decisPercVal: createjs.Text = new createjs.Text(Math.floor(percentageData * 100) + "%", "0.8em trebuchet", "#303030");
-                            decisPercVal.textBaseline = "middle";
-                            decisPercVal.maxWidth = 22;
-                            decisPercVal.x = 71;
-                            decisPercVal.y = 6 + (i * 12);
+                        decisPercVal.textBaseline = "middle";
+                        decisPercVal.maxWidth = 22;
+                        decisPercVal.x = 71;
+                        decisPercVal.y = 6 + (i * 12);
 
-                            decisionCont.addChild(decisBarBackgr);
-                            decisionCont.addChild(decisBar);
-                            decisionCont.addChild(decisPercVal);
-            }
+                        decisionCont.addChild(decisBarBackgr);
+                        decisionCont.addChild(decisBar);
+                        decisionCont.addChild(decisPercVal);
+
 
 
 
@@ -284,9 +295,9 @@ module Mareframe {
                     p_elmt.m_decisEaselElmt = decisionCont;
                     this.m_mcaContainer.addChild(decisionCont);
 
-                    //if (p_elmt.getType() == 2) {
-                    //    decisionCont.visible = false;
-                    //}
+                    if (p_elmt.getType() == 2) {
+                        decisionCont.visible = false;
+                    }
                 }
             }
 
