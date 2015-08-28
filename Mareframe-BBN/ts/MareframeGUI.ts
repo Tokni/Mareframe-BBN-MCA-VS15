@@ -752,11 +752,12 @@ module Mareframe {
                         model.update();
                     }
                     else {
-                    elmt.setUpdated(false);
-                    //TODO set all elements which are affected by this change to updated = false
+                        elmt.setUpdated(false);
+                        //TODO set all elements which are affected by this change to updated = false
+                    }
+                    ////console.log("new table after submit:");
+                    ////console.log(elmt.getData());
                 }
-                ////console.log("new table after submit:");
-                ////console.log(elmt.getData());
             }
 
             
