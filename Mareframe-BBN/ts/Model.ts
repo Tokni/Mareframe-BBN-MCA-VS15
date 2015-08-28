@@ -11,6 +11,7 @@
             private m_modelChanged: boolean = true;
             private m_dataMatrix: any[][] = [];
             private m_mainObjective: Element;
+            private m_autoUpdate: boolean = false;
             constructor(p_bbnMode: boolean) {
                 this.m_bbnMode = p_bbnMode;
                 this.createNewElement = this.createNewElement.bind(this);
@@ -120,7 +121,12 @@
             getIdent(): string {
                 return this.m_modelIdent;
             }
-
+            setAutoUpdate(p_bool: boolean): void {
+                this.m_autoUpdate = p_bool;
+            }
+            getAutoUpdate(): boolean {
+                return this.m_autoUpdate;
+            }
             setMainObj(p_goalElmt: Element): void {
                 this.m_mainObjective = p_goalElmt;
             }

@@ -70,7 +70,9 @@
             <input class="advButton" type="checkbox" id="cnctTool"><label for="cnctTool" class="advButton">Connect Tool</label>
             <div style="float:right">
                 <input class="button" type="checkbox" id="editorMode">
-                <label for="editorMode" class="button" >Editor Mode</label>
+                <label for="editorMode" class="button">Editor Mode</label>
+                <input class="button" type="checkbox" id="autoUpdate">
+                <label for="autoUpdate" class="button">Automatically update</label>
                 <button class="button" id="updateMdl">Update</button>
             </div>
         </div>
@@ -89,6 +91,9 @@
     <!--Popup Dialog-->
     <div id="detailsDialog">
         <div id="description_div"></div>  
+        <input class="dialogButton" type="checkbox" id="showDescription">
+        <label for="showDescription" class="button">Show Description</label> 
+        <div id="userDescription_div" contenteditable=true> </div>
     	<div class="editable ">
            <div id="defTable_div"></div> 		
     	</div>
@@ -105,6 +110,7 @@
         $("#deleteElmt").button({ icons: { primary: "ui-icon-trash" } });
         $("#cnctTool").button({ icons: { primary: "ui-icon-link" } });
         $("#editorMode").button({ icons: { primary: "ui-icon-link" } });
+        $("#autoUpdate").button({ icons: { primary: "ui-icon-refresh" } });
         $("#updateMdl").button({ icons: { primary: "ui-icon-refresh" } });
         $("#resetDcmt").button({ icons: { primary: "ui-icon-arrowreturnthick-1-w" } })
         $("#selectAllElmt").button({ icons: { primary: "ui-icon-star" } });
