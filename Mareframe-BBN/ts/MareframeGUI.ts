@@ -701,7 +701,9 @@ module Mareframe {
 
             private showValues() {
                 var elmt: Element = $("#detailsDialog").data("element");
-                $("#valuesTable_div").html(Tools.htmlTableFromArray("Values", elmt.getData()));
+                console.log("Data: " + elmt.getData());
+                console.log("Values: " + elmt.getValues());
+                $("#valuesTable_div").html(Tools.htmlTableFromArray("Values", elmt.getValues()));
                 $("#valuesTable_div").show();
                 $("#values").prop("disabled", true);
             }

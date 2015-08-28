@@ -306,7 +306,7 @@ var Mareframe;
                 var element = p_element;
                 //console.log("calculate valeus for " + p_element.getName());
                 if (element.getType() !== 1) {
-                    // console.log("calculate valeus for " + this.getName());
+                    console.log("calculate valeus for " + p_element.getName());
                     var data = element.getData();
                     var headerRows = [];
                     var takenIntoAccount = [];
@@ -347,8 +347,11 @@ var Mareframe;
                         headerRows.push(newValues);
                         newValues = headerRows;
                     }
-                    // //console.log("new values: " + newValues)
-                    element.setValues(newValues);
+                    console.log("new values: " + newValues);
+                    p_element.setValues(newValues);
+                    console.log("hello");
+                    //p_element.setData(newValues);
+                    console.log("yes?");
                 }
                 else {
                     console.log("decisions node begin");
@@ -390,7 +393,7 @@ var Mareframe;
                                     value += Tools.getHighest(valueArray);
                                 }
                             });
-                            console.log("i: " + i + "  j: " + j + "  Value: " + value);
+                            //console.log("i: " + i + "  j: " + j + "  Value: " + value);
                             values[i][j] = value;
                         }
                     }

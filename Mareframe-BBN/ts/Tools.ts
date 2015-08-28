@@ -335,7 +335,7 @@
                 
 
                 if (element.getType() !== 1) {//If its a chance or value node
-                    // console.log("calculate valeus for " + this.getName());
+                    console.log("calculate valeus for " + p_element.getName());
                     var data = element.getData();
                     var headerRows = [];
                     var takenIntoAccount = [];
@@ -374,8 +374,12 @@
                         headerRows.push(newValues);
                         newValues = headerRows;
                     }
-                    // //console.log("new values: " + newValues)
-                    element.setValues(newValues);
+                    console.log("new values: " + newValues)
+                    p_element.setValues(newValues);
+                    console.log("hello");
+                    //p_element.setData(newValues);
+                   
+                    console.log("yes?");
                 } else {//If it is a decision node
                     console.log("decisions node begin");
                     element.setValues(element.updateHeaderRows(element.copyDefArray()));
@@ -415,7 +419,7 @@
                                     value += Tools.getHighest(valueArray);
                                 }
                             })
-                            console.log("i: " + i + "  j: " + j + "  Value: " + value);
+                            //console.log("i: " + i + "  j: " + j + "  Value: " + value);
                             values[i][j] = value;
                             
                         }
