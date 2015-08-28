@@ -8,6 +8,7 @@ var Mareframe;
                 this.m_id = "elmtbroken";
                 this.m_name = "Element";
                 this.m_description = "write description here";
+                this.m_userDescription = "write your own description or comments here";
                 this.m_type = 0;
                 this.m_weightingMethod = 1;
                 this.m_connections = [];
@@ -57,7 +58,7 @@ var Mareframe;
             };
             Element.prototype.copyDefArray = function () {
                 var valueArray = [];
-                ////console.log(this);
+                //console.log(this);
                 for (var i = 0; i < this.m_data.length; i++) {
                     valueArray[i] = [];
                     for (var j = 0; j < this.m_data[0].length; j++) {
@@ -67,7 +68,7 @@ var Mareframe;
                 return valueArray;
             };
             Element.prototype.updateData = function () {
-                ////console.log("updateData " + this.m_name);
+                //console.log("updateData " + this.m_name);
                 this.m_data = this.updateHeaderRows(this.m_data);
             };
             Element.prototype.updateHeaderRows = function (p_originalData) {
@@ -77,7 +78,7 @@ var Mareframe;
                 var parents = this.getParentElements();
                 for (var i = 0; i < parents.length; i++) {
                     var elmt = parents[i];
-                    ////console.log("Parent: " + elmt.getName());
+                    //console.log("Parent: " + elmt.getName());
                     data = DST.Tools.addNewHeaderRow(elmt.getMainValues(), data, this.m_data);
                 }
                 //Add original values to the table
@@ -91,7 +92,7 @@ var Mareframe;
             };
             //returns the different variables (conditions or choices) that belong to the element
             Element.prototype.getMainValues = function () {
-                ////console.log(this.m_data);
+                //console.log(this.m_data);
                 var row = [];
                 var data = this.m_data;
                 row.push(this.m_name);
@@ -156,6 +157,12 @@ var Mareframe;
             Element.prototype.setDescription = function (p_description) {
                 this.m_description = p_description;
             };
+            Element.prototype.getUserDescription = function () {
+                return this.m_userDescription;
+            };
+            Element.prototype.setUserDescription = function (p_description) {
+                this.m_userDescription = p_description;
+            };
             Element.prototype.getType = function () {
                 return this.m_type;
             };
@@ -200,8 +207,8 @@ var Mareframe;
                 return { posX: this.m_easelElmt.x, posY: this.m_easelElmt.y, elmtID: this.getID(), elmtName: this.getName(), elmtDesc: this.getDescription(), elmtType: this.getType(), elmtData: this.getData(), elmtWghtMthd: this.getMethod() };
             };
             Element.prototype.fromJSON = function (p_jsonElmt) {
-                ////console.log("element.fromJSON()");
-                ////console.log(p_jsonElmt);
+                //console.log("element.fromJSON()");
+                //console.log(p_jsonElmt);
                 this.m_easelElmt.x = p_jsonElmt.posX;
                 this.m_easelElmt.y = p_jsonElmt.posY;
                 this.m_id = p_jsonElmt.elmtID;
@@ -210,6 +217,7 @@ var Mareframe;
                 this.m_type = p_jsonElmt.elmtType;
                 this.m_data = p_jsonElmt.elmtData;
                 this.m_weightingMethod = p_jsonElmt.elmtWghtMthd;
+                this.m_is;
             };
             return Element;
         })();

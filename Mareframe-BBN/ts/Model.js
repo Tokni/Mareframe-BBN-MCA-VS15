@@ -13,6 +13,7 @@ var Mareframe;
                 this.m_modelPath = "./";
                 this.m_modelChanged = true;
                 this.m_dataMatrix = [];
+                this.m_autoUpdate = false;
                 this.m_bbnMode = p_bbnMode;
                 this.createNewElement = this.createNewElement.bind(this);
                 this.deleteElement = this.deleteElement.bind(this);
@@ -102,6 +103,12 @@ var Mareframe;
             };
             Model.prototype.getIdent = function () {
                 return this.m_modelIdent;
+            };
+            Model.prototype.setAutoUpdate = function (p_bool) {
+                this.m_autoUpdate = p_bool;
+            };
+            Model.prototype.getAutoUpdate = function () {
+                return this.m_autoUpdate;
             };
             Model.prototype.setMainObj = function (p_goalElmt) {
                 this.m_mainObjective = p_goalElmt;
@@ -376,6 +383,7 @@ var Mareframe;
                     //if (JsonElmt.posY > maxY)
                     //    maxY = JsonElmt.posY;
                     elmt.fromJSON(JsonElmt);
+                    console.log("created from json: " + elmt.getName());
                 }
                 for (var i = 0; i < p_jsonObject.connections.length; i++) {
                     var conn = p_jsonObject.connections[i];
@@ -389,7 +397,10 @@ var Mareframe;
                     this.m_mainObjective = this.getElement(p_jsonObject.mainObj);
                 for (var i = 0; i < p_jsonObject.elements.length; i++) {
                     if (this.m_bbnMode)
-                        elmt.update();
+                        //console.log("from json: " + elmt.getName());
+                        //console.log(this.m_elementArr);
+                        //elmt.update();
+                        this.m_elementArr[i].update();
                 }
                 //h.gui.setSize(maxX + 80, maxY + 20);
                 //h.gui.updateTable(this.dataMatrix);

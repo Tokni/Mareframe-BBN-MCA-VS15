@@ -5,6 +5,7 @@ var Mareframe;
         var GUIHandler = (function () {
             function GUIHandler(p_model, p_handler) {
                 this.m_editorMode = false;
+                this.m_showDescription = true;
                 this.m_mcaStage = new createjs.Stage("MCATool");
                 this.m_valueFnStage = new createjs.Stage("valueFn_canvas");
                 this.m_controlP = new createjs.Shape();
@@ -39,21 +40,35 @@ var Mareframe;
                 };
                 this.m_elementColors = [["#efefff", "#15729b", "#dfdfff"], ["#ffefef", "#c42f33", "#ffdfdf"], ["#fff6e0", "#f6a604", "#fef4c6"], ["#efffef", "#2fc433", "#dfffdf"]];
                 this.m_trashBin = [];
+                this.setShowDescription = function (cb) {
+                    this.m_showDescription = cb.currentTarget.checked;
+                    if (this.m_showDescription) {
+                        $("#description_div").show();
+                    }
+                    else {
+                        $("#description_div").hide();
+                    }
+                };
                 this.setEditorMode = function (cb) {
-                    ////console.log(cb);
+                    console.log(cb);
                     this.m_editorMode = cb.currentTarget.checked;
                     this.updateEditorMode();
-                    ////console.log("editormode: " + this);
+                    console.log("editormode: " + this.m_editorMode);
+                };
+                this.setAutoUpdate = function (cb) {
+                    console.log(cb);
+                    this.m_model.setAutoUpdate(cb.currentTarget.checked);
+                    console.log("auto update: " + this.m_model.getAutoUpdate);
                 };
                 this.m_handler = p_handler;
-                ////console.log(this.m_handler);
                 if (p_model.m_bbnMode) {
                     $("#detailsDialog").on('dialogclose', function (event) {
                         $("#valuesTable_div").hide();
                     });
-                    $("#submit").on("click", this.saveDefTable);
+                    $("#submit").on("click", this.saveChanges);
                     $("#values").on("click", this.showValues);
                     this.setEditorMode = this.setEditorMode.bind(this);
+                    this.setAutoUpdate = this.setAutoUpdate.bind(this);
                 }
                 this.pressMove = this.pressMove.bind(this);
                 this.mouseDown = this.mouseDown.bind(this);
@@ -92,6 +107,8 @@ var Mareframe;
                 $("#newElmt").on("click", this.createNewElement);
                 $("#deleteElmt").on("click", this.deleteSelected);
                 $("#editorMode").on("click", this.setEditorMode);
+                $("#showDescription").on("click", this.setShowDescription);
+                $("#autoUpdate").on("click", this.setAutoUpdate);
                 $("#resetDcmt").on("click", this.quickLoad);
                 $("#updateMdl").on("click", this.updateModel);
                 $("#selectAllElmt").on("click", this.selectAll);
@@ -141,12 +158,12 @@ var Mareframe;
             GUIHandler.prototype.importStage = function () {
                 console.log("importing stage");
                 this.m_mcaContainer.removeAllChildren();
-                console.log(this.m_model);
+                //console.log(this);
                 var elmts = this.m_model.getElementArr();
                 var conns = this.m_model.getConnectionArr();
                 for (var i = 0; i < elmts.length; i++) {
-                    //////console.log("adding to stage:")
-                    //////console.log(elmts[i]);
+                    //console.log("adding to stage:")
+                    //console.log(elmts[i]);
                     this.addElementToStage(elmts[i]);
                 }
                 for (var i = 0; i < conns.length; i++) {
@@ -160,7 +177,7 @@ var Mareframe;
             };
             ;
             GUIHandler.prototype.mouseUp = function (p_evt) {
-                ////console.log("mouse up");
+                //console.log("mouse up");
                 this.m_updateMCAStage = true;
             };
             GUIHandler.prototype.updateElement = function (p_elmt) {
@@ -263,7 +280,7 @@ var Mareframe;
                 this.addElementToStage(elmt);
             };
             GUIHandler.prototype.deleteSelected = function (p_evt) {
-                ////console.log("deleting");
+                console.log("deleting");
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
                     var elmt = this.m_model.getElement(this.m_selectedItems[i].name);
                     if (this.addToTrash(elmt)) {
@@ -318,7 +335,7 @@ var Mareframe;
                 ////console.log(this);
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
                     this.populateElmtDetails(this.m_model.getElement(p_evt.target.name));
-                    if (this.m_editorMode && this.m_model.m_bbnMode) {
+                    if (this.m_model.m_bbnMode) {
                         $("#submit").show();
                     }
                     else {
@@ -336,15 +353,21 @@ var Mareframe;
                 if (this.m_model.m_bbnMode) {
                     //bbn mode only
                     $("#detailsDialog").data("element", p_elmt);
+                    $("#detailsDialog").data("model", this.m_model);
                     var s = DST.Tools.htmlTableFromArray("Definition", p_elmt.getData());
                     $("#defTable_div").html(s);
                     $("#defTable_div").show();
                     if (this.m_editorMode) {
                         this.addEditFunction();
                     }
-                    //set description
-                    document.getElementById("description_div").innerHTML = p_elmt.getDescription();
-                    $("#description_div").show();
+                    if (this.m_showDescription) {
+                        //set description
+                        document.getElementById("description_div").innerHTML = p_elmt.getDescription();
+                        $("#description_div").show();
+                    }
+                    //set user description
+                    document.getElementById("userDescription_div").innerHTML = p_elmt.getUserDescription();
+                    $("#userDescription_div").show();
                     if (p_elmt.isUpdated()) {
                         $("#values").prop('disabled', false);
                     }
@@ -354,7 +377,7 @@ var Mareframe;
                 }
                 else {
                     //MCA mode only
-                    //////console.log(tableMat);
+                    //console.log(tableMat);
                     var chartOptions = {
                         width: 700,
                         height: 400,
@@ -475,6 +498,27 @@ var Mareframe;
             ;
             GUIHandler.prototype.addEditFunction = function () {
                 $(function () {
+                    $("#description_div").dblclick(function () {
+                        var originalValue = $(this).text();
+                        $(this).addClass("editable");
+                        $(this).html("<input type='text' value='" + originalValue + "' />");
+                        $(this).children().first().focus();
+                        $(this).children().first().keypress(function (e) {
+                            if (e.which == 13) {
+                                var newText = $(this).val();
+                                $(this).parent().text(newText);
+                            }
+                            $(this).parent().removeClass("editable");
+                        });
+                        $(this).children().first().blur(function () {
+                            var newText = $(this).val();
+                            $(this).parent().text(newText);
+                            $(this).parent().text(newText);
+                            $(this).parent().removeClass("editable");
+                        });
+                    });
+                });
+                $(function () {
                     $("td").dblclick(function () {
                         var originalValue = $(this).text();
                         $(this).addClass("editable");
@@ -536,8 +580,16 @@ var Mareframe;
                 $("#valuesTable_div").show();
                 $("#values").prop("disabled", true);
             };
-            GUIHandler.prototype.saveDefTable = function () {
+            GUIHandler.prototype.saveChanges = function () {
                 var elmt = $("#detailsDialog").data("element");
+                var model = $("#detailsDialog").data("model");
+                //Save user description
+                var userDescription = $("#userDescription_div").text();
+                elmt.setUserDescription(userDescription);
+                //Save description
+                var description = $("#description_div").text();
+                elmt.setDescription(description);
+                //Save def table
                 var table = $("#defTable_div");
                 var newTable = [];
                 var newRow = [];
@@ -569,10 +621,13 @@ var Mareframe;
                 }
                 else {
                     elmt.setData(newTable);
-                    elmt.setUpdated(false);
+                    if (model.getAutoUpdate()) {
+                        model.update();
+                    }
+                    else {
+                        elmt.setUpdated(false);
+                    }
                 }
-                ////console.log("new table after submit:");
-                ////console.log(elmt.getData());
             };
             GUIHandler.prototype.updateValFnCP = function (p_controlPointX, p_controlPointY, p_flipped_numBool) {
                 //var functionSegments = 10;
@@ -681,7 +736,7 @@ var Mareframe;
                 this.addToSelection(p_evt.target);
             };
             GUIHandler.prototype.pressMove = function (p_evt) {
-                //////console.log("press move");
+                //console.log("press move");
                 if (p_evt.target.name === "hitarea") {
                     if (p_evt.nativeEvent.ctrlKey) {
                         ////console.log("orig: " + this.m_originalPressX + ", " + this.m_originalPressY + ". curr: " + p_evt.stageX + ", " + p_evt.stageY);
@@ -690,7 +745,7 @@ var Mareframe;
                         this.m_mcaContainer.addChild(this.m_selectionBox);
                     }
                     else if (this.m_editorMode) {
-                        //////console.log("panning");
+                        //console.log("panning");
                         this.m_mcaContainer.x += p_evt.stageX - this.m_oldX;
                         this.m_mcaContainer.y += p_evt.stageY - this.m_oldY;
                     }
@@ -725,13 +780,13 @@ var Mareframe;
             GUIHandler.prototype.connectTo = function (p_evt) {
                 var elmtIdent = p_evt.target.name;
                 var connected = false;
-                //////console.log("attempting connection "+elmtIdent);
+                //console.log("attempting connection "+elmtIdent);
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
                     var e = this.m_selectedItems[i];
                     if (e.name.substr(0, 4) === "elmt" && e.name !== elmtIdent) {
                         var outputElmt = this.m_model.getElement(elmtIdent);
                         var c = this.m_model.createNewConnection(this.m_model.getElement(e.name), outputElmt);
-                        //////console.log("connection: " + c);
+                        //console.log("connection: " + c);
                         if (this.m_model.addConnection(c)) {
                             this.addConnectionToStage(c);
                             connected = true;

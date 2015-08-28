@@ -176,7 +176,7 @@ module Mareframe {
             importStage(): void {
                 console.log("importing stage");
                 this.m_mcaContainer.removeAllChildren();
-                console.log(this.m_model);
+                //console.log(this);
                 var elmts = this.m_model.getElementArr();
                 var conns = this.m_model.getConnectionArr();
                 for (var i = 0; i < elmts.length; i++) {
@@ -197,7 +197,7 @@ module Mareframe {
             };
 
             private mouseUp(p_evt: createjs.MouseEvent) {
-                console.log("mouse up");
+                //console.log("mouse up");
                 this.m_updateMCAStage = true;
             }
 
@@ -271,7 +271,7 @@ module Mareframe {
                             decisionCont.addChild(decisBarBackgr);
                             decisionCont.addChild(decisBar);
                             decisionCont.addChild(decisPercVal);
-                        }
+            }
 
 
 
@@ -752,9 +752,9 @@ module Mareframe {
                         model.update();
                     }
                     else {
-                        elmt.setUpdated(false);
-                        //TODO set all elements which are affected by this change to updated = false
-                    }
+                    elmt.setUpdated(false);
+                    //TODO set all elements which are affected by this change to updated = false
+                }
                     ////console.log("new table after submit:");
                     ////console.log(elmt.getData());
                 }

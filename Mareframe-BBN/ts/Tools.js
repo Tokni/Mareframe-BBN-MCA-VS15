@@ -51,7 +51,7 @@ var Mareframe;
                 for (var i = 0; i < sURLVariables.length; i++) {
                     var sParameterName = sURLVariables[i].split('=');
                     if (sParameterName[0] === p_sParam) {
-                        ////console.log("returning " + sParameterName[1] + " to handler");
+                        //console.log("returning " + sParameterName[1] + " to handler");
                         return sParameterName[1];
                     }
                 }
@@ -137,15 +137,15 @@ var Mareframe;
                     }
                     htmlString += "</tr>";
                 }
-                ////console.log("html table: " + htmlString);
+                //console.log("html table: " + htmlString);
                 return htmlString;
             };
             Tools.round = function (numb) {
                 return Number(Math.round(numb * 1000) / 1000);
             };
             Tools.getColumn = function (p_matrix, index) {
-                ////console.log("get column " + index + " from " + p_matrix)
-                ////console.log(p_matrix)
+                //console.log("get column " + index + " from " + p_matrix)
+                //console.log(p_matrix)
                 var rows = math.size(p_matrix).valueOf()[0];
                 var range = math.range(0, rows);
                 // //console.log("returned: " + math.subset(matrix, math.index(range, index)))
@@ -304,8 +304,9 @@ var Mareframe;
             Tools.calculateValues = function (p_model, p_element) {
                 var model = p_model;
                 var element = p_element;
+                //console.log("calculate valeus for " + p_element.getName());
                 if (element.getType() !== 1) {
-                    // //console.log("calculate valeus for " + this.getName());
+                    // console.log("calculate valeus for " + this.getName());
                     var data = element.getData();
                     var headerRows = [];
                     var takenIntoAccount = [];
@@ -350,6 +351,7 @@ var Mareframe;
                     element.setValues(newValues);
                 }
                 else {
+                    console.log("decisions node begin");
                     element.setValues(element.updateHeaderRows(element.copyDefArray()));
                     var values = element.getValues();
                     //Number of header rows is equal to number of rows in values minus number of rows in deftinition
@@ -388,9 +390,12 @@ var Mareframe;
                                     value += Tools.getHighest(valueArray);
                                 }
                             });
+                            console.log("i: " + i + "  j: " + j + "  Value: " + value);
                             values[i][j] = value;
                         }
                     }
+                    console.log("decisions end");
+                    p_element.setData(values);
                 }
             };
             Tools.addNewHeaderRow = function (p_headerRow, p_table, p_data) {
