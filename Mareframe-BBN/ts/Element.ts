@@ -59,7 +59,7 @@
 
             copyDefArray(): any[] {
                 var valueArray = [];
-                console.log(this);
+                //console.log(this);
                 for (var i = 0; i < this.m_data.length; i++) {
                     valueArray[i] = [];
                     for (var j = 0; j < this.m_data[0].length; j++) {
@@ -75,7 +75,7 @@
             
 
             updateData() {
-                console.log("updateData " + this.m_name);
+                //console.log("updateData " + this.m_name);
                 this.m_data = this.updateHeaderRows(this.m_data);
             }
 
@@ -86,7 +86,7 @@
                 var parents: Element[] = this.getParentElements();
                 for (var i = 0; i < parents.length; i++) {
                     var elmt: Element = parents[i];
-                    console.log("Parent: " + elmt.getName());
+                    //console.log("Parent: " + elmt.getName());
                     data = Tools.addNewHeaderRow(elmt.getMainValues(), data, this.m_data);
                 }
                 //Add original values to the table
@@ -111,7 +111,7 @@
 
 	        //returns the different variables (conditions or choices) that belong to the element
             getMainValues(): any[]{
-                console.log(this.m_data);
+                //console.log(this.m_data);
                 var row = [];
                 var data = this.m_data;
                 row.push(this.m_name);
@@ -227,8 +227,8 @@
             }
 
             fromJSON(p_jsonElmt: any): void {
-                console.log("element.fromJSON()");
-                console.log(p_jsonElmt);
+                //console.log("element.fromJSON()");
+                //console.log(p_jsonElmt);
                 this.m_easelElmt.x = p_jsonElmt.posX;
                 this.m_easelElmt.y = p_jsonElmt.posY;
                 this.m_id = p_jsonElmt.elmtID;
@@ -237,6 +237,7 @@
                 this.m_type = p_jsonElmt.elmtType;
                 this.m_data = p_jsonElmt.elmtData;
                 this.m_weightingMethod = p_jsonElmt.elmtWghtMthd;
+                this.m_is
             }
         }
     }

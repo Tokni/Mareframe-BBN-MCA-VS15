@@ -60,7 +60,7 @@
                 for (var i = 0; i < sURLVariables.length; i++) {
                     var sParameterName = sURLVariables[i].split('=');
                     if (sParameterName[0] === p_sParam) {
-                        console.log("returning " + sParameterName[1] + " to handler");
+                        //console.log("returning " + sParameterName[1] + " to handler");
                         return sParameterName[1];
                     }
                 }
@@ -152,7 +152,7 @@
                     }
                     htmlString += "</tr>";
                 }
-                console.log("html table: " + htmlString);
+                //console.log("html table: " + htmlString);
                 return htmlString;
             }
 
@@ -161,8 +161,8 @@
             }
 
             static getColumn(p_matrix: any[][], index: number) {
-                console.log("get column " + index + " from " + p_matrix)
-                console.log(p_matrix)
+                //console.log("get column " + index + " from " + p_matrix)
+                //console.log(p_matrix)
                 var rows = math.size(p_matrix).valueOf()[0];
                 var range = math.range(0, rows);
                 // console.log("returned: " + math.subset(matrix, math.index(range, index)))
@@ -331,9 +331,9 @@
             static calculateValues(p_model: Model, p_element: Element) { //move to model or tools??
                 var model: Model = p_model;
                 var element: Element = p_element;
-
+                //console.log("calculate valeus for " + p_element.getName());
                 if (element.getType() !== 1) {//If its a chance or value node
-                    // console.log("calculate valeus for " + this.getName());
+                     
                     var data = element.getData();
                     var headerRows = [];
                     var takenIntoAccount = [];
@@ -375,6 +375,7 @@
                     // console.log("new values: " + newValues)
                     element.setValues(newValues);
                 } else {//If it is a decision node
+                    console.log("decisions node begin");
                     element.setValues(element.updateHeaderRows(element.copyDefArray()));
                     var values: any[] = element.getValues();
                     //Number of header rows is equal to number of rows in values minus number of rows in deftinition
@@ -412,9 +413,14 @@
                                     value += Tools.getHighest(valueArray);
                                 }
                             })
+                            console.log("i: " + i + "  j: " + j + "  Value: " + value);
                             values[i][j] = value;
+                            
                         }
                     }
+                    console.log("decisions end");
+                    p_element.setData(values);
+                    //p_element.setValues(values);
                 }
 
             }

@@ -160,7 +160,7 @@ module Mareframe {
             importStage(): void {
                 console.log("importing stage");
                 this.m_mcaContainer.removeAllChildren();
-                console.log(this);
+                //console.log(this);
                 var elmts = this.m_model.getElementArr();
                 var conns = this.m_model.getConnectionArr();
                 for (var i = 0; i < elmts.length; i++) {
@@ -181,7 +181,7 @@ module Mareframe {
             };
 
             private mouseUp(p_evt: createjs.MouseEvent) {
-                console.log("mouse up");
+                //console.log("mouse up");
                 this.m_updateMCAStage = true;
             }
 
@@ -361,6 +361,7 @@ module Mareframe {
                     //set description
                     document.getElementById("description_div").innerHTML = p_elmt.getDescription();
                     $("#description_div").show();
+
                     if (p_elmt.isUpdated()) {
                         $("#values").prop('disabled', false);
                     } else {
