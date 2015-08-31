@@ -246,8 +246,8 @@ module Mareframe {
                         
 
                         var decisRect: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
-                        console.log(p_elmt.getName());
-                        console.log(p_elmt.getValues());
+                        //console.log(p_elmt.getName());
+                        //console.log(p_elmt.getValues());
                         var decisName: createjs.Text = new createjs.Text(p_elmt.getValues()[i][0].substr(0, 12), "0.8em trebuchet", "#303030");
                         decisName.textBaseline = "middle";
                         decisName.maxWidth = 68;
@@ -291,8 +291,8 @@ module Mareframe {
             }
 
             private clickedDecision(p_evt: createjs.MouseEvent) {
-                console.log("clicked a decision");
-                console.log(p_evt);
+                //console.log("clicked a decision");
+                //console.log(p_evt);
                 this.m_model.setDecision(p_evt.currentTarget.name, Math.floor(p_evt.localY/12));
             }
 
