@@ -112,8 +112,10 @@
 
             update() {
                 this.m_elementArr.forEach(function (p_elmt: Element) {
+                    console.log(" Elemt " + p_elmt.getName() + " does not need update");
                     if (!p_elmt.isUpdated()) {
                         p_elmt.update();
+                        console.log(" Elemt " + p_elmt.getName() + " has been updated");
                     }
                 });
             }

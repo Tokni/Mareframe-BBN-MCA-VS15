@@ -13,12 +13,12 @@ module Mareframe {
             private m_fileHandler: FileIO;
             private m_gui: GUIHandler;
             constructor() {
-                
+                console.log("handler started");
                 this.m_fileHandler = new FileIO(this);
                 this.m_activeModel = this.addNewModel();
                 this.m_gui = new GUIHandler(this.m_activeModel,this);
 
-                //console.log("handler started");
+                
                 var loadModel: string = Tools.getUrlParameter('model');
                 loadModel = "scotland";
                 if (loadModel !== null) {

@@ -217,6 +217,7 @@ var Mareframe;
                 this.m_type = p_jsonElmt.elmtType;
                 this.m_data = p_jsonElmt.elmtData;
                 this.m_weightingMethod = p_jsonElmt.elmtWghtMthd;
+                this.m_is;
             };
             return Element;
         })();
