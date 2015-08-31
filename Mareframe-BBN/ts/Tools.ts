@@ -12,7 +12,7 @@
 
                 //y =a*(xVal*xVal)+b*xVal+0
 
-                ////console.log("y=" + y);
+                //////console.log("y=" + y);
                 //return y;
 
                 var A = 1 - 3 * p_posX + 3 * p_posX;
@@ -60,7 +60,7 @@
                 for (var i = 0; i < sURLVariables.length; i++) {
                     var sParameterName = sURLVariables[i].split('=');
                     if (sParameterName[0] === p_sParam) {
-                        console.log("returning " + sParameterName[1] + " to handler");
+                        //console.log("returning " + sParameterName[1] + " to handler");
                         return sParameterName[1];
                     }
                 }
@@ -100,14 +100,14 @@
             }
 
             static getHighest(array: number[]):number {
-                // console.log("finding highest in " + array)
+                // //console.log("finding highest in " + array)
                 var highest: number = Number.NEGATIVE_INFINITY;
                 array.forEach(function (numb: number) {
                     if (numb > highest) {
                         highest = numb;
                     }
                 })
-                // console.log("higest " + highest)
+                // //console.log("higest " + highest)
                 return highest;
             }
 
@@ -152,7 +152,7 @@
                     }
                     htmlString += "</tr>";
                 }
-                console.log("html table: " + htmlString);
+                //console.log("html table: " + htmlString);
                 return htmlString;
             }
 
@@ -161,16 +161,16 @@
             }
 
             static getColumn(p_matrix: any[][], index: number) {
-                console.log("get column " + index + " from " + p_matrix)
-                console.log(p_matrix)
+                //console.log("get column " + index + " from " + p_matrix)
+                //console.log(p_matrix)
                 var rows = math.size(p_matrix).valueOf()[0];
                 var range = math.range(0, rows);
-                // console.log("returned: " + math.subset(matrix, math.index(range, index)))
+                // //console.log("returned: " + math.subset(matrix, math.index(range, index)))
                 return math.subset(p_matrix, math.index(range, index));
             }
 
             static getRow(p_matrix: any[][], p_index: number) {
-                // console.log("get row " + index + " from " + matrix)
+                // //console.log("get row " + index + " from " + matrix)
                 var columns = math.size(p_matrix).valueOf()[1];
                 var range = [];
                 for (var n = 0; n < columns; n++) {
@@ -195,49 +195,49 @@
             }
 
             static getMatrixWithoutHeader(p_matrix: any[][]): any[][] {
-                // console.log("get matrix without header from " + matrix)
+                // //console.log("get matrix without header from " + matrix)
                 var numOfColumns = math.size(p_matrix)[1];
                 var numOfRows = math.size(p_matrix)[0];
-                // console.log("numOfRows: " + numOfRows + " numOfColumns: " + numOfColumns);
+                // //console.log("numOfRows: " + numOfRows + " numOfColumns: " + numOfColumns);
                 var newMatrix = [];
                 //For each row
                 for (var i = 0; i < numOfRows; i++) {
                     //If there is a number in column 2 in this row, this is not a header row
-                    // console.log("i: " + i)
-                    // console.log("subset: " + math.subset(matrix, math.index(i, 1)));
+                    // //console.log("i: " + i)
+                    // //console.log("subset: " + math.subset(matrix, math.index(i, 1)));
                     if (!(isNaN(math.subset(p_matrix, math.index(i, 1))))) {
                         var row = math.squeeze(Tools.getRow(p_matrix, i));
-                        // console.log("row " + i+ ": " + row + " length " + row.length)
+                        // //console.log("row " + i+ ": " + row + " length " + row.length)
                         var range = math.range(1, row.length)
                         row = math.subset(row, math.index(math.squeeze(range)))
                         if (row.length === undefined) {
                             row = [row];
                         }
-                        // console.log(row)
+                        // //console.log(row)
                         newMatrix.push(row);
-                        // console.log("newMatrix: "+ newMatrix)
+                        // //console.log("newMatrix: "+ newMatrix)
                     }
                 }
-                // console.log("returned: " + newMatrix)
+                // //console.log("returned: " + newMatrix)
                 return newMatrix;
             }
 
 
             static getValueWithCondition(p_values:any[][],p_rowElmt:any, p_conditionArray): number[] {
-                // console.log("getting value " + rowElmt + " with condition " + conditionArray + " from " + this.getName());
+                // //console.log("getting value " + rowElmt + " with condition " + conditionArray + " from " + this.getName());
                 var values: number[][] = p_values;
-                // console.log("values table : \n " + values);
+                // //console.log("values table : \n " + values);
                 var valuesFound = [];
                 //First find the correct row
                 for (var i = 0; i < values.length; i++) {
-                    // console.log("comparing " + values[i][0] + " against " + rowElmt)
+                    // //console.log("comparing " + values[i][0] + " against " + rowElmt)
                     if (values[i][0] === p_rowElmt) {
-                        // console.log("row found")
+                        // //console.log("row found")
                         //Then find the correct column
                         for (var j = 1; j < values[0].length; j++) {
                             var rightColumn = true;
                             var decArray = math.flatten(Tools.getColumn(values, j));
-                            // console.log("looking in " + decArray)
+                            // //console.log("looking in " + decArray)
                             p_conditionArray.forEach(function (condition) {
                                 //If condition is not found in the column, this is not the correct column
                                 if (decArray.indexOf(condition) === -1) {
@@ -251,14 +251,14 @@
                         }
                     }
                 }
-                // console.log("returned " + valuesFound);
+                // //console.log("returned " + valuesFound);
                 return valuesFound;
             }
 
             static createSubMatrices(p_matrix: any[][], p_takenIntoAccount: any[], p_data: any[][]) {
-                // console.log("create sub matrix from " + matrix + " for values " + takenIntoAccount[takenIntoAccount.length - 1].getMainValues())
+                // //console.log("create sub matrix from " + matrix + " for values " + takenIntoAccount[takenIntoAccount.length - 1].getMainValues())
                 var data = p_data;
-                // console.log("data: " + data)
+                // //console.log("data: " + data)
                 var subMatrices = [];
                 var columns = math.size(p_matrix).valueOf()[1];
                 var added = [];
@@ -267,7 +267,7 @@
                     //If column has not already been added
                     if (added.indexOf(n) === -1) {
                         var currentColumn = math.flatten(Tools.getColumn(data, n));
-                        // console.log("current column: " + currentColumn)
+                        // //console.log("current column: " + currentColumn)
                         var newMatrix = Tools.makeSureItsAnArray(Tools.getColumn(p_matrix, n - 1));
                         var matchingColumn = true;
                         //Look through the rest of the columns
@@ -277,7 +277,7 @@
                             for (var j = 0; j < Tools.numOfHeaderRows(data); j++) {
                                 //If the value is not found this is not a matching column
                                 if (currentColumn.indexOf(data[j][i]) === -1) {
-                                    // console.log(data[j][i] + " was not found in " + currentColumn)
+                                    // //console.log(data[j][i] + " was not found in " + currentColumn)
                                     matchingColumn = false;
                                     //But if the value has already been taken into account the column might be a matching column
                                     p_takenIntoAccount.forEach(function (elmt) {
@@ -296,18 +296,18 @@
                                 added.push(i);
                                 var column = Tools.makeSureItsAnArray(Tools.getColumn(p_matrix, i - 1));
                                 newMatrix = math.concat(newMatrix, column)
-                                // console.log("new matrix:" + newMatrix);
+                                // //console.log("new matrix:" + newMatrix);
                             }
                         }
                         subMatrices.push(newMatrix);
                     }
                 }
-                // console.log("returned " + subMatrices)
+                // //console.log("returned " + subMatrices)
                 return subMatrices;
             }
 
             static convertToArray(p_matrix: any[][]): any[] {
-                // console.log("converting to array: " + matrix)
+                // //console.log("converting to array: " + matrix)
                 var rows = math.size(p_matrix).valueOf()[0];
                 var columns = math.size(p_matrix).valueOf()[1];
                 var array = [];
@@ -331,9 +331,11 @@
             static calculateValues(p_model: Model, p_element: Element) { //move to model or tools??
                 var model: Model = p_model;
                 var element: Element = p_element;
+                //console.log("calculate valeus for " + p_element.getName());
+                
 
                 if (element.getType() !== 1) {//If its a chance or value node
-                    // console.log("calculate valeus for " + this.getName());
+                    console.log("calculate valeus for " + p_element.getName());
                     var data = element.getData();
                     var headerRows = [];
                     var takenIntoAccount = [];
@@ -358,13 +360,13 @@
                         }
                     })
                     newValues = Tools.convertToArray(newValues);
-                    // console.log(newValues)
+                    // //console.log(newValues)
                     if (newValues[0][0] === undefined) {//It's one dimensional
-                        // console.log("one-dimensional")
+                        // //console.log("one-dimensional")
                         newValues.unshift(data[Tools.numOfHeaderRows(element.getData())][0]);
                     } else {
                         for (var i = 0; i < newValues.length; i++) {
-                            // console.log("unshifting " + newValues[i])
+                            // //console.log("unshifting " + newValues[i])
                             newValues[i].unshift(data[i + Tools.numOfHeaderRows(element.getData())][0]);
                         }
                     }
@@ -372,12 +374,17 @@
                         headerRows.push(newValues);
                         newValues = headerRows;
                     }
-                    // console.log("new values: " + newValues)
-                    element.setValues(newValues);
+                    console.log("new values: " + newValues)
+                    p_element.setValues(newValues);
+                    console.log("hello");
+                    //p_element.setData(newValues);
+                   
+                    console.log("yes?");
                 } else {//If it is a decision node
+                    console.log("decisions node begin");
                     element.setValues(element.updateHeaderRows(element.copyDefArray()));
                     var values: any[] = element.getValues();
-                    //Number of header rows is equal to number of rows in values minus number of rows in deftinition
+                    //Number of header rows is equal to number of rows in values minus number of rows in definition
                     var numOfHeaderRows = values.length - element.getData().length;
                     //If there are no header rows add an empty column for the values
                     if (numOfHeaderRows === 0) {
@@ -412,15 +419,20 @@
                                     value += Tools.getHighest(valueArray);
                                 }
                             })
+                            //console.log("i: " + i + "  j: " + j + "  Value: " + value);
                             values[i][j] = value;
+                            
                         }
                     }
+                    console.log("decisions end");
+                    p_element.setData(values);
+                    //p_element.setValues(values);
                 }
 
             }
 
             static addNewHeaderRow(p_headerRow: any[], p_table: any[][],p_data:any[][]): any[][] {
-                // console.log("Adding array: " + headerRow)
+                // //console.log("Adding array: " + headerRow)
                 var array = p_headerRow.slice();
                 //Convert the array to only contain one of each element
                 var newArray = [array[0]];
@@ -430,11 +442,11 @@
                     }
                 }
                 array = newArray;
-                // console.log("to " + table);
-                // console.log("number of header rows: " + numOfHeaderRows);
+                // //console.log("to " + table);
+                // //console.log("number of header rows: " + numOfHeaderRows);
                 var newTable: any[][] = [];
                 var numOfDiffValues: number = array.length - 1;
-                // console.log("numOfDiffValues " + numOfDiffValues)
+                // //console.log("numOfDiffValues " + numOfDiffValues)
                 if (p_table[0] !== undefined) {
                     var rowLength = p_table[0].length - 1;
                     //For each row
@@ -446,10 +458,10 @@
                             for (var j = 1; j <= rowLength; j++) {
                                 //Add the value
                                 newRow.push(p_table[i][j]);
-                                // console.log("adding " + table[i][j]);
+                                // //console.log("adding " + table[i][j]);
                             }
                         }
-                        // console.log("new row number " + i + ": " + newRow)
+                        // //console.log("new row number " + i + ": " + newRow)
                         newTable.push(newRow);
                     }
                 } else {//This is the first row to be added
@@ -463,11 +475,53 @@
                         newRow.push(array[j]);
                     }
                 }
-                // console.log("new header row: " + newRow);
+                // //console.log("new header row: " + newRow);
                 //Add the new row to the table
                 newTable.splice(Tools.numOfHeaderRows(p_data) - 1, 0, newRow);
-                // console.log("new table: " + newTable)
+                // //console.log("new table: " + newTable)
                 return newTable;
+            }
+            static getRowNumber(values: any[][], decisionElement: Element): number {
+                for (var i = 0; i < values.length; i++) {
+                    if (values[i][0] === decisionElement.getName()) {
+                        return i;
+                    }
+                }
+            }
+            static updateConcerningDecisions(element: Element) {
+                var rowsToDelete: number[] = [];
+                element.getParentElements().forEach(function (elmt) {
+                    if (elmt.getType() === 1 && elmt.getDecision() !== undefined) {//If Parent is decision and choice is made
+                        var values: any[][] = element.getValues();
+                        var decision: String = elmt.getData()[elmt.getDecision()][0];
+                        console.log("choice is made: " + decision + " in elemnent " + elmt.getName());
+                        var newValues: any[][] = [];
+                        var rowNumber: number = Tools.getRowNumber(element.getValues(), elmt);
+                        for (var i = 0; i < values.length; i++) {
+                            var newRow: any[] = [];
+                            for (var j = 0; j < values[0].length; j++) {
+                                if (values[rowNumber][j] === decision || j === 0)
+                                    newRow.push(values[i][j]);
+                            }
+                            newValues.push(newRow);
+                        }
+                    rowsToDelete.push(rowNumber);
+                    element.setValues(newValues);
+                    }
+
+                });
+                //element.setValues(Tools.deleteRows(element.getValues(), rowsToDelete));
+            }
+            static deleteRows(array: any[][], rows: number[]): any[][] {
+                console.log("deleting " + rows + " from " + array);
+                var newArray: any[][] = [];
+                for (var i = 0; i < array.length; i++) {
+                    if (rows.indexOf(i) === -1) {
+                        console.log("pushing row " + i+ " " + rows.indexOf(i));
+                        newArray.push(array[i]);
+                    }
+                }
+               return newArray;
             }
         }
     }

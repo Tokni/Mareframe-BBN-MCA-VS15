@@ -18,7 +18,7 @@ module Mareframe {
                 this.m_activeModel = this.addNewModel();
                 this.m_gui = new GUIHandler(this.m_activeModel,this);
 
-                console.log("handler started");
+                //console.log("handler started");
                 var loadModel: string = Tools.getUrlParameter('model');
                 loadModel = "scotland";
                 if (loadModel !== null) {
@@ -45,7 +45,7 @@ module Mareframe {
                 var bbnMode = (Tools.getUrlParameter('bbn') == "true");
                 //bbnMode = true;
                 var mdl = new Model(bbnMode);
-                console.log("BBN mode is: " + mdl.m_bbnMode);
+                //console.log("BBN mode is: " + mdl.m_bbnMode);
                 this.setActiveModel(mdl);
                 return mdl;
             }

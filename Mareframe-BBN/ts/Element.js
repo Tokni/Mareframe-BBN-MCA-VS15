@@ -15,6 +15,7 @@ var Mareframe;
                 this.m_values = [];
                 this.m_updated = false;
                 this.m_easelElmt = new createjs.Container();
+                this.m_decisEaselElmt = new createjs.Container();
                 if (p_id.substr(0, 4) == "elmt") {
                     this.m_id = p_id;
                 }
@@ -35,7 +36,14 @@ var Mareframe;
             Element.prototype.setUpdated = function (p_updated) {
                 this.m_updated = p_updated;
             };
+            Element.prototype.getDecision = function () {
+                return this.m_decision;
+            };
+            Element.prototype.setDecision = function (n) {
+                this.m_decision = n;
+            };
             Element.prototype.update = function () {
+                //console.log(this);
                 if (this.m_type !== 1) {
                     //Definition table in decision nodes does not rely on parents
                     this.updateData();
@@ -51,12 +59,12 @@ var Mareframe;
                         parents.push(c.getInputElement());
                     }
                 });
-                //console.log(elmt.getName() + " parents: " + parents);
+                ////console.log(elmt.getName() + " parents: " + parents);
                 return parents;
             };
             Element.prototype.copyDefArray = function () {
                 var valueArray = [];
-                console.log(this);
+                //console.log(this);
                 for (var i = 0; i < this.m_data.length; i++) {
                     valueArray[i] = [];
                     for (var j = 0; j < this.m_data[0].length; j++) {
@@ -66,40 +74,42 @@ var Mareframe;
                 return valueArray;
             };
             Element.prototype.updateData = function () {
-                console.log("updateData " + this.m_name);
+                //console.log("updateData " + this.m_name);
                 this.m_data = this.updateHeaderRows(this.m_data);
             };
             Element.prototype.updateHeaderRows = function (p_originalData) {
-                // console.log("updating header rows")
+                // //console.log("updating header rows")
+                //console.log(this);
                 var data = [];
                 var parents = this.getParentElements();
                 for (var i = 0; i < parents.length; i++) {
                     var elmt = parents[i];
-                    console.log("Parent: " + elmt.getName());
+                    //console.log("Parent: " + elmt.getName());
                     data = DST.Tools.addNewHeaderRow(elmt.getMainValues(), data, this.m_data);
                 }
                 //Add original values to the table
                 for (var i = DST.Tools.numOfHeaderRows(this.m_data); i < p_originalData.length; i++) {
-                    // console.log("i: " + i);
-                    // console.log("new data: " + originalData[i]);
+                    // //console.log("i: " + i);
+                    // //console.log("new data: " + originalData[i]);
                     data.push(p_originalData[i]);
                 }
+                //console.log(data);
                 return data;
             };
             //returns the different variables (conditions or choices) that belong to the element
             Element.prototype.getMainValues = function () {
-                console.log(this.m_data);
+                //console.log(this.m_data);
                 var row = [];
                 var data = this.m_data;
                 row.push(this.m_name);
                 for (var i = 0; i < data.length; i++) {
-                    // console.log("i: " + i);
-                    // console.log("check data: " + data[i][1]);
+                    // //console.log("i: " + i);
+                    // //console.log("check data: " + data[i][1]);
                     if (!isNaN(parseFloat(data[i][1])) || data[i][1] === undefined) {
                         row.push(data[i][0]);
                     }
                 }
-                //console.log("new row: " + row);
+                ////console.log("new row: " + row);
                 return row;
             };
             //MCA TOOL
@@ -126,6 +136,7 @@ var Mareframe;
                 else {
                     this.m_data = p_data;
                 }
+                this.m_updated = false;
             };
             Element.prototype.getID = function () {
                 return this.m_id;
@@ -202,8 +213,8 @@ var Mareframe;
                 return { posX: this.m_easelElmt.x, posY: this.m_easelElmt.y, elmtID: this.getID(), elmtName: this.getName(), elmtDesc: this.getDescription(), elmtType: this.getType(), elmtData: this.getData(), elmtWghtMthd: this.getMethod() };
             };
             Element.prototype.fromJSON = function (p_jsonElmt) {
-                console.log("element.fromJSON()");
-                console.log(p_jsonElmt);
+                //console.log("element.fromJSON()");
+                //console.log(p_jsonElmt);
                 this.m_easelElmt.x = p_jsonElmt.posX;
                 this.m_easelElmt.y = p_jsonElmt.posY;
                 this.m_id = p_jsonElmt.elmtID;

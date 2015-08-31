@@ -17,8 +17,8 @@ var Mareframe;
                 this.m_bbnMode = p_bbnMode;
                 this.createNewElement = this.createNewElement.bind(this);
                 this.deleteElement = this.deleteElement.bind(this);
-                console.log("model loaded");
-                console.log(this);
+                ////console.log("model loaded")
+                ////console.log(this);
             }
             ;
             Model.prototype.saveModel = function () {
@@ -38,7 +38,7 @@ var Mareframe;
                         case 0:
                             dataStream += '<cpt id="' + elmt.getID() + '">\n';
                             for (var i = 0; i < elmt.getData().length; i++) {
-                                dataStream += '<state id="' + elmt.getData(1, i) + '" />\n';
+                                dataStream += '<state id="' + elmt.getData(i, 0) + '" />\n';
                             }
                             if (elmt.getParentElements().length > 0) {
                                 dataStream += '<parents>';
@@ -67,7 +67,7 @@ var Mareframe;
                             if (elmt.getParentElements().length > 0) {
                                 dataStream += '<parents>';
                                 elmt.getParentElements().forEach(function (parElmt) {
-                                    dataStream += parElmt.getID() + ' ';
+                                    dataStream = dataStream.substring(0, dataStream.lastIndexOf(">") + 1) + parElmt.getID() + ' ' + dataStream.substring(dataStream.lastIndexOf(">") + 1);
                                 });
                                 dataStream = dataStream.slice(0, dataStream.length - 1) + '</parents>\n';
                             }
@@ -75,7 +75,7 @@ var Mareframe;
                             for (var i = 1; i < elmt.getData(1).length; i++) {
                                 dataStream += elmt.getData(elmt.getData().length - 1, i) + ' ';
                             }
-                            dataStream = dataStream.slice(0, dataStream.length) + '</utilities>\n';
+                            dataStream = dataStream.slice(0, dataStream.length - 1) + '</utilities>\n';
                             dataStream += '</utility>\n';
                     }
                 });
@@ -86,7 +86,7 @@ var Mareframe;
                         '<interior color="aaaaaa" />\n' +
                         '<outline color="000080" />\n' +
                         '<font color="000000" name="Arial" size="8" />\n' +
-                        '<position>' + (elmt.m_easelElmt.x - 70) + ' ' + (elmt.m_easelElmt.y - 30) + ' ' + (elmt.m_easelElmt.x + 70) + ' ' + (elmt.m_easelElmt.y + 30) + '</position>\n</node>\n';
+                        '<position>' + (elmt.m_easelElmt.x - 75) + ' ' + (elmt.m_easelElmt.y - 15) + ' ' + (elmt.m_easelElmt.x + 75) + ' ' + (elmt.m_easelElmt.y + 15) + '</position>\n</node>\n';
                 });
                 dataStream += '</genie>\n</extensions>\n</smile>\n';
                 return dataStream;
@@ -96,9 +96,12 @@ var Mareframe;
             };
             Model.prototype.update = function () {
                 this.m_elementArr.forEach(function (p_elmt) {
-                    if (p_elmt.isUpdated()) {
+                    if (!p_elmt.isUpdated()) {
                         p_elmt.update();
                     }
+                });
+                this.m_elementArr.forEach(function (p_elmt) {
+                    DST.Tools.updateConcerningDecisions(p_elmt);
                 });
             };
             Model.prototype.getIdent = function () {
@@ -135,7 +138,7 @@ var Mareframe;
             Model.prototype.getFinalScore = function () {
                 var tempMatrix = JSON.parse(JSON.stringify(this.m_dataMatrix));
                 var weightsArr = DST.Tools.getWeights(this.m_mainObjective, this);
-                //console.log(tempMatrix);
+                ////console.log(tempMatrix);
                 for (var i = 0; i < weightsArr.length; i++) {
                     var elmtData = this.getElement(this.m_dataMatrix[0][i + 1]).getData();
                     //set minimum and maximum values
@@ -160,8 +163,8 @@ var Mareframe;
                     //}
                     for (var j = 1; j < tempMatrix.length - 1; j++) {
                         tempMatrix[j][i + 1] = Mareframe.DST.Tools.getValueFn(Math.abs(elmtData[3] - ((tempMatrix[j][i + 1] - minVal) / (maxVal - minVal))), Math.abs(elmtData[3] - ((elmtData[1] / 100))), 1 - (elmtData[2] / 100));
-                        //console.log(getValueFn(tempMatrix[j][i + 1] / currentMax, elmtData[1]/100, elmtData[2]/100));
-                        //console.log(tempMatrix[j][i + 1] / currentMax);
+                        ////console.log(getValueFn(tempMatrix[j][i + 1] / currentMax, elmtData[1]/100, elmtData[2]/100));
+                        ////console.log(tempMatrix[j][i + 1] / currentMax);
                         tempMatrix[j][i + 1] *= weightsArr[i][1];
                         tempMatrix[j][i + 1] = (Math.round(1000 * tempMatrix[j][i + 1])) / 1000;
                     }
@@ -203,24 +206,24 @@ var Mareframe;
                             if (!p_addHeader) {
                                 toAdd.push(Mareframe.DST.Tools.getValueFn(Math.abs(p_elmt.getData(3) - ((this.m_dataMatrix[i][p_elmt.getData(0)] - minVal) / (maxVal - minVal))), Math.abs(p_elmt.getData(3) - ((p_elmt.getData(1) / 100))), 1 - (p_elmt.getData(2) / 100)));
                             }
-                            //console.log(elmt.getData()[1]);
+                            ////console.log(elmt.getData()[1]);
                             tempMatrix.push(toAdd);
                         }
                         break;
                     case 1:
                         var total = 0.0;
                         p_elmt.getData(1).forEach(function (val) { total += val; });
-                        //console.log(total + " : " + elmt.getName());
+                        ////console.log(total + " : " + elmt.getName());
                         for (var i = 0; i < p_elmt.getData(0).length; i++) {
-                            //console.log(elmt.getData());
+                            ////console.log(elmt.getData());
                             var tempEl = this.getConnection(p_elmt.getData(0, i)).getInputElement();
                             var tempArr = this.getWeightedData(tempEl, false);
-                            //console.log(tempArr);
+                            ////console.log(tempArr);
                             var result = 0;
                             for (var j = 0; j < tempArr.length; j++) {
                                 result += tempArr[j][1];
                             }
-                            //console.log(result + " " + elmt.getName()+"; "+tempArr+" "+tempEl.getName());
+                            ////console.log(result + " " + elmt.getName()+"; "+tempArr+" "+tempEl.getName());
                             tempMatrix.push([tempEl.getName(), result * (p_elmt.getData(1, i) / total)]);
                         }
                         break;
@@ -228,7 +231,7 @@ var Mareframe;
                 return tempMatrix;
             };
             Model.prototype.createNewElement = function () {
-                console.log(this.m_counter);
+                ////console.log(this.m_counter);
                 var e = new DST.Element("elmt" + this.m_counter, this);
                 this.m_counter++;
                 this.m_elementArr.push(e);
@@ -238,7 +241,7 @@ var Mareframe;
                 return this.m_elementArr[this.getObjectIndex(p_elmtStringId)];
             };
             Model.prototype.getObjectIndex = function (p_objectStringId) {
-                console.log(p_objectStringId);
+                ////console.log(p_objectStringId);
                 var key = 0;
                 if (p_objectStringId.substr(0, 4) === "elmt") {
                     this.m_elementArr.every(function (p_elmt) {
@@ -261,7 +264,7 @@ var Mareframe;
                     });
                 }
                 else {
-                    console.log(p_objectStringId);
+                    ////console.log(p_objectStringId);
                     throw DOMException.NOT_FOUND_ERR;
                 }
                 return key;
@@ -314,7 +317,20 @@ var Mareframe;
                 if (key >= this.m_connectionArr.length)
                     return false;
                 else {
+                    var states = this.m_connectionArr[key].getInputElement().getData().length;
+                    var data = this.m_connectionArr[key].getOutputElement().getData();
+                    var splicePos = 1 + Math.floor((data[data.length - 1].length / states));
+                    //console.log(states);
+                    //console.log(splicePos);
+                    for (var row = 0; row < data.length; row++) {
+                        if (data[row].length - 1 > splicePos)
+                            data[row].splice(splicePos);
+                    }
+                    //console.log(data);
+                    //console.log(this.m_connectionArr[key]);
+                    this.m_connectionArr[key].getOutputElement().setData(data);
                     this.m_connectionArr.splice(key, 1);
+                    //console.log(this.m_elementArr);
                     return true;
                 }
             };
@@ -359,6 +375,7 @@ var Mareframe;
                 this.m_dataMatrix = p_jsonObject.dataMat;
                 this.m_elementArr = [];
                 this.m_connectionArr = [];
+                this.m_counter = 0;
                 var maxX = 0;
                 var maxY = 0;
                 for (var i = 0; i < p_jsonObject.elements.length; i++) {
@@ -369,6 +386,7 @@ var Mareframe;
                     //if (JsonElmt.posY > maxY)
                     //    maxY = JsonElmt.posY;
                     elmt.fromJSON(JsonElmt);
+                    console.log("created from json: " + elmt.getName());
                 }
                 for (var i = 0; i < p_jsonObject.connections.length; i++) {
                     var conn = p_jsonObject.connections[i];
@@ -382,16 +400,24 @@ var Mareframe;
                     this.m_mainObjective = this.getElement(p_jsonObject.mainObj);
                 for (var i = 0; i < p_jsonObject.elements.length; i++) {
                     if (this.m_bbnMode)
-                        elmt.update();
+                        //console.log("from json: " + elmt.getName());
+                        //console.log(this.m_elementArr);
+                        //elmt.update();
+                        this.m_elementArr[i].update();
                 }
                 //h.gui.setSize(maxX + 80, maxY + 20);
                 //h.gui.updateTable(this.dataMatrix);
-                console.log("model.fromJSON()");
-                console.log(this);
+                ////console.log("model.fromJSON()");
+                ////console.log(this);
             };
             Model.prototype.createNewConnection = function (p_inputElmt, p_outputElmt) {
                 var c = new DST.Connection(p_inputElmt, p_outputElmt, this.m_bbnMode, "conn" + this.m_counter);
                 return c;
+            };
+            Model.prototype.setDecision = function (p_elmtIdent, p_decisNumb) {
+                var elmt = this.getElement(p_elmtIdent);
+                elmt.setDecision(p_decisNumb);
+                console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
             };
             return Model;
         })();

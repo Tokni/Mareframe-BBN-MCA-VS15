@@ -12,7 +12,7 @@ var Mareframe;
                 this.m_fileHandler = new DST.FileIO(this);
                 this.m_activeModel = this.addNewModel();
                 this.m_gui = new DST.GUIHandler(this.m_activeModel, this);
-                console.log("handler started");
+                //console.log("handler started");
                 var loadModel = DST.Tools.getUrlParameter('model');
                 loadModel = "scotland";
                 if (loadModel !== null) {
@@ -35,7 +35,7 @@ var Mareframe;
                 var bbnMode = (DST.Tools.getUrlParameter('bbn') == "true");
                 //bbnMode = true;
                 var mdl = new DST.Model(bbnMode);
-                console.log("BBN mode is: " + mdl.m_bbnMode);
+                //console.log("BBN mode is: " + mdl.m_bbnMode);
                 this.setActiveModel(mdl);
                 return mdl;
             };

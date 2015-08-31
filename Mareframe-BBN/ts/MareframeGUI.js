@@ -58,7 +58,7 @@ var Mareframe;
                 this.setAutoUpdate = function (cb) {
                     console.log(cb);
                     this.m_model.setAutoUpdate(cb.currentTarget.checked);
-                    console.log("auto update: " + this.m_model.getAutoUpdate);
+                    console.log("auto update: " + this.m_model.m_autoUpdate);
                 };
                 this.m_handler = p_handler;
                 if (p_model.m_bbnMode) {
@@ -91,6 +91,8 @@ var Mareframe;
                 this.mouseUp = this.mouseUp.bind(this);
                 this.selectAll = this.selectAll.bind(this);
                 this.saveModel = this.saveModel.bind(this);
+                this.loadModel = this.loadModel.bind(this);
+                this.clickedDecision = this.clickedDecision.bind(this);
                 this.m_model = p_model;
                 this.m_mcaBackground.name = "hitarea";
                 this.updateEditorMode();
@@ -115,6 +117,10 @@ var Mareframe;
                     $("#saveFile_div").hide();
                 });
                 this.m_mcaBackground.addEventListener("pressup", this.mouseUp);
+                $("#lodDcmt").on("change", this.loadModel);
+                $("#lodDcmt").on("click", function () {
+                    this.value = null;
+                });
                 this.m_mcaStage.addChild(this.m_mcaBackground);
                 this.m_mcaStage.addChild(this.m_mcaContainer);
                 this.m_valueFnStage.addChild(this.m_valFnBackground);
@@ -124,6 +130,11 @@ var Mareframe;
                 createjs.Ticker.addEventListener("tick", this.tick);
                 createjs.Ticker.setFPS(60);
             }
+            GUIHandler.prototype.loadModel = function (p_evt) {
+                ////console.log(this);
+                ////console.log(this.m_handler);
+                this.m_handler.getFileIO().loadfromGenie(this.m_model, this.importStage);
+            };
             GUIHandler.prototype.saveModel = function (p_evt) {
                 $("#saveFile_div").show();
                 this.m_handler.getFileIO().saveModel(this.m_model);
@@ -135,6 +146,7 @@ var Mareframe;
             };
             GUIHandler.prototype.updateModel = function () {
                 this.m_model.update();
+                this.updateMiniTable(this.m_model.getElementArr());
             };
             GUIHandler.prototype.setSize = function (p_width, p_height) {
                 this.m_mcaStageCanvas.height = p_height;
@@ -147,7 +159,7 @@ var Mareframe;
             GUIHandler.prototype.importStage = function () {
                 console.log("importing stage");
                 this.m_mcaContainer.removeAllChildren();
-                console.log(this);
+                //console.log(this);
                 var elmts = this.m_model.getElementArr();
                 var conns = this.m_model.getConnectionArr();
                 for (var i = 0; i < elmts.length; i++) {
@@ -158,15 +170,19 @@ var Mareframe;
                 for (var i = 0; i < conns.length; i++) {
                     this.addConnectionToStage(conns[i]);
                 }
-                this.updateTable(this.m_model.getDataMatrix());
-                if (!this.m_model.m_bbnMode)
+                if (!this.m_model.m_bbnMode) {
                     this.updateFinalScores();
+                    this.updateTable(this.m_model.getDataMatrix());
+                }
+                else {
+                    this.updateMiniTable(elmts);
+                }
                 this.m_updateMCAStage = true;
                 this.m_handler.getFileIO().quickSave(this.m_model);
             };
             ;
             GUIHandler.prototype.mouseUp = function (p_evt) {
-                console.log("mouse up");
+                //console.log("mouse up");
                 this.m_updateMCAStage = true;
             };
             GUIHandler.prototype.updateElement = function (p_elmt) {
@@ -174,8 +190,9 @@ var Mareframe;
                 var shape = new createjs.Shape();
                 shape.graphics.f(this.m_elementColors[p_elmt.getType()][0]).s(this.m_elementColors[p_elmt.getType()][1]);
                 var elmtShapeType = 2;
-                if (this.m_model.m_bbnMode)
+                if (this.m_model.m_bbnMode) {
                     elmtShapeType = p_elmt.getType();
+                }
                 switch (elmtShapeType) {
                     case 0:
                         //chance
@@ -187,7 +204,7 @@ var Mareframe;
                         break;
                     case 2:
                         //Value
-                        shape.graphics.drawRoundRect(0, 0, 150, 30, 4);
+                        shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
                     default:
                         break;
                 }
@@ -199,6 +216,60 @@ var Mareframe;
                 label.y = 15;
                 p_elmt.m_easelElmt.addChild(shape);
                 p_elmt.m_easelElmt.addChild(label);
+                if (this.m_model.m_bbnMode) {
+                }
+            };
+            GUIHandler.prototype.updateMiniTable = function (p_elmtArr) {
+                for (var j = 0; j < p_elmtArr.length; j++) {
+                    var elmt = p_elmtArr[j];
+                    var backgroundColors = ["#c6c6c6", "#bfbfe0"];
+                    var decisionCont = elmt.m_decisEaselElmt;
+                    decisionCont.removeAllChildren();
+                    for (var i = 0; i < elmt.getValues().length; i++) {
+                        var decisRect = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
+                        //console.log(elmt.getName());
+                        // console.log(elmt.getValues());
+                        var decisName = new createjs.Text(elmt.getValues()[i][0].substr(0, 12), "0.8em trebuchet", "#303030");
+                        decisName.textBaseline = "middle";
+                        decisName.maxWidth = 68;
+                        decisName.x = 2;
+                        decisName.y = 6 + (i * 12);
+                        decisionCont.addChild(decisRect);
+                        decisionCont.addChild(decisName);
+                        var valueData = elmt.getValues()[i][1];
+                        var decisBarBackgr = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
+                        var decisBar = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
+                        if (elmt.getType() === 0) {
+                            var decisPercVal = new createjs.Text(Math.floor(valueData * 100) + "%", "0.8em trebuchet", "#303030");
+                        }
+                        else {
+                            decisBar.visible = false;
+                            var decisPercVal = new createjs.Text("" + valueData, "0.8em trebuchet", "#303030");
+                        }
+                        decisPercVal.textBaseline = "middle";
+                        decisPercVal.maxWidth = 22;
+                        decisPercVal.x = 71;
+                        decisPercVal.y = 6 + (i * 12);
+                        decisionCont.addChild(decisBarBackgr);
+                        decisionCont.addChild(decisBar);
+                        decisionCont.addChild(decisPercVal);
+                    }
+                    decisionCont.addEventListener("click", this.clickedDecision);
+                    decisionCont.x = elmt.m_easelElmt.x + 75;
+                    decisionCont.y = elmt.m_easelElmt.y - 15;
+                    decisionCont.name = elmt.getID();
+                    elmt.m_decisEaselElmt = decisionCont;
+                    this.m_mcaContainer.addChild(decisionCont);
+                    if (elmt.getType() == 2) {
+                        decisionCont.visible = false;
+                    }
+                    this.m_updateMCAStage = true;
+                }
+            };
+            GUIHandler.prototype.clickedDecision = function (p_evt) {
+                console.log("clicked a decision");
+                console.log(p_evt);
+                this.m_model.setDecision(p_evt.currentTarget.name, Math.floor(p_evt.localY / 12));
             };
             GUIHandler.prototype.updateEditorMode = function () {
                 if (this.m_editorMode) {
@@ -231,7 +302,7 @@ var Mareframe;
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
                     var elmt = this.m_model.getElement(this.m_selectedItems[i].name);
                     if (this.addToTrash(elmt)) {
-                        console.log(this.m_trashBin);
+                        ////console.log(this.m_trashBin);
                         for (var j = 0; j < elmt.getConnections().length; j++) {
                             var conn = elmt.getConnections()[j];
                             if (conn.getOutputElement().getID() === elmt.getID()) {
@@ -248,10 +319,10 @@ var Mareframe;
                     this.m_model.deleteElement(this.m_trashBin[i].getID());
                 }
                 this.importStage();
-                console.log(this.m_model.getConnectionArr());
+                ////console.log(this.m_model.getConnectionArr());
             };
             GUIHandler.prototype.addToTrash = function (p_obj) {
-                console.log(this.m_trashBin.indexOf(p_obj));
+                ////console.log(this.m_trashBin.indexOf(p_obj));
                 if (this.m_trashBin.indexOf(p_obj) === -1) {
                     this.m_trashBin.push(p_obj);
                     return true;
@@ -279,7 +350,7 @@ var Mareframe;
                 this.m_updateMCAStage = true;
             };
             GUIHandler.prototype.dblClick = function (p_evt) {
-                console.log(this);
+                ////console.log(this);
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
                     this.populateElmtDetails(this.m_model.getElement(p_evt.target.name));
                     if (this.m_model.m_bbnMode) {
@@ -292,7 +363,7 @@ var Mareframe;
                 }
             };
             GUIHandler.prototype.populateElmtDetails = function (p_elmt) {
-                console.log(p_elmt);
+                ////console.log(p_elmt)
                 //set dialog title
                 $("#detailsDialog").dialog({
                     title: p_elmt.getName()
@@ -389,7 +460,7 @@ var Mareframe;
                                         else {
                                             val = 0;
                                         }
-                                        console.log(p_elmt.getData(1));
+                                        ////console.log(p_elmt.getData(1));
                                     });
                                 }
                                 makeSlider(i, childEl.getID(), this);
@@ -400,7 +471,7 @@ var Mareframe;
                             var tableMat = this.m_model.getWeightedData(p_elmt, false);
                             var cPX = p_elmt.getData(1);
                             var cPY = p_elmt.getData(2);
-                            console.log("draw line");
+                            ////console.log("draw line");
                             this.m_valueFnLineCont.removeAllChildren();
                             this.m_controlP.regX = 3;
                             this.m_controlP.regY = 3;
@@ -429,7 +500,7 @@ var Mareframe;
                                 }
                             }
                             for (var i = 1; i < tableMat.length; i++) {
-                                console.log(tableMat[i][1]);
+                                ////console.log(tableMat[i][1]);
                                 var vertLine = new createjs.Shape(this.getValueFnLine((tableMat[i][1] - minVal) / (maxVal - minVal) * this.m_valueFnSize, this.m_googleColors[i - 1]));
                                 this.m_valueFnLineCont.addChild(vertLine);
                             }
@@ -523,7 +594,9 @@ var Mareframe;
             ;
             GUIHandler.prototype.showValues = function () {
                 var elmt = $("#detailsDialog").data("element");
-                $("#valuesTable_div").html(DST.Tools.htmlTableFromArray("Values", elmt.getData()));
+                console.log("Data: " + elmt.getData());
+                console.log("Values: " + elmt.getValues());
+                $("#valuesTable_div").html(DST.Tools.htmlTableFromArray("Values", elmt.getValues()));
                 $("#valuesTable_div").show();
                 $("#values").prop("disabled", true);
             };
@@ -540,10 +613,11 @@ var Mareframe;
                 var table = $("#defTable_div");
                 var newTable = [];
                 var newRow = [];
+                ////console.log(table);
                 table.find("tr").each(function () {
                     $(this).find("th,td").each(function () {
-                        // console.log("text to be added: " + $(this).text());
-                        // console.log("does it exsist: " + $.inArray($(this).text(), newRow) === -1)
+                        // ////console.log("text to be added: " + $(this).text());
+                        // ////console.log("does it exsist: " + $.inArray($(this).text(), newRow) === -1)
                         var value = $(this).text();
                         //Don't add the same value twice if it is in one of the header cells
                         //(Better solution: check before the text is saved in the cell)
@@ -558,6 +632,7 @@ var Mareframe;
                     newTable.push(newRow);
                     newRow = [];
                 });
+                ////console.log(newTable);
                 //Remove header row with title the "Definition"
                 newTable.splice(0, 1);
                 if (!DST.Tools.columnSumsAreValid(newTable, DST.Tools.numOfHeaderRows(elmt.getData())) && elmt.getType() == 0) {
@@ -567,14 +642,13 @@ var Mareframe;
                 else {
                     elmt.setData(newTable);
                     if (model.getAutoUpdate()) {
+                        console.log("auto update is on");
                         model.update();
                     }
                     else {
                         elmt.setUpdated(false);
                     }
                 }
-                console.log("new table after submit:");
-                console.log(elmt.getData());
             };
             GUIHandler.prototype.updateValFnCP = function (p_controlPointX, p_controlPointY, p_flipped_numBool) {
                 //var functionSegments = 10;
@@ -650,20 +724,20 @@ var Mareframe;
                     topRow = false;
                 }
                 $("#editableDataTable").html(tableHTML);
-                console.log("original datamatrix");
-                console.log(this.m_model.getDataMatrix());
+                ////console.log("original datamatrix");
+                ////console.log(this.m_model.getDataMatrix());
             };
             GUIHandler.prototype.mouseDown = function (p_evt) {
-                //console.log("mouse down at: ("+e.stageX+","+e.stageY+")");
+                //////console.log("mouse down at: ("+e.stageX+","+e.stageY+")");
                 this.m_oldX = p_evt.stageX;
                 this.m_oldY = p_evt.stageY;
                 this.m_originalPressX = p_evt.stageX;
                 this.m_originalPressY = p_evt.stageY;
-                //console.log("cnctool options: "+$("#cnctTool").button("option","checked"));
+                //////console.log("cnctool options: "+$("#cnctTool").button("option","checked"));
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
                     var cnctChkbox = document.getElementById("cnctTool");
                     if (cnctChkbox.checked) {
-                        console.log("cnctTool enabled");
+                        ////console.log("cnctTool enabled");
                         this.connectTo(p_evt);
                     }
                     else {
@@ -675,18 +749,18 @@ var Mareframe;
                 }
             };
             GUIHandler.prototype.select = function (p_evt) {
-                //console.log("ctrl key: " + e.nativeEvent.ctrlKey);
+                //////console.log("ctrl key: " + e.nativeEvent.ctrlKey);
                 if (!p_evt.nativeEvent.ctrlKey && this.m_selectedItems.indexOf(p_evt.target) === -1) {
                     this.clearSelection();
                 }
-                //console.log("adding to selection");
+                //////console.log("adding to selection");
                 this.addToSelection(p_evt.target);
             };
             GUIHandler.prototype.pressMove = function (p_evt) {
                 //console.log("press move");
                 if (p_evt.target.name === "hitarea") {
                     if (p_evt.nativeEvent.ctrlKey) {
-                        console.log("orig: " + this.m_originalPressX + ", " + this.m_originalPressY + ". curr: " + p_evt.stageX + ", " + p_evt.stageY);
+                        ////console.log("orig: " + this.m_originalPressX + ", " + this.m_originalPressY + ". curr: " + p_evt.stageX + ", " + p_evt.stageY);
                         this.setSelection(this.m_model.getEaselElementsInBox(this.m_originalPressX, this.m_originalPressY, p_evt.stageX, p_evt.stageY));
                         this.m_selectionBox.graphics.clear().s("rgba(0,0,0,0.7)").setStrokeDash([2, 2], createjs.Ticker.getTime()).drawRect(this.m_originalPressX, this.m_originalPressY, p_evt.stageX - this.m_originalPressX, p_evt.stageY - this.m_originalPressY);
                         this.m_mcaContainer.addChild(this.m_selectionBox);
@@ -786,9 +860,13 @@ var Mareframe;
             };
             GUIHandler.prototype.addToSelection = function (p_easelElmt) {
                 if (this.m_selectedItems.indexOf(p_easelElmt) === -1 && p_easelElmt.name.substr(0, 4) === "elmt") {
+                    var elmt = this.m_model.getElement(p_easelElmt.name);
                     this.m_selectedItems.push(p_easelElmt);
-                    var elmtType = this.m_model.getElement(p_easelElmt.name).getType();
-                    //console.log(e);
+                    if (this.m_model.m_bbnMode) {
+                        this.m_selectedItems.push(elmt.m_decisEaselElmt);
+                    }
+                    var elmtType = elmt.getType();
+                    //////console.log(e);
                     var shape = p_easelElmt.getChildAt(0);
                     shape.graphics.clear().f(this.m_elementColors[elmtType][2]).s(this.m_elementColors[elmtType][1]);
                     var elmtShapeType = 2;
@@ -805,7 +883,7 @@ var Mareframe;
                             break;
                         case 2:
                             //Value
-                            shape.graphics.drawRoundRect(0, 0, 150, 30, 4);
+                            shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
                         default:
                             break;
                     }
@@ -814,7 +892,7 @@ var Mareframe;
             };
             GUIHandler.prototype.setSelection = function (p_easelElmt) {
                 this.clearSelection();
-                console.log(p_easelElmt);
+                ////console.log(p_easelElmt);
                 for (var i = 0; i < p_easelElmt.length; i++) {
                     this.addToSelection(p_easelElmt[i]);
                 }
@@ -825,26 +903,28 @@ var Mareframe;
             GUIHandler.prototype.clearSelection = function () {
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
                     var easelElmt = this.m_selectedItems[i];
-                    var elmtType = this.m_model.getElement(easelElmt.name).getType();
-                    var shape = easelElmt.getChildAt(0);
-                    shape.graphics.clear().f(this.m_elementColors[elmtType][0]).s(this.m_elementColors[elmtType][1]);
-                    var elmtShapeType = 2;
-                    if (this.m_model.m_bbnMode)
-                        elmtShapeType = elmtType;
-                    switch (elmtShapeType) {
-                        case 0:
-                            //chance
-                            shape.graphics.drawEllipse(0, 0, 150, 30);
-                            break;
-                        case 1:
-                            //decision
-                            shape.graphics.drawRect(0, 0, 150, 30);
-                            break;
-                        case 2:
-                            //Value
-                            shape.graphics.drawRoundRect(0, 0, 150, 30, 4);
-                        default:
-                            break;
+                    if (easelElmt.id != this.m_model.getElement(easelElmt.name).m_decisEaselElmt.id) {
+                        var elmtType = this.m_model.getElement(easelElmt.name).getType();
+                        var shape = easelElmt.getChildAt(0);
+                        shape.graphics.clear().f(this.m_elementColors[elmtType][0]).s(this.m_elementColors[elmtType][1]);
+                        var elmtShapeType = 2;
+                        if (this.m_model.m_bbnMode)
+                            elmtShapeType = elmtType;
+                        switch (elmtShapeType) {
+                            case 0:
+                                //chance
+                                shape.graphics.drawEllipse(0, 0, 150, 30);
+                                break;
+                            case 1:
+                                //decision
+                                shape.graphics.drawRect(0, 0, 150, 30);
+                                break;
+                            case 2:
+                                //Value
+                                shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
+                            default:
+                                break;
+                        }
                     }
                 }
                 this.m_selectedItems = [];
