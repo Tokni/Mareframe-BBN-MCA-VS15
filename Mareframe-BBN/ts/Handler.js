@@ -9,10 +9,10 @@ var Mareframe;
         var Handler = (function () {
             function Handler() {
                 this.m_modelArr = [];
+                console.log("handler started");
                 this.m_fileHandler = new DST.FileIO(this);
                 this.m_activeModel = this.addNewModel();
                 this.m_gui = new DST.GUIHandler(this.m_activeModel, this);
-                //console.log("handler started");
                 var loadModel = DST.Tools.getUrlParameter('model');
                 loadModel = "scotland";
                 if (loadModel !== null) {

@@ -61,6 +61,7 @@ var Mareframe;
                     console.log("auto update: " + this.m_model.getAutoUpdate);
                 };
                 this.m_handler = p_handler;
+                this.saveChanges = this.saveChanges.bind(this);
                 if (p_model.m_bbnMode) {
                     $("#detailsDialog").on('dialogclose', function (event) {
                         $("#valuesTable_div").hide();
@@ -146,6 +147,7 @@ var Mareframe;
             };
             GUIHandler.prototype.updateModel = function () {
                 this.m_model.update();
+                this.updateMiniTable(this.m_model.getElementArr());
             };
             GUIHandler.prototype.setSize = function (p_width, p_height) {
                 this.m_mcaStageCanvas.height = p_height;
@@ -169,9 +171,13 @@ var Mareframe;
                 for (var i = 0; i < conns.length; i++) {
                     this.addConnectionToStage(conns[i]);
                 }
-                this.updateTable(this.m_model.getDataMatrix());
-                if (!this.m_model.m_bbnMode)
+                if (!this.m_model.m_bbnMode) {
                     this.updateFinalScores();
+                    this.updateTable(this.m_model.getDataMatrix());
+                }
+                else {
+                    this.updateMiniTable(elmts);
+                }
                 this.m_updateMCAStage = true;
                 this.m_handler.getFileIO().quickSave(this.m_model);
             };
@@ -212,45 +218,58 @@ var Mareframe;
                 p_elmt.m_easelElmt.addChild(shape);
                 p_elmt.m_easelElmt.addChild(label);
                 if (this.m_model.m_bbnMode) {
-                    var backgroundColors = ["#b6b6b6", "#afafd0"];
-                    var decisionCont = new createjs.Container();
-                    for (var i = 0; i < p_elmt.getData().length; i++) {
+                }
+            };
+            GUIHandler.prototype.updateMiniTable = function (p_elmtArr) {
+                for (var j = 0; j < p_elmtArr.length; j++) {
+                    var elmt = p_elmtArr[j];
+                    var backgroundColors = ["#c6c6c6", "#bfbfe0"];
+                    var decisionCont = elmt.m_decisEaselElmt;
+                    decisionCont.removeAllChildren();
+                    for (var i = 0; i < elmt.getValues().length; i++) {
                         var decisRect = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
-                        var decisName = new createjs.Text(p_elmt.getData(i, 0).substr(0, 12), "0.8em trebuchet", "#303030");
+                        //console.log(elmt.getName());
+                        // console.log(elmt.getValues());
+                        var decisName = new createjs.Text(elmt.getValues()[i][0].substr(0, 12), "0.8em trebuchet", "#303030");
                         decisName.textBaseline = "middle";
                         decisName.maxWidth = 68;
                         decisName.x = 2;
                         decisName.y = 6 + (i * 12);
                         decisionCont.addChild(decisRect);
                         decisionCont.addChild(decisName);
-                        if (elmtShapeType === 0) {
-                            var percentageData = p_elmt.getData(i, 1);
-                            var decisBarBackgr = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
-                            var decisBar = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * percentageData, 10));
-                            var decisPercVal = new createjs.Text(Math.floor(percentageData * 100) + "%", "0.8em trebuchet", "#303030");
-                            decisPercVal.textBaseline = "middle";
-                            decisPercVal.maxWidth = 22;
-                            decisPercVal.x = 71;
-                            decisPercVal.y = 6 + (i * 12);
-                            decisionCont.addChild(decisBarBackgr);
-                            decisionCont.addChild(decisBar);
-                            decisionCont.addChild(decisPercVal);
+                        var valueData = elmt.getValues()[i][1];
+                        var decisBarBackgr = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
+                        var decisBar = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
+                        if (elmt.getType() === 0) {
+                            var decisPercVal = new createjs.Text(Math.floor(valueData * 100) + "%", "0.8em trebuchet", "#303030");
                         }
+                        else {
+                            decisBar.visible = false;
+                            var decisPercVal = new createjs.Text("" + valueData, "0.8em trebuchet", "#303030");
+                        }
+                        decisPercVal.textBaseline = "middle";
+                        decisPercVal.maxWidth = 22;
+                        decisPercVal.x = 71;
+                        decisPercVal.y = 6 + (i * 12);
+                        decisionCont.addChild(decisBarBackgr);
+                        decisionCont.addChild(decisBar);
+                        decisionCont.addChild(decisPercVal);
                     }
                     decisionCont.addEventListener("click", this.clickedDecision);
-                    decisionCont.x = p_elmt.m_easelElmt.x + 75;
-                    decisionCont.y = p_elmt.m_easelElmt.y - 15;
-                    decisionCont.name = p_elmt.getID();
-                    p_elmt.m_decisEaselElmt = decisionCont;
+                    decisionCont.x = elmt.m_easelElmt.x + 75;
+                    decisionCont.y = elmt.m_easelElmt.y - 15;
+                    decisionCont.name = elmt.getID();
+                    elmt.m_decisEaselElmt = decisionCont;
                     this.m_mcaContainer.addChild(decisionCont);
-                    if (p_elmt.getType() == 2) {
+                    if (elmt.getType() == 2) {
                         decisionCont.visible = false;
                     }
+                    this.m_updateMCAStage = true;
                 }
             };
             GUIHandler.prototype.clickedDecision = function (p_evt) {
-                console.log("clicked a decision");
-                console.log(p_evt);
+                //console.log("clicked a decision");
+                //console.log(p_evt);
                 this.m_model.setDecision(p_evt.currentTarget.name, Math.floor(p_evt.localY / 12));
             };
             GUIHandler.prototype.updateEditorMode = function () {
@@ -584,7 +603,7 @@ var Mareframe;
             };
             GUIHandler.prototype.saveChanges = function () {
                 var elmt = $("#detailsDialog").data("element");
-                var model = $("#detailsDialog").data("model");
+                var model = this.m_model;
                 //Save user description
                 var userDescription = $("#userDescription_div").text();
                 elmt.setUserDescription(userDescription);
@@ -595,7 +614,7 @@ var Mareframe;
                 var table = $("#defTable_div");
                 var newTable = [];
                 var newRow = [];
-                ////console.log(table);
+                //console.log(this);
                 table.find("tr").each(function () {
                     $(this).find("th,td").each(function () {
                         // ////console.log("text to be added: " + $(this).text());
@@ -624,7 +643,7 @@ var Mareframe;
                 else {
                     elmt.setData(newTable);
                     if (model.getAutoUpdate()) {
-                        model.update();
+                        this.updateModel();
                     }
                     else {
                         elmt.setUpdated(false);
@@ -842,7 +861,10 @@ var Mareframe;
             GUIHandler.prototype.addToSelection = function (p_easelElmt) {
                 if (this.m_selectedItems.indexOf(p_easelElmt) === -1 && p_easelElmt.name.substr(0, 4) === "elmt") {
                     var elmt = this.m_model.getElement(p_easelElmt.name);
-                    this.m_selectedItems.push(p_easelElmt, elmt.m_decisEaselElmt);
+                    this.m_selectedItems.push(p_easelElmt);
+                    if (this.m_model.m_bbnMode) {
+                        this.m_selectedItems.push(elmt.m_decisEaselElmt);
+                    }
                     var elmtType = elmt.getType();
                     //////console.log(e);
                     var shape = p_easelElmt.getChildAt(0);
@@ -861,7 +883,7 @@ var Mareframe;
                             break;
                         case 2:
                             //Value
-                            shape.graphics.drawRoundRect(0, 0, 150, 30, 4);
+                            shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
                         default:
                             break;
                     }
@@ -899,7 +921,7 @@ var Mareframe;
                                 break;
                             case 2:
                                 //Value
-                                shape.graphics.drawRoundRect(0, 0, 150, 30, 4);
+                                shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
                             default:
                                 break;
                         }

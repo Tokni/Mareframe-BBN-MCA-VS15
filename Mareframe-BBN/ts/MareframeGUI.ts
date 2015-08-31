@@ -46,7 +46,7 @@ module Mareframe {
 
             constructor(p_model: Model, p_handler: Handler) {
                 this.m_handler = p_handler;
-
+                this.saveChanges = this.saveChanges.bind(this);
                 if (p_model.m_bbnMode) {
                     $("#detailsDialog").on('dialogclose', function (event) {
                         $("#valuesTable_div").hide();
@@ -740,8 +740,9 @@ module Mareframe {
             }
 
             private saveChanges() {
+                
                 var elmt: Element = $("#detailsDialog").data("element");
-                var model: Model = $("#detailsDialog").data("model");
+                var model: Model = this.m_model;
                 //Save user description
                 var userDescription = $("#userDescription_div").text();
                 elmt.setUserDescription(userDescription);
@@ -753,7 +754,7 @@ module Mareframe {
                 var newTable = [];
                 var newRow = [];
 
-                ////console.log(table);
+                //console.log(this);
                 table.find("tr").each(function () {
                     $(this).find("th,td").each(function () {
                         // ////console.log("text to be added: " + $(this).text());
@@ -782,7 +783,8 @@ module Mareframe {
                     elmt.setData(newTable);
 
                     if (model.getAutoUpdate()) {
-                        model.update();
+                        this.updateModel();
+                        
                     }
                     else {
                     elmt.setUpdated(false);
