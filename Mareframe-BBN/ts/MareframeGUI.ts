@@ -246,10 +246,10 @@ module Mareframe {
                 p_elmt.m_easelElmt.addChild(label);
 
                 if (this.m_model.m_bbnMode) {
-                    
+                        
                 }
             }
-
+                        
             updateMiniTable(p_elmtArr: Element[]) {
 
                 for (var j = 0; j < p_elmtArr.length; j++) {
@@ -280,7 +280,7 @@ module Mareframe {
 
 
 
-                        var decisBarBackgr: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
+                            var decisBarBackgr: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
                         var decisBar: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
 
                         if (elmt.getType() === 0) {
@@ -292,14 +292,14 @@ module Mareframe {
                         }
 
 
-                        decisPercVal.textBaseline = "middle";
-                        decisPercVal.maxWidth = 22;
-                        decisPercVal.x = 71;
-                        decisPercVal.y = 6 + (i * 12);
+                            decisPercVal.textBaseline = "middle";
+                            decisPercVal.maxWidth = 22;
+                            decisPercVal.x = 71;
+                            decisPercVal.y = 6 + (i * 12);
 
-                        decisionCont.addChild(decisBarBackgr);
-                        decisionCont.addChild(decisBar);
-                        decisionCont.addChild(decisPercVal);
+                            decisionCont.addChild(decisBarBackgr);
+                            decisionCont.addChild(decisBar);
+                            decisionCont.addChild(decisPercVal);
 
 
 
@@ -321,8 +321,8 @@ module Mareframe {
             }
 
             private clickedDecision(p_evt: createjs.MouseEvent) {
-                console.log("clicked a decision");
-                console.log(p_evt);
+                //console.log("clicked a decision");
+                //console.log(p_evt);
                 this.m_model.setDecision(p_evt.currentTarget.name, Math.floor(p_evt.localY/12));
             }
 

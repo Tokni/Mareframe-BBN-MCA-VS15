@@ -28,6 +28,7 @@
     <Content Include="css\DST.css" />
     <Content Include="css\footer.css" />
     <Content Include="css\lib\bootstrap.min.css" />
+    <Content Include="DST.html" />
     <Content Include="jQueryUI\jquery-ui.css" />
     <Content Include="jQueryUI\jquery-ui.structure.css" />
     <Content Include="jQueryUI\jquery-ui.theme.css" />

@@ -21,6 +21,7 @@
                 { this.m_id = p_id; }
                 else { this.m_id = "elmt" + p_id; }
                 this.m_model = p_model;
+                this.getChildrenElements = this.getChildrenElements.bind(this);
             }
 
             getValues(): any[][] {
@@ -42,12 +43,24 @@
                 this.m_decision = n;
             }
             update(): void {
-                //console.log(this);
+                console.log("Updating element " + this.getName() );
                 if (this.m_type !== 1) {
                     //Definition table in decision nodes does not rely on parents
                     this.updateData();
                 }
-                Tools.calculateValues(this.m_model,this);
+                Tools.calculateValues(this.m_model, this);
+                console.log(this);
+                var children: Element[] = this.getChildrenElements();
+                if (children.length !== 0) {
+
+                    for (var i in children) {
+                        console.log(this.getName() + " children: " + children[i].getName() + "updating");
+                        //children[i].update();
+                        children[i].setUpdated(false);
+                        console.log(this.getName() + " children: " + children[i].getName() + "updated");
+                    }
+                }
+                console.log("Updated element " + this.getName());
                 this.m_updated = true;
             }
 
@@ -61,8 +74,21 @@
                 })
                 ////console.log(elmt.getName() + " parents: " + parents);
                 return parents;
+            }
 
-
+            getChildrenElements(): Element[] {
+                var children: Element[] = [];
+                var elmt = this;
+                console.log(this.m_connections);
+                this.m_connections.forEach(function (c) {
+                    //console.log("OutputElement: " + c.getOutputElement().getID());
+                    //console.log("this Element id: " + elmt.getID());
+                    if (c.getInputElement().getID() === elmt.getID() ) {
+                        children.push(c.getOutputElement());
+                    }
+                })
+                console.log(this.getName() + " chilxxdren: " + children);
+                return children;
             }
 
 
