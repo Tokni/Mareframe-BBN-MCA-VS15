@@ -37,6 +37,12 @@ var Mareframe;
             Element.prototype.setUpdated = function (p_updated) {
                 this.m_updated = p_updated;
             };
+            Element.prototype.getDecision = function () {
+                return this.m_decision;
+            };
+            Element.prototype.setDecision = function (n) {
+                this.m_decision = n;
+            };
             Element.prototype.update = function () {
                 console.log("Updating element " + this.getName());
                 if (this.m_type !== 1) {

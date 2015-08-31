@@ -14,6 +14,7 @@
             public m_easelElmt: createjs.Container = new createjs.Container();
             public m_decisEaselElmt: createjs.Container = new createjs.Container();
             private m_model: Model;
+            private m_decision: number;
 
             constructor(p_id: string, p_model: Model) {
                 if (p_id.substr(0, 4) == "elmt")
@@ -35,7 +36,12 @@
             setUpdated(p_updated): void {
                 this.m_updated = p_updated;
             }
-
+            getDecision(): number {
+                return this.m_decision;
+            }
+            setDecision(n: number): void {
+                this.m_decision = n;
+            }
             update(): void {
                 console.log("Updating element " + this.getName() );
                 if (this.m_type !== 1) {

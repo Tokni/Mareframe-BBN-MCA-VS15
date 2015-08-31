@@ -349,14 +349,15 @@ var Mareframe;
                     }
                     console.log("new values: " + newValues);
                     p_element.setValues(newValues);
+                    console.log("hello");
                     //p_element.setData(newValues);
-                    console.log("calculate valeus for " + p_element.getName());
+                    console.log("yes?");
                 }
                 else {
                     console.log("decisions node begin");
                     element.setValues(element.updateHeaderRows(element.copyDefArray()));
                     var values = element.getValues();
-                    //Number of header rows is equal to number of rows in values minus number of rows in deftinition
+                    //Number of header rows is equal to number of rows in values minus number of rows in definition
                     var numOfHeaderRows = values.length - element.getData().length;
                     //If there are no header rows add an empty column for the values
                     if (numOfHeaderRows === 0) {
@@ -450,27 +451,46 @@ var Mareframe;
                 // //console.log("new table: " + newTable)
                 return newTable;
             };
-            Tools.strengthOfInfluence = function (p_table, p_dims) {
-                var strength = [];
-                var underDim = [];
-                var overDim = [];
-                for (var init = 0; init < p_dims.length; init++) {
-                    underDim[init] = 1;
-                    overDim[init] = 1;
-                }
-                for (var ix in p_dims) {
-                    for (var iy in p_dims) {
-                        if (ix < iy) {
-                            underDim[ix] *= p_dims[ix];
-                        }
-                        if (p_dims[ix]) {
-                            overDim[ix] *= p_dims[ix];
-                        }
+            Tools.getRowNumber = function (values, decisionElement) {
+                for (var i = 0; i < values.length; i++) {
+                    if (values[i][0] === decisionElement.getName()) {
+                        return i;
                     }
                 }
-                console.log("underDim: " + underDim);
-                console.log("overDim: " + overDim);
-                return strength;
+            };
+            Tools.updateConcerningDecisions = function (element) {
+                var rowsToDelete = [];
+                element.getParentElements().forEach(function (elmt) {
+                    if (elmt.getType() === 1 && elmt.getDecision() !== undefined) {
+                        var values = element.getValues();
+                        var decision = elmt.getData()[elmt.getDecision()][0];
+                        console.log("choice is made: " + decision + " in elemnent " + elmt.getName());
+                        var newValues = [];
+                        var rowNumber = Tools.getRowNumber(element.getValues(), elmt);
+                        for (var i = 0; i < values.length; i++) {
+                            var newRow = [];
+                            for (var j = 0; j < values[0].length; j++) {
+                                if (values[rowNumber][j] === decision || j === 0)
+                                    newRow.push(values[i][j]);
+                            }
+                            newValues.push(newRow);
+                        }
+                        rowsToDelete.push(rowNumber);
+                        element.setValues(newValues);
+                    }
+                });
+                //element.setValues(Tools.deleteRows(element.getValues(), rowsToDelete));
+            };
+            Tools.deleteRows = function (array, rows) {
+                console.log("deleting " + rows + " from " + array);
+                var newArray = [];
+                for (var i = 0; i < array.length; i++) {
+                    if (rows.indexOf(i) === -1) {
+                        console.log("pushing row " + i + " " + rows.indexOf(i));
+                        newArray.push(array[i]);
+                    }
+                }
+                return newArray;
             };
             return Tools;
         })();

@@ -366,7 +366,7 @@ module Mareframe {
             private setAutoUpdate = function (cb) {
                 console.log(cb);
                 this.m_model.setAutoUpdate(cb.currentTarget.checked);
-                console.log("auto update: " + this.m_model.getAutoUpdate);
+                console.log("auto update: " + this.m_model.m_autoUpdate);
             }
             private createNewElement(p_evt: Event) {
                 var elmt = this.m_model.createNewElement()
@@ -785,6 +785,7 @@ module Mareframe {
                     if (model.getAutoUpdate()) {
                         this.updateModel();
                         
+                        console.log("auto update is on");
                     }
                     else {
                     elmt.setUpdated(false);

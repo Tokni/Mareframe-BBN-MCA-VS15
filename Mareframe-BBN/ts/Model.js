@@ -102,6 +102,9 @@ var Mareframe;
                         console.log(" Elemt " + p_elmt.getName() + " has been updated");
                     }
                 });
+                this.m_elementArr.forEach(function (p_elmt) {
+                    DST.Tools.updateConcerningDecisions(p_elmt);
+                });
             };
             Model.prototype.getIdent = function () {
                 return this.m_modelIdent;
@@ -415,6 +418,7 @@ var Mareframe;
             };
             Model.prototype.setDecision = function (p_elmtIdent, p_decisNumb) {
                 var elmt = this.getElement(p_elmtIdent);
+                elmt.setDecision(p_decisNumb);
                 console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
             };
             return Model;

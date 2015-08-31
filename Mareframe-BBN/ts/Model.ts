@@ -117,9 +117,12 @@
                         p_elmt.update();
                         console.log(" Elemt " + p_elmt.getName() + " has been updated");
                     }
+
+                });
+                this.m_elementArr.forEach(function (p_elmt: Element) {
+                    Tools.updateConcerningDecisions(p_elmt);
                 });
             }
-
             getIdent(): string {
                 return this.m_modelIdent;
             }
@@ -483,6 +486,7 @@
 
             setDecision(p_elmtIdent: string, p_decisNumb: number): void {
                 var elmt: Element = this.getElement(p_elmtIdent);
+                elmt.setDecision(p_decisNumb);
                 console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
             }
 

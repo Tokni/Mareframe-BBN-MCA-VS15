@@ -58,7 +58,7 @@ var Mareframe;
                 this.setAutoUpdate = function (cb) {
                     console.log(cb);
                     this.m_model.setAutoUpdate(cb.currentTarget.checked);
-                    console.log("auto update: " + this.m_model.getAutoUpdate);
+                    console.log("auto update: " + this.m_model.m_autoUpdate);
                 };
                 this.m_handler = p_handler;
                 this.saveChanges = this.saveChanges.bind(this);
@@ -238,7 +238,7 @@ var Mareframe;
                         decisionCont.addChild(decisRect);
                         decisionCont.addChild(decisName);
                         var valueData = elmt.getValues()[i][1];
-                        var decisBarBackgr = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
+                            var decisBarBackgr = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
                         var decisBar = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
                         if (elmt.getType() === 0) {
                             var decisPercVal = new createjs.Text(Math.floor(valueData * 100) + "%", "0.8em trebuchet", "#303030");
@@ -247,14 +247,14 @@ var Mareframe;
                             decisBar.visible = false;
                             var decisPercVal = new createjs.Text("" + valueData, "0.8em trebuchet", "#303030");
                         }
-                        decisPercVal.textBaseline = "middle";
-                        decisPercVal.maxWidth = 22;
-                        decisPercVal.x = 71;
-                        decisPercVal.y = 6 + (i * 12);
-                        decisionCont.addChild(decisBarBackgr);
-                        decisionCont.addChild(decisBar);
-                        decisionCont.addChild(decisPercVal);
-                    }
+                            decisPercVal.textBaseline = "middle";
+                            decisPercVal.maxWidth = 22;
+                            decisPercVal.x = 71;
+                            decisPercVal.y = 6 + (i * 12);
+                            decisionCont.addChild(decisBarBackgr);
+                            decisionCont.addChild(decisBar);
+                            decisionCont.addChild(decisPercVal);
+                        }
                     decisionCont.addEventListener("click", this.clickedDecision);
                     decisionCont.x = elmt.m_easelElmt.x + 75;
                     decisionCont.y = elmt.m_easelElmt.y - 15;
@@ -644,6 +644,7 @@ var Mareframe;
                     elmt.setData(newTable);
                     if (model.getAutoUpdate()) {
                         this.updateModel();
+                        console.log("auto update is on");
                     }
                     else {
                         elmt.setUpdated(false);

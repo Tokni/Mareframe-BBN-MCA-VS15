@@ -384,7 +384,7 @@
                     console.log("decisions node begin");
                     element.setValues(element.updateHeaderRows(element.copyDefArray()));
                     var values: any[] = element.getValues();
-                    //Number of header rows is equal to number of rows in values minus number of rows in deftinition
+                    //Number of header rows is equal to number of rows in values minus number of rows in definition
                     var numOfHeaderRows = values.length - element.getData().length;
                     //If there are no header rows add an empty column for the values
                     if (numOfHeaderRows === 0) {
@@ -481,6 +481,48 @@
                 // //console.log("new table: " + newTable)
                 return newTable;
             }
+            static getRowNumber(values: any[][], decisionElement: Element): number {
+                for (var i = 0; i < values.length; i++) {
+                    if (values[i][0] === decisionElement.getName()) {
+                        return i;
+                    }
+                }
+            }
+            static updateConcerningDecisions(element: Element) {
+                var rowsToDelete: number[] = [];
+                element.getParentElements().forEach(function (elmt) {
+                    if (elmt.getType() === 1 && elmt.getDecision() !== undefined) {//If Parent is decision and choice is made
+                        var values: any[][] = element.getValues();
+                        var decision: String = elmt.getData()[elmt.getDecision()][0];
+                        console.log("choice is made: " + decision + " in elemnent " + elmt.getName());
+                        var newValues: any[][] = [];
+                        var rowNumber: number = Tools.getRowNumber(element.getValues(), elmt);
+                        for (var i = 0; i < values.length; i++) {
+                            var newRow: any[] = [];
+                            for (var j = 0; j < values[0].length; j++) {
+                                if (values[rowNumber][j] === decision || j === 0)
+                                    newRow.push(values[i][j]);
+                            }
+                            newValues.push(newRow);
+                        }
+                    rowsToDelete.push(rowNumber);
+                    element.setValues(newValues);
+                    }
+
+                });
+                //element.setValues(Tools.deleteRows(element.getValues(), rowsToDelete));
+            }
+            static deleteRows(array: any[][], rows: number[]): any[][] {
+                console.log("deleting " + rows + " from " + array);
+                var newArray: any[][] = [];
+                for (var i = 0; i < array.length; i++) {
+                    if (rows.indexOf(i) === -1) {
+                        console.log("pushing row " + i+ " " + rows.indexOf(i));
+                        newArray.push(array[i]);
+                    }
+                }
+               return newArray;
+            }
 
             static strengthOfInfluence(p_table: number[][], p_dims: number[]): number[] {
                 var strength: number[] = [];
@@ -500,8 +542,8 @@
                         if (p_dims[ix]) {
                             overDim[ix] *= p_dims[ix];
                         }
-                    }
-                }
+        }
+    }
                 console.log("underDim: " + underDim);
                 console.log("overDim: " + overDim);
                 return strength;
