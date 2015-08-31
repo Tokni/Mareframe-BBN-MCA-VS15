@@ -70,6 +70,10 @@ var Mareframe;
                     $("#values").on("click", this.showValues);
                     this.setEditorMode = this.setEditorMode.bind(this);
                     this.setAutoUpdate = this.setAutoUpdate.bind(this);
+                    $("#model_description").text("This is the Mareframe BBN tool. You may doubleclick on each element below, to access the properties tables for that element.");
+                }
+                else {
+                    $("#model_description").text("This is the Mareframe MCA tool. Data has been loaded into the table on the right. You may doubleclick on each element below, to access the properties panel for that element. If you doubleclick on one of the red or green elements, you may adjust the weights of it's child elements, and thus the data it points to. In the chart at the bottom, you will see the result of the analysis, with the tallest column being the highest scoring one.");
                 }
                 this.pressMove = this.pressMove.bind(this);
                 this.mouseDown = this.mouseDown.bind(this);
@@ -238,7 +242,7 @@ var Mareframe;
                         decisionCont.addChild(decisRect);
                         decisionCont.addChild(decisName);
                         var valueData = elmt.getValues()[i][1];
-                            var decisBarBackgr = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
+                        var decisBarBackgr = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
                         var decisBar = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
                         if (elmt.getType() === 0) {
                             var decisPercVal = new createjs.Text(Math.floor(valueData * 100) + "%", "0.8em trebuchet", "#303030");
@@ -247,14 +251,14 @@ var Mareframe;
                             decisBar.visible = false;
                             var decisPercVal = new createjs.Text("" + valueData, "0.8em trebuchet", "#303030");
                         }
-                            decisPercVal.textBaseline = "middle";
-                            decisPercVal.maxWidth = 22;
-                            decisPercVal.x = 71;
-                            decisPercVal.y = 6 + (i * 12);
-                            decisionCont.addChild(decisBarBackgr);
-                            decisionCont.addChild(decisBar);
-                            decisionCont.addChild(decisPercVal);
-                        }
+                        decisPercVal.textBaseline = "middle";
+                        decisPercVal.maxWidth = 22;
+                        decisPercVal.x = 71;
+                        decisPercVal.y = 6 + (i * 12);
+                        decisionCont.addChild(decisBarBackgr);
+                        decisionCont.addChild(decisBar);
+                        decisionCont.addChild(decisPercVal);
+                    }
                     decisionCont.addEventListener("click", this.clickedDecision);
                     decisionCont.x = elmt.m_easelElmt.x + 75;
                     decisionCont.y = elmt.m_easelElmt.y - 15;
@@ -417,7 +421,7 @@ var Mareframe;
                             // Create the data table.
                             // Instantiate and draw our chart, passing in some options.
                             var chartData = google.visualization.arrayToDataTable(this.m_model.getWeightedData(p_elmt, true));
-                            var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+                            var chart = new google.visualization.ColumnChart($("#chart_div").get(0));
                             chart.draw(chartData, chartOptions);
                             break;
                         case 3: //objective

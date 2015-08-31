@@ -349,9 +349,8 @@ var Mareframe;
                     }
                     console.log("new values: " + newValues);
                     p_element.setValues(newValues);
-                    console.log("hello");
                     //p_element.setData(newValues);
-                    console.log("yes?");
+                    console.log("calculate valeus for " + p_element.getName());
                 }
                 else {
                     console.log("decisions node begin");
@@ -491,6 +490,28 @@ var Mareframe;
                     }
                 }
                 return newArray;
+            };
+            Tools.strengthOfInfluence = function (p_table, p_dims) {
+                var strength = [];
+                var underDim = [];
+                var overDim = [];
+                for (var init = 0; init < p_dims.length; init++) {
+                    underDim[init] = 1;
+                    overDim[init] = 1;
+                }
+                for (var ix in p_dims) {
+                    for (var iy in p_dims) {
+                        if (ix < iy) {
+                            underDim[ix] *= p_dims[ix];
+                        }
+                        if (p_dims[ix]) {
+                            overDim[ix] *= p_dims[ix];
+                        }
+                    }
+                }
+                console.log("underDim: " + underDim);
+                console.log("overDim: " + overDim);
+                return strength;
             };
             return Tools;
         })();

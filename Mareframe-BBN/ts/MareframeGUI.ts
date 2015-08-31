@@ -47,6 +47,7 @@ module Mareframe {
             constructor(p_model: Model, p_handler: Handler) {
                 this.m_handler = p_handler;
                 this.saveChanges = this.saveChanges.bind(this);
+
                 if (p_model.m_bbnMode) {
                     $("#detailsDialog").on('dialogclose', function (event) {
                         $("#valuesTable_div").hide();
@@ -55,6 +56,12 @@ module Mareframe {
                     $("#values").on("click", this.showValues);
                     this.setEditorMode = this.setEditorMode.bind(this);
                     this.setAutoUpdate = this.setAutoUpdate.bind(this);
+
+                    $("#model_description").text("This is the Mareframe BBN tool. You may doubleclick on each element below, to access the properties tables for that element.");
+                }
+                else {
+                    $("#model_description").text("This is the Mareframe MCA tool. Data has been loaded into the table on the right. You may doubleclick on each element below, to access the properties panel for that element. If you doubleclick on one of the red or green elements, you may adjust the weights of it's child elements, and thus the data it points to. In the chart at the bottom, you will see the result of the analysis, with the tallest column being the highest scoring one.");
+
                 }
 
 
@@ -515,7 +522,7 @@ module Mareframe {
                             // Create the data table.
                             // Instantiate and draw our chart, passing in some options.
                             var chartData = google.visualization.arrayToDataTable(this.m_model.getWeightedData(p_elmt, true));
-                            var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+                            var chart = new google.visualization.ColumnChart($("#chart_div").get(0));
                             chart.draw(chartData, chartOptions);
 
                             break;
