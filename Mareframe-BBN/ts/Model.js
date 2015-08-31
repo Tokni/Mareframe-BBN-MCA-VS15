@@ -37,7 +37,7 @@ var Mareframe;
                     switch (elmt.getType()) {
                         case 0:
                             dataStream += '<cpt id="' + elmt.getID() + '">\n';
-                            for (var i = 0; i < elmt.getData().length; i++) {
+                            for (var i = elmt.getParentElements().length; i < elmt.getData().length; i++) {
                                 dataStream += '<state id="' + elmt.getData(i, 0) + '" />\n';
                             }
                             if (elmt.getParentElements().length > 0) {
@@ -47,9 +47,10 @@ var Mareframe;
                                 });
                                 dataStream = dataStream.slice(0, dataStream.length - 1) + '</parents>\n';
                             }
+                            console.log(elmt.getData());
                             dataStream += '<probabilities>';
                             for (var i = 1; i < elmt.getData(1).length; i++) {
-                                for (var j = 0; j < elmt.getData().length; j++)
+                                for (var j = elmt.getParentElements().length; j < elmt.getData().length; j++)
                                     dataStream += elmt.getData(j, i) + ' ';
                             }
                             dataStream = dataStream.slice(0, dataStream.length - 1) + '</probabilities>\n';
