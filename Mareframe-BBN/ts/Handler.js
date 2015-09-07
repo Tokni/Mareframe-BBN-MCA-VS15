@@ -21,6 +21,7 @@ var Mareframe;
                 else {
                     this.m_gui.m_editorMode = true;
                 }
+                console.log("handler constructor done");
             }
             Handler.prototype.getGUI = function () {
                 return this.m_gui;

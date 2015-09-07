@@ -28,7 +28,7 @@ module Mareframe {
                     this.m_gui.m_editorMode = true;
                 }
 
-
+                console.log("handler constructor done");
             }
             
 
