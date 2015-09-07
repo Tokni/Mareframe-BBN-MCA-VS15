@@ -9,7 +9,7 @@
         { "posX": 500, "posY": 224, "elmtID": "elmtChance2", "elmtName": "Expert forecast", "elmtDesc": "write description here", "elmtType": 0, "elmtData": [["Good", 0.4, 0.7, 0.1, 0.4],
         																																					["Moderate", 0.4, 0.2, 0.3, 0.1],
         																																					["Poor", 0.2, 0.1, 0.6,0.5] ]},
-        { "posX": 100, "posY": 96, "elmtID": "elmtDec1", "elmtName": "Investment decision", "elmtDesc": "write description here", "elmtType": 1, "elmtData": [["Invest"], ["DoNotInvest"]]},
+        { "posX": 200, "posY": 96, "elmtID": "elmtDec1", "elmtName": "Investment decision", "elmtDesc": "write description here", "elmtType": 1, "elmtData": [["Invest"], ["DoNotInvest"]]},
         { "posX": 300, "posY": 224, "elmtID": "elmtValue1", "elmtName": "Financial Gain", "elmtDesc": "write description here", "elmtType": 2, "elmtData": [["Value", 10000, -5000, 500, 500,10000, -5000, 500, 500]]}
     ],
     "connections": [

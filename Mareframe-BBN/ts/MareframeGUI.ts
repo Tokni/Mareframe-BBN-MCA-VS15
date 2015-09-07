@@ -379,6 +379,8 @@ module Mareframe {
             private createNewElement(p_evt: Event) {
                 var elmt = this.m_model.createNewElement()
                 this.addElementToStage(elmt);
+                elmt.update();
+                this.updateMiniTable([elmt]);
             }
 
             private deleteSelected(p_evt: Event) {
@@ -944,12 +946,12 @@ module Mareframe {
                 if (!p_evt.nativeEvent.ctrlKey && this.m_selectedItems.indexOf(p_evt.target) === -1) {
                     this.clearSelection();
                 }
-                //////console.log("adding to selection");
+                console.log("adding to selection: " + p_evt.target);
                 this.addToSelection(p_evt.target);
             }
 
             private pressMove(p_evt: createjs.MouseEvent): void {
-                //console.log("press move");
+                console.log("press move on target " + p_evt.target.name);
 
                 if (p_evt.target.name === "hitarea") {
                     if (p_evt.nativeEvent.ctrlKey) {
@@ -970,7 +972,8 @@ module Mareframe {
                         elmt.x += p_evt.stageX - this.m_oldX;
                         elmt.y += p_evt.stageY - this.m_oldY;
 
-
+                console.log("selected elements: " + this.m_selectedItems);
+                        console.log("element: " + elmt.name);
                         for (var j = 0; j < this.m_model.getElement(elmt.name).getConnections().length; j++) {
                             var c = this.m_model.getElement(elmt.name).getConnections()[j];
 
@@ -1074,6 +1077,7 @@ module Mareframe {
                 if (this.m_selectedItems.indexOf(p_easelElmt) === -1 && p_easelElmt.name.substr(0, 4) === "elmt") {
                     var elmt = this.m_model.getElement(p_easelElmt.name)
                     this.m_selectedItems.push(p_easelElmt);
+                    console.log("pushed " + p_easelElmt);
                     if (this.m_model.m_bbnMode) {
                         this.m_selectedItems.push(elmt.m_decisEaselElmt);
                     }

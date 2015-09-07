@@ -280,6 +280,7 @@
                 var e = new Element("elmt" + this.m_counter,this);
                 this.m_counter++;
                 this.m_elementArr.push(e);
+                e.setData([["state0", 0.5], ["state1", 0.5]]);
                 return e;
 
             }
