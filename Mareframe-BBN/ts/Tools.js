@@ -144,7 +144,7 @@ var Mareframe;
                 return Number(Math.round(numb * 1000) / 1000);
             };
             Tools.getColumn = function (p_matrix, index) {
-                //console.log("get column " + index + " from " + p_matrix)
+                console.log("get column " + index + " from " + p_matrix);
                 //console.log(p_matrix)
                 var rows = math.size(p_matrix).valueOf()[0];
                 var range = math.range(0, rows);
@@ -354,7 +354,7 @@ var Mareframe;
                 }
                 else {
                     console.log("decisions node begin");
-                    element.setValues(element.updateHeaderRows(element.copyDefArray()));
+                    element.setValues(Tools.fillEmptySpaces(element.updateHeaderRows(element.copyDefArray())));
                     var values = element.getValues();
                     //Number of header rows is equal to number of rows in values minus number of rows in definition
                     var numOfHeaderRows = values.length - element.getData().length;
@@ -370,9 +370,15 @@ var Mareframe;
                         for (var j = 1; j < values[0].length; j++) {
                             if (numOfHeaderRows !== 0) {
                                 //Get the conditions for this value
+                                console.log("Trying to get column " + j);
+                                console.log(values);
                                 var conditions = math.flatten(Tools.getColumn(values, j));
-                                var range = math.range(0, numOfHeaderRows - 1);
-                                conditions = math.subset(conditions, math.squeeze(range));
+                                var range = math.range(0, numOfHeaderRows); // - 1);
+                                console.log("trying to get subset from " + conditions + " with range " + range);
+                                console.log(conditions);
+                                console.log(math.index(0, math.squeeze(range)));
+                                conditions = Tools.makeSureItsAnArray(math.subset(conditions, math.index(math.squeeze(range))));
+                                console.log(conditions);
                             }
                             else {
                                 conditions = [];
@@ -397,8 +403,22 @@ var Mareframe;
                         }
                     }
                     console.log("decisions end");
-                    p_element.setData(values);
+                    //p_element.setData(values);
+                    p_element.setValues(values);
                 }
+            };
+            Tools.fillEmptySpaces = function (p_table) {
+                console.log("Filling empty spaces in: " + p_table);
+                for (var i = 0; i < p_table.length; i++) {
+                    for (var j = 0; j < p_table[0].length; j++) {
+                        console.log(p_table[i][j]);
+                        if (p_table[i][j] === undefined) {
+                            p_table[i][j] = 0;
+                        }
+                    }
+                }
+                console.log("result: " + p_table);
+                return p_table;
             };
             Tools.addNewHeaderRow = function (p_headerRow, p_table, p_data) {
                 // //console.log("Adding array: " + headerRow)

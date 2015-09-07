@@ -462,7 +462,7 @@ module Mareframe {
             }
 
             private populateElmtDetails(p_elmt: Element): void {
-
+                console.log(p_elmt.getName() + " is updated: " + p_elmt.isUpdated());
                 ////console.log(p_elmt)
                 //set dialog title
                 $("#detailsDialog").dialog({
@@ -477,6 +477,7 @@ module Mareframe {
 
 
                     var s = Tools.htmlTableFromArray("Definition", p_elmt.getData());
+                    
                     $("#defTable_div").html(s);
                     $("#defTable_div").show();
                     if (this.m_editorMode) {

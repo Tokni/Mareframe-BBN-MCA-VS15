@@ -111,6 +111,7 @@
             }
 
             update() {
+                console.log("updating model");
                 this.m_elementArr.forEach(function (p_elmt: Element) {
                     console.log(" Elemt " + p_elmt.getName() + " does not need update");
                     if (!p_elmt.isUpdated()) {
@@ -467,8 +468,9 @@
                     if (this.m_bbnMode)
                         //console.log("from json: " + elmt.getName());
                         //console.log(this.m_elementArr);
-                    //elmt.update();
-                    this.m_elementArr[i].update();
+                        //elmt.update();
+                        
+                        this.m_elementArr[i].update();
                 }
                 //h.gui.setSize(maxX + 80, maxY + 20);
 

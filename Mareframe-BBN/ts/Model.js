@@ -96,6 +96,7 @@ var Mareframe;
                 return JSON.stringify(this);
             };
             Model.prototype.update = function () {
+                console.log("updating model");
                 this.m_elementArr.forEach(function (p_elmt) {
                     console.log(" Elemt " + p_elmt.getName() + " does not need update");
                     if (!p_elmt.isUpdated()) {

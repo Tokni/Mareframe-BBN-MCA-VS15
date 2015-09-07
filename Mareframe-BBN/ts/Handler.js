@@ -14,14 +14,13 @@ var Mareframe;
                 this.m_activeModel = this.addNewModel();
                 this.m_gui = new DST.GUIHandler(this.m_activeModel, this);
                 var loadModel = DST.Tools.getUrlParameter('model');
-                //loadModel = "scotland";
+                loadModel = "scotland";
                 if (loadModel !== null) {
                     this.m_fileHandler.loadModel(loadModel, this.m_activeModel, this.m_gui.importStage);
                 }
                 else {
                     this.m_gui.m_editorMode = true;
                 }
-                console.log("handler constructor done");
             }
             Handler.prototype.getGUI = function () {
                 return this.m_gui;

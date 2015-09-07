@@ -46,6 +46,7 @@ var Mareframe;
             Element.prototype.update = function () {
                 console.log("Updating element " + this.getName());
                 if (this.m_type !== 1) {
+                    console.log("This is not a decision node");
                     //Definition table in decision nodes does not rely on parents
                     this.updateData();
                 }
@@ -54,7 +55,7 @@ var Mareframe;
                 var children = this.getChildrenElements();
                 if (children.length !== 0) {
                     for (var i in children) {
-                        console.log(this.getName() + " children: " + children[i].getName() + "updating");
+                        console.log(this.getName() + " children: " + children[i].getName() + " updating");
                         //children[i].update();
                         children[i].setUpdated(false);
                         console.log(this.getName() + " children: " + children[i].getName() + "updated");
@@ -239,15 +240,17 @@ var Mareframe;
                 return { posX: this.m_easelElmt.x, posY: this.m_easelElmt.y, elmtID: this.getID(), elmtName: this.getName(), elmtDesc: this.getDescription(), elmtType: this.getType(), elmtData: this.getData(), elmtWghtMthd: this.getMethod() };
             };
             Element.prototype.fromJSON = function (p_jsonElmt) {
-                //console.log("element.fromJSON()");
+                // console.log("element.fromJSON()");
                 //console.log(p_jsonElmt);
                 this.m_easelElmt.x = p_jsonElmt.posX;
                 this.m_easelElmt.y = p_jsonElmt.posY;
                 this.m_id = p_jsonElmt.elmtID;
                 this.m_name = p_jsonElmt.elmtName;
+                console.log("name: " + this.m_name);
                 this.m_description = p_jsonElmt.elmtDesc;
                 this.m_type = p_jsonElmt.elmtType;
                 this.m_data = p_jsonElmt.elmtData;
+                console.log("data: " + this.m_data);
                 this.m_weightingMethod = p_jsonElmt.elmtWghtMthd;
             };
             return Element;

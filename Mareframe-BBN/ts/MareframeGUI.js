@@ -369,6 +369,7 @@ var Mareframe;
                 }
             };
             GUIHandler.prototype.populateElmtDetails = function (p_elmt) {
+                console.log(p_elmt.getName() + " is updated: " + p_elmt.isUpdated());
                 ////console.log(p_elmt)
                 //set dialog title
                 $("#detailsDialog").dialog({
