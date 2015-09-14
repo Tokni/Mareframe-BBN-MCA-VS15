@@ -113,7 +113,7 @@
             update() {
                 console.log("updating model");
                 this.m_elementArr.forEach(function (p_elmt: Element) {
-                    console.log(" Elemt " + p_elmt.getName() + " does not need update");
+                   
                     if (!p_elmt.isUpdated()) {
                         p_elmt.update();
                         console.log(" Elemt " + p_elmt.getName() + " has been updated");
@@ -275,12 +275,24 @@
                 return tempMatrix;
             }
 
-            createNewElement(): Element {
+            createNewElement(p_type: number): Element {
                 ////console.log(this.m_counter);
-                var e = new Element("elmt" + this.m_counter,this);
+                var e = new Element("elmt" + this.m_counter, this, p_type);
                 this.m_counter++;
                 this.m_elementArr.push(e);
-                e.setData([["state0", 0.5], ["state1", 0.5]]);
+                switch (p_type) {
+                    case 0:
+                        e.setData([["state0", 0.5], ["state1", 0.5]]);
+                        break;
+                    case 1:
+                        e.setData([["choice0"], ["choice1"]]);
+                        break;
+                    case 2:
+                        e.setData(["Value", 0]);
+                    default:
+                        break;
+                }
+                
                 return e;
 
             }
@@ -443,7 +455,7 @@
                 for (var i = 0; i < p_jsonObject.elements.length; i++)
                 {
                     var JsonElmt = p_jsonObject.elements[i];
-                    var elmt = this.createNewElement()
+                    var elmt = this.createNewElement(undefined)
                     //if (JsonElmt.posX > maxX)
                     //    maxX = JsonElmt.posX;
 

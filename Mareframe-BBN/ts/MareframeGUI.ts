@@ -81,6 +81,9 @@ module Mareframe {
                 this.updateTable = this.updateTable.bind(this);
                 this.connectTo = this.connectTo.bind(this);
                 this.updateConnection = this.updateConnection.bind(this);
+                this.createNewChance = this.createNewChance.bind(this);
+                this.createNewDec = this.createNewDec.bind(this);
+                this.createNewValue = this.createNewValue.bind(this);
                 this.createNewElement = this.createNewElement.bind(this);
                 this.deleteSelected = this.deleteSelected.bind(this);
                 this.quickLoad = this.quickLoad.bind(this);
@@ -90,6 +93,7 @@ module Mareframe {
                 this.saveModel = this.saveModel.bind(this);
                 this.loadModel = this.loadModel.bind(this);
                 this.clickedDecision = this.clickedDecision.bind(this);
+                this.fullscreen = this.fullscreen.bind(this);
 
 
 
@@ -108,6 +112,9 @@ module Mareframe {
                 $("#valueFn_Linear").on("click", this.linearizeValFn);
                 $("#valueFn_Flip").on("click", this.flipValFn);
                 $("#newElmt").on("click", this.createNewElement);
+                $("#newChance").on("click", this.createNewChance);
+                $("#newDec").on("click", this.createNewDec);
+                $("#newValue").on("click", this.createNewValue);
                 $("#deleteElmt").on("click", this.deleteSelected);
                 $("#editorMode").on("click", this.setEditorMode);
                 $("#showDescription").on("click", this.setShowDescription);
@@ -119,6 +126,7 @@ module Mareframe {
                 $("#downloadLink").on("click", function (evt) {
                     $("#saveFile_div").hide();
                 });
+                $("#fullscreen").on("click", this.fullscreen);
                 this.m_mcaBackground.addEventListener("pressup", this.mouseUp);
 
                 $("#lodDcmt").on("change", this.loadModel);
@@ -145,7 +153,6 @@ module Mareframe {
 
 
             }
-
             private loadModel(p_evt: Event) {
                 ////console.log(this);
                 ////console.log(this.m_handler);
@@ -273,7 +280,9 @@ module Mareframe {
 
                         var decisRect: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
                         //console.log(elmt.getName());
-                       // console.log(elmt.getValues());
+
+                        //console.log("" + elmt.getValues());
+                        //console.log("substring 0-12: " + elmt.getValues()[i][0]);
                         var decisName: createjs.Text = new createjs.Text(elmt.getValues()[i][0].substr(0, 12), "0.8em trebuchet", "#303030");
                         decisName.textBaseline = "middle";
                         decisName.maxWidth = 68;
@@ -338,6 +347,14 @@ module Mareframe {
                 if (this.m_editorMode) {
                     $(".advButton").show();
                     $("#reset").show();
+                    if (this.m_model.m_bbnMode) {
+                        //$("#newElmt").hide();
+                    }
+                    else {
+                        $("#newChance").hide();
+                        $("#newDec").hide();
+                        $("#newValue").hide();
+                    }
                 } else {
                     $(".advButton").hide();
                     $("#reset").hide();
@@ -376,8 +393,37 @@ module Mareframe {
                 this.m_model.setAutoUpdate(cb.currentTarget.checked);
                 console.log("auto update: " + this.m_model.m_autoUpdate);
             }
+            private createNewChance(p_evt: Event) {
+
+                var elmt = this.m_model.createNewElement(0)
+                this.addElementToStage(elmt);
+                elmt.update();
+                this.updateMiniTable([elmt]);
+            }
+            private fullscreen(p_evt: Event) {
+                console.log("fullscreen pressed");
+                $(".row").hide();
+                this.m_mcaStageCanvas.width = $(window).width();
+                this.m_mcaStageCanvas.height = $(window).height();
+                this.quickLoad();
+            }
+            private createNewDec(p_evt: Event) {
+
+                var elmt = this.m_model.createNewElement(1)
+                this.addElementToStage(elmt);
+                elmt.update();
+                this.updateMiniTable([elmt]);
+            }
+            private createNewValue(p_evt: Event) {
+
+                var elmt = this.m_model.createNewElement(2)
+                this.addElementToStage(elmt);
+                elmt.update();
+                this.updateMiniTable([elmt]);
+            }
             private createNewElement(p_evt: Event) {
-                var elmt = this.m_model.createNewElement()
+
+                var elmt = this.m_model.createNewElement(undefined)
                 this.addElementToStage(elmt);
                 elmt.update();
                 this.updateMiniTable([elmt]);
@@ -1019,8 +1065,9 @@ module Mareframe {
                             this.addConnectionToStage(c);
                             connected = true;
                         }
-                        if (outputElmt.getType() !== 1 && this.m_model.m_bbnMode) {
+                        if (this.m_model.m_bbnMode) {
                             outputElmt.updateData();
+                            outputElmt.setUpdated(false);
                         }
                     }
                 }

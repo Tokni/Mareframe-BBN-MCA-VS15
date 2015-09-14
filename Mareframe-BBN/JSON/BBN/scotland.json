@@ -23,8 +23,8 @@
         "connID": "conn5"
       },
       {
-        "connInput": "elmtDec1",
-        "connOutput": "elmtDec2",
+        "connInput": "elmtDec2",
+        "connOutput": "elmtDec1",
         "connID": "conn6"
       }
     ],

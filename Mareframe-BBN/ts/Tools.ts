@@ -113,11 +113,14 @@
 
             static numOfHeaderRows(p_valuesArray): number {
                 var counter = 0;
+                if (p_valuesArray[p_valuesArray.length - 1][1] !== undefined) { //One dimensional
+                    
                 for (var i = 0; i < p_valuesArray.length; i++) {
                     //if the cell in column 2 contains text it is a header row and must be a decision
                     if (isNaN(p_valuesArray[i][1]) && p_valuesArray[i][1] !== undefined) {
                         counter++;
                     }
+                }
                 }
                 return counter
             }
@@ -161,7 +164,7 @@
             }
 
             static getColumn(p_matrix: any[][], index: number) {
-                console.log("get column " + index + " from " + p_matrix)
+                //console.log("get column " + index + " from " + p_matrix)
                 //console.log(p_matrix)
                 var rows = math.size(p_matrix).valueOf()[0];
                 var range = math.range(0, rows);
@@ -170,9 +173,14 @@
             }
 
             static getRow(p_matrix: any[][], p_index: number) {
-                // //console.log("get row " + index + " from " + matrix)
+                console.log("get row " + p_index + " from " + p_matrix)
                 var columns = math.size(p_matrix).valueOf()[1];
                 var range = [];
+                var oneDimensional;
+                if (columns === undefined) { //One dimensional
+                    return p_matrix;
+                }
+                console.log("columns: " + columns);
                 for (var n = 0; n < columns; n++) {
                     range.push(n);
                 }
@@ -195,30 +203,48 @@
             }
 
             static getMatrixWithoutHeader(p_matrix: any[][]): any[][] {
-                // //console.log("get matrix without header from " + matrix)
-                var numOfColumns = math.size(p_matrix)[1];
-                var numOfRows = math.size(p_matrix)[0];
-                // //console.log("numOfRows: " + numOfRows + " numOfColumns: " + numOfColumns);
+                console.log("get matrix without header from " + p_matrix)
+                var numOfColumns: number;
+                var numOfRows: number;
+                console.log("size: " + math.size(p_matrix));
+                if (math.size(p_matrix).length > 1) {
+                    numOfColumns = math.size(p_matrix)[1];
+                    numOfRows = math.size(p_matrix)[0];
+                    
+                }
+                else { //one dimensional
+                    numOfColumns = math.size(p_matrix)[0];
+                    numOfRows = 1;
+                }
+                console.log("numOfRows: " + numOfRows + " numOfColumns: " + numOfColumns);
                 var newMatrix = [];
                 //For each row
                 for (var i = 0; i < numOfRows; i++) {
                     //If there is a number in column 2 in this row, this is not a header row
-                    // //console.log("i: " + i)
-                    // //console.log("subset: " + math.subset(matrix, math.index(i, 1)));
-                    if (!(isNaN(math.subset(p_matrix, math.index(i, 1))))) {
+                    console.log("i: " + i)
+                    var secondColumnValue: any;
+                    if (numOfRows === 1) { // One dimensional
+                        secondColumnValue = math.subset(p_matrix, math.index(1));
+                    }
+                    else {
+                        secondColumnValue = math.subset(p_matrix, math.index(i, 1));
+                    }
+                    console.log("subset: " + secondColumnValue);
+                    if (!(isNaN(secondColumnValue))) {
                         var row = math.squeeze(Tools.getRow(p_matrix, i));
-                        // //console.log("row " + i+ ": " + row + " length " + row.length)
+                        console.log("row " + i+ ": " + row + " length " + row.length)
                         var range = math.range(1, row.length)
                         row = math.subset(row, math.index(math.squeeze(range)))
                         if (row.length === undefined) {
                             row = [row];
                         }
-                        // //console.log(row)
-                        newMatrix.push(row);
-                        // //console.log("newMatrix: "+ newMatrix)
+                     
+                            newMatrix.push(row);
+                       
+                        console.log("newMatrix: " + newMatrix)
                     }
                 }
-                // //console.log("returned: " + newMatrix)
+                console.log("returned: " + Tools.arrayToString(newMatrix));
                 return newMatrix;
             }
 
@@ -328,18 +354,18 @@
                 return array;
             }
 
-            static calculateValues(p_model: Model, p_element: Element) { //move to model or tools??
+            static calculateValues(p_model: Model, p_element: Element) {
                 var model: Model = p_model;
                 var element: Element = p_element;
-                //console.log("calculate valeus for " + p_element.getName());
+                console.log("calculate valeus for " + p_element.getName());
                 
 
                 if (element.getType() !== 1) {//If its a chance or value node
-                    console.log("calculate valeus for " + p_element.getName());
                     var data = element.getData();
                     var headerRows = [];
                     var takenIntoAccount = [];
                     var newValues = Tools.getMatrixWithoutHeader(data);
+                    console.log("data: " + Tools.arrayToString(newValues));
                     element.getParentElements().forEach(function (elmt) {
                         if (elmt.getType() === 0) {//If Parent is a chance
                             takenIntoAccount.push(elmt) //The parents which already have been evaluated
@@ -350,8 +376,10 @@
                             }
                             var parentValuesMatrix = Tools.getMatrixWithoutHeader(elmt.getValues());
                             //For each submatrix calculate new values
+                            console.log("multiplying " + submatrices[0] + " and " + parentValuesMatrix);
                             var result = Tools.makeSureItsAnArray([math.multiply(submatrices[0], parentValuesMatrix)]);
                             for (var i = 1; i < submatrices.length; i++) {
+                                console.log("multiplying " + submatrices[i] + " and " + parentValuesMatrix);
                                 result.push(Tools.makeSureItsAnArray(math.multiply(submatrices[i], parentValuesMatrix)));
                             }
                             newValues = Tools.concatMatrices(result);
@@ -360,26 +388,34 @@
                         }
                     })
                     newValues = Tools.convertToArray(newValues);
-                    // //console.log(newValues)
-                    if (newValues[0][0] === undefined) {//It's one dimensional
-                        // //console.log("one-dimensional")
+
+                    console.log(Tools.arrayToString(newValues));
+                    console.log("checking for dimension: " + Tools.isOneDimensional(newValues)); 
+                    if (Tools.isOneDimensional(newValues)) {//newValues[newValues.length-1][0] === undefined) {//It's one dimensional
+                       console.log("one-dimensional")
                         newValues.unshift(data[Tools.numOfHeaderRows(element.getData())][0]);
                     } else {
                         for (var i = 0; i < newValues.length; i++) {
-                            // //console.log("unshifting " + newValues[i])
+                            console.log("unshifting " + data[i + Tools.numOfHeaderRows(element.getData())][0])
                             newValues[i].unshift(data[i + Tools.numOfHeaderRows(element.getData())][0]);
                         }
                     }
+                    console.log("new values: \n" + Tools.arrayToString(newValues));
                     if (headerRows.length > 0) {//If there have been added header rows
-                        headerRows.push(newValues);
+                        if (newValues[newValues.length - 1][1] === undefined) {
+                            console.log("pushing " + newValues + " into " + headerRows);
+                            headerRows.push(newValues);
+                        }
+                        else {
+                            for (var i = 0; i < newValues.length; i++) {
+                                headerRows.push(newValues[i]);
+                            }
+                        }
                         newValues = headerRows;
                     }
-                    console.log("new values: " + newValues)
+                    console.log(Tools.arrayToString(newValues))
                     p_element.setValues(newValues);
-                    
-                    //p_element.setData(newValues);
                    
-                    console.log("calculate valeus for " + p_element.getName());
                 } else {//If it is a decision node
                     console.log("decisions node begin");
                     element.setValues(Tools.fillEmptySpaces(element.updateHeaderRows(element.copyDefArray())));
@@ -398,15 +434,15 @@
                         for (var j = 1; j < values[0].length; j++) {
                             if (numOfHeaderRows !== 0) {
                                 //Get the conditions for this value
-                                console.log("Trying to get column " + j);
-                                console.log(values);
+                               // console.log("Trying to get column " + j);
+                                //console.log(values);
                                 var conditions = math.flatten(Tools.getColumn(values, j));
                                 var range = math.range(0, numOfHeaderRows);// - 1);
-                                console.log("trying to get subset from " + conditions + " with range " + range);
-                                console.log(conditions);
-                                console.log(math.index(0, math.squeeze(range)));
+                               // console.log("trying to get subset from " + conditions + " with range " + range);
+                                //console.log(conditions);
+                                //console.log(math.index(0, math.squeeze(range)));
                                 conditions = Tools.makeSureItsAnArray(math.subset(conditions, math.index(math.squeeze(range))));
-                                console.log(conditions);
+                                //console.log(conditions);
                             } else {
                                 conditions = [];
                             }
@@ -435,6 +471,32 @@
                     p_element.setValues(values);
                 }
 
+            }
+            static isOneDimensional(p_array: any[][]): Boolean {
+                console.log(p_array[0]);
+                return (p_array.length === 1 || !($.isArray((p_array)[0])));
+            }
+            static arrayToString(p_array: any[][]): String {
+                var newString: String = "[";
+                if (p_array[p_array.length - 1][1] === undefined) {//Its one dimensional
+                    //console.log("in arrayToString its one dimensional");
+                    newString += "[";
+                    for (var i = 0; i < p_array.length; i++) {
+                        newString += ", " + p_array[i];
+                    }
+                    newString += "]";
+                }
+                else {
+                    for (var i = 0; i < p_array.length; i++) {
+                        newString += "[";
+                        for (var j = 0; j < p_array[0].length; j++) {
+                            newString += (", " + p_array[i][j]);
+                        }
+                        newString += "]\n";
+                    }
+                }
+
+                return newString + "]";
             }
             static fillEmptySpaces(p_table: any[][]): any[][]{
                 console.log("Filling empty spaces in: " + p_table);
@@ -507,6 +569,7 @@
                 }
             }
             static updateConcerningDecisions(element: Element) {
+                console.log("updating concerning decisions " + element.getName());
                 var rowsToDelete: number[] = [];
                 element.getParentElements().forEach(function (elmt) {
                     if (elmt.getType() === 1 && elmt.getDecision() !== undefined) {//If Parent is decision and choice is made
@@ -565,6 +628,40 @@
                 console.log("underDim: " + underDim);
                 console.log("overDim: " + overDim);
                 return strength;
+            }
+            static fillDataTable(p_dataTable: any[][]) {
+                console.log("filling table: " + p_dataTable);
+                var headerRows: any[][] = [];
+                var data: any[][] = [];
+                var numOfHeaderRows: number = Tools.numOfHeaderRows(p_dataTable);
+                for (var i = 0; i < numOfHeaderRows; i++) {
+                    var newRow: any[] = [];
+                    for (var j = 0; j < p_dataTable[0].length; j++) {
+                        newRow.push(p_dataTable[i][j]);
+                    }
+                    headerRows.push(newRow);
+                }
+                console.log("header rows: " + headerRows);
+                for (var i = numOfHeaderRows; i < p_dataTable.length; i++) {
+                    var newRow: any[] = [];
+                    for (var j = 1; j < p_dataTable[0].length; j++) {
+                        var value: any = p_dataTable[i][j];
+                        if (!isNaN(value)) {
+                            newRow.push(value);
+                        }
+                    }
+                    data.push(newRow);
+                }
+                console.log("before concat: " + data);
+                data = math.concat(data, data);
+                console.log("after concat: " + data);
+                var newDataTable: any[][] = headerRows;
+                for (var i = 0; i < data.length; i++) {
+                    data[i].unshift(p_dataTable[numOfHeaderRows + i][0]);
+                    newDataTable.push(data[i]);
+                }
+                console.log("new table after filling: " + newDataTable);
+                return newDataTable;
             }
                  
         }

@@ -67,10 +67,14 @@
             <button class="advButton" id="savDcmt">Save Document</button>
             <button class="advButton" id="resetDcmt">Reset</button>
             <button class="advButton" id="newElmt">New Element</button>
+            <button class="advButton" id="newChance">New Chance</button>
+            <button class="advButton" id="newDec">New Decision</button>
+            <button class="advButton" id="newValue">New Value</button>
             <button class="advButton" id="deleteElmt">Delete Element</button>
             <button class="advButton" id="selectAllElmt">Select All</button>
             <input class="advButton" type="checkbox" id="cnctTool"><label for="cnctTool" class="advButton">Connect Tool</label>
             <div style="float:right">
+                <button class="button" id="fullscreen"> Fullscreen</button>
                 <input class="button" type="checkbox" id="editorMode">
                 <label for="editorMode" class="button">Editor Mode</label>
                 <input class="button" type="checkbox" id="autoUpdate">
@@ -78,6 +82,7 @@
                 <button class="button" id="updateMdl">Update</button>
             </div>
         </div>
+
     </div>
     <div id="MCAContainer" style="text-align:center">
 
@@ -140,6 +145,7 @@
         $("#newElmt").button({ icons: { primary: "ui-icon-plus" } });
         $("#deleteElmt").button({ icons: { primary: "ui-icon-trash" } });
         $("#cnctTool").button({ icons: { primary: "ui-icon-link" } });
+        $("#fullscreen").button({ icons: { primary: "ui-icon-zoomin" } });
         $("#editorMode").button({ icons: { primary: "ui-icon-link" } });
         $("#autoUpdate").button({ icons: { primary: "ui-icon-refresh" } });
         $("#updateMdl").button({ icons: { primary: "ui-icon-refresh" } });

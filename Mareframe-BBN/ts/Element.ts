@@ -16,10 +16,13 @@
             private m_model: Model;
             private m_decision: number;
 
-            constructor(p_id: string, p_model: Model) {
+            constructor(p_id: string, p_model: Model, p_type: number) {
                 if (p_id.substr(0, 4) == "elmt")
                 { this.m_id = p_id; }
                 else { this.m_id = "elmt" + p_id; }
+                if (p_type != undefined) {
+                    this.m_type = p_type;
+                }
                 this.m_model = p_model;
                 this.getChildrenElements = this.getChildrenElements.bind(this);
             }
@@ -111,31 +114,51 @@
             
 
             updateData() {
-                //console.log("updateData " + this.m_name);
+                console.log("updateData " + this.m_name);
+                console.log("data: " + this.m_data);
                 this.m_data = this.updateHeaderRows(this.m_data);
+                console.log("data: " + this.m_data);
+                var rows: number;
+                var columns: number;
+                console.log("checking: " + this.m_data[this.m_data.length - 1][1]);
+                console.log("data length: " + this.m_data.length);
+                if (this.m_data[this.m_data.length-1][1] === undefined) {// One dimensional
+                    rows = 1;
+                    columns = this.m_data.length;
+                }
+                else {
+                    rows = this.m_data.length;
+                    columns = this.m_data[0].length;
+                }
+                console.log("rows " + rows + " columns " + columns);
+                console.log("in filling " + this.m_name + " last cell is " + this.m_data[rows - 1][columns - 1]);
+                if (this.m_data[rows-1][columns-1] === undefined) {
+                    this.m_data = Tools.fillDataTable(this.m_data);
+                }
             }
 
             updateHeaderRows(p_originalData: any[][]): any[][] {
-                // //console.log("updating header rows")
-                //console.log(this);
+                console.log("updating header rows in " + this.getName())
+                console.log("data: " + p_originalData);
+                
                 var data: any[][] = [];
                 var parents: Element[] = this.getParentElements();
                 
                 for (var i = 0; i < parents.length; i++) {
                     var elmt: Element = parents[i];
-                    //console.log("Parent: " + elmt.getName());
+                    console.log("Parent: " + elmt.getName());
                     data = Tools.addNewHeaderRow(elmt.getMainValues(), data, this.m_data);
                     //console.log(data);
 
                 }
-
+                console.log("number of header rows : " + Tools.numOfHeaderRows(this.m_data));
                 //Add original values to the table
                 for (var i = Tools.numOfHeaderRows(this.m_data); i < p_originalData.length; i++) {
-                    // //console.log("i: " + i);
-                    // //console.log("new data: " + originalData[i]);
+                    console.log("i: " + i);
+                    console.log("new data: " + p_originalData[i]);
                     data.push(p_originalData[i]);
                 }
-                //console.log(data);
+                console.log(data);
                 return data;
 
             }
