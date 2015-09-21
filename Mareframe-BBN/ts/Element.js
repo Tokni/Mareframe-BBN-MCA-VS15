@@ -134,7 +134,7 @@ var Mareframe;
                 for (var i = 0; i < parents.length; i++) {
                     var elmt = parents[i];
                     console.log("Parent: " + elmt.getName());
-                    data = DST.Tools.addNewHeaderRow(elmt.getMainValues(), data, this.m_data);
+                    data = DST.Tools.addNewHeaderRow(elmt.getMainValues(), data);
                 }
                 console.log("number of header rows : " + DST.Tools.numOfHeaderRows(this.m_data));
                 //Add original values to the table
@@ -151,7 +151,7 @@ var Mareframe;
                 //console.log(this.m_data);
                 var row = [];
                 var data = this.m_data;
-                row.push(this.m_name);
+                row.push(this.m_id);
                 for (var i = 0; i < data.length; i++) {
                     // //console.log("i: " + i);
                     // //console.log("check data: " + data[i][1]);

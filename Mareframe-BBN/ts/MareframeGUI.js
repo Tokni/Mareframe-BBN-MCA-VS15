@@ -422,7 +422,8 @@ var Mareframe;
                     //bbn mode only
                     $("#detailsDialog").data("element", p_elmt);
                     $("#detailsDialog").data("model", this.m_model);
-                    var s = DST.Tools.htmlTableFromArray("Definition", p_elmt.getData());
+                    console.log(this.m_model);
+                    var s = DST.Tools.htmlTableFromArray("Definition", p_elmt.getData(), this.m_model);
                     $("#defTable_div").html(s);
                     $("#defTable_div").show();
                     if (this.m_editorMode) {
@@ -646,7 +647,7 @@ var Mareframe;
                 var elmt = $("#detailsDialog").data("element");
                 console.log("Data: " + elmt.getData());
                 console.log("Values: " + elmt.getValues());
-                $("#valuesTable_div").html(DST.Tools.htmlTableFromArray("Values", elmt.getValues()));
+                $("#valuesTable_div").html(DST.Tools.htmlTableFromArray("Values", elmt.getValues(), $("#detailsDialog").data("model")));
                 $("#valuesTable_div").show();
                 $("#values").prop("disabled", true);
             };

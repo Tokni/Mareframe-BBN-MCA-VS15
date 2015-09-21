@@ -523,8 +523,8 @@ module Mareframe {
                     $("#detailsDialog").data("element", p_elmt);
                     $("#detailsDialog").data("model", this.m_model);
 
-
-                    var s = Tools.htmlTableFromArray("Definition", p_elmt.getData());
+                    console.log(this.m_model)
+                    var s = Tools.htmlTableFromArray("Definition", p_elmt.getData(), this.m_model);
                     
                     $("#defTable_div").html(s);
                     $("#defTable_div").show();
@@ -791,7 +791,7 @@ module Mareframe {
                 var elmt: Element = $("#detailsDialog").data("element");
                 console.log("Data: " + elmt.getData());
                 console.log("Values: " + elmt.getValues());
-                $("#valuesTable_div").html(Tools.htmlTableFromArray("Values", elmt.getValues()));
+                $("#valuesTable_div").html(Tools.htmlTableFromArray("Values", elmt.getValues(), $("#detailsDialog").data("model")));
                 $("#valuesTable_div").show();
                 $("#values").prop("disabled", true);
             }
