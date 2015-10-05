@@ -188,10 +188,10 @@ var Mareframe;
                 return p_value;
             };
             Tools.getMatrixWithoutHeader = function (p_matrix) {
-                // console.log("get matrix without header from " + p_matrix)
+                console.log("get matrix without header from " + p_matrix);
                 var numOfColumns;
                 var numOfRows;
-                // console.log("size: " + math.size(p_matrix));
+                console.log("size: " + math.size(p_matrix));
                 if (math.size(p_matrix).length > 1) {
                     numOfColumns = math.size(p_matrix)[1];
                     numOfRows = math.size(p_matrix)[0];
@@ -539,9 +539,10 @@ var Mareframe;
             Tools.calculateValues = function (p_model, p_element) {
                 var model = p_model;
                 var element = p_element;
-                //console.log("calculate valeus for " + p_element.getName());
+                console.log("calculate valeus for " + p_element.getName());
                 var dataHeaders = [];
                 var data = element.getData();
+                console.log("data: " + data);
                 for (var i = 0; i < Tools.numOfHeaderRows(data); i++) {
                     var newRow = [];
                     for (var j = 0; j < data[0].length; j++) {

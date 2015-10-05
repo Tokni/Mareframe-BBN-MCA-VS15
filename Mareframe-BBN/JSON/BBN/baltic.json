@@ -1,38 +1,240 @@
 {
-    "elements": [
-        { "posX": 710, "posY": 96, "elmtID": "elmtMSYwoL", "elmtName": "MSY without landing", "elmtDesc": "The purpose of this scenario is to establish a baseline for comparing the alternative management approaches that represented by the other listed scenarios: What might happen if management was to proceed as before the 2014 CFP reform?", "elmtType": 2, "elmtData": [ 1 ], "elmtWghtMthd": 0 },
-        { "posX": 710, "posY": 160, "elmtID": "elmtMSYwL", "elmtName": "MSY with landing", "elmtDesc": "The purpose of this scenario is to establish a baseline for comparing the alternative management approaches that represented by the other listed scenarios: What would happen if management was to proceed according to CFP as revised CFP in 2014?", "elmtType": 2, "elmtData": [ 2 ], "elmtWghtMthd": 0 },
-        { "posX": 710, "posY": 224, "elmtID": "elmtMMEY", "elmtName": "MMEY", "elmtDesc": "By changing the balance between the main commercial species and fisheries involved (including the balance between whitefish and Norwegian lobster), this scenario proposes an approach to achieve the maximum economically yield.", "elmtType": 2, "elmtData": [ 3 ], "elmtWghtMthd": 0 },
-        { "posX": 710, "posY": 288, "elmtID": "elmtMSYrS", "elmtName": "MSY & reducing seals", "elmtDesc": "The purpose of this scenario is to assess the potential impact of increased seals populations in combination with the requirements of the coming landing obligation and of achieving MSY for commercial stocks.", "elmtType": 2, "elmtData": [ 4 ], "elmtWghtMthd": 0 },
-        { "posX": 710, "posY": 352, "elmtID": "elmtMMEYrS", "elmtName": "MMEY & reducing seals", "elmtDesc": "The purpose of this scenario is suggest an approach to achieve maximum economically yield by changing the balance between the main commercial species and fisheries involved (including the balance between whitefish and Norwegian lobster) in combination with improved selectivity measures to address the landing obligation and a reduction of the seal populations to the levels estimated to be present in the 1980s.", "elmtType": 2, "elmtData": [ 5 ], "elmtWghtMthd": 0 },
-        { "posX": 500, "posY": 96, "elmtID": "elmtAttr1", "elmtName": "Attribute 1", "elmtDesc": "write description here", "elmtType": 0, "elmtData": [ 1 ], "elmtWghtMthd": 0 },
-        { "posX": 500, "posY": 160, "elmtID": "elmtAttr2", "elmtName": "Attribute 2", "elmtDesc": "write description here", "elmtType": 0, "elmtData": [ 2 ], "elmtWghtMthd": 0 },
-        { "posX": 500, "posY": 224, "elmtID": "elmtAttr3", "elmtName": "Attribute 3", "elmtDesc": "write description here", "elmtType": 0, "elmtData": [ 3 ], "elmtWghtMthd": 0 },
-        { "posX": 500, "posY": 288, "elmtID": "elmtAttr4", "elmtName": "Attribute 4", "elmtDesc": "write description here", "elmtType": 0, "elmtData": [ 4 ], "elmtWghtMthd": 0 },
-        { "posX": 500, "posY": 352, "elmtID": "elmtAttr5", "elmtName": "Attribute 5", "elmtDesc": "write description here", "elmtType": 0, "elmtData": [ 5 ], "elmtWghtMthd": 0 },
-        { "posX": 290, "posY": 128, "elmtID": "elmtEco", "elmtName": "Economical", "elmtDesc": "write description here", "elmtType": 1, "elmtData": [ [ "conn4", "conn5" ], [ 80, 10 ] ], "elmtWghtMthd": 1 },
-        { "posX": 290, "posY": 224, "elmtID": "elmtSoc", "elmtName": "Social", "elmtDesc": "write description here", "elmtType": 1, "elmtData": [ [ "conn6" ], [ 100 ] ], "elmtWghtMthd": 1 },
-        { "posX": 290, "posY": 320, "elmtID": "elmtEnv", "elmtName": "Environmental", "elmtDesc": "write description here", "elmtType": 1, "elmtData": [ [ "conn7", "conn8" ], [ 90, 10 ] ], "elmtWghtMthd": 1 },
-        { "posX": 80, "posY": 224, "elmtID": "elmtGoal", "elmtName": "Sustainable Fisheries", "elmtDesc": "write description here", "elmtType": 3, "elmtData": [ [ "conn1", "conn2", "conn3" ], [ 90, 80, 60 ] ], "elmtWghtMthd": 1 }
-    ],
-    "connections": [
-        { "connInput": "elmtEco", "connOutput": "elmtGoal", "connID": "conn1" },
-        { "connInput": "elmtSoc", "connOutput": "elmtGoal", "connID": "conn2" },
-        { "connInput": "elmtEnv", "connOutput": "elmtGoal", "connID": "conn3" },
-        { "connInput": "elmtAttr1", "connOutput": "elmtEco", "connID": "conn4" },
-        { "connInput": "elmtAttr2", "connOutput": "elmtEco", "connID": "conn5" },
-        { "connInput": "elmtAttr3", "connOutput": "elmtSoc", "connID": "conn6" },
-        { "connInput": "elmtAttr4", "connOutput": "elmtEnv", "connID": "conn7" },
-        { "connInput": "elmtAttr5", "connOutput": "elmtEnv", "connID": "conn8" }
-    ],
-    "mdlName": "The Baltic Sea",
-    "mainObj": "elmtGoal",
-    "dataMat": [
-        [ "leaveblank", "Attribute 1", "Attribute 2", "Attribute 3", "Attribute 4", "Attribute 5" ],
-        [ "elmtMSYwoL", 300, 2345, 215, 65, 6945 ],
-        [ "elmtMSYwL", 252, 3248, 165, 68, 6845 ],
-        [ "elmtMMEY", 420, 2156, 253, 210, 4589 ],
-        [ "elmtMSYrS", 345 , 3545 ,351 , 98, 5684 ],
-        [ "elmtMMEYrS", 215, 2123, 366, 54, 4289 ]
-    ]
-}
+  "elements": [
+
+    {
+      "posX": 468.5,
+      "posY": 155.5,
+      "elmtID": "management",
+      "elmtName": "management",
+      "elmtDesc": "",
+      "elmtType": 1,
+      "elmtData": [
+        [ "BAU" ],
+        [ "Fmsy" ],
+        [ "Area_closures" ]
+      ]
+    },
+    {
+      "posX": 406,
+      "posY": 594,
+      "elmtID": "year",
+      "elmtName": "year",
+      "elmtDesc": "",
+      "elmtType": 0,
+      "elmtData": [s
+        [ "Year0", 0.5001 ],
+        [ "Year1", 0.4999 ]
+      ]
+    },
+    {
+      "posX": 472.5,
+      "posY": 371,
+      "elmtID": "effort",
+      "elmtName": "effort",
+      "elmtDesc": "",
+      "elmtType": 0,
+      "elmtData": [
+        [ "Low", 0.0001, 0.99410059, 0.038935042 ],
+        [ "Moderate", 0.9191, 0.00579942, 0.717445701 ],
+        [ "High", 0.0808, 0.0001, 0.243619257 ]
+      ]
+    },
+    {
+      "posX": 472.5,
+      "posY": 482.5,
+      "elmtID": "SSB",
+      "elmtName": "SSB",
+      "elmtDesc": "",
+      "elmtType": 0,
+      "elmtData": [
+        [ "Below500", 0.0978, 0.126, 0.230938563, 0.0851, 0.1164, 0.215021502 ],
+        [ "Btw500and1000", 0.6413, 0.638, 0.587152291, 0.6356, 0.6455, 0.592859286 ],
+        [ "Btw1000and1500", 0.2252, 0.2026, 0.155393236, 0.238, 0.204, 0.165116512 ],
+        [ "Above1500", 0.0357, 0.0334, 0.02651591, 0.0413, 0.0341, 0.0270027 ]
+      ]
+    },
+    {
+      "posX": 921.5,
+      "posY": 242,
+      "elmtID": "regime",
+      "elmtName": "regime",
+      "elmtDesc": "",
+      "elmtType": 0,
+      "elmtData": [
+        [ "Typical", 0.85 ],
+        [ "Anomaly", 0.15 ]
+      ]
+    },
+    {
+      "posX": 811.5,
+      "posY": 481,
+      "elmtID": "T",
+      "elmtName": "T",
+      "elmtDesc": "",
+      "elmtType": 0,
+      "elmtData": [
+        [ "Below3", 0.976, 0.0001 ],
+        [ "Btw3and6", 0.0239, 0.0866 ],
+        [ "Above6", 0.0001, 0.9133 ]
+      ]
+    },
+    {
+      "posX": 624.5,
+      "posY": 482,
+      "elmtID": "R",
+      "elmtName": "R",
+      "elmtDesc": "",
+      "elmtType": 0,
+      "elmtData": [
+        [ "Below1million", 1, 0.7621, 0.3174, 0.8038, 0.0069, 0, 0.749, 0, 0, 0.9968, 0.7596, 0.3157 ],
+        [ "Btw1and1dot3", 0, 0.2023, 0.1309, 0.1962, 0.389, 0, 0.251, 0.3358, 0, 0.0032, 0.178, 0.1635 ],
+        [ "Above1dot3million", 0, 0.0356, 0.5517, 0, 0.6041, 1, 0, 0.6642, 1, 0, 0.0624, 0.5208 ]
+      ]
+    },
+    {
+      "posX": 273.5,
+      "posY": 485,
+      "elmtID": "catch",
+      "elmtName": "catch",
+      "elmtDesc": "",
+      "elmtType": 0,
+      "elmtData": [
+        [ "Below200", 0.999501682, 0.731533046, 0.289006731, 0.847672332, 0.0392, 0.000100271, 0.527769159, 0.0001, 0.000158655, 0.247441483, 0.000125392, 0.00140647, 0.999300504, 0.762549715, 0.288166958, 0.877242579, 0.052, 0.000100241, 0.548071871, 0.0001, 0.000156715, 0.2590127, 0.000125581, 0.001414427 ],
+        [ "Btw200and500", 0.000249159, 0.268256804, 0.428513155, 0.152116542, 0.7024, 0.020455229, 0.472023994, 0.204679532, 0.000158655, 0.385550714, 0.003887147, 0.00140647, 0.000419698, 0.2372353, 0.436414105, 0.122539959, 0.7007, 0.022754611, 0.451717978, 0.230776922, 0.000156715, 0.391847603, 0.004018586, 0.001414427 ],
+        [ "Btw500and800", 0.00012458, 0.000105075, 0.230165205, 0.000105563, 0.2562, 0.220294796, 0.000103423, 0.491950805, 0.000317309, 0.261627318, 0.10984326, 0.00140647, 0.000139899, 0.000107492, 0.228641925, 0.000108731, 0.2468, 0.227145148, 0.000105075, 0.481251875, 0.001097007, 0.247644408, 0.111139018, 0.001414427 ],
+        [ "Above800", 0.00012458, 0.000105075, 0.052314909, 0.000105563, 0.0022, 0.759149704, 0.000103423, 0.303269673, 0.999365382, 0.105380484, 0.886144201, 0.995780591, 0.000139899, 0.000107492, 0.046777012, 0.000108731, 0.0005, 0.75, 0.000105075, 0.287871213, 0.998589563, 0.101495289, 0.884716815, 0.995756719 ]
+      ]
+    },
+    {
+      "posX": 247.5,
+      "posY": 371,
+      "elmtID": "profit",
+      "elmtName": "Profit NPV",
+      "elmtDesc": "",
+      "elmtType": 0,
+      "elmtData": [
+        [ "Negative", 0.4475, 0.9966, 1, 0, 0.4343, 0.9987, 0, 0, 0.7792, 0, 0, 0.1107 ],
+        [ "Btw0and2", 0.5525, 0.0034, 0, 0.9095, 0.5657, 0.0013, 0.0601, 0.7275, 0.2208, 0, 0.0087, 0.2798 ],
+        [ "Bet2and4", 0, 0, 0, 0.0905, 0, 0, 0.9399, 0.2725, 0, 0.0768, 0.2644, 0.3292 ],
+        [ "Above4", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.9232, 0.7269, 0.2803 ]
+      ]
+    },
+    {
+      "posX": 138,
+      "posY": 78,
+      "elmtID": "Monetary_utility",
+      "elmtName": "Monetary utility",
+      "elmtDesc": "",
+      "elmtType": 2,
+      "elmtData": [ [ "Value", 0, 0.5, 0.8, 1 ] ]
+    },
+    {
+      "posX": 721.5,
+      "posY": 258,
+      "elmtID": "Recruitment_risk",
+      "elmtName": "Recruitment risk",
+      "elmtDesc": "",
+      "elmtType": 2,
+      "elmtData": [ [ "Value", 0, 1.4, 1 ] ]
+    },
+    {
+      "posX": 704.5,
+      "posY": 91,
+      "elmtID": "Sea_bottom_integrity",
+      "elmtName": "Sea bottom integrity",
+      "elmtDesc": "",
+      "elmtType": 2,
+      "elmtData": [ [ "Value", 1, 0.7, 0 ] ]
+    },
+    {
+      "posX": 276.5,
+      "posY": 160,
+      "elmtID": "employment",
+      "elmtName": "employment",
+      "elmtDesc": "",
+      "elmtType": 2,
+      "elmtData": [ [ "Value", 0.2, 0.5, 1 ] ]
+    }
+  ],
+  "connections": [
+    {
+      "connInput": "effort",
+      "connOutput": "employment",
+      "connID": "conn15"
+    },
+    {
+      "connInput": "effort",
+      "connOutput": "Sea_bottom_integrity",
+      "connID": "conn14"
+    },
+    {
+      "connInput": "R",
+      "connOutput": "Recruitment_risk",
+      "connID": "conn13"
+    },
+    {
+      "connInput": "profit",
+      "connOutput": "Monetary_utility",
+      "connID": "conn12"
+    },
+    {
+      "connInput": "effort",
+      "connOutput": "profit",
+      "connID": "conn11"
+    },
+    {
+      "connInput": "catch",
+      "connOutput": "profit",
+      "connID": "conn10"
+    },
+    {
+      "connInput": "effort",
+      "connOutput": "catch",
+      "connID": "conn9"
+    },
+    {
+      "connInput": "SSB",
+      "connOutput": "catch",
+      "connID": "conn8"
+    },
+    {
+      "connInput": "year",
+      "connOutput": "catch",
+      "connID": "conn7"
+    },
+    {
+      "connInput": "T",
+      "connOutput": "R",
+      "connID": "conn6"
+    },
+    {
+      "connInput": "SSB",
+      "connOutput": "R",
+      "connID": "conn5"
+    },
+    {
+      "connInput": "regime",
+      "connOutput": "T",
+      "connID": "conn4"
+    },
+    {
+      "connInput": "effort",
+      "connOutput": "SSB",
+      "connID": "conn3"
+    },
+    {
+      "connInput": "year",
+      "connOutput": "SSB",
+      "connID": "conn2"
+    },
+    {
+      "connInput": "management",
+      "connOutput": "effort",
+      "connID": "conn1"
+    }
+  ],
+  "mdlName": "Network2 discretized",
+  "dataMat": [ ],
+  "mdlIdent": "Unnamed",
+  "mdlDesc":""}
+      }

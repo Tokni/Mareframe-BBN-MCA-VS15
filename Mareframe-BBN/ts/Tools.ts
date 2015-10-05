@@ -210,10 +210,10 @@
             }
 
             static getMatrixWithoutHeader(p_matrix: any[][]): any[][] {
-               // console.log("get matrix without header from " + p_matrix)
+               console.log("get matrix without header from " + p_matrix)
                 var numOfColumns: number;
                 var numOfRows: number;
-               // console.log("size: " + math.size(p_matrix));
+               console.log("size: " + math.size(p_matrix));
                 if (math.size(p_matrix).length > 1) {
                     numOfColumns = math.size(p_matrix)[1];
                     numOfRows = math.size(p_matrix)[0];
@@ -586,9 +586,10 @@
             static calculateValues(p_model: Model, p_element: Element) {
                 var model: Model = p_model;
                 var element: Element = p_element;
-                //console.log("calculate valeus for " + p_element.getName());
+                console.log("calculate valeus for " + p_element.getName());
                 var dataHeaders: any[][] = [];
                 var data: any[][] = element.getData();
+                console.log("data: " + data);
                 for (var i = 0; i < Tools.numOfHeaderRows(data); i++) {
                     var newRow: any[] = [];
                     for (var j = 0; j < data[0].length; j++) {
