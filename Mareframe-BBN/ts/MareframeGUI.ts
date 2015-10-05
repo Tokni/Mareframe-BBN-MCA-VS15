@@ -266,47 +266,49 @@ module Mareframe {
             }
                         
             updateMiniTable(p_elmtArr: Element[]) {
-
+                console.log("updating minitable");
                 for (var j = 0; j < p_elmtArr.length; j++) {
                     var elmt = p_elmtArr[j];
-                    var backgroundColors = ["#c6c6c6", "#bfbfe0"]
-                    var decisionCont: createjs.Container = elmt.m_decisEaselElmt
+                    //console.log(elmt.getName());
+                            if (elmt.getType() !== 2) {
+                               // console.log("minitable is being updated");
+                        var backgroundColors = ["#c6c6c6", "#bfbfe0"]
+                        var decisionCont: createjs.Container = elmt.m_decisEaselElmt
 
-                    decisionCont.removeAllChildren();
+                        decisionCont.removeAllChildren();
 
-                    for (var i = 0; i < elmt.getValues().length; i++) {
+                        for (var i = 0; i < elmt.getValues().length; i++) {
 
 
 
-                        var decisRect: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
-                        //console.log(elmt.getName());
+                            var decisRect: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
 
-                        //console.log("" + elmt.getValues());
-                        //console.log("substring 0-12: " + elmt.getValues()[i][0]);
-                        var decisName: createjs.Text = new createjs.Text(elmt.getValues()[i][0].substr(0, 12), "0.8em trebuchet", "#303030");
-                        decisName.textBaseline = "middle";
-                        decisName.maxWidth = 68;
-                        decisName.x = 2;
-                        decisName.y = 6 + (i * 12);
+                         //   console.log("" + elmt.getValues());
+                            //console.log("substring 0-12: " + elmt.getValues()[i][0]);
+                            var decisName: createjs.Text = new createjs.Text(elmt.getValues()[i][0].substr(0, 12), "0.8em trebuchet", "#303030");
+                            decisName.textBaseline = "middle";
+                            decisName.maxWidth = 68;
+                            decisName.x = 2;
+                            decisName.y = 6 + (i * 12);
 
-                        decisionCont.addChild(decisRect);
-                        decisionCont.addChild(decisName);
+                            decisionCont.addChild(decisRect);
+                            decisionCont.addChild(decisName);
 
-                        var valueData: number = elmt.getValues()[i][1];
+                            var valueData: number = elmt.getValues()[i][1];
 
 
 
 
                             var decisBarBackgr: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
-                        var decisBar: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
+                            var decisBar: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
 
-                        if (elmt.getType() === 0) {
-                            var decisPercVal: createjs.Text = new createjs.Text(Math.floor(valueData * 100) + "%", "0.8em trebuchet", "#303030");
-                        } else {
-                            decisBar.visible = false;
-                            var decisPercVal: createjs.Text = new createjs.Text("" + valueData, "0.8em trebuchet", "#303030");
+                            if (elmt.getType() === 0) {
+                                var decisPercVal: createjs.Text = new createjs.Text(Math.floor(valueData * 100) + "%", "0.8em trebuchet", "#303030");
+                            } else {
+                                decisBar.visible = false;
+                                var decisPercVal: createjs.Text = new createjs.Text("" + valueData, "0.8em trebuchet", "#303030");
 
-                        }
+                            }
 
 
                             decisPercVal.textBaseline = "middle";
@@ -321,19 +323,20 @@ module Mareframe {
 
 
 
-                    }
-                    decisionCont.addEventListener("click", this.clickedDecision);
-                    decisionCont.x = elmt.m_easelElmt.x + 75;
-                    decisionCont.y = elmt.m_easelElmt.y - 15;
-                    decisionCont.name = elmt.getID();
-                    elmt.m_decisEaselElmt = decisionCont;
-                    this.m_mcaContainer.addChild(decisionCont);
+                        }
+                        decisionCont.addEventListener("click", this.clickedDecision);
+                        decisionCont.x = elmt.m_easelElmt.x + 75;
+                        decisionCont.y = elmt.m_easelElmt.y - 15;
+                        decisionCont.name = elmt.getID();
+                        elmt.m_decisEaselElmt = decisionCont;
+                        this.m_mcaContainer.addChild(decisionCont);
 
-                    if (elmt.getType() == 2) {
-                        decisionCont.visible = false;
-                    }
+                        if (elmt.getType() == 2) {
+                            decisionCont.visible = false;
+                        }
 
-                    this.m_updateMCAStage = true;
+                        this.m_updateMCAStage = true;
+                    }
                 }
             }
 
@@ -788,9 +791,11 @@ module Mareframe {
             };
 
             private showValues() {
-                var elmt: Element = $("#detailsDialog").data("element");
+                var elmt: Element =  $("#detailsDialog").data("element");
                 console.log("Data: " + elmt.getData());
-                console.log("Values: " + elmt.getValues());
+                console.log("Values: " + Tools.arrayToString(elmt.getValues()));
+                console.log(elmt.getValues());
+                console.log("size of values: " + math.size(elmt.getValues()));
                 $("#valuesTable_div").html(Tools.htmlTableFromArray("Values", elmt.getValues(), $("#detailsDialog").data("model")));
                 $("#valuesTable_div").show();
                 $("#values").prop("disabled", true);
@@ -912,7 +917,7 @@ module Mareframe {
             private flipValFn(): void {
 
 
-                var elmt = this.m_model.getElement($("#valueFn_Flip").data("name"));
+                var elmt = this.m_model.getElement($("#valueFn_Flip").data("name")[0][0]);
 
                 elmt.getData()[3] = Math.abs(elmt.getData()[3] - 1);
                 this.updateValFnCP(elmt.getData()[1], elmt.getData()[2], elmt.getData()[3]);

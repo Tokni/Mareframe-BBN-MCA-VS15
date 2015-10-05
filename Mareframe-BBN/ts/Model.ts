@@ -111,12 +111,15 @@
             }
 
             update() {
+                var m: Model = this;
                 console.log("updating model");
                 this.m_elementArr.forEach(function (p_elmt: Element) {
-                   
                     if (!p_elmt.isUpdated()) {
+                        console.log("updating " + p_elmt.getName());
+                        console.log("Success of venture: " + m.getElement("elmtChance1").getValues());
                         p_elmt.update();
                         console.log(" Elemt " + p_elmt.getName() + " has been updated");
+                        console.log("Success of venture: " + m.getElement("elmtChance1").getValues());
                     }
 
                 });
@@ -300,7 +303,7 @@
                 return this.m_elementArr[this.getObjectIndex(p_elmtStringId)];
             }
             private getObjectIndex(p_objectStringId: string): number {
-                ////console.log(p_objectStringId);
+             //   console.log(p_objectStringId);
                 var key = 0;
                 if (p_objectStringId.substr(0, 4) === "elmt") {
                     this.m_elementArr.every(function (p_elmt) {
@@ -462,7 +465,7 @@
                     //if (JsonElmt.posY > maxY)
                     //    maxY = JsonElmt.posY;
                     elmt.fromJSON(JsonElmt);
-                    console.log("created from json: " + elmt.getName());
+                   // console.log("created from json: " + elmt.getName());
                 }
 
                 for (var i = 0; i < p_jsonObject.connections.length; i++)

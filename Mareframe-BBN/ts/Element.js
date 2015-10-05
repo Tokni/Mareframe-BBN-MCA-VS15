@@ -47,24 +47,23 @@ var Mareframe;
                 this.m_decision = n;
             };
             Element.prototype.update = function () {
-                console.log("Updating element " + this.getName());
+                // console.log("Updating element " + this.getName() );
                 if (this.m_type !== 1) {
-                    console.log("This is not a decision node");
+                    //   console.log("This is not a decision node");
                     //Definition table in decision nodes does not rely on parents
                     this.updateData();
                 }
                 DST.Tools.calculateValues(this.m_model, this);
-                console.log(this);
+                //  console.log(this);
                 var children = this.getChildrenElements();
                 if (children.length !== 0) {
                     for (var i in children) {
-                        console.log(this.getName() + " children: " + children[i].getName() + " updating");
+                        //  console.log(this.getName() + " children: " + children[i].getName() + " updating");
                         //children[i].update();
                         children[i].setUpdated(false);
-                        console.log(this.getName() + " children: " + children[i].getName() + "updated");
                     }
                 }
-                console.log("Updated element " + this.getName());
+                //console.log("Updated element " + this.getName());
                 this.m_updated = true;
             };
             Element.prototype.getParentElements = function () {
@@ -81,7 +80,7 @@ var Mareframe;
             Element.prototype.getChildrenElements = function () {
                 var children = [];
                 var elmt = this;
-                console.log(this.m_connections);
+                // console.log(this.m_connections);
                 this.m_connections.forEach(function (c) {
                     //console.log("OutputElement: " + c.getOutputElement().getID());
                     //console.log("this Element id: " + elmt.getID());
@@ -89,7 +88,7 @@ var Mareframe;
                         children.push(c.getOutputElement());
                     }
                 });
-                console.log(this.getName() + " chilxxdren: " + children);
+                //   console.log(this.getName() + " chilxxdren: " + children);
                 return children;
             };
             Element.prototype.copyDefArray = function () {
@@ -104,14 +103,14 @@ var Mareframe;
                 return valueArray;
             };
             Element.prototype.updateData = function () {
-                console.log("updateData " + this.m_name);
-                console.log("data: " + this.m_data);
+                // console.log("updateData " + this.m_name);
+                // console.log("data: " + this.m_data);
                 this.m_data = this.updateHeaderRows(this.m_data);
-                console.log("data: " + this.m_data);
+                // console.log("data: " + this.m_data);
                 var rows;
                 var columns;
-                console.log("checking: " + this.m_data[this.m_data.length - 1][1]);
-                console.log("data length: " + this.m_data.length);
+                // console.log("checking: " + this.m_data[this.m_data.length - 1][1]);
+                //console.log("data length: " + this.m_data.length);
                 if (this.m_data[this.m_data.length - 1][1] === undefined) {
                     rows = 1;
                     columns = this.m_data.length;
@@ -120,30 +119,30 @@ var Mareframe;
                     rows = this.m_data.length;
                     columns = this.m_data[0].length;
                 }
-                console.log("rows " + rows + " columns " + columns);
-                console.log("in filling " + this.m_name + " last cell is " + this.m_data[rows - 1][columns - 1]);
+                //console.log("rows " + rows + " columns " + columns);
+                //console.log("in filling " + this.m_name + " last cell is " + this.m_data[rows - 1][columns - 1]);
                 if (this.m_data[rows - 1][columns - 1] === undefined) {
                     this.m_data = DST.Tools.fillDataTable(this.m_data);
                 }
             };
             Element.prototype.updateHeaderRows = function (p_originalData) {
-                console.log("updating header rows in " + this.getName());
-                console.log("data: " + p_originalData);
+                //console.log("updating header rows in " + this.getName())
+                // console.log("data: " + p_originalData);
                 var data = [];
                 var parents = this.getParentElements();
                 for (var i = 0; i < parents.length; i++) {
                     var elmt = parents[i];
-                    console.log("Parent: " + elmt.getName());
+                    // console.log("Parent: " + elmt.getName());
                     data = DST.Tools.addNewHeaderRow(elmt.getMainValues(), data);
                 }
-                console.log("number of header rows : " + DST.Tools.numOfHeaderRows(this.m_data));
+                //console.log("number of header rows : " + Tools.numOfHeaderRows(this.m_data));
                 //Add original values to the table
                 for (var i = DST.Tools.numOfHeaderRows(this.m_data); i < p_originalData.length; i++) {
-                    console.log("i: " + i);
-                    console.log("new data: " + p_originalData[i]);
+                    //console.log("i: " + i);
+                    // console.log("new data: " + p_originalData[i]);
                     data.push(p_originalData[i]);
                 }
-                console.log(data);
+                // console.log(data);
                 return data;
             };
             //returns the different variables (conditions or choices) that belong to the element
@@ -269,11 +268,11 @@ var Mareframe;
                 this.m_easelElmt.y = p_jsonElmt.posY;
                 this.m_id = p_jsonElmt.elmtID;
                 this.m_name = p_jsonElmt.elmtName;
-                console.log("name: " + this.m_name);
+                // console.log("name: " + this.m_name);
                 this.m_description = p_jsonElmt.elmtDesc;
                 this.m_type = p_jsonElmt.elmtType;
                 this.m_data = p_jsonElmt.elmtData;
-                console.log("data: " + this.m_data);
+                //  console.log("data: " + this.m_data);
                 this.m_weightingMethod = p_jsonElmt.elmtWghtMthd;
             };
             return Element;

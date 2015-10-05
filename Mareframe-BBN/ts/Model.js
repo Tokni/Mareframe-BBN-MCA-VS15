@@ -96,11 +96,15 @@ var Mareframe;
                 return JSON.stringify(this);
             };
             Model.prototype.update = function () {
+                var m = this;
                 console.log("updating model");
                 this.m_elementArr.forEach(function (p_elmt) {
                     if (!p_elmt.isUpdated()) {
+                        console.log("updating " + p_elmt.getName());
+                        console.log("Success of venture: " + m.getElement("elmtChance1").getValues());
                         p_elmt.update();
                         console.log(" Elemt " + p_elmt.getName() + " has been updated");
+                        console.log("Success of venture: " + m.getElement("elmtChance1").getValues());
                     }
                 });
                 this.m_elementArr.forEach(function (p_elmt) {
@@ -256,7 +260,7 @@ var Mareframe;
                 return this.m_elementArr[this.getObjectIndex(p_elmtStringId)];
             };
             Model.prototype.getObjectIndex = function (p_objectStringId) {
-                ////console.log(p_objectStringId);
+                //   console.log(p_objectStringId);
                 var key = 0;
                 if (p_objectStringId.substr(0, 4) === "elmt") {
                     this.m_elementArr.every(function (p_elmt) {
@@ -401,7 +405,6 @@ var Mareframe;
                     //if (JsonElmt.posY > maxY)
                     //    maxY = JsonElmt.posY;
                     elmt.fromJSON(JsonElmt);
-                    console.log("created from json: " + elmt.getName());
                 }
                 for (var i = 0; i < p_jsonObject.connections.length; i++) {
                     var conn = p_jsonObject.connections[i];
