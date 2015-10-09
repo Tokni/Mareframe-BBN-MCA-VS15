@@ -260,7 +260,7 @@ var Mareframe;
                 return this.m_elementArr[this.getObjectIndex(p_elmtStringId)];
             };
             Model.prototype.getObjectIndex = function (p_objectStringId) {
-                //   console.log(p_objectStringId);
+                console.log(" get object " + p_objectStringId);
                 var key = 0;
                 if (p_objectStringId.substr(0, 4) === "elmt") {
                     this.m_elementArr.every(function (p_elmt) {
@@ -283,7 +283,7 @@ var Mareframe;
                     });
                 }
                 else {
-                    ////console.log(p_objectStringId);
+                    console.log(p_objectStringId + " not found");
                     throw DOMException.NOT_FOUND_ERR;
                 }
                 return key;

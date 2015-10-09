@@ -850,9 +850,10 @@ var Mareframe;
                 }
             };
             Tools.updateConcerningDecisions = function (element) {
-                // console.log("updating concerning decisions " + element.getName());
+                console.log("updating concerning decisions " + element.getName());
                 var rowsToDelete = [];
-                element.getParentElements().forEach(function (elmt) {
+                console.log("all ancestors for " + element.getName() + ": " + element.getAllAncestors());
+                element.getAllAncestors().forEach(function (elmt) {
                     if (elmt.getType() === 1 && elmt.getDecision() !== undefined) {
                         console.log("checking: " + elmt.getName());
                         var values = element.getValues();

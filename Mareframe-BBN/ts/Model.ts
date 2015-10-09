@@ -303,7 +303,7 @@
                 return this.m_elementArr[this.getObjectIndex(p_elmtStringId)];
             }
             private getObjectIndex(p_objectStringId: string): number {
-             //   console.log(p_objectStringId);
+             console.log(" get object "  + p_objectStringId);
                 var key = 0;
                 if (p_objectStringId.substr(0, 4) === "elmt") {
                     this.m_elementArr.every(function (p_elmt) {
@@ -324,7 +324,7 @@
                         }
                     });
                 } else {
-                    ////console.log(p_objectStringId);
+                    console.log(p_objectStringId + " not found");
                     throw DOMException.NOT_FOUND_ERR;
                 }
                 return key;

@@ -908,9 +908,10 @@
                 }
             }
             static updateConcerningDecisions(element: Element) {
-               // console.log("updating concerning decisions " + element.getName());
+                console.log("updating concerning decisions " + element.getName());
                 var rowsToDelete: number[] = [];
-                element.getParentElements().forEach(function (elmt) {
+                console.log("all ancestors for " + element.getName() +": "  + element.getAllAncestors());
+                element.getAllAncestors().forEach(function (elmt) {
                     if (elmt.getType() === 1 && elmt.getDecision() !== undefined) {//If Parent is decision and choice is made
                         console.log("checking: " + elmt.getName());
                         var values: any[][] = element.getValues();
@@ -971,6 +972,7 @@
               //  console.log("overDim: " + overDim);
                 return strength;
             }
+           
             static fillDataTable(p_dataTable: any[][]) {
                // console.log("filling table: " + p_dataTable);
                 var headerRows: any[][] = [];

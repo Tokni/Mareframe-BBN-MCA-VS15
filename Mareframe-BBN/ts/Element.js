@@ -91,6 +91,25 @@ var Mareframe;
                 //   console.log(this.getName() + " chilxxdren: " + children);
                 return children;
             };
+            Element.prototype.getAllAncestors = function () {
+                console.log("getting ancestors for: " + this.getName());
+                var ancestors = [];
+                var parents = this.getParentElements();
+                if (parents.length === 0) {
+                    console.log("ancestors: " + ancestors);
+                    return ancestors;
+                }
+                else {
+                    parents.forEach(function (e) {
+                        if (ancestors.indexOf(e) === -1) {
+                            console.log("pushing " + e.getName());
+                            ancestors.push(e);
+                            ancestors = ancestors.concat(e.getAllAncestors());
+                        }
+                    });
+                }
+                return ancestors;
+            };
             Element.prototype.copyDefArray = function () {
                 var valueArray = [];
                 //console.log(this);

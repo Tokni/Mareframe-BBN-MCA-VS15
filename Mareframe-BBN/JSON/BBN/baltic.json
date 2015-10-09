@@ -4,7 +4,7 @@
     {
       "posX": 468.5,
       "posY": 155.5,
-      "elmtID": "management",
+      "elmtID": "elmtmanagement",
       "elmtName": "management",
       "elmtDesc": "",
       "elmtType": 1,
@@ -17,11 +17,11 @@
     {
       "posX": 406,
       "posY": 594,
-      "elmtID": "year",
+      "elmtID": "elmtyear",
       "elmtName": "year",
       "elmtDesc": "",
       "elmtType": 0,
-      "elmtData": [s
+      "elmtData": [
         [ "Year0", 0.5001 ],
         [ "Year1", 0.4999 ]
       ]
@@ -29,7 +29,7 @@
     {
       "posX": 472.5,
       "posY": 371,
-      "elmtID": "effort",
+      "elmtID": "elmteffort",
       "elmtName": "effort",
       "elmtDesc": "",
       "elmtType": 0,
@@ -42,7 +42,7 @@
     {
       "posX": 472.5,
       "posY": 482.5,
-      "elmtID": "SSB",
+      "elmtID": "elmtSSB",
       "elmtName": "SSB",
       "elmtDesc": "",
       "elmtType": 0,
@@ -56,7 +56,7 @@
     {
       "posX": 921.5,
       "posY": 242,
-      "elmtID": "regime",
+      "elmtID": "elmtregime",
       "elmtName": "regime",
       "elmtDesc": "",
       "elmtType": 0,
@@ -68,7 +68,7 @@
     {
       "posX": 811.5,
       "posY": 481,
-      "elmtID": "T",
+      "elmtID": "elmtT",
       "elmtName": "T",
       "elmtDesc": "",
       "elmtType": 0,
@@ -81,7 +81,7 @@
     {
       "posX": 624.5,
       "posY": 482,
-      "elmtID": "R",
+      "elmtID": "elmtR",
       "elmtName": "R",
       "elmtDesc": "",
       "elmtType": 0,
@@ -94,7 +94,7 @@
     {
       "posX": 273.5,
       "posY": 485,
-      "elmtID": "catch",
+      "elmtID": "elmtcatch",
       "elmtName": "catch",
       "elmtDesc": "",
       "elmtType": 0,
@@ -108,7 +108,7 @@
     {
       "posX": 247.5,
       "posY": 371,
-      "elmtID": "profit",
+      "elmtID": "elmtprofit",
       "elmtName": "Profit NPV",
       "elmtDesc": "",
       "elmtType": 0,
@@ -122,7 +122,7 @@
     {
       "posX": 138,
       "posY": 78,
-      "elmtID": "Monetary_utility",
+      "elmtID": "elmtMonetary_utility",
       "elmtName": "Monetary utility",
       "elmtDesc": "",
       "elmtType": 2,
@@ -131,7 +131,7 @@
     {
       "posX": 721.5,
       "posY": 258,
-      "elmtID": "Recruitment_risk",
+      "elmtID": "elmtRecruitment_risk",
       "elmtName": "Recruitment risk",
       "elmtDesc": "",
       "elmtType": 2,
@@ -140,7 +140,7 @@
     {
       "posX": 704.5,
       "posY": 91,
-      "elmtID": "Sea_bottom_integrity",
+      "elmtID": "elmtSea_bottom_integrity",
       "elmtName": "Sea bottom integrity",
       "elmtDesc": "",
       "elmtType": 2,
@@ -149,7 +149,7 @@
     {
       "posX": 276.5,
       "posY": 160,
-      "elmtID": "employment",
+      "elmtID": "elmtemployment",
       "elmtName": "employment",
       "elmtDesc": "",
       "elmtType": 2,
@@ -237,4 +237,3 @@
   "dataMat": [ ],
   "mdlIdent": "Unnamed",
   "mdlDesc":""}
-      }

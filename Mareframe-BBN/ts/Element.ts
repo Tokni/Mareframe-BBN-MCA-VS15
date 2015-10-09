@@ -94,7 +94,25 @@
              //   console.log(this.getName() + " chilxxdren: " + children);
                 return children;
             }
-
+            getAllAncestors(): Element[] {
+                console.log("getting ancestors for: " + this.getName());
+                var ancestors: Element[] =[];
+                var parents: Element[] = this.getParentElements();
+                if (parents.length === 0) {
+                    console.log("ancestors: " + ancestors);
+                    return ancestors;
+                }
+                else {
+                    parents.forEach(function (e) {
+                        if (ancestors.indexOf(e) === -1) {
+                            console.log("pushing " + e.getName());
+                            ancestors.push(e);
+                            ancestors = ancestors.concat(e.getAllAncestors());
+                        }
+                    });
+                }
+                return ancestors;
+            }
 
             copyDefArray(): any[] {
                 var valueArray = [];
