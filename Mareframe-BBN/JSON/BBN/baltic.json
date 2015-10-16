@@ -1,9 +1,8 @@
 {
   "elements": [
-
     {
-      "posX": 468.5,
-      "posY": 155.5,
+      "posX": 645.5,
+      "posY": 41.5,
       "elmtID": "elmtmanagement",
       "elmtName": "management",
       "elmtDesc": "",
@@ -15,8 +14,8 @@
       ]
     },
     {
-      "posX": 406,
-      "posY": 594,
+      "posX": 160,
+      "posY": 419,
       "elmtID": "elmtyear",
       "elmtName": "year",
       "elmtDesc": "",
@@ -27,8 +26,8 @@
       ]
     },
     {
-      "posX": 472.5,
-      "posY": 371,
+      "posX": 473.5,
+      "posY": 225,
       "elmtID": "elmteffort",
       "elmtName": "effort",
       "elmtDesc": "",
@@ -40,8 +39,8 @@
       ]
     },
     {
-      "posX": 472.5,
-      "posY": 482.5,
+      "posX": 542.5,
+      "posY": 417.5,
       "elmtID": "elmtSSB",
       "elmtName": "SSB",
       "elmtDesc": "",
@@ -54,8 +53,8 @@
       ]
     },
     {
-      "posX": 921.5,
-      "posY": 242,
+      "posX": 894.5,
+      "posY": 238,
       "elmtID": "elmtregime",
       "elmtName": "regime",
       "elmtDesc": "",
@@ -66,8 +65,8 @@
       ]
     },
     {
-      "posX": 811.5,
-      "posY": 481,
+      "posX": 842.5,
+      "posY": 410,
       "elmtID": "elmtT",
       "elmtName": "T",
       "elmtDesc": "",
@@ -79,8 +78,8 @@
       ]
     },
     {
-      "posX": 624.5,
-      "posY": 482,
+      "posX": 620.5,
+      "posY": 282,
       "elmtID": "elmtR",
       "elmtName": "R",
       "elmtDesc": "",
@@ -92,8 +91,8 @@
       ]
     },
     {
-      "posX": 273.5,
-      "posY": 485,
+      "posX": 251.5,
+      "posY": 295,
       "elmtID": "elmtcatch",
       "elmtName": "catch",
       "elmtDesc": "",
@@ -106,8 +105,8 @@
       ]
     },
     {
-      "posX": 247.5,
-      "posY": 371,
+      "posX": 161.5,
+      "posY": 116,
       "elmtID": "elmtprofit",
       "elmtName": "Profit NPV",
       "elmtDesc": "",
@@ -120,8 +119,8 @@
       ]
     },
     {
-      "posX": 138,
-      "posY": 78,
+      "posX": 222,
+      "posY": 52,
       "elmtID": "elmtMonetary_utility",
       "elmtName": "Monetary utility",
       "elmtDesc": "",
@@ -129,8 +128,8 @@
       "elmtData": [ [ "Value", 0, 0.5, 0.8, 1 ] ]
     },
     {
-      "posX": 721.5,
-      "posY": 258,
+      "posX": 893.5,
+      "posY": 172,
       "elmtID": "elmtRecruitment_risk",
       "elmtName": "Recruitment risk",
       "elmtDesc": "",
@@ -138,7 +137,7 @@
       "elmtData": [ [ "Value", 0, 1.4, 1 ] ]
     },
     {
-      "posX": 704.5,
+      "posX": 874.5,
       "posY": 91,
       "elmtID": "elmtSea_bottom_integrity",
       "elmtName": "Sea bottom integrity",
@@ -147,8 +146,8 @@
       "elmtData": [ [ "Value", 1, 0.7, 0 ] ]
     },
     {
-      "posX": 276.5,
-      "posY": 160,
+      "posX": 399.5,
+      "posY": 52,
       "elmtID": "elmtemployment",
       "elmtName": "employment",
       "elmtDesc": "",
@@ -158,82 +157,83 @@
   ],
   "connections": [
     {
-      "connInput": "effort",
-      "connOutput": "employment",
+      "connInput": "elmteffort",
+      "connOutput": "elmtemployment",
       "connID": "conn15"
     },
     {
-      "connInput": "effort",
-      "connOutput": "Sea_bottom_integrity",
+      "connInput": "elmteffort",
+      "connOutput": "elmtSea_bottom_integrity",
       "connID": "conn14"
     },
     {
-      "connInput": "R",
-      "connOutput": "Recruitment_risk",
+      "connInput": "elmtR",
+      "connOutput": "elmtRecruitment_risk",
       "connID": "conn13"
     },
     {
-      "connInput": "profit",
-      "connOutput": "Monetary_utility",
+      "connInput": "elmtprofit",
+      "connOutput": "elmtMonetary_utility",
       "connID": "conn12"
     },
     {
-      "connInput": "effort",
-      "connOutput": "profit",
+      "connInput": "elmteffort",
+      "connOutput": "elmtprofit",
       "connID": "conn11"
     },
     {
-      "connInput": "catch",
-      "connOutput": "profit",
+      "connInput": "elmtcatch",
+      "connOutput": "elmtprofit",
       "connID": "conn10"
     },
     {
-      "connInput": "effort",
-      "connOutput": "catch",
+      "connInput": "elmteffort",
+      "connOutput": "elmtcatch",
       "connID": "conn9"
     },
     {
-      "connInput": "SSB",
-      "connOutput": "catch",
+      "connInput": "elmtSSB",
+      "connOutput": "elmtcatch",
       "connID": "conn8"
     },
     {
-      "connInput": "year",
-      "connOutput": "catch",
+      "connInput": "elmtyear",
+      "connOutput": "elmtcatch",
       "connID": "conn7"
     },
     {
-      "connInput": "T",
-      "connOutput": "R",
+      "connInput": "elmtT",
+      "connOutput": "elmtR",
       "connID": "conn6"
     },
     {
-      "connInput": "SSB",
-      "connOutput": "R",
+      "connInput": "elmtSSB",
+      "connOutput": "elmtR",
       "connID": "conn5"
     },
     {
-      "connInput": "regime",
-      "connOutput": "T",
+      "connInput": "elmtregime",
+      "connOutput": "elmtT",
       "connID": "conn4"
     },
     {
-      "connInput": "effort",
-      "connOutput": "SSB",
+      "connInput": "elmteffort",
+      "connOutput": "elmtSSB",
       "connID": "conn3"
     },
     {
-      "connInput": "year",
-      "connOutput": "SSB",
+      "connInput": "elmtyear",
+      "connOutput": "elmtSSB",
       "connID": "conn2"
     },
     {
-      "connInput": "management",
-      "connOutput": "effort",
+      "connInput": "elmtmanagement",
+      "connOutput": "elmteffort",
       "connID": "conn1"
     }
   ],
   "mdlName": "Network2 discretized",
   "dataMat": [ ],
-  "mdlIdent": "Unnamed",
-  "mdlDesc":""}
+  "mdlIdent": "elmtUnnamed",
+  "mdlDesc": ""
+}

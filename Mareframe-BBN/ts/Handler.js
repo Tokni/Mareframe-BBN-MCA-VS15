@@ -14,7 +14,7 @@ var Mareframe;
                 this.m_activeModel = this.addNewModel();
                 this.m_gui = new DST.GUIHandler(this.m_activeModel, this);
                 var loadModel = DST.Tools.getUrlParameter('model');
-                loadModel = "scotland";
+                loadModel = "baltic";
                 console.log("using model: " + loadModel);
                 if (loadModel !== null) {
                     this.m_fileHandler.loadModel(loadModel, this.m_activeModel, this.m_gui.importStage);

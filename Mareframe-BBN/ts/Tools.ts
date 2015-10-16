@@ -169,8 +169,9 @@
             }
 
             static getColumn(p_matrix: any[][], index: number) {
-                //console.log("get column " + index + " from " + p_matrix)
-                //console.log(p_matrix)
+                //console.log("get column " + index + " from " + p_matrix + " size " + math.size(p_matrix));
+               
+              //  console.log(p_matrix)
                 var rows = math.size(p_matrix).valueOf()[0];
                 var range = math.range(0, rows);
                 // //console.log("returned: " + math.subset(matrix, math.index(range, index)))
@@ -210,10 +211,10 @@
             }
 
             static getMatrixWithoutHeader(p_matrix: any[][]): any[][] {
-               console.log("get matrix without header from " + p_matrix)
+              // console.log("get matrix without header from " + p_matrix)
                 var numOfColumns: number;
                 var numOfRows: number;
-               console.log("size: " + math.size(p_matrix));
+               //console.log("size: " + math.size(p_matrix));
                 if (math.size(p_matrix).length > 1) {
                     numOfColumns = math.size(p_matrix)[1];
                     numOfRows = math.size(p_matrix)[0];
@@ -289,57 +290,67 @@
             }
 
             static createSubMatrices(p_matrix: any[][], p_takenIntoAccount: any[], p_data: any[][]) {
-       //         console.log("create sub matrix from " + p_matrix + " for values " + p_takenIntoAccount[p_takenIntoAccount.length - 1].getMainValues())
+                //console.log("create sub matrix from " + p_matrix + " size " + math.size(p_matrix) + " for values " + p_takenIntoAccount[p_takenIntoAccount.length - 1].getMainValues())
                 var data = p_data;
-              //  console.log("data: " + Tools.arrayToString(data))
+                console.log("data: " + (data) + " size " + math.size(data));
+                console.log("taken into account: ");
+                p_takenIntoAccount.forEach(function (elmt) {
+                    console.log(" " + elmt.getName());
+                });
                 var subMatrices = [];
                 var columns = math.size(p_matrix).valueOf()[1];
               //  console.log("columns: " + columns);
                 var added = [];
                 //For each column
-                for (var n = 1; n < columns; n++) {
+                for (var n = 1; n <= columns; n++) {
                     //If column has not already been added
                     if (added.indexOf(n) === -1) {
+                       // console.log(data);
                         var currentColumn = math.flatten(Tools.makeSureItsAnArray(Tools.getColumn(data, n)));
-                       // console.log("current column: " + currentColumn)
+                       console.log("current column: " + currentColumn)
                         var newMatrix = Tools.makeSureItsAnArray(Tools.getColumn(p_matrix, n - 1));
-                        var matchingColumn = true;
                         //Look through the rest of the columns
                         for (var i = n + 1; i <= columns; i++) {
+                        var matchingColumn = true;
                             var columnValues = math.flatten(Tools.makeSureItsAnArray(Tools.getColumn(data, i)));
+                           console.log("checking column " + columnValues);
                             //For each header value in column
                             for (var j = 0; j < Tools.numOfHeaderRows(data); j++) {
                                 //If the value is not found this is not a matching column
                                 //console.log("checking value: " + data[j][i]);
                                 if (currentColumn.indexOf(data[j][i]) === -1) {
-                                   // console.log(data[j][i] + " was not found in " + currentColumn)
+                                  console.log(data[j][i] + " was not found in " + currentColumn)
                                     matchingColumn = false;
                                     //But if the value has already been taken into account the column might be a matching column
                                     p_takenIntoAccount.forEach(function (elmt) {
+                                        console.log("checking " + elmt.getMainValues()[0]+ " + against " + data[j][0]);
                                         if (elmt.getMainValues()[0] === data[j][0]) {
-                                         //   console.log("element has been taking into account");
+                                          console.log("element has been taking into account");
                                             matchingColumn = true;
                                         }
                                     })
                                 }
                                 //If the element was not found in current column nor in takenIntoAccount break out of the loop
                                 if (!matchingColumn) {
+                                    console.log("not a matching column");
                                     break;
                                 }
                             }
                             //If this column is right, add it to the matrix
                             if (matchingColumn) {
+                            //console.log("matching column");
                                 added.push(i);
                                 var column = Tools.makeSureItsAnArray(Tools.getColumn(p_matrix, i - 1));
                                 newMatrix = math.concat(newMatrix, column)
-                                //console.log("new matrix:" + Tools.arrayToString(newMatrix));
+                               console.log("new matrix:" + Tools.arrayToString(newMatrix));
                             }
                         }
+                        console.log("adding matrix: " + newMatrix);
                         subMatrices.push(newMatrix);
                     }
                 }
-             //   console.log("returned " + subMatrices)
-                return subMatrices;
+                console.log("returned " + subMatrices + " size of submatrix " + math.size(subMatrices[0]) + " number of submatrices " + subMatrices.length);
+;                return subMatrices;
             }
 
             static convertToArray(p_matrix: any[][]): any[] {
@@ -364,7 +375,7 @@
                 return array;
             }
             static updateDataHeader(p_dataHeader: any[][], p_newRows: any[][]) {
-              //  console.log("inserting " + Tools.arrayToString(p_newRows) + " into " + Tools.arrayToString(p_dataHeader));
+              console.log("inserting " + Tools.arrayToString(p_newRows) + " into " + Tools.arrayToString(p_dataHeader));
                 var rowsInDataHeader: number;
                 var columnsInDataHeader: number;
                 var rowsInNewRows: number;
@@ -377,7 +388,7 @@
                     rowsInDataHeader = p_dataHeader.length;
                     columnsInDataHeader = p_dataHeader[0].length;
                     //Delete last row in dataHeader
-                  //  console.log("deleting: " + p_dataHeader[rowsInDataHeader - 1]);
+                   console.log("deleting: " + p_dataHeader[rowsInDataHeader - 1]);
                     p_dataHeader.splice(rowsInDataHeader - 1, 1);
                     rowsInDataHeader--;
                    // console.log("dataHeader: " + Tools.arrayToString(p_dataHeader));
@@ -404,7 +415,7 @@
                         }
                         else {
                             p_dataHeader = p_newRows;
-                            return;
+                            return p_dataHeader;
                         }
                 }
                 else if (rowsInDataHeader === 1) {
@@ -417,18 +428,18 @@
                         }
                         if (duplicateRow) {
                             p_dataHeader = p_newRows;
-                            return;
+                            return p_dataHeader;
                         }
                         else {
                             tempDataHeader = p_dataHeader;
                         } 
                 }
                 else if (rowsInNewRows === 1) {
-                    //console.log("new rows is one dimensional");
+                    console.log("new rows is one dimensional");
                     for (var i = 0; i < rowsInDataHeader; i++) {
-                       // console.log("comparing " + p_dataHeader[i][0] + " and " + p_newRows[0]);
+                       console.log("comparing " + p_dataHeader[i][0] + " and " + p_newRows[0]);
                         if (p_dataHeader[i][0] !== p_newRows[0]) {
-                           // console.log("pushing " + p_dataHeader[i]);
+                            console.log("pushing " + p_dataHeader[i]);
                             tempDataHeader.push(p_dataHeader[i]);
                         }
                         else {
@@ -450,7 +461,7 @@
                             tempDataHeader.push(p_newRows[i])
                         }
                         else {
-                            //console.log("duplicate found: " + p_dataHeader[i][0]);
+                            console.log("duplicate found: " + p_dataHeader[i][0]);
                             rowsInNewDataHeader--;
                         }
                     }
@@ -493,10 +504,11 @@
                     }*/
                     
                 }
-                //console.log("same value columns: " + sameValueColumns);
+                console.log("same value columns: " + sameValueColumns);
+                console.log("columns in new rows: " + columnsInNewRows);
                 //If there are fewer same value columns in dataHeader than there are columns in newRows
                 //copy columns until there are the same amount
-             //   console.log("dataHeader: " + p_dataHeader);
+              console.log("dataHeader: " + p_dataHeader);
                 while (sameValueColumns < columnsInNewRows - 1) {
                     for (var i = 1; i < columnsInNewRows; i += sameValueColumns) {
                         if (rowsInDataHeader === 1) {
@@ -520,34 +532,37 @@
                         }
                         else {
                             for (var j = 0; j < rowsInDataHeader; j++) {
+                                console.log("deleting: " + p_dataHeader[j][i]);
                                 p_dataHeader[j].splice(i, 1);
                             }
                         }
                     }
                     sameValueColumns--;
                 }
-               // console.log("rows in dataHeader : " + p_dataHeader.length);
+               console.log("rows in dataHeader : " + p_dataHeader.length);
                     //Insert the new rows
                 if (rowsInNewRows === 1) {
-                   // console.log("inserting : " + p_newRows);
+                   console.log("inserting : " + p_newRows);
                     p_dataHeader.push(p_newRows);
                 }
                 else {
                     for (var i = 0; i < rowsInNewRows; i++) {
-                       // console.log("inserting: " + p_newRows[i]);
+                       console.log("inserting: " + p_newRows[i]);
                         p_dataHeader.push(p_newRows[i]);
                     }
-                }
+               }
+                console.log("dataHeader: " + p_dataHeader);
                // console.log("rows in dataHeader : " + p_dataHeader.length);
                // console.log("new dataHeader: " +(p_dataHeader));
                 var columnsInOriginalNewRows = columnsInNewRows - 1;
                 //console.log("columnsInOriginalNewRows: " + columnsInOriginalNewRows);
                 //insert into the table until it is full
                 while (columnsInNewRows < columnsInDataHeader) {
-                    //console.log("columnsInNewRows: " + columnsInNewRows + " columnsInDataHeader: " + columnsInDataHeader);
+                    console.log("columnsInNewRows: " + columnsInNewRows + " columnsInDataHeader: " + columnsInDataHeader);
+                    console.log("data headers: " + p_dataHeader);
                     //Add the new rows
                     for (var i = 0; i < rowsInNewRows; i++) {
-                        for (var j = 1; j < columnsInNewRows; j++) {
+                        for (var j = 1; j <= columnsInOriginalNewRows; j++) {
                            // console.log(i + rowsInDataHeader);
                             if (rowsInNewRows === 1) {
                                 p_dataHeader[i + rowsInDataHeader].push(p_newRows[j]);
@@ -561,6 +576,8 @@
                         columnsInNewRows += columnsInOriginalNewRows;
                     }
                 }
+                console.log("dataHeader: " + p_dataHeader);
+                return p_dataHeader;
             }
             static insertNewHeaderRowAtBottom(p_newRow: any[], p_table: any[]): any[] {
                 //   console.log("inserting " + p_newRow + " in " + p_table);
@@ -586,7 +603,7 @@
             static calculateValues(p_model: Model, p_element: Element) {
                 var model: Model = p_model;
                 var element: Element = p_element;
-                console.log("calculate valeus for " + p_element.getName());
+                console.log("calculate values for " + p_element.getName());
                 var dataHeaders: any[][] = [];
                 var data: any[][] = element.getData();
                 console.log("data: " + data);
@@ -606,65 +623,97 @@
                         console.log("parent: " + elmt.getName());
                         if (elmt.getType() === 0) {//If Parent is a chance
                             takenIntoAccount.push(elmt) //The parents which already have been evaluated
+                            console.log("dataheaders: " + dataHeaders);
                             //Parent must be updated
                             if (!elmt.isUpdated()) {
                                 elmt.update();
                             }
-                        //console.log("parent values: " + Tools.arrayToString(elmt.getValues()));
+                            console.log("parent values: " + Tools.arrayToString(elmt.getValues()));
                             var parentValuesMatrix = Tools.getMatrixWithoutHeader(elmt.getValues());
                             var submatrices = Tools.createSubMatrices(newValues, takenIntoAccount, dataHeaders);
                             //For each submatrix calculate new values
-                          //  console.log("multiplying " + submatrices[0] + " and " + parentValuesMatrix);
                             var result = [];//Tools.makeSureItsAnArray([math.multiply(submatrices[0], parentValuesMatrix)]);
-                           // console.log("size of result: " + math.size(result));
+                            // console.log("size of result: " + math.size(result));
+                            
+                          
+                            //If parent has dec in values table these are added to dataHeaders
+                            console.log("num of header rows in parent " + elmt.getName() + " values: " + Tools.numOfHeaderRows(elmt.getValues()));
+                            if (Tools.numOfHeaderRows(elmt.getValues()) > 0) {
+                                var decRow = elmt.getValues()[Tools.numOfHeaderRows(elmt.getValues()) - 1];
+                               // console.log("checking if dec exsists: " + math.flatten(Tools.getColumn(dataHeaders, 0)) + " index of " + decRow[0]);
+                                //If the parents decision already is in data headers create submatrices from parent
+                                console.log("number of header rows in data headers: " + Tools.numOfHeaderRows(dataHeaders));
+                                if (Tools.numOfHeaderRows(dataHeaders) > 1 && math.flatten(Tools.getColumn(dataHeaders, 0)).indexOf(decRow[0]) > -1) {
+                                    console.log("DEC EXISTS");
+                                    var parentSubMatrices = Tools.createSubMatrices(parentValuesMatrix, [], [decRow]);
+                                    var j = 0;
+                                    for (var i = 0; i < submatrices.length; i++) {
+                                        console.log("i: " + i + " j: " + j);
+                                        console.log("multiplying " + submatrices[i] + " size " + math.size(submatrices[i]) + " and " + parentSubMatrices[j] + " size " + math.size(parentSubMatrices[j]));
+                                        var newMatrix = Tools.makeSureItsAnArray(math.multiply(submatrices[i], parentSubMatrices[j]));
+                                        //console.log("size of new matrix: " + math.size(newMatrix));
+                                        result.push(newMatrix);
+                                        console.log("size of result: " + math.size(result));
+                                        if (j < parentSubMatrices.length - 1) {
+                                            j++;
+                                        }
+                                        else {
+                                            j = 0;
+                                        }
+
+                                    }
+                                    console.log("size of result" + math.size(result));
+                                    newValues = Tools.concatMatrices(result);
+                                    console.log("size of new values: " + math.size(newValues));
+                                }
+                                else {
+                                    //   console.log("parent contains decisions");
+                                    // console.log("dataHeaders before adding: " + Tools.arrayToString(dataHeaders));
+                                    var newRows: any[];
+                                    //If there is just one decision
+                                    if (Tools.numOfHeaderRows(elmt.getValues()) === 1) {
+                                        //dataHeaders = Tools.deleteHeaderRow(elmt.getValues()[0][0], dataHeaders); //Delete if it already has been added
+                                        //Tools.insertNewHeaderRowAtBottom(elmt.getValues()[0].slice(), dataHeaders);
+                                        newRows = elmt.getValues()[0].slice();
+                                        //headerRows = Tools.deleteHeaderRow(elmt.getValues()[0][0], headerRows);
+                                        headerRows = Tools.insertNewHeaderRowAtBottom(elmt.getValues()[0], headerRows);
+                                        console.log("new header rows: " + headerRows);
+                                    }
+                                    else {
+                                        newRows = [];
+                                        for (var i = 0; i < Tools.numOfHeaderRows(elmt.getValues()); i++) {
+                                            //dataHeaders = Tools.deleteHeaderRow(elmt.getValues()[i][0], dataHeaders); //Delete if it already has been added
+                                            //Tools.insertNewHeaderRowAtBottom(elmt.getValues()[0].slice(), dataHeaders);
+
+                                            newRows.push(elmt.getValues()[i].slice());
+                                            //headerRows = Tools.deleteHeaderRow(elmt.getValues()[i][0], headerRows);
+                                            Tools.insertNewHeaderRowAtBottom(elmt.getValues()[i], headerRows);
+                                            //   console.log("new header rows: " + headerRows);
+                                        }
+                                    }
+                                
+
+                                    //console.log("new rows: " + newRows);
+                                    dataHeaders = Tools.updateDataHeader(dataHeaders, newRows);
+                                    //console.log("Parent values: " + elmt.getValues());
+                                    // console.log("new dataHeaders: " + (dataHeaders));
+                                }
+                            }
+                            if (result.length === 0) {
                                 for (var i = 0; i < submatrices.length; i++) {
-                                 //   console.log("multiplying " + submatrices[i] + " and " + parentValuesMatrix);
+                                    console.log("multiplying " + submatrices[i] + " size " + math.size(submatrices[i]) + " and " + parentValuesMatrix + " size " + math.size(parentValuesMatrix));
                                     var newMatrix = Tools.makeSureItsAnArray(math.multiply(submatrices[i], parentValuesMatrix));
                                     //console.log("size of new matrix: " + math.size(newMatrix));
                                     result.push(newMatrix);
-                                 //   console.log("size of result: " + math.size(result));
-                                
-                            }
-                            newValues = Tools.concatMatrices(result);
-                            //If parent has dec in values table these are added to dataHeaders
-                         //   console.log("num of header rows in parent " + elmt.getName() + " values: " + Tools.numOfHeaderRows(elmt.getValues()));
-                            if (Tools.numOfHeaderRows(elmt.getValues()) > 0) {
-                             //   console.log("parent contains decisions");
-                               // console.log("dataHeaders before adding: " + Tools.arrayToString(dataHeaders));
-                                var newRows: any[];
-                                //If there is just one decision
-                                if (Tools.numOfHeaderRows(elmt.getValues()) === 1) {
-                                    //dataHeaders = Tools.deleteHeaderRow(elmt.getValues()[0][0], dataHeaders); //Delete if it already has been added
-                                    //Tools.insertNewHeaderRowAtBottom(elmt.getValues()[0].slice(), dataHeaders);
-                                    newRows = elmt.getValues()[0].slice();
-                                    //headerRows = Tools.deleteHeaderRow(elmt.getValues()[0][0], headerRows);
-                                    headerRows = Tools.insertNewHeaderRowAtBottom(elmt.getValues()[0], headerRows);
-                                    console.log("new header rows: " + headerRows);
+                                    //   console.log("size of result: " + math.size(result));
                                 }
-                                else {
-                                    newRows = [];
-                                    for (var i = 0; i < Tools.numOfHeaderRows(elmt.getValues()); i++) {
-                                        //dataHeaders = Tools.deleteHeaderRow(elmt.getValues()[i][0], dataHeaders); //Delete if it already has been added
-                                        //Tools.insertNewHeaderRowAtBottom(elmt.getValues()[0].slice(), dataHeaders);
-
-                                       newRows.push(elmt.getValues()[i].slice());
-                                        //headerRows = Tools.deleteHeaderRow(elmt.getValues()[i][0], headerRows);
-                                        Tools.insertNewHeaderRowAtBottom(elmt.getValues()[i], headerRows);
-                                     //   console.log("new header rows: " + headerRows);
-                                    }
-                                }
-
-
-                               // console.log("new rows: " + newRows);
-                               Tools.updateDataHeader(dataHeaders, newRows);
-                             //   console.log("Parent values: " + elmt.getValues());
-                             //   console.log("new dataHeaders: " + Tools.arrayToString(dataHeaders));
+                                newValues = Tools.concatMatrices(result);
                             }
                         } else if (elmt.getType() === 1) {//If Parent is a decision
                             headerRows = Tools.addNewHeaderRow(elmt.getMainValues(), headerRows);
                         }
-                        console.log("parent values: " + Tools.arrayToString(elmt.getValues()));
-                    })
+                        console.log("new values: " + newValues + " size " + math.size(newValues));
+                    });
                     newValues = Tools.convertToArray(newValues);
                    // console.log("size: " + math.size(newValues));
                     //console.log(Tools.arrayToString(newValues));
@@ -704,7 +753,7 @@
                         }
                         newValues = headerRows;
                     }
-                    console.log("new values: " + Tools.arrayToString(newValues))
+                    console.log("new values: " +(newValues))
                     p_element.setValues(newValues);
                 } else {//If it is a decision node
                    // console.log("decisions node begin");
@@ -759,7 +808,7 @@
                     //console.log("decisions end");
                     p_element.setValues(values);
                 }
-
+                console.log("done calculatint values for " + p_element.getName());
             }
             static isOneDimensional(p_array: any[][]): Boolean {
                 //console.log(p_array.length);

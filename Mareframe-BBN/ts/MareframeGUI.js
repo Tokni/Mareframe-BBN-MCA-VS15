@@ -72,6 +72,7 @@ var Mareframe;
                     this.setAutoUpdate = this.setAutoUpdate.bind(this);
                     $("#MCADataTable").hide();
                     $("#model_description").text("This is the Mareframe BBN tool. You may doubleclick on each element below, to access the properties tables for that element.");
+                    this.m_mcaStageCanvas.width = $(window).width();
                 }
                 else {
                     $("#model_description").text("This is the Mareframe MCA tool. Data has been loaded into the table on the right. You may doubleclick on each element below, to access the properties panel for that element. If you doubleclick on one of the red or green elements, you may adjust the weights of it's child elements, and thus the data it points to. In the chart at the bottom, you will see the result of the analysis, with the tallest column being the highest scoring one.");
