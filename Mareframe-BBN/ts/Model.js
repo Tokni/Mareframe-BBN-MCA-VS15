@@ -100,11 +100,7 @@ var Mareframe;
                 console.log("updating model");
                 this.m_elementArr.forEach(function (p_elmt) {
                     if (!p_elmt.isUpdated()) {
-                        console.log("updating " + p_elmt.getName());
-                        console.log("Success of venture: " + m.getElement("elmtChance1").getValues());
                         p_elmt.update();
-                        console.log(" Elemt " + p_elmt.getName() + " has been updated");
-                        console.log("Success of venture: " + m.getElement("elmtChance1").getValues());
                     }
                 });
                 this.m_elementArr.forEach(function (p_elmt) {
@@ -435,6 +431,10 @@ var Mareframe;
             Model.prototype.setDecision = function (p_elmtIdent, p_decisNumb) {
                 var elmt = this.getElement(p_elmtIdent);
                 elmt.setDecision(p_decisNumb);
+                elmt.getAllDescendants().forEach(function (e) {
+                    e.setUpdated(false);
+                    console.log(e.getName() + " not updated");
+                });
                 console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
             };
             return Model;

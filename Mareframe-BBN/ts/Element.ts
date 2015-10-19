@@ -95,23 +95,43 @@
                 return children;
             }
             getAllAncestors(): Element[] {
-                console.log("getting ancestors for: " + this.getName());
+              //  console.log("getting ancestors for: " + this.getName());
                 var ancestors: Element[] =[];
                 var parents: Element[] = this.getParentElements();
                 if (parents.length === 0) {
-                    console.log("ancestors: " + ancestors);
+                  //  console.log("ancestors: " + ancestors);
                     return ancestors;
                 }
                 else {
                     parents.forEach(function (e) {
                         if (ancestors.indexOf(e) === -1) {
-                            console.log("pushing " + e.getName());
+                         //   console.log("pushing " + e.getName());
                             ancestors.push(e);
                             ancestors = ancestors.concat(e.getAllAncestors());
                         }
                     });
                 }
                 return ancestors;
+            }
+            getAllDescendants(): Element[]{
+                console.log("get all decendants for " + this.getName());
+                var decendants: Element[] = [];
+                var children: Element[] = this.getChildrenElements();
+                if (children.length === 0) {
+                    console.log("returned: " + decendants);
+                    return decendants;
+                }
+                else {
+                    children.forEach(function (e) {
+                        if (decendants.indexOf(e) === -1) {
+                            //   console.log("pushing " + e.getName());
+                            decendants.push(e);
+                            decendants = decendants.concat(e.getAllDescendants());
+                        }
+                    });
+                }
+                console.log("returned: " + decendants);
+                return decendants;
             }
 
             copyDefArray(): any[] {

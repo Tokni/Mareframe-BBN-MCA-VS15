@@ -239,57 +239,65 @@ var Mareframe;
                 for (var j = 0; j < p_elmtArr.length; j++) {
                     var elmt = p_elmtArr[j];
                     //console.log(elmt.getName());
-                    if (elmt.getType() !== 2) {
-                        // console.log("minitable is being updated");
-                        var backgroundColors = ["#c6c6c6", "#bfbfe0"];
-                        var decisionCont = elmt.m_decisEaselElmt;
-                        decisionCont.removeAllChildren();
-                        for (var i = 0; i < elmt.getValues().length; i++) {
-                            var decisRect = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
-                            //   console.log("" + elmt.getValues());
-                            //console.log("substring 0-12: " + elmt.getValues()[i][0]);
-                            var decisName = new createjs.Text(elmt.getValues()[i][0].substr(0, 12), "0.8em trebuchet", "#303030");
-                            decisName.textBaseline = "middle";
-                            decisName.maxWidth = 68;
-                            decisName.x = 2;
-                            decisName.y = 6 + (i * 12);
-                            decisionCont.addChild(decisRect);
-                            decisionCont.addChild(decisName);
-                            var valueData = elmt.getValues()[i][1];
-                            var decisBarBackgr = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
-                            var decisBar = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
-                            if (elmt.getType() === 0) {
-                                var decisPercVal = new createjs.Text(Math.floor(valueData * 100) + "%", "0.8em trebuchet", "#303030");
-                            }
-                            else {
-                                decisBar.visible = false;
-                                var decisPercVal = new createjs.Text("" + valueData, "0.8em trebuchet", "#303030");
-                            }
-                            decisPercVal.textBaseline = "middle";
-                            decisPercVal.maxWidth = 22;
-                            decisPercVal.x = 71;
-                            decisPercVal.y = 6 + (i * 12);
-                            decisionCont.addChild(decisBarBackgr);
-                            decisionCont.addChild(decisBar);
-                            decisionCont.addChild(decisPercVal);
+                    // if (elmt.getType() !== 2) {
+                    console.log(elmt.getName() + " minitable is being updated");
+                    var backgroundColors = ["#c6c6c6", "#bfbfe0"];
+                    var decisionCont = elmt.m_decisEaselElmt;
+                    decisionCont.removeAllChildren();
+                    for (var i = 0; i < elmt.getValues().length; i++) {
+                        var backgroundColor;
+                        if (elmt.getDecision() == i && elmt.getType() == 1) {
+                            backgroundColor = "#CCFFCC";
                         }
-                        decisionCont.addEventListener("click", this.clickedDecision);
-                        decisionCont.x = elmt.m_easelElmt.x + 75;
-                        decisionCont.y = elmt.m_easelElmt.y - 15;
-                        decisionCont.name = elmt.getID();
-                        elmt.m_decisEaselElmt = decisionCont;
-                        this.m_mcaContainer.addChild(decisionCont);
-                        if (elmt.getType() == 2) {
-                            decisionCont.visible = false;
+                        else {
+                            backgroundColor = backgroundColors[i % 2];
                         }
-                        this.m_updateMCAStage = true;
+                        var decisRect = new createjs.Shape(new createjs.Graphics().f(backgroundColor).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
+                        //   console.log("" + elmt.getValues());
+                        //console.log("substring 0-12: " + elmt.getValues()[i][0]);
+                        var decisName = new createjs.Text(elmt.getValues()[i][0].substr(0, 12), "0.8em trebuchet", "#303030");
+                        decisName.textBaseline = "middle";
+                        decisName.maxWidth = 68;
+                        decisName.x = 2;
+                        decisName.y = 6 + (i * 12);
+                        decisionCont.addChild(decisRect);
+                        decisionCont.addChild(decisName);
+                        var valueData = elmt.getValues()[i][1];
+                        var decisBarBackgr = new createjs.Shape(new createjs.Graphics().f(backgroundColor).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
+                        var decisBar = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
+                        if (elmt.getType() === 0) {
+                            var decisPercVal = new createjs.Text(Math.floor(valueData * 100) + "%", "0.8em trebuchet", "#303030");
+                        }
+                        else {
+                            decisBar.visible = false;
+                            var decisPercVal = new createjs.Text("" + DST.Tools.round(valueData), "0.8em trebuchet", "#303030");
+                        }
+                        decisPercVal.textBaseline = "middle";
+                        decisPercVal.maxWidth = 22;
+                        decisPercVal.x = 71;
+                        decisPercVal.y = 6 + (i * 12);
+                        decisionCont.addChild(decisBarBackgr);
+                        decisionCont.addChild(decisBar);
+                        decisionCont.addChild(decisPercVal);
                     }
+                    decisionCont.addEventListener("click", this.clickedDecision);
+                    decisionCont.x = elmt.m_easelElmt.x + 75;
+                    decisionCont.y = elmt.m_easelElmt.y - 15;
+                    decisionCont.name = elmt.getID();
+                    elmt.m_decisEaselElmt = decisionCont;
+                    this.m_mcaContainer.addChild(decisionCont);
+                    if (elmt.getType() == 2) {
+                        decisionCont.visible = false;
+                    }
+                    this.m_updateMCAStage = true;
                 }
+                //}
             };
             GUIHandler.prototype.clickedDecision = function (p_evt) {
                 //console.log("clicked a decision");
                 //console.log(p_evt);
                 this.m_model.setDecision(p_evt.currentTarget.name, Math.floor(p_evt.localY / 12));
+                this.updateModel();
             };
             GUIHandler.prototype.updateEditorMode = function () {
                 if (this.m_editorMode) {

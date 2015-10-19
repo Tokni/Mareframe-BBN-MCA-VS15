@@ -271,18 +271,22 @@ module Mareframe {
                 for (var j = 0; j < p_elmtArr.length; j++) {
                     var elmt = p_elmtArr[j];
                     //console.log(elmt.getName());
-                            if (elmt.getType() !== 2) {
-                               // console.log("minitable is being updated");
+                           // if (elmt.getType() !== 2) {
+                       console.log(elmt.getName() + " minitable is being updated");
                         var backgroundColors = ["#c6c6c6", "#bfbfe0"]
                         var decisionCont: createjs.Container = elmt.m_decisEaselElmt
 
                         decisionCont.removeAllChildren();
 
                         for (var i = 0; i < elmt.getValues().length; i++) {
-
-
-
-                            var decisRect: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
+                            var backgroundColor: string;
+                            if (elmt.getDecision() == i && elmt.getType() == 1) {
+                                backgroundColor = "#CCFFCC";
+                            }
+                            else {
+                                backgroundColor = backgroundColors[i % 2];
+                            }
+                            var decisRect: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColor).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
 
                          //   console.log("" + elmt.getValues());
                             //console.log("substring 0-12: " + elmt.getValues()[i][0]);
@@ -297,17 +301,15 @@ module Mareframe {
 
                             var valueData: number = elmt.getValues()[i][1];
 
-
-
-
-                            var decisBarBackgr: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColors[i % 2]).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
+                            var decisBarBackgr: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColor).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
+                            
                             var decisBar: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
 
                             if (elmt.getType() === 0) {
                                 var decisPercVal: createjs.Text = new createjs.Text(Math.floor(valueData * 100) + "%", "0.8em trebuchet", "#303030");
                             } else {
                                 decisBar.visible = false;
-                                var decisPercVal: createjs.Text = new createjs.Text("" + valueData, "0.8em trebuchet", "#303030");
+                                var decisPercVal: createjs.Text = new createjs.Text("" + Tools.round(valueData), "0.8em trebuchet", "#303030");
 
                             }
 
@@ -334,17 +336,18 @@ module Mareframe {
 
                         if (elmt.getType() == 2) {
                             decisionCont.visible = false;
-                        }
+                       }
 
                         this.m_updateMCAStage = true;
                     }
-                }
+                //}
             }
 
             private clickedDecision(p_evt: createjs.MouseEvent) {
                 //console.log("clicked a decision");
                 //console.log(p_evt);
-                this.m_model.setDecision(p_evt.currentTarget.name, Math.floor(p_evt.localY/12));
+                this.m_model.setDecision(p_evt.currentTarget.name, Math.floor(p_evt.localY / 12));
+                this.updateModel();
             }
 
             private updateEditorMode() {
