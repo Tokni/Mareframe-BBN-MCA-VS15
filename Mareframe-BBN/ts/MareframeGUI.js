@@ -479,6 +479,10 @@ var Mareframe;
                     this.addEditFunction(this.m_editorMode);
                     if (this.m_showDescription) {
                         //set description
+                        var description = p_elmt.getDescription();
+                        if (description.length < 1) {
+                            description = "empty";
+                        }
                         document.getElementById("description_div").innerHTML = p_elmt.getDescription();
                         $("#description_div").show();
                     }
@@ -631,8 +635,11 @@ var Mareframe;
                         $(this).children().first().keypress(function (e) {
                             if (e.which == 13) {
                                 var newText = $(this).val();
-                                $(this).parent().text(newText);
                                 console.log("new text: " + newText);
+                                if (newText.length < 1) {
+                                    newText = originalValue;
+                                }
+                                $(this).parent().text(newText);
                                 if (newText !== originalValue) {
                                     console.log("unsaved changes");
                                     mareframeGUI.m_unsavedChanges = true;
@@ -642,7 +649,10 @@ var Mareframe;
                         });
                         $(this).children().first().blur(function () {
                             var newText = $(this).val();
-                            $(this).parent().text(newText);
+                            console.log("new text: " + newText);
+                            if (newText.length < 1) {
+                                newText = originalValue;
+                            }
                             $(this).parent().text(newText);
                             if (newText !== originalValue) {
                                 mareframeGUI.m_unsavedChanges = true;
@@ -663,6 +673,9 @@ var Mareframe;
                                 if (e.which == 13) {
                                     var newText = $(this).val();
                                     $(this).parent().text(newText);
+                                    if (newText.length < 1) {
+                                    }
+                                    newText = originalValue;
                                     if (newText !== originalValue) {
                                         mareframeGUI.m_unsavedChanges = true;
                                     }
@@ -671,7 +684,9 @@ var Mareframe;
                             });
                             $(this).children().first().blur(function () {
                                 var newText = $(this).val();
-                                $(this).parent().text(newText);
+                                if (newText.length < 1) {
+                                    newText = originalValue;
+                                }
                                 $(this).parent().text(newText);
                                 if (newText !== originalValue) {
                                     mareframeGUI.m_unsavedChanges = true;
