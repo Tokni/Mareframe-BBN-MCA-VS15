@@ -430,7 +430,13 @@ var Mareframe;
             };
             Model.prototype.setDecision = function (p_elmtIdent, p_decisNumb) {
                 var elmt = this.getElement(p_elmtIdent);
-                elmt.setDecision(p_decisNumb);
+                if (elmt.getDecision() == p_decisNumb) {
+                    console.log("unsetting decision");
+                    elmt.setDecision(undefined);
+                }
+                else {
+                    elmt.setDecision(p_decisNumb);
+                }
                 elmt.getAllDescendants().forEach(function (e) {
                     e.setUpdated(false);
                     console.log(e.getName() + " not updated");

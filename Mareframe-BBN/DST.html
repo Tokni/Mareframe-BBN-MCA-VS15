@@ -72,7 +72,8 @@
             <button class="advButton" id="newValue">New Value</button>
             <button class="advButton" id="deleteElmt">Delete Element</button>
             <button class="advButton" id="selectAllElmt">Select All</button>
-            <input class="advButton" type="checkbox" id="cnctTool"><label for="cnctTool" class="advButton">Connect Tool</label>
+        <!--<input class="advButton" type="checkbox" id="cnctTool"><label for="cnctTool" class="advButton">Connect Tool</label>-->    
+            
             <div style="float:right">
                 <button class="button" id="fullscreen"> Fullscreen</button>
                 <input class="button" type="checkbox" id="editorMode">
@@ -125,9 +126,9 @@
         <div id="datatable_div"></div>
         <div id="description_div"></div>
         <div id="chart_div"></div>
-        <input class="dialogButton" type="checkbox" id="showDescription">
-        <label for="showDescription" class="button">Show Description</label>
-        <div id="userDescription_div" contenteditable=true> </div>
+        <input class="dialogButton" type="checkbox" id="showDescription" checked>
+        <label for="showDescription" class="button">Hide Description</label>
+        <div id="userDescription_div"> </div>
         <div class="editable ">
             <div id="defTable_div"></div>
         </div>
@@ -164,6 +165,7 @@
                 effect: "scale",
                 duration: 400
             },
+            
             buttons: {
                 Close: function () {
                     $("#valuesTable_div").hide();
@@ -178,6 +180,7 @@
             }
 
         });
+
         $("#weightingMethodSelector").hide();
         $("#valueFn_div").hide();
         $("#sliders_div").hide();

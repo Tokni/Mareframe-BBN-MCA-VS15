@@ -26,7 +26,7 @@ module Mareframe {
                     this.m_fileHandler.loadModel(loadModel, this.m_activeModel, this.m_gui.importStage);
                     
                 } else {
-                    this.m_gui.m_editorMode = true;
+                    this.m_gui.setEditorMode(true);
                 }
             }
             

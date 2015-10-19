@@ -500,7 +500,13 @@
 
             setDecision(p_elmtIdent: string, p_decisNumb: number): void {
                 var elmt: Element = this.getElement(p_elmtIdent);
-                elmt.setDecision(p_decisNumb);
+                if (elmt.getDecision() == p_decisNumb) {
+                    console.log("unsetting decision");
+                    elmt.setDecision(undefined)
+                }
+                else {
+                    elmt.setDecision(p_decisNumb);
+                }
                 elmt.getAllDescendants().forEach(function (e: Element) {
                     e.setUpdated(false);
                     console.log(e.getName() + " not updated");

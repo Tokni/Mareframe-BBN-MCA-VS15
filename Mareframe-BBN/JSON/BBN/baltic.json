@@ -5,7 +5,7 @@
       "posY": 41.5,
       "elmtID": "elmtmanagement",
       "elmtName": "management",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 1,
       "elmtData": [
         [ "BAU" ],
@@ -18,7 +18,7 @@
       "posY": 349,
       "elmtID": "elmtyear",
       "elmtName": "year",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 0,
       "elmtData": [
         [ "Year0", 0.5001 ],
@@ -30,7 +30,7 @@
       "posY": 225,
       "elmtID": "elmteffort",
       "elmtName": "effort",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 0,
       "elmtData": [
         [ "Low", 0.0001, 0.99410059, 0.038935042 ],
@@ -43,7 +43,7 @@
       "posY": 417.5,
       "elmtID": "elmtSSB",
       "elmtName": "SSB",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 0,
       "elmtData": [
         [ "Below500", 0.0978, 0.126, 0.230938563, 0.0851, 0.1164, 0.215021502 ],
@@ -57,7 +57,7 @@
       "posY": 238,
       "elmtID": "elmtregime",
       "elmtName": "regime",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 0,
       "elmtData": [
         [ "Typical", 0.85 ],
@@ -69,7 +69,7 @@
       "posY": 410,
       "elmtID": "elmtT",
       "elmtName": "T",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 0,
       "elmtData": [
         [ "Below3", 0.976, 0.0001 ],
@@ -82,7 +82,7 @@
       "posY": 282,
       "elmtID": "elmtR",
       "elmtName": "R",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 0,
       "elmtData": [
         [ "Below1million", 1, 0.7621, 0.3174, 0.8038, 0.0069, 0, 0.749, 0, 0, 0.9968, 0.7596, 0.3157 ],
@@ -95,7 +95,7 @@
       "posY": 295,
       "elmtID": "elmtcatch",
       "elmtName": "catch",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 0,
       "elmtData": [
         [ "Below200", 0.999501682, 0.731533046, 0.289006731, 0.847672332, 0.0392, 0.000100271, 0.527769159, 0.0001, 0.000158655, 0.247441483, 0.000125392, 0.00140647, 0.999300504, 0.762549715, 0.288166958, 0.877242579, 0.052, 0.000100241, 0.548071871, 0.0001, 0.000156715, 0.2590127, 0.000125581, 0.001414427 ],
@@ -109,7 +109,7 @@
       "posY": 116,
       "elmtID": "elmtprofit",
       "elmtName": "Profit NPV",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 0,
       "elmtData": [
         [ "Negative", 0.4475, 0.9966, 1, 0, 0.4343, 0.9987, 0, 0, 0.7792, 0, 0, 0.1107 ],
@@ -123,7 +123,7 @@
       "posY": 52,
       "elmtID": "elmtMonetary_utility",
       "elmtName": "Monetary utility",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 2,
       "elmtData": [ [ "Value", 0, 0.5, 0.8, 1 ] ]
     },
@@ -132,7 +132,7 @@
       "posY": 172,
       "elmtID": "elmtRecruitment_risk",
       "elmtName": "Recruitment risk",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 2,
       "elmtData": [ [ "Value", 0, 1.4, 1 ] ]
     },
@@ -141,7 +141,7 @@
       "posY": 91,
       "elmtID": "elmtSea_bottom_integrity",
       "elmtName": "Sea bottom integrity",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 2,
       "elmtData": [ [ "Value", 1, 0.7, 0 ] ]
     },
@@ -150,7 +150,7 @@
       "posY": 52,
       "elmtID": "elmtemployment",
       "elmtName": "employment",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 2,
       "elmtData": [ [ "Value", 0.2, 0.5, 1 ] ]
     }

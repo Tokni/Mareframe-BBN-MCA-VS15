@@ -6,6 +6,8 @@ var Mareframe;
             function GUIHandler(p_model, p_handler) {
                 this.m_editorMode = false;
                 this.m_showDescription = true;
+                this.m_unsavedChanges = false;
+                this.m_fullscreen = false;
                 this.m_mcaStage = new createjs.Stage("MCATool");
                 this.m_valueFnStage = new createjs.Stage("valueFn_canvas");
                 this.m_controlP = new createjs.Shape();
@@ -44,9 +46,11 @@ var Mareframe;
                     this.m_showDescription = cb.currentTarget.checked;
                     if (this.m_showDescription) {
                         $("#description_div").show();
+                        $("#showDescription").siblings('label').html("Hide description");
                     }
                     else {
                         $("#description_div").hide();
+                        $("#showDescription").siblings('label').html("Show description");
                     }
                 };
                 this.setEditorMode = function (cb) {
@@ -62,8 +66,20 @@ var Mareframe;
                 };
                 this.m_handler = p_handler;
                 this.saveChanges = this.saveChanges.bind(this);
+                var mareframeGUI = this;
                 if (p_model.m_bbnMode) {
+                    console.log("unsaved changes");
+                    $("#detailsDialog").dialog({
+                        beforeClose: function (event, ui) {
+                            if (mareframeGUI.m_unsavedChanges) {
+                                if (!confirm("You have unsaved changes. Pressing OK will close the window and discard all changes.")) {
+                                    return false;
+                                }
+                            }
+                        }
+                    });
                     $("#detailsDialog").on('dialogclose', function (event) {
+                        console.log("closing window");
                         $("#valuesTable_div").hide();
                     });
                     $("#submit").on("click", this.saveChanges);
@@ -240,45 +256,51 @@ var Mareframe;
                     var elmt = p_elmtArr[j];
                     //console.log(elmt.getName());
                     // if (elmt.getType() !== 2) {
-                    console.log(elmt.getName() + " minitable is being updated");
+                    //  console.log(elmt.getName() + " minitable is being updated");
                     var backgroundColors = ["#c6c6c6", "#bfbfe0"];
                     var decisionCont = elmt.m_decisEaselElmt;
                     decisionCont.removeAllChildren();
-                    for (var i = 0; i < elmt.getValues().length; i++) {
-                        var backgroundColor;
-                        if (elmt.getDecision() == i && elmt.getType() == 1) {
-                            backgroundColor = "#CCFFCC";
+                    if (elmt.getValues()[0].length > 2) {
+                        var decisTextBox = new createjs.Text("Values is multidimensional", "0.8em trebuchet", "#303030");
+                        decisionCont.addChild(decisTextBox);
+                    }
+                    else {
+                        for (var i = 0; i < elmt.getValues().length; i++) {
+                            var backgroundColor;
+                            if (elmt.getDecision() == i && elmt.getType() == 1) {
+                                backgroundColor = "#CCFFCC";
+                            }
+                            else {
+                                backgroundColor = backgroundColors[i % 2];
+                            }
+                            var decisRect = new createjs.Shape(new createjs.Graphics().f(backgroundColor).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
+                            //   console.log("" + elmt.getValues());
+                            //console.log("substring 0-12: " + elmt.getValues()[i][0]);
+                            var decisName = new createjs.Text(elmt.getValues()[i][0].substr(0, 12), "0.8em trebuchet", "#303030");
+                            decisName.textBaseline = "middle";
+                            decisName.maxWidth = 68;
+                            decisName.x = 2;
+                            decisName.y = 6 + (i * 12);
+                            decisionCont.addChild(decisRect);
+                            decisionCont.addChild(decisName);
+                            var valueData = elmt.getValues()[i][1];
+                            var decisBarBackgr = new createjs.Shape(new createjs.Graphics().f(backgroundColor).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
+                            var decisBar = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
+                            if (elmt.getType() === 0) {
+                                var decisPercVal = new createjs.Text(Math.floor(valueData * 100) + "%", "0.8em trebuchet", "#303030");
+                            }
+                            else {
+                                decisBar.visible = false;
+                                var decisPercVal = new createjs.Text("" + DST.Tools.round(valueData), "0.8em trebuchet", "#303030");
+                            }
+                            decisPercVal.textBaseline = "middle";
+                            decisPercVal.maxWidth = 22;
+                            decisPercVal.x = 71;
+                            decisPercVal.y = 6 + (i * 12);
+                            decisionCont.addChild(decisBarBackgr);
+                            decisionCont.addChild(decisBar);
+                            decisionCont.addChild(decisPercVal);
                         }
-                        else {
-                            backgroundColor = backgroundColors[i % 2];
-                        }
-                        var decisRect = new createjs.Shape(new createjs.Graphics().f(backgroundColor).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
-                        //   console.log("" + elmt.getValues());
-                        //console.log("substring 0-12: " + elmt.getValues()[i][0]);
-                        var decisName = new createjs.Text(elmt.getValues()[i][0].substr(0, 12), "0.8em trebuchet", "#303030");
-                        decisName.textBaseline = "middle";
-                        decisName.maxWidth = 68;
-                        decisName.x = 2;
-                        decisName.y = 6 + (i * 12);
-                        decisionCont.addChild(decisRect);
-                        decisionCont.addChild(decisName);
-                        var valueData = elmt.getValues()[i][1];
-                        var decisBarBackgr = new createjs.Shape(new createjs.Graphics().f(backgroundColor).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
-                        var decisBar = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
-                        if (elmt.getType() === 0) {
-                            var decisPercVal = new createjs.Text(Math.floor(valueData * 100) + "%", "0.8em trebuchet", "#303030");
-                        }
-                        else {
-                            decisBar.visible = false;
-                            var decisPercVal = new createjs.Text("" + DST.Tools.round(valueData), "0.8em trebuchet", "#303030");
-                        }
-                        decisPercVal.textBaseline = "middle";
-                        decisPercVal.maxWidth = 22;
-                        decisPercVal.x = 71;
-                        decisPercVal.y = 6 + (i * 12);
-                        decisionCont.addChild(decisBarBackgr);
-                        decisionCont.addChild(decisBar);
-                        decisionCont.addChild(decisPercVal);
                     }
                     decisionCont.addEventListener("click", this.clickedDecision);
                     decisionCont.x = elmt.m_easelElmt.x + 75;
@@ -304,6 +326,12 @@ var Mareframe;
                     $(".advButton").show();
                     $("#reset").show();
                     if (this.m_model.m_bbnMode) {
+                        $("#newElmt").hide();
+                        $("#newChance").hide();
+                        $("#newDec").hide();
+                        $("#newValue").hide();
+                        $("#newDcmt").hide();
+                        $("#cnctTool").hide();
                     }
                     else {
                         $("#newChance").hide();
@@ -335,11 +363,25 @@ var Mareframe;
                 this.updateMiniTable([elmt]);
             };
             GUIHandler.prototype.fullscreen = function (p_evt) {
+                var model = this.m_model;
+                this.m_handler.getFileIO().quickSave(model);
+                console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
                 console.log("fullscreen pressed");
-                $(".row").hide();
-                this.m_mcaStageCanvas.width = $(window).width();
-                this.m_mcaStageCanvas.height = $(window).height();
-                this.quickLoad();
+                if (!this.m_fullscreen) {
+                    console.log("was not in fullscreen");
+                    $(".row").hide();
+                    this.setSize($(window).width(), $(window).height());
+                    this.m_fullscreen = true;
+                }
+                else {
+                    console.log("was in fullscreen");
+                    $(".row").show();
+                    this.setSize($(window).width(), 500);
+                    this.m_fullscreen = false;
+                }
+                var json = JSON.parse(localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
+                model.fromJSON(json);
+                this.importStage();
             };
             GUIHandler.prototype.createNewDec = function (p_evt) {
                 var elmt = this.m_model.createNewElement(1);
@@ -415,18 +457,13 @@ var Mareframe;
                 ////console.log(this);
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
                     this.populateElmtDetails(this.m_model.getElement(p_evt.target.name));
-                    if (this.m_model.m_bbnMode) {
-                        $("#submit").show();
-                    }
-                    else {
-                        $("#submit").hide();
-                    }
+                    $("#submit").hide();
                     $("#detailsDialog").dialog("open");
                 }
             };
             GUIHandler.prototype.populateElmtDetails = function (p_elmt) {
                 console.log(p_elmt.getName() + " is updated: " + p_elmt.isUpdated());
-                ////console.log(p_elmt)
+                //console.log(p_elmt)
                 //set dialog title
                 $("#detailsDialog").dialog({
                     title: p_elmt.getName()
@@ -439,16 +476,19 @@ var Mareframe;
                     var s = DST.Tools.htmlTableFromArray("Definition", p_elmt.getData(), this.m_model);
                     $("#defTable_div").html(s);
                     $("#defTable_div").show();
-                    if (this.m_editorMode) {
-                        this.addEditFunction();
-                    }
+                    this.addEditFunction(this.m_editorMode);
                     if (this.m_showDescription) {
                         //set description
                         document.getElementById("description_div").innerHTML = p_elmt.getDescription();
                         $("#description_div").show();
                     }
                     //set user description
-                    document.getElementById("userDescription_div").innerHTML = p_elmt.getUserDescription();
+                    if (p_elmt.getUserDescription().length < 1) {
+                        document.getElementById("userDescription_div").innerHTML = "write your own description or comments here";
+                    }
+                    else {
+                        document.getElementById("userDescription_div").innerHTML = p_elmt.getUserDescription();
+                    }
                     $("#userDescription_div").show();
                     if (p_elmt.isUpdated()) {
                         $("#values").prop('disabled', false);
@@ -578,17 +618,25 @@ var Mareframe;
                 }
             };
             ;
-            GUIHandler.prototype.addEditFunction = function () {
+            GUIHandler.prototype.addEditFunction = function (p_editorMode) {
+                var mareframeGUI = this;
                 $(function () {
-                    $("#description_div").dblclick(function () {
+                    $("#userDescription_div").dblclick(function () {
+                        $("#submit").show();
                         var originalValue = $(this).text();
                         $(this).addClass("editable");
+                        console.log("original value : " + originalValue);
                         $(this).html("<input type='text' value='" + originalValue + "' />");
                         $(this).children().first().focus();
                         $(this).children().first().keypress(function (e) {
                             if (e.which == 13) {
                                 var newText = $(this).val();
                                 $(this).parent().text(newText);
+                                console.log("new text: " + newText);
+                                if (newText !== originalValue) {
+                                    console.log("unsaved changes");
+                                    mareframeGUI.m_unsavedChanges = true;
+                                }
                             }
                             $(this).parent().removeClass("editable");
                         });
@@ -596,19 +644,69 @@ var Mareframe;
                             var newText = $(this).val();
                             $(this).parent().text(newText);
                             $(this).parent().text(newText);
+                            if (newText !== originalValue) {
+                                mareframeGUI.m_unsavedChanges = true;
+                            }
                             $(this).parent().removeClass("editable");
                         });
                     });
                 });
-                $(function () {
-                    $("td").dblclick(function () {
-                        var originalValue = $(this).text();
-                        $(this).addClass("editable");
-                        $(this).html("<input type='text' value='" + originalValue + "' />");
-                        $(this).children().first().focus();
-                        $(this).children().first().keypress(function (e) {
-                            if (e.which == 13) {
+                if (p_editorMode) {
+                    $(function () {
+                        $("#description_div").dblclick(function () {
+                            $("#submit").show();
+                            var originalValue = $(this).text();
+                            $(this).addClass("editable");
+                            $(this).html("<input type='text' value='" + originalValue + "' />");
+                            $(this).children().first().focus();
+                            $(this).children().first().keypress(function (e) {
+                                if (e.which == 13) {
+                                    var newText = $(this).val();
+                                    $(this).parent().text(newText);
+                                    if (newText !== originalValue) {
+                                        mareframeGUI.m_unsavedChanges = true;
+                                    }
+                                }
+                                $(this).parent().removeClass("editable");
+                            });
+                            $(this).children().first().blur(function () {
                                 var newText = $(this).val();
+                                $(this).parent().text(newText);
+                                $(this).parent().text(newText);
+                                if (newText !== originalValue) {
+                                    mareframeGUI.m_unsavedChanges = true;
+                                }
+                                $(this).parent().removeClass("editable");
+                            });
+                        });
+                    });
+                    $(function () {
+                        $("td").dblclick(function () {
+                            $("#submit").show();
+                            var originalValue = $(this).text();
+                            $(this).addClass("editable");
+                            $(this).html("<input type='text' value='" + originalValue + "' />");
+                            $(this).children().first().focus();
+                            $(this).children().first().keypress(function (e) {
+                                if (e.which == 13) {
+                                    var newText = $(this).val();
+                                    if (isNaN(newText)) {
+                                        alert("Value must be a number");
+                                        //TODO find better solution than alert
+                                        $(this).parent().text(originalValue);
+                                    }
+                                    else {
+                                        $(this).parent().text(newText);
+                                        if (newText !== originalValue) {
+                                            mareframeGUI.m_unsavedChanges = true;
+                                        }
+                                    }
+                                    $(this).parent().removeClass("editable");
+                                }
+                            });
+                            $(this).children().first().blur(function () {
+                                var newText = $(this).val();
+                                $(this).parent().text(newText);
                                 if (isNaN(newText)) {
                                     alert("Value must be a number");
                                     //TODO find better solution than alert
@@ -616,44 +714,41 @@ var Mareframe;
                                 }
                                 else {
                                     $(this).parent().text(newText);
+                                    if (newText !== originalValue) {
+                                        mareframeGUI.m_unsavedChanges = true;
+                                    }
                                 }
                                 $(this).parent().removeClass("editable");
-                            }
+                            });
                         });
-                        $(this).children().first().blur(function () {
-                            var newText = $(this).val();
-                            $(this).parent().text(newText);
-                            if (isNaN(newText)) {
-                                alert("Value must be a number");
-                                //TODO find better solution than alert
-                                $(this).parent().text(originalValue);
-                            }
-                            else {
-                                $(this).parent().text(newText);
-                            }
-                            $(this).parent().removeClass("editable");
-                        });
-                    });
-                    //TODO Prevent user from editing the top rows. That data should come from the child elements
-                    $("th").dblclick(function () {
-                        var originalText = $(this).text();
-                        $(this).addClass("editable");
-                        $(this).html("<input type='text' value='" + originalText + "' />");
-                        $(this).children().first().focus();
-                        $(this).children().first().keypress(function (e) {
-                            if (e.which == 13) {
+                        //TODO Prevent user from editing the top rows. That data should come from the child elements
+                        $("th").dblclick(function () {
+                            $("#submit").show();
+                            var originalText = $(this).text();
+                            $(this).addClass("editable");
+                            $(this).html("<input type='text' value='" + originalText + "' />");
+                            $(this).children().first().focus();
+                            $(this).children().first().keypress(function (e) {
+                                if (e.which == 13) {
+                                    var newText = $(this).val();
+                                    $(this).parent().text(newText);
+                                    if (newText !== originalText) {
+                                        mareframeGUI.m_unsavedChanges = true;
+                                    }
+                                    $(this).parent().removeClass("editable");
+                                }
+                            });
+                            $(this).children().first().blur(function () {
                                 var newText = $(this).val();
                                 $(this).parent().text(newText);
+                                if (newText !== originalText) {
+                                    mareframeGUI.m_unsavedChanges = true;
+                                }
                                 $(this).parent().removeClass("editable");
-                            }
-                        });
-                        $(this).children().first().blur(function () {
-                            var newText = $(this).val();
-                            $(this).parent().text(newText);
-                            $(this).parent().removeClass("editable");
+                            });
                         });
                     });
-                });
+                }
             };
             ;
             GUIHandler.prototype.showValues = function () {
@@ -668,6 +763,7 @@ var Mareframe;
             };
             GUIHandler.prototype.saveChanges = function () {
                 var elmt = $("#detailsDialog").data("element");
+                var oldData = elmt.getData();
                 var model = this.m_model;
                 //Save user description
                 var userDescription = $("#userDescription_div").text();
@@ -682,8 +778,8 @@ var Mareframe;
                 //console.log(this);
                 table.find("tr").each(function () {
                     $(this).find("th,td").each(function () {
-                        // ////console.log("text to be added: " + $(this).text());
-                        // ////console.log("does it exsist: " + $.inArray($(this).text(), newRow) === -1)
+                        //console.log("text to be added: " + $(this).text());
+                        //console.log("does it exsist: " + $.inArray($(this).text(), newRow) === -1)
                         var value = $(this).text();
                         //Don't add the same value twice if it is in one of the header cells
                         //(Better solution: check before the text is saved in the cell)
@@ -698,9 +794,16 @@ var Mareframe;
                     newTable.push(newRow);
                     newRow = [];
                 });
-                ////console.log(newTable);
+                //console.log(newTable);
                 //Remove header row with title the "Definition"
                 newTable.splice(0, 1);
+                //Reset the headerrows. (Better solution would be to prevent the user from editing them
+                for (var i = 0; i < DST.Tools.numOfHeaderRows(oldData); i++) {
+                    for (var j = 0; j < oldData[0].length; j++) {
+                        newTable[i][j] = oldData[i][j];
+                    }
+                    newTable[i][0] = oldData[i][0];
+                }
                 if (!DST.Tools.columnSumsAreValid(newTable, DST.Tools.numOfHeaderRows(elmt.getData())) && elmt.getType() == 0) {
                     //Should also show which row is unvalid (maybe right after the user has changed the value)
                     alert("The values in each column must add up to 1");
@@ -801,8 +904,8 @@ var Mareframe;
                 this.m_originalPressY = p_evt.stageY;
                 //////console.log("cnctool options: "+$("#cnctTool").button("option","checked"));
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
-                    var cnctChkbox = document.getElementById("cnctTool");
-                    if (cnctChkbox.checked) {
+                    //   var cnctChkbox: HTMLInputElement = <HTMLInputElement>document.getElementById("cnctTool")
+                    if (false) {
                         ////console.log("cnctTool enabled");
                         this.connectTo(p_evt);
                     }

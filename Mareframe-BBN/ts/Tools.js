@@ -62,7 +62,7 @@ var Mareframe;
                     for (var j = numOfHeaderRows; j < data.length; j++) {
                         sum += parseFloat(data[j][i]);
                     }
-                    if (sum < 0.9999 || sum > 1.0001) {
+                    if (sum < 0.999 || sum > 1.001) {
                         return false;
                     }
                     sum = 0;
@@ -896,15 +896,15 @@ var Mareframe;
                 }
             };
             Tools.updateConcerningDecisions = function (element) {
-                console.log("updating concerning decisions " + element.getName());
+                // console.log("updating concerning decisions " + element.getName());
                 var rowsToDelete = [];
                 // console.log("all ancestors for " + element.getName() +": "  + element.getAllAncestors());
                 element.getAllAncestors().forEach(function (elmt) {
                     if (elmt.getType() === 1 && elmt.getDecision() !== undefined) {
-                        console.log("checking: " + elmt.getName());
+                        //   console.log("checking: " + elmt.getName());
                         var values = element.getValues();
                         var decision = elmt.getData()[elmt.getDecision()][0];
-                        console.log("choice is made: " + decision + " in elemnent " + elmt.getName());
+                        //console.log("choice is made: " + decision + " in elemnent " + elmt.getName());
                         //  console.log("values: " + values + " size: " + math.size(values));
                         var newValues = [];
                         var rowNumber = Tools.getRowNumber(element.getValues(), elmt);
