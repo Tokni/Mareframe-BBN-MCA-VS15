@@ -603,7 +603,7 @@
             static calculateValues(p_model: Model, p_element: Element) {
                 var model: Model = p_model;
                 var element: Element = p_element;
-             //   console.log("calculate values for " + p_element.getName());
+                console.log("calculate values for " + p_element.getName());
                 var dataHeaders: any[][] = [];
                 var data: any[][] = element.getData();
               //  console.log("data: " + data);
@@ -620,88 +620,81 @@
                     var newValues = Tools.getMatrixWithoutHeader(data);
                    // console.log("data: " + Tools.arrayToString(newValues));
                     element.getParentElements().forEach(function (elmt) {
-                      //  console.log("parent: " + elmt.getName());
+                        //  console.log("parent: " + elmt.getName());
                         if (elmt.getType() === 0) {//If Parent is a chance
                             takenIntoAccount.push(elmt) //The parents which already have been evaluated
-                          //  console.log("dataheaders: " + dataHeaders);
+                            //  console.log("dataheaders: " + dataHeaders);
                             //Parent must be updated
                             if (!elmt.isUpdated()) {
                                 elmt.update();
                             }
-                           // console.log("parent values: " + Tools.arrayToString(elmt.getValues()));
+                            // console.log("parent values: " + Tools.arrayToString(elmt.getValues()));
                             var parentValuesMatrix = Tools.getMatrixWithoutHeader(elmt.getValues());
                             var submatrices = Tools.createSubMatrices(newValues, takenIntoAccount, dataHeaders);
-                            //For each submatrix calculate new values
-                            var result = [];//Tools.makeSureItsAnArray([math.multiply(submatrices[0], parentValuesMatrix)]);
-                            // console.log("size of result: " + math.size(result));
-                            
-                          
-                            //If parent has dec in values table these are added to dataHeaders
-                           // console.log("num of header rows in parent " + elmt.getName() + " values: " + Tools.numOfHeaderRows(elmt.getValues()));
+                            var result = [];
+                            var decRows: any[] = [];
+                            var newRows: any[] = [];
+                            //If parent has dec in values table these are added to dataHeaders or parent submatrices are created
+                            // console.log("num of header rows in parent " + elmt.getName() + " values: " + Tools.numOfHeaderRows(elmt.getValues()));
                             if (Tools.numOfHeaderRows(elmt.getValues()) > 0) {
-                                var decRow = elmt.getValues()[Tools.numOfHeaderRows(elmt.getValues()) - 1];
-                               // console.log("checking if dec exsists: " + math.flatten(Tools.getColumn(dataHeaders, 0)) + " index of " + decRow[0]);
-                                //If the parents decision already is in data headers create submatrices from parent
-                              //  console.log("number of header rows in data headers: " + Tools.numOfHeaderRows(dataHeaders));
-                                if (Tools.numOfHeaderRows(dataHeaders) > 1 && math.flatten(Tools.getColumn(dataHeaders, 0)).indexOf(decRow[0]) > -1) {
-                                //    console.log("DEC EXISTS");
-                                    var parentSubMatrices = Tools.createSubMatrices(parentValuesMatrix, [], [decRow]);
+                                //For each dec in parent
+                                for (var i = 0; i < Tools.numOfHeaderRows(elmt.getValues()); i++) {
+                                    var decRow = elmt.getValues()[i];
+                                    // console.log("checking if dec exsists: " + math.flatten(Tools.getColumn(dataHeaders, 0)) + " index of " + decRow[0]);
+                                    //If the parents decision already is in data headers add it to decRows to be used when creating parentsubmatrices
+                                    //  console.log("number of header rows in data headers: " + Tools.numOfHeaderRows(dataHeaders));
+                                    if (Tools.numOfHeaderRows(dataHeaders) > 1 && math.flatten(Tools.getColumn(dataHeaders, 0)).indexOf(decRow[0]) > -1) {
+                                        //    console.log("DEC EXISTS");
+                                        decRows.push(decRow);
+                                        
+                                    }
+                                    else {
+                                        //   console.log("parent contains decisions");
+                                        // console.log("dataHeaders before adding: " + Tools.arrayToString(dataHeaders));
+                                        var newRows: any[];
+                                        //If there is just one decision
+                                        if (Tools.numOfHeaderRows(elmt.getValues()) === 1) {
+                                            newRows = elmt.getValues()[0].slice();
+                                            headerRows = Tools.insertNewHeaderRowAtBottom(elmt.getValues()[0], headerRows);
+                                            // console.log("new header rows: " + headerRows);
+                                        }
+                                        else {
+                                            newRows = [];
+                                                newRows.push(elmt.getValues()[i].slice());
+                                                Tools.insertNewHeaderRowAtBottom(elmt.getValues()[i], headerRows);
+                                                //   console.log("new header rows: " + headerRows);
+                                        }
+                                        //console.log("new rows: " + newRows);
+                                        dataHeaders = Tools.updateDataHeader(dataHeaders, newRows);
+                                        //console.log("Parent values: " + elmt.getValues());
+                                        // console.log("new dataHeaders: " + (dataHeaders));
+                                    }
+                                }
+                                if (decRows.length > 0) {
+                                    var parentSubMatrices = Tools.createSubMatrices(parentValuesMatrix, [], decRows);
                                     var j = 0;
                                     for (var i = 0; i < submatrices.length; i++) {
-                                       // console.log("i: " + i + " j: " + j);
-                                       // console.log("multiplying " + submatrices[i] + " size " + math.size(submatrices[i]) + " and " + parentSubMatrices[j] + " size " + math.size(parentSubMatrices[j]));
+                                        // console.log("i: " + i + " j: " + j);
+                                        // console.log("multiplying " + submatrices[i] + " size " + math.size(submatrices[i]) + " and " + parentSubMatrices[j] + " size " + math.size(parentSubMatrices[j]));
                                         var newMatrix = Tools.makeSureItsAnArray(math.multiply(submatrices[i], parentSubMatrices[j]));
                                         //console.log("size of new matrix: " + math.size(newMatrix));
                                         result.push(newMatrix);
-                                     //   console.log("size of result: " + math.size(result));
+                                        //   console.log("size of result: " + math.size(result));
                                         if (j < parentSubMatrices.length - 1) {
                                             j++;
                                         }
                                         else {
                                             j = 0;
                                         }
-
                                     }
-                                 //   console.log("size of result" + math.size(result));
+                                    //   console.log("size of result" + math.size(result));
                                     newValues = Tools.concatMatrices(result);
-                                 //   console.log("size of new values: " + math.size(newValues));
-                                }
-                                else {
-                                    //   console.log("parent contains decisions");
-                                    // console.log("dataHeaders before adding: " + Tools.arrayToString(dataHeaders));
-                                    var newRows: any[];
-                                    //If there is just one decision
-                                    if (Tools.numOfHeaderRows(elmt.getValues()) === 1) {
-                                        //dataHeaders = Tools.deleteHeaderRow(elmt.getValues()[0][0], dataHeaders); //Delete if it already has been added
-                                        //Tools.insertNewHeaderRowAtBottom(elmt.getValues()[0].slice(), dataHeaders);
-                                        newRows = elmt.getValues()[0].slice();
-                                        //headerRows = Tools.deleteHeaderRow(elmt.getValues()[0][0], headerRows);
-                                        headerRows = Tools.insertNewHeaderRowAtBottom(elmt.getValues()[0], headerRows);
-                                       // console.log("new header rows: " + headerRows);
-                                    }
-                                    else {
-                                        newRows = [];
-                                        for (var i = 0; i < Tools.numOfHeaderRows(elmt.getValues()); i++) {
-                                            //dataHeaders = Tools.deleteHeaderRow(elmt.getValues()[i][0], dataHeaders); //Delete if it already has been added
-                                            //Tools.insertNewHeaderRowAtBottom(elmt.getValues()[0].slice(), dataHeaders);
-
-                                            newRows.push(elmt.getValues()[i].slice());
-                                            //headerRows = Tools.deleteHeaderRow(elmt.getValues()[i][0], headerRows);
-                                            Tools.insertNewHeaderRowAtBottom(elmt.getValues()[i], headerRows);
-                                            //   console.log("new header rows: " + headerRows);
-                                        }
-                                    }
-                                
-
-                                    //console.log("new rows: " + newRows);
-                                    dataHeaders = Tools.updateDataHeader(dataHeaders, newRows);
-                                    //console.log("Parent values: " + elmt.getValues());
-                                    // console.log("new dataHeaders: " + (dataHeaders));
+                                    //   console.log("size of new values: " + math.size(newValues));
                                 }
                             }
                             if (result.length === 0) {
                                 for (var i = 0; i < submatrices.length; i++) {
-                                  //  console.log("multiplying " + submatrices[i] + " size " + math.size(submatrices[i]) + " and " + parentValuesMatrix + " size " + math.size(parentValuesMatrix));
+                                    //  console.log("multiplying " + submatrices[i] + " size " + math.size(submatrices[i]) + " and " + parentValuesMatrix + " size " + math.size(parentValuesMatrix));
                                     var newMatrix = Tools.makeSureItsAnArray(math.multiply(submatrices[i], parentValuesMatrix));
                                     //console.log("size of new matrix: " + math.size(newMatrix));
                                     result.push(newMatrix);
@@ -712,7 +705,6 @@
                         } else if (elmt.getType() === 1) {//If Parent is a decision
                             headerRows = Tools.addNewHeaderRow(elmt.getMainValues(), headerRows);
                         }
-                       // console.log("new values: " + newValues + " size " + math.size(newValues));
                     });
                     newValues = Tools.convertToArray(newValues);
                    // console.log("size: " + math.size(newValues));

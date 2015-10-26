@@ -556,7 +556,7 @@ var Mareframe;
             Tools.calculateValues = function (p_model, p_element) {
                 var model = p_model;
                 var element = p_element;
-                //   console.log("calculate values for " + p_element.getName());
+                console.log("calculate values for " + p_element.getName());
                 var dataHeaders = [];
                 var data = element.getData();
                 //  console.log("data: " + data);
@@ -584,19 +584,42 @@ var Mareframe;
                             // console.log("parent values: " + Tools.arrayToString(elmt.getValues()));
                             var parentValuesMatrix = Tools.getMatrixWithoutHeader(elmt.getValues());
                             var submatrices = Tools.createSubMatrices(newValues, takenIntoAccount, dataHeaders);
-                            //For each submatrix calculate new values
-                            var result = []; //Tools.makeSureItsAnArray([math.multiply(submatrices[0], parentValuesMatrix)]);
-                            // console.log("size of result: " + math.size(result));
-                            //If parent has dec in values table these are added to dataHeaders
+                            var result = [];
+                            var decRows = [];
+                            var newRows = [];
+                            //If parent has dec in values table these are added to dataHeaders or parent submatrices are created
                             // console.log("num of header rows in parent " + elmt.getName() + " values: " + Tools.numOfHeaderRows(elmt.getValues()));
                             if (Tools.numOfHeaderRows(elmt.getValues()) > 0) {
-                                var decRow = elmt.getValues()[Tools.numOfHeaderRows(elmt.getValues()) - 1];
-                                // console.log("checking if dec exsists: " + math.flatten(Tools.getColumn(dataHeaders, 0)) + " index of " + decRow[0]);
-                                //If the parents decision already is in data headers create submatrices from parent
-                                //  console.log("number of header rows in data headers: " + Tools.numOfHeaderRows(dataHeaders));
-                                if (Tools.numOfHeaderRows(dataHeaders) > 1 && math.flatten(Tools.getColumn(dataHeaders, 0)).indexOf(decRow[0]) > -1) {
-                                    //    console.log("DEC EXISTS");
-                                    var parentSubMatrices = Tools.createSubMatrices(parentValuesMatrix, [], [decRow]);
+                                //For each dec in parent
+                                for (var i = 0; i < Tools.numOfHeaderRows(elmt.getValues()); i++) {
+                                    var decRow = elmt.getValues()[i];
+                                    // console.log("checking if dec exsists: " + math.flatten(Tools.getColumn(dataHeaders, 0)) + " index of " + decRow[0]);
+                                    //If the parents decision already is in data headers add it to decRows to be used when creating parentsubmatrices
+                                    //  console.log("number of header rows in data headers: " + Tools.numOfHeaderRows(dataHeaders));
+                                    if (Tools.numOfHeaderRows(dataHeaders) > 1 && math.flatten(Tools.getColumn(dataHeaders, 0)).indexOf(decRow[0]) > -1) {
+                                        //    console.log("DEC EXISTS");
+                                        decRows.push(decRow);
+                                    }
+                                    else {
+                                        //   console.log("parent contains decisions");
+                                        // console.log("dataHeaders before adding: " + Tools.arrayToString(dataHeaders));
+                                        var newRows;
+                                        //If there is just one decision
+                                        if (Tools.numOfHeaderRows(elmt.getValues()) === 1) {
+                                            newRows = elmt.getValues()[0].slice();
+                                            headerRows = Tools.insertNewHeaderRowAtBottom(elmt.getValues()[0], headerRows);
+                                        }
+                                        else {
+                                            newRows = [];
+                                            newRows.push(elmt.getValues()[i].slice());
+                                            Tools.insertNewHeaderRowAtBottom(elmt.getValues()[i], headerRows);
+                                        }
+                                        //console.log("new rows: " + newRows);
+                                        dataHeaders = Tools.updateDataHeader(dataHeaders, newRows);
+                                    }
+                                }
+                                if (decRows.length > 0) {
+                                    var parentSubMatrices = Tools.createSubMatrices(parentValuesMatrix, [], decRows);
                                     var j = 0;
                                     for (var i = 0; i < submatrices.length; i++) {
                                         // console.log("i: " + i + " j: " + j);
@@ -615,31 +638,6 @@ var Mareframe;
                                     //   console.log("size of result" + math.size(result));
                                     newValues = Tools.concatMatrices(result);
                                 }
-                                else {
-                                    //   console.log("parent contains decisions");
-                                    // console.log("dataHeaders before adding: " + Tools.arrayToString(dataHeaders));
-                                    var newRows;
-                                    //If there is just one decision
-                                    if (Tools.numOfHeaderRows(elmt.getValues()) === 1) {
-                                        //dataHeaders = Tools.deleteHeaderRow(elmt.getValues()[0][0], dataHeaders); //Delete if it already has been added
-                                        //Tools.insertNewHeaderRowAtBottom(elmt.getValues()[0].slice(), dataHeaders);
-                                        newRows = elmt.getValues()[0].slice();
-                                        //headerRows = Tools.deleteHeaderRow(elmt.getValues()[0][0], headerRows);
-                                        headerRows = Tools.insertNewHeaderRowAtBottom(elmt.getValues()[0], headerRows);
-                                    }
-                                    else {
-                                        newRows = [];
-                                        for (var i = 0; i < Tools.numOfHeaderRows(elmt.getValues()); i++) {
-                                            //dataHeaders = Tools.deleteHeaderRow(elmt.getValues()[i][0], dataHeaders); //Delete if it already has been added
-                                            //Tools.insertNewHeaderRowAtBottom(elmt.getValues()[0].slice(), dataHeaders);
-                                            newRows.push(elmt.getValues()[i].slice());
-                                            //headerRows = Tools.deleteHeaderRow(elmt.getValues()[i][0], headerRows);
-                                            Tools.insertNewHeaderRowAtBottom(elmt.getValues()[i], headerRows);
-                                        }
-                                    }
-                                    //console.log("new rows: " + newRows);
-                                    dataHeaders = Tools.updateDataHeader(dataHeaders, newRows);
-                                }
                             }
                             if (result.length === 0) {
                                 for (var i = 0; i < submatrices.length; i++) {
@@ -654,7 +652,6 @@ var Mareframe;
                         else if (elmt.getType() === 1) {
                             headerRows = Tools.addNewHeaderRow(elmt.getMainValues(), headerRows);
                         }
-                        // console.log("new values: " + newValues + " size " + math.size(newValues));
                     });
                     newValues = Tools.convertToArray(newValues);
                     // console.log("size: " + math.size(newValues));

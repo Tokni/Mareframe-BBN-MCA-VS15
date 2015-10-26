@@ -347,16 +347,17 @@ module Mareframe {
             }
 
             private updateEditorMode() {
+                console.log("updating editormode");
                 if (this.m_editorMode) {
                     $(".advButton").show();
                     $("#reset").show();
                     if (this.m_model.m_bbnMode) {
                         $("#newElmt").hide();
-                        $("#newChance").hide();
+                       /* $("#newChance").hide();
                         $("#newDec").hide();
                         $("#newValue").hide();
                         $("#newDcmt").hide();
-                        $("#cnctTool").hide();
+                        $("#cnctTool").hide();*/
                     }
                     else {
                         $("#newChance").hide();
@@ -1055,8 +1056,8 @@ module Mareframe {
                 this.m_originalPressY = p_evt.stageY;
                 //////console.log("cnctool options: "+$("#cnctTool").button("option","checked"));
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
-                 //   var cnctChkbox: HTMLInputElement = <HTMLInputElement>document.getElementById("cnctTool")
-                    if (false)//cnctChkbox.checked) //check if connect tool is enabled
+                   var cnctChkbox: HTMLInputElement = <HTMLInputElement>document.getElementById("cnctTool")
+                    if (cnctChkbox.checked) //check if connect tool is enabled
                     {
                         ////console.log("cnctTool enabled");
                         this.connectTo(p_evt);
