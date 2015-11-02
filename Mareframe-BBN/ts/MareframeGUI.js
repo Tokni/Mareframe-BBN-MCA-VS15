@@ -328,6 +328,11 @@ var Mareframe;
                     $("#reset").show();
                     if (this.m_model.m_bbnMode) {
                         $("#newElmt").hide();
+                        $("#newChance").hide();
+                        $("#newDec").hide();
+                        $("#newValue").hide();
+                        $("#newDcmt").hide();
+                        $("#cnctTool").hide();
                     }
                     else {
                         $("#newChance").hide();
