@@ -154,7 +154,8 @@
             updateData() {
                // console.log("updateData " + this.m_name);
                // console.log("data: " + this.m_data);
-                this.m_data = this.updateHeaderRows(this.m_data);
+                    this.m_data = this.updateHeaderRows(this.m_data);
+                
                // console.log("data: " + this.m_data);
                 var rows: number;
                 var columns: number;

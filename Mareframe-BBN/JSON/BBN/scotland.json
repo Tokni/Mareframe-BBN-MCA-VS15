@@ -1,29 +1,239 @@
 {
-    "elements": [
-    { "posX": 200, "posY": 96, "elmtID": "elmtDec2", "elmtName": "Decision", "elmtDesc": "write description here", "elmtType": 1, "elmtData": [["c0"],
-        																																		["c1"]]},
-    { "posX": 600, "posY": 150, "elmtID": "elmtChance3", "elmtName": "Chance", "elmtDesc": "write description here", "elmtType": 0, "elmtData": [["S0", 0.3],
-        																																		["S1", 0.7]]},
-     { "posX": 500, "posY": 96, "elmtID": "elmtChance1", "elmtName": "Success of venture", "elmtDesc": "write description here", "elmtType": 0, "elmtData": [["Success", 0.2],
-        																																						["Failure", 0.8]]},
-        { "posX": 500, "posY": 224, "elmtID": "elmtChance2", "elmtName": "Expert forecast", "elmtDesc": "write description here", "elmtType": 0, "elmtData": [["Good", 0.4, 0.7, 0.1, 0.4],
-        																																					["Moderate", 0.4, 0.2, 0.3, 0.1],
-        																																					["Poor", 0.2, 0.1, 0.6,0.5] ]},
-        { "posX": 100, "posY": 150, "elmtID": "elmtDec1", "elmtName": "Investment decision", "elmtDesc": "write description here", "elmtType": 1, "elmtData": [["Invest"], ["DoNotInvest"]]},
-        { "posX": 300, "posY": 224, "elmtID": "elmtValue1", "elmtName": "Financial Gain", "elmtDesc": "write description here", "elmtType": 2, "elmtData": [["Value", 10000, -5000, 500, 500,10000, -5000, 500, 500]]}
-    ],
-    "connections": [
-        { "connInput": "elmtChance1", "connOutput": "elmtChance2", "connID": "conn1" },
-        { "connInput": "elmtChance1", "connOutput": "elmtValue1", "connID": "conn2" },
-        { "connInput": "elmtDec1", "connOutput": "elmtValue1", "connID": "conn3" },
-        { "connInput": "elmtChance3", "connOutput": "elmtChance2", "connID": "conn4" },
-        { "connInput": "elmtDec2", "connOutput": "elmtValue1","connID": "conn5"},
-        {"connInput": "elmtDec2", "connOutput": "elmtDec1",  "connID": "conn6"  }
-    ],
-  "mdlName": "The West Coast of Scotland",
-  "mdlIdent": "scotland",
-    "mdlDesc": "",
-    "dataMat": [
-        
-    ]
+  "elements": [
+    {
+      "posX": 645.5,
+      "posY": 41.5,
+      "elmtID": "elmtmanagement",
+      "elmtName": "management",
+      "elmtDesc": "Element description",
+      "elmtType": 1,
+      "elmtData": [
+        [ "BAU" ],
+        [ "Fmsy" ],
+        [ "Area_closures" ]
+      ]
+    },
+    {
+      "posX": 160,
+      "posY": 349,
+      "elmtID": "elmtyear",
+      "elmtName": "year",
+      "elmtDesc": "Element description",
+      "elmtType": 0,
+      "elmtData": [
+        [ "Year0", 0.5001 ],
+        [ "Year1", 0.4999 ]
+      ]
+    },
+    {
+      "posX": 473.5,
+      "posY": 225,
+      "elmtID": "elmteffort",
+      "elmtName": "effort",
+      "elmtDesc": "Element description",
+      "elmtType": 0,
+      "elmtData": [
+        [ "Low", 0.0001, 0.99410059, 0.038935042 ],
+        [ "Moderate", 0.9191, 0.00579942, 0.717445701 ],
+        [ "High", 0.0808, 0.0001, 0.243619257 ]
+      ]
+    },
+    {
+      "posX": 542.5,
+      "posY": 417.5,
+      "elmtID": "elmtSSB",
+      "elmtName": "SSB",
+      "elmtDesc": "Element description",
+      "elmtType": 0,
+      "elmtData": [
+        [ "Below500", 0.0978, 0.126, 0.230938563, 0.0851, 0.1164, 0.215021502 ],
+        [ "Btw500and1000", 0.6413, 0.638, 0.587152291, 0.6356, 0.6455, 0.592859286 ],
+        [ "Btw1000and1500", 0.2252, 0.2026, 0.155393236, 0.238, 0.204, 0.165116512 ],
+        [ "Above1500", 0.0357, 0.0334, 0.02651591, 0.0413, 0.0341, 0.0270027 ]
+      ]
+    },
+    {
+      "posX": 894.5,
+      "posY": 238,
+      "elmtID": "elmtregime",
+      "elmtName": "regime",
+      "elmtDesc": "Element description",
+      "elmtType": 0,
+      "elmtData": [
+        [ "Typical", 0.85 ],
+        [ "Anomaly", 0.15 ]
+      ]
+    },
+    {
+      "posX": 842.5,
+      "posY": 410,
+      "elmtID": "elmtT",
+      "elmtName": "T",
+      "elmtDesc": "Element description",
+      "elmtType": 0,
+      "elmtData": [
+        [ "Below3", 0.976, 0.0001 ],
+        [ "Btw3and6", 0.0239, 0.0866 ],
+        [ "Above6", 0.0001, 0.9133 ]
+      ]
+    },
+    {
+      "posX": 620.5,
+      "posY": 282,
+      "elmtID": "elmtR",
+      "elmtName": "R",
+      "elmtDesc": "Element description",
+      "elmtType": 0,
+      "elmtData": [
+        [ "Below1million", 1, 0.7621, 0.3174, 0.8038, 0.0069, 0, 0.749, 0, 0, 0.9968, 0.7596, 0.3157 ],
+        [ "Btw1and1dot3", 0, 0.2023, 0.1309, 0.1962, 0.389, 0, 0.251, 0.3358, 0, 0.0032, 0.178, 0.1635 ],
+        [ "Above1dot3million", 0, 0.0356, 0.5517, 0, 0.6041, 1, 0, 0.6642, 1, 0, 0.0624, 0.5208 ]
+      ]
+    },
+    {
+      "posX": 251.5,
+      "posY": 295,
+      "elmtID": "elmtcatch",
+      "elmtName": "catch",
+      "elmtDesc": "Element description",
+      "elmtType": 0,
+      "elmtData": [
+        [ "Below200", 0.999501682, 0.731533046, 0.289006731, 0.847672332, 0.0392, 0.000100271, 0.527769159, 0.0001, 0.000158655, 0.247441483, 0.000125392, 0.00140647, 0.999300504, 0.762549715, 0.288166958, 0.877242579, 0.052, 0.000100241, 0.548071871, 0.0001, 0.000156715, 0.2590127, 0.000125581, 0.001414427 ],
+        [ "Btw200and500", 0.000249159, 0.268256804, 0.428513155, 0.152116542, 0.7024, 0.020455229, 0.472023994, 0.204679532, 0.000158655, 0.385550714, 0.003887147, 0.00140647, 0.000419698, 0.2372353, 0.436414105, 0.122539959, 0.7007, 0.022754611, 0.451717978, 0.230776922, 0.000156715, 0.391847603, 0.004018586, 0.001414427 ],
+        [ "Btw500and800", 0.00012458, 0.000105075, 0.230165205, 0.000105563, 0.2562, 0.220294796, 0.000103423, 0.491950805, 0.000317309, 0.261627318, 0.10984326, 0.00140647, 0.000139899, 0.000107492, 0.228641925, 0.000108731, 0.2468, 0.227145148, 0.000105075, 0.481251875, 0.001097007, 0.247644408, 0.111139018, 0.001414427 ],
+        [ "Above800", 0.00012458, 0.000105075, 0.052314909, 0.000105563, 0.0022, 0.759149704, 0.000103423, 0.303269673, 0.999365382, 0.105380484, 0.886144201, 0.995780591, 0.000139899, 0.000107492, 0.046777012, 0.000108731, 0.0005, 0.75, 0.000105075, 0.287871213, 0.998589563, 0.101495289, 0.884716815, 0.995756719 ]
+      ]
+    },
+    {
+      "posX": 161.5,
+      "posY": 116,
+      "elmtID": "elmtprofit",
+      "elmtName": "Profit NPV",
+      "elmtDesc": "Element description",
+      "elmtType": 0,
+      "elmtData": [
+        [ "Negative", 0.4475, 0.9966, 1, 0, 0.4343, 0.9987, 0, 0, 0.7792, 0, 0, 0.1107 ],
+        [ "Btw0and2", 0.5525, 0.0034, 0, 0.9095, 0.5657, 0.0013, 0.0601, 0.7275, 0.2208, 0, 0.0087, 0.2798 ],
+        [ "Bet2and4", 0, 0, 0, 0.0905, 0, 0, 0.9399, 0.2725, 0, 0.0768, 0.2644, 0.3292 ],
+        [ "Above4", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.9232, 0.7269, 0.2803 ]
+      ]
+    },
+    {
+      "posX": 222,
+      "posY": 52,
+      "elmtID": "elmtMonetary_utility",
+      "elmtName": "Monetary utility",
+      "elmtDesc": "Element description",
+      "elmtType": 2,
+      "elmtData": [ [ "Value", 0, 0.5, 0.8, 1 ] ]
+    },
+    {
+      "posX": 893.5,
+      "posY": 172,
+      "elmtID": "elmtRecruitment_risk",
+      "elmtName": "Recruitment risk",
+      "elmtDesc": "Element description",
+      "elmtType": 2,
+      "elmtData": [ [ "Value", 0, 1.4, 1 ] ]
+    },
+    {
+      "posX": 874.5,
+      "posY": 91,
+      "elmtID": "elmtSea_bottom_integrity",
+      "elmtName": "Sea bottom integrity",
+      "elmtDesc": "Element description",
+      "elmtType": 2,
+      "elmtData": [ [ "Value", 1, 0.7, 0 ] ]
+    },
+    {
+      "posX": 399.5,
+      "posY": 52,
+      "elmtID": "elmtemployment",
+      "elmtName": "employment",
+      "elmtDesc": "Element description",
+      "elmtType": 2,
+      "elmtData": [ [ "Value", 0.2, 0.5, 1 ] ]
+    }
+  ],
+  "connections": [
+    {
+      "connInput": "elmteffort",
+      "connOutput": "elmtemployment",
+      "connID": "conn15"
+    },
+    {
+      "connInput": "elmteffort",
+      "connOutput": "elmtSea_bottom_integrity",
+      "connID": "conn14"
+    },
+    {
+      "connInput": "elmtR",
+      "connOutput": "elmtRecruitment_risk",
+      "connID": "conn13"
+    },
+    {
+      "connInput": "elmtprofit",
+      "connOutput": "elmtMonetary_utility",
+      "connID": "conn12"
+    },
+    {
+      "connInput": "elmteffort",
+      "connOutput": "elmtprofit",
+      "connID": "conn11"
+    },
+    {
+      "connInput": "elmtcatch",
+      "connOutput": "elmtprofit",
+      "connID": "conn10"
+    },
+    {
+      "connInput": "elmteffort",
+      "connOutput": "elmtcatch",
+      "connID": "conn9"
+    },
+    {
+      "connInput": "elmtSSB",
+      "connOutput": "elmtcatch",
+      "connID": "conn8"
+    },
+    {
+      "connInput": "elmtyear",
+      "connOutput": "elmtcatch",
+      "connID": "conn7"
+    },
+    {
+      "connInput": "elmtT",
+      "connOutput": "elmtR",
+      "connID": "conn6"
+    },
+    {
+      "connInput": "elmtSSB",
+      "connOutput": "elmtR",
+      "connID": "conn5"
+    },
+    {
+      "connInput": "elmtregime",
+      "connOutput": "elmtT",
+      "connID": "conn4"
+    },
+    {
+      "connInput": "elmteffort",
+      "connOutput": "elmtSSB",
+      "connID": "conn3"
+    },
+    {
+      "connInput": "elmtyear",
+      "connOutput": "elmtSSB",
+      "connID": "conn2"
+    },
+    {
+      "connInput": "elmtmanagement",
+      "connOutput": "elmteffort",
+      "connID": "conn1"
+    }
+  ],
+  "mdlName": "Network2 discretized",
+  "dataMat": [ ],
+  "mdlIdent": "elmtUnnamed",
+  "mdlDesc": ""
 }

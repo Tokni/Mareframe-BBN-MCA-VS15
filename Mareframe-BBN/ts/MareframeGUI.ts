@@ -353,11 +353,11 @@ module Mareframe {
                     $("#reset").show();
                     if (this.m_model.m_bbnMode) {
                         $("#newElmt").hide();
-                        $("#newChance").hide();
+                        /*$("#newChance").hide();
                         $("#newDec").hide();
                         $("#newValue").hide();
                         $("#newDcmt").hide();
-                        $("#cnctTool").hide();
+                        $("#cnctTool").hide();*/
                     }
                     else {
                         $("#newChance").hide();
@@ -1148,7 +1148,9 @@ module Mareframe {
                             connected = true;
                         }
                         if (this.m_model.m_bbnMode) {
-                            outputElmt.updateData();
+                            if (outputElmt.getType() !== 1) { //Dec nodes data does not rely on parents
+                                outputElmt.updateData();
+                            }
                             outputElmt.setUpdated(false);
                         }
                     }

@@ -20,7 +20,7 @@ module Mareframe {
 
                 
                 var loadModel: string = Tools.getUrlParameter('model');
-                loadModel = "baltic";
+                loadModel = "scotland";
                 console.log("using model: " + loadModel);
                 if (loadModel !== null) {
                     this.m_fileHandler.loadModel(loadModel, this.m_activeModel, this.m_gui.importStage);
