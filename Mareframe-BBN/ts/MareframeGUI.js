@@ -468,7 +468,7 @@ var Mareframe;
                     //bbn mode only
                     $("#detailsDialog").data("element", p_elmt);
                     $("#detailsDialog").data("model", this.m_model);
-                    console.log(this.m_model);
+                    console.log("data table: " + p_elmt.getData());
                     var s = DST.Tools.htmlTableFromArray("Definition", p_elmt.getData(), this.m_model);
                     $("#defTable_div").html(s);
                     $("#defTable_div").show();

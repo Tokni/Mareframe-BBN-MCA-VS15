@@ -114,6 +114,7 @@
                 var m: Model = this;
                 console.log("updating model");
                 this.m_elementArr.forEach(function (p_elmt: Element) {
+                    console.log(p_elmt.getName() + " has been updated: " + p_elmt.isUpdated());
                     if (!p_elmt.isUpdated()) {
                         p_elmt.update();
                     }
@@ -299,7 +300,7 @@
                 return this.m_elementArr[this.getObjectIndex(p_elmtStringId)];
             }
             private getObjectIndex(p_objectStringId: string): number {
-             console.log(" get object "  + p_objectStringId);
+           //  console.log(" get object "  + p_objectStringId);
                 var key = 0;
                 if (p_objectStringId.substr(0, 4) === "elmt") {
                     this.m_elementArr.every(function (p_elmt) {

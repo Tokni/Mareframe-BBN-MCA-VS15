@@ -47,7 +47,7 @@ var Mareframe;
                 this.m_decision = n;
             };
             Element.prototype.update = function () {
-                // console.log("Updating element " + this.getName() );
+                console.log("Updating element " + this.getName());
                 if (this.m_type !== 1) {
                     //   console.log("This is not a decision node");
                     //Definition table in decision nodes does not rely on parents
@@ -60,10 +60,11 @@ var Mareframe;
                     for (var i in children) {
                         //  console.log(this.getName() + " children: " + children[i].getName() + " updating");
                         //children[i].update();
+                        console.log("setting update = false for  " + children[i].getName());
                         children[i].setUpdated(false);
                     }
                 }
-                //console.log("Updated element " + this.getName());
+                console.log("Updated element " + this.getName());
                 this.m_updated = true;
             };
             Element.prototype.getParentElements = function () {
