@@ -537,7 +537,6 @@ module Mareframe {
                     $("#detailsDialog").data("element", p_elmt);
                     $("#detailsDialog").data("model", this.m_model);
                     
-                    console.log("data table: " + p_elmt.getData())
                     var s = Tools.htmlTableFromArray("Definition", p_elmt.getData(), this.m_model);
                     
                     $("#defTable_div").html(s);
@@ -870,7 +869,6 @@ module Mareframe {
             }
 
             private saveChanges() {
-                
                 var elmt: Element = $("#detailsDialog").data("element");
                 var oldData: any[][] = elmt.getData();
                 var model: Model = this.m_model;
@@ -920,27 +918,23 @@ module Mareframe {
                     alert("The values in each column must add up to 1");
                 } else {
                     elmt.setData(newTable);
-
                     if (model.getAutoUpdate()) {
                         this.updateModel();
-                        
                         console.log("auto update is on");
                     }
                     else {
-                    elmt.setUpdated(false);
-                    //TODO set all elements which are affected by this change to updated = false
-                }
+                        elmt.setUpdated(false);
+                        elmt.getAllDescendants().forEach(function (e) {
+                            e.setUpdated(false);
+                        });
+                    }
                     //console.log("new table after submit:");
                     //console.log(elmt.getData());
                 }
             }
-
             
-
             private updateValFnCP(p_controlPointX: number, p_controlPointY: number, p_flipped_numBool: number): void {
                 //var functionSegments = 10;
-		
-                
                 this.m_valueFnContainer.removeAllChildren();
                 var line = new createjs.Graphics().beginStroke("#0f0f0f").mt(0, this.m_valueFnSize - (this.m_valueFnSize * p_flipped_numBool)).bt(p_controlPointX, p_controlPointY, p_controlPointX, p_controlPointY, this.m_valueFnSize, 0 + (this.m_valueFnSize * p_flipped_numBool));
                 //for (var i = 1; i <= functionSegments; i++)
@@ -1152,6 +1146,9 @@ module Mareframe {
                                 outputElmt.updateData();
                             }
                             outputElmt.setUpdated(false);
+                            outputElmt.getAllDescendants().forEach(function (e) {
+                                e.setUpdated(false);
+                            });
                         }
                     }
                 }

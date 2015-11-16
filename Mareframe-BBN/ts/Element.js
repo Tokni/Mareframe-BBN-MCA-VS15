@@ -54,16 +54,6 @@ var Mareframe;
                     this.updateData();
                 }
                 DST.Tools.calculateValues(this.m_model, this);
-                //  console.log(this);
-                var children = this.getChildrenElements();
-                if (children.length !== 0) {
-                    for (var i in children) {
-                        //  console.log(this.getName() + " children: " + children[i].getName() + " updating");
-                        //children[i].update();
-                        console.log("setting update = false for  " + children[i].getName());
-                        children[i].setUpdated(false);
-                    }
-                }
                 console.log("Updated element " + this.getName());
                 this.m_updated = true;
             };
