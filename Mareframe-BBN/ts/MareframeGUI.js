@@ -469,6 +469,7 @@ var Mareframe;
                     $("#detailsDialog").data("element", p_elmt);
                     $("#detailsDialog").data("model", this.m_model);
                     var s = DST.Tools.htmlTableFromArray("Definition", p_elmt.getData(), this.m_model);
+                    console.log(p_elmt.getData());
                     $("#defTable_div").html(s);
                     $("#defTable_div").show();
                     this.addEditFunction(this.m_editorMode);

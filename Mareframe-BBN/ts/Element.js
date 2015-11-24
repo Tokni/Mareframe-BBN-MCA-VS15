@@ -150,7 +150,7 @@ var Mareframe;
                     columns = this.m_data[0].length;
                 }
                 //console.log("rows " + rows + " columns " + columns);
-                //console.log("in filling " + this.m_name + " last cell is " + this.m_data[rows - 1][columns - 1]);
+                console.log("in filling " + this.m_name + " last cell is " + this.m_data[rows - 1][columns - 1]);
                 if (this.m_data[rows - 1][columns - 1] === undefined) {
                     this.m_data = DST.Tools.fillDataTable(this.m_data);
                 }
