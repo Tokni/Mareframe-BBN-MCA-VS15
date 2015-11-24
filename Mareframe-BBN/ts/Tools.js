@@ -195,8 +195,8 @@ var Mareframe;
                 return p_array;
             };
             Tools.getMatrixWithoutHeader = function (p_matrix) {
-                console.log("get matrix without header from " + p_matrix);
-                console.log(p_matrix);
+                // console.log("get matrix without header from " + p_matrix)
+                //   console.log(p_matrix);
                 var numOfColumns;
                 var numOfRows;
                 //    console.log("size: " + math.size(p_matrix));
@@ -348,8 +348,8 @@ var Mareframe;
                         }
                     }
                 }
-                console.log("new data headers: " + newDataHeaders);
-                console.log("returned " + subMatrices + " size of submatrix " + math.size(subMatrices[0]) + " number of submatrices " + subMatrices.length);
+                //    console.log("new data headers: " + newDataHeaders);
+                //   console.log("returned " + subMatrices + " size of submatrix " + math.size(subMatrices[0]) + " number of submatrices " + subMatrices.length);
                 return [subMatrices, newDataHeaders];
                 //return subMatrices;
             };
@@ -525,13 +525,13 @@ var Mareframe;
                     var newValues = Tools.getMatrixWithoutHeader(data);
                     // console.log("data: " + Tools.arrayToString(newValues));
                     element.getParentElements().forEach(function (elmt) {
-                        console.log("parent: " + elmt.getName());
+                        //  console.log("parent: " + elmt.getName());
                         if (elmt.getType() === 0) {
                             // takenIntoAccount.push(elmt) //The parents which already have been evaluated
                             //  console.log("dataheaders: " + dataHeaders);
                             //Parent must be updated
                             if (!elmt.isUpdated()) {
-                                console.log("updating " + elmt.getName());
+                                // console.log("updating " + elmt.getName());
                                 elmt.update();
                             }
                             //              console.log("parent values: " + Tools.arrayToString(elmt.getValues()));
@@ -544,7 +544,7 @@ var Mareframe;
                             //    console.log("submatrices has size: " + math.size(submatrices));
                             dataHeaders = temp[1];
                             //var submatrices = Tools.createSubMatrices(newValues, takenIntoAccount, dataHeaders);
-                            console.log("data headers: " + dataHeaders);
+                            // console.log("data headers: " + dataHeaders);
                             var result = [];
                             var decRows = [];
                             var newRow = [];
@@ -556,17 +556,17 @@ var Mareframe;
                                 for (var i = 0; i < decInParent; i++) {
                                     //console.log("i:" + i + " decInParent: " + decInParent);
                                     var decRow = elmt.getValues()[i];
-                                    console.log("decRow: " + decRow);
+                                    //  console.log("decRow: " + decRow);
                                     // console.log("checking if dec exsists: " + math.flatten(Tools.getColumn(dataHeaders, 0)) + " index of " + decRow[0]);
                                     //If the parents decision already is in data headers add it to decRows to be used when creating parentsubmatrices
                                     //  console.log("number of header rows in data headers: " + Tools.numOfHeaderRows(dataHeaders));
                                     // console.log(dataHeaders);
                                     if (math.size(dataHeaders).length > 1 && math.size(dataHeaders)[0] > 1 && math.flatten(Tools.getColumn(dataHeaders, 0)).indexOf(decRow[0]) > -1) {
-                                        console.log("DEC EXISTS");
+                                        //     console.log("DEC EXISTS");
                                         decRows.push(decRow);
                                     }
                                     else if (math.size(Tools.makeSureItsTwoDimensional(dataHeaders))[0] === 1 && Tools.makeSureItsTwoDimensional(dataHeaders)[0][0] === decRow[0]) {
-                                        console.log("DEC EXISTS");
+                                        //   console.log("DEC EXISTS");
                                         decRows.push(decRow);
                                     }
                                     else {
@@ -575,7 +575,7 @@ var Mareframe;
                                         headerRows = Tools.insertNewHeaderRowAtBottom(p_model.getElement(elmt.getValues()[i][0]).getMainValues(), headerRows);
                                         //   console.log("new header rows: " + headerRows);
                                         newRow = elmt.getValues()[i].slice();
-                                        console.log("new row: " + newRow);
+                                        //      console.log("new row: " + newRow);
                                         //Update data headers to contain the new dec row
                                         dataHeaders = Tools.insertNewHeaderRowAtBottom(newRow, dataHeaders);
                                     }
@@ -612,29 +612,26 @@ var Mareframe;
                                 }
                                 newValues = Tools.concatMatrices(result);
                             }
-                            console.log(newValues);
                         }
                         else if (elmt.getType() === 1) {
-                            console.log(headerRows);
+                            // console.log(headerRows);
                             //Only add if it does not already exist
                             if (headerRows.length === 0) {
-                                console.log("empty");
+                                //console.log("empty");
                                 headerRows = Tools.addNewHeaderRow(elmt.getMainValues(), headerRows);
                             }
                             else if (math.size(headerRows).length === 1 && headerRows[0] !== elmt.getID()) {
-                                console.log("compared " + headerRows[0] + " and " + elmt.getID() + " not equal " + headerRows[0] !== elmt.getID());
-                                console.log("one dimensional");
+                                // console.log("compared " + headerRows[0] + " and " + elmt.getID() + " not equal " + headerRows[0] !== elmt.getID());
+                                // console.log("one dimensional");
                                 headerRows = Tools.addNewHeaderRow(elmt.getMainValues(), headerRows);
                             }
                             else if (math.size(headerRows).length > 1 && math.flatten(Tools.getColumn(Tools.makeSureItsTwoDimensional(headerRows), 0)).indexOf(elmt.getID()) === -1) {
-                                console.log("adding");
+                                //  console.log("adding");
                                 headerRows = Tools.addNewHeaderRow(elmt.getMainValues(), headerRows);
                             }
                         }
                     });
-                    console.log(newValues);
                     newValues = Tools.convertToArray(newValues);
-                    console.log(newValues);
                     if (math.size(newValues).length === 2 && math.size(newValues)[0] === 1) {
                         var tempArray = [];
                         for (var i = 0; i < math.size(newValues)[1]; i++) {
@@ -644,17 +641,17 @@ var Mareframe;
                     }
                     // console.log("checking for dimension: " + Tools.isOneDimensional(newValues)); 
                     if (Tools.isOneDimensional(newValues)) {
-                        console.log("one-dimensional");
+                        //console.log("one-dimensional")
                         newValues.unshift(data[Tools.numOfHeaderRows(element.getData())][0]);
                     }
                     else {
                         for (var i = 0; i < newValues.length; i++) {
-                            console.log("unshifting " + data[i + Tools.numOfHeaderRows(element.getData())][0]);
+                            //   console.log("unshifting " + data[i + Tools.numOfHeaderRows(element.getData())][0])
                             newValues[i].unshift(data[i + Tools.numOfHeaderRows(element.getData())][0]);
                         }
                     }
-                    console.log("new values: \n" + newValues);
-                    console.log("size: " + math.size(newValues));
+                    // console.log("new values: \n" + newValues);
+                    // console.log("size: " + math.size(newValues));
                     if (headerRows.length > 0) {
                         headerRows = Tools.makeSureItsTwoDimensional(headerRows);
                         newValues = Tools.makeSureItsTwoDimensional(newValues);
@@ -934,7 +931,7 @@ var Mareframe;
                 return strength;
             };
             Tools.fillDataTable = function (p_dataTable) {
-                console.log("filling table: " + p_dataTable);
+                // console.log("filling table: " + p_dataTable);
                 console.log(p_dataTable);
                 var headerRows = [];
                 var data = [];

@@ -1135,20 +1135,23 @@ module Mareframe {
                     var e = this.m_selectedItems[i];
                     if (e.name.substr(0, 4) === "elmt" && e.name !== elmtIdent) {
                         var outputElmt: Element = this.m_model.getElement(elmtIdent);
-                        var c = this.m_model.createNewConnection(this.m_model.getElement(e.name), outputElmt);
-                        //console.log("connection: " + c);
-                        if (this.m_model.addConnection(c)) {
-                            this.addConnectionToStage(c);
-                            connected = true;
-                        }
-                        if (this.m_model.m_bbnMode) {
-                            if (outputElmt.getType() !== 1) { //Dec nodes data does not rely on parents
-                                outputElmt.updateData();
+                        var inputElmt: Element = this.m_model.getElement(e.name);
+                        if (!(inputElmt.isAncestorOf(outputElmt))) { //Cannot connect to its ancestor. This would create a cycle
+                            var c = this.m_model.createNewConnection(inputElmt, outputElmt);
+                            //console.log("connection: " + c);
+                            if (this.m_model.addConnection(c)) {
+                                this.addConnectionToStage(c);
+                                connected = true;
                             }
-                            outputElmt.setUpdated(false);
-                            outputElmt.getAllDescendants().forEach(function (e) {
-                                e.setUpdated(false);
-                            });
+                            if (this.m_model.m_bbnMode) {
+                                if (outputElmt.getType() !== 1) { //Dec nodes data does not rely on parents
+                                    outputElmt.updateData();
+                                }
+                                outputElmt.setUpdated(false);
+                                outputElmt.getAllDescendants().forEach(function (e) {
+                                    e.setUpdated(false);
+                                });
+                            }
                         }
                     }
                 }

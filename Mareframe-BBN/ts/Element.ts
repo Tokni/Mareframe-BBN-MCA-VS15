@@ -102,12 +102,16 @@
                 }
                 return ancestors;
             }
+            isAncestorOf(elmt): boolean {
+              //  console.log("checking if " + this.getName() + " is an ancestor of " + elmt.getName() + ": " + (this.getAllAncestors().indexOf(elmt) > -1));
+                return (this.getAllAncestors().indexOf(elmt) > -1);
+            }
             getAllDescendants(): Element[]{
-                console.log("get all decendants for " + this.getName());
+             //   console.log("get all decendants for " + this.getName());
                 var decendants: Element[] = [];
                 var children: Element[] = this.getChildrenElements();
                 if (children.length === 0) {
-                    console.log("returned: " + decendants);
+                 //   console.log("returned: " + decendants);
                     return decendants;
                 }
                 else {
@@ -155,7 +159,7 @@
                     columns = this.m_data[0].length;
                 }
                 //console.log("rows " + rows + " columns " + columns);
-                console.log("in filling " + this.m_name + " last cell is " + this.m_data[rows - 1][columns - 1]);
+               // console.log("in filling " + this.m_name + " last cell is " + this.m_data[rows - 1][columns - 1]);
                 if (this.m_data[rows-1][columns-1] === undefined) {
                     this.m_data = Tools.fillDataTable(this.m_data);
                 }
