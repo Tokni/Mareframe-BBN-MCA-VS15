@@ -68,10 +68,10 @@ var Mareframe;
                 this.saveChanges = this.saveChanges.bind(this);
                 var mareframeGUI = this;
                 if (p_model.m_bbnMode) {
-                    console.log("unsaved changes");
                     $("#detailsDialog").dialog({
                         beforeClose: function (event, ui) {
                             if (mareframeGUI.m_unsavedChanges) {
+                                console.log("unsaved changes");
                                 if (!confirm("You have unsaved changes. Pressing OK will close the window and discard all changes.")) {
                                     return false;
                                 }
@@ -619,6 +619,7 @@ var Mareframe;
             };
             ;
             GUIHandler.prototype.addEditFunction = function (p_editorMode) {
+                console.log("ready for editing");
                 var mareframeGUI = this;
                 $(function () {
                     $("#userDescription_div").dblclick(function () {
@@ -695,14 +696,17 @@ var Mareframe;
                         $("td").dblclick(function () {
                             $("#submit").show();
                             var originalValue = $(this).text();
+                            console.log("original value : " + originalValue);
                             $(this).addClass("editable");
                             $(this).html("<input type='text' value='" + originalValue + "' />");
                             $(this).children().first().focus();
                             $(this).children().first().keypress(function (e) {
                                 if (e.which == 13) {
                                     var newText = $(this).val();
+                                    console.log("new text: " + newText);
                                     if (isNaN(newText)) {
-                                        alert("Value must be a number");
+                                        console.log("value is not a number");
+                                        // alert("Value must be a number");
                                         //TODO find better solution than alert
                                         $(this).parent().text(originalValue);
                                     }
@@ -725,8 +729,12 @@ var Mareframe;
                                 }
                                 else {
                                     $(this).parent().text(newText);
+                                    console.log(" new text: " + newText + " originalValue: " + originalValue);
                                     if (newText !== originalValue) {
                                         mareframeGUI.m_unsavedChanges = true;
+                                    }
+                                    else {
+                                        mareframeGUI.m_unsavedChanges = false;
                                     }
                                 }
                                 $(this).parent().removeClass("editable");
@@ -992,7 +1000,13 @@ var Mareframe;
                     if (e.name.substr(0, 4) === "elmt" && e.name !== elmtIdent) {
                         var outputElmt = this.m_model.getElement(elmtIdent);
                         var inputElmt = this.m_model.getElement(e.name);
-                        if (!(inputElmt.isAncestorOf(outputElmt))) {
+                        if (inputElmt.isAncestorOf(outputElmt)) {
+                            alert("cannot create a cycle");
+                        }
+                        else if (inputElmt.getType() === 2 && outputElmt.getType() !== 3) {
+                            alert("Value cannot one have super-value children");
+                        }
+                        else {
                             var c = this.m_model.createNewConnection(inputElmt, outputElmt);
                             //console.log("connection: " + c);
                             if (this.m_model.addConnection(c)) {
