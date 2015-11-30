@@ -862,7 +862,7 @@ module Mareframe {
             private showValues() {
                 var elmt: Element =  $("#detailsDialog").data("element");
                 console.log("Data: " + elmt.getData());
-                console.log("Values: " + Tools.arrayToString(elmt.getValues()));
+                console.log("Values: " + elmt.getValues());
                 console.log(elmt.getValues());
                 console.log("size of values: " + math.size(elmt.getValues()));
                 $("#valuesTable_div").html(Tools.htmlTableFromArray("Values", elmt.getValues(), $("#detailsDialog").data("model")));

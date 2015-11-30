@@ -217,43 +217,30 @@
             }
             static getMatrixWithoutHeader(p_matrix: any[][]): any[][] {
                // console.log("get matrix without header from " + p_matrix)
-             //   console.log(p_matrix);
+         //       console.log(p_matrix);
+                p_matrix = Tools.makeSureItsTwoDimensional(p_matrix);
                 var numOfColumns: number;
                 var numOfRows: number;
            //    console.log("size: " + math.size(p_matrix));
-                if (math.size(p_matrix).length > 1) {
                     numOfColumns = math.size(p_matrix)[1];
                     numOfRows = math.size(p_matrix)[0];
-                }
-                else { //one dimensional
-                    numOfColumns = math.size(p_matrix)[0];
-                    numOfRows = 1;
-                }
+
        // console.log("numOfRows: " + numOfRows + " numOfColumns: " + numOfColumns);
                 var newMatrix = [];
                 //For each row
                 for (var i = 0; i < numOfRows; i++) {
                     //If there is a number in column 2 in this row, this is not a header row         
-                    var secondColumnValue: any;
-                    if (numOfRows === 1) { // One dimensional
-                        secondColumnValue = math.subset(p_matrix, math.index(1));
-                    }
-                    else {
-              //          console.log("get subset " + math.index(i, 1));
-               //         console.log(p_matrix);
-                        secondColumnValue = math.subset(p_matrix, math.index(i, 1));
-                    }
+                    var secondColumnValue = math.subset(p_matrix, math.index(i, 1));
                    // console.log("subset: " + secondColumnValue);
                     if (!(isNaN(secondColumnValue))) {
                         var row = math.squeeze(Tools.getRow(p_matrix, i));
-               //         console.log("row " + i+ ": " + row + " length " + row.length)
+               // console.log("row " + i+ ": " + row + " length " + row.length)
                         var range = math.range(1, row.length)
                         row = math.subset(row, math.index(math.squeeze(range)))
                         if (row.length === undefined) {
                             row = [row];
                         }
-                     
-                            newMatrix.push(row);
+                        newMatrix.push(row);
                        
                       //  console.log("newMatrix: " + newMatrix)
                     }
@@ -543,7 +530,7 @@
              //   console.log("calculate values for " + p_element.getName());
                 var dataHeaders: any[][] = []; //the header rows from data
                 var data: any[][] = element.getData();
-            //    console.log("data: " + data);
+           //     console.log("data: " + data + " size " + math.size(data));
                 for (var i = 0; i < Tools.numOfHeaderRows(data); i++) {
                     var newRow: any[] = [];
                     for (var j = 0; j < data[0].length; j++) {
@@ -551,7 +538,6 @@
                     }
                     dataHeaders.push(newRow);
                 }
-                
               //  console.log("data headers: " + dataHeaders);
                 if (element.getType() !== 1) {//If its a chance or value node
                     var headerRows = []; //Used to add decisions to value matrix
@@ -618,7 +604,7 @@
                                     }
                                 }
                                 if (decRows.length > 0) {
-                                     console.log("creating submatrices for parent");
+                                     //console.log("creating submatrices for parent");
                                     var parentSubMatrices = Tools.createSubMatrices(parentValuesMatrix, undefined, decRows)[0];
                                     var j = 0;
                                     for (var i = 0; i < submatrices.length; i++) {
@@ -706,6 +692,7 @@
                         newValues = headerRows;
                     }
              //       console.log("new values: " +(newValues))
+                    newValues = Tools.makeSureItsTwoDimensional(newValues);
                     p_element.setValues(newValues);
                 } else {//If it is a decision node
                    // console.log("decisions node begin");
@@ -760,7 +747,8 @@
                //     console.log("decisions end");
                     p_element.setValues(values);
                 }
-                //console.log("done calculatint values for " + p_element.getName());
+                console.log("done calculatint values for " + p_element.getName());
+                console.log("values: " + p_element.getValues() + " size " + math.size(p_element.getValues()));
             }
             static isOneDimensional(p_array: any[][]): Boolean {
                 //console.log(p_array.length);

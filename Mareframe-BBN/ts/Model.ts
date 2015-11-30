@@ -287,11 +287,11 @@
                         break;
                     case 1:
                         e.setData([["choice0"], ["choice1"]]);
-                       // e.setValues([["choice0",0], ["choice1",0]]);
+                        e.setValues([["choice0",0], ["choice1",0]]);
                         break;
                     case 2:
                         e.setData([["Value", 0]]);
-                        e.setValues(e.getData());
+                        e.setValues([["Value", 0]]);
                     default:
                         break;
                 }
