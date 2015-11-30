@@ -352,12 +352,6 @@ var Mareframe;
                     }
                 }
             };
-            GUIHandler.prototype.createNewChance = function (p_evt) {
-                var elmt = this.m_model.createNewElement(0);
-                this.addElementToStage(elmt);
-                elmt.update();
-                this.updateMiniTable([elmt]);
-            };
             GUIHandler.prototype.fullscreen = function (p_evt) {
                 var model = this.m_model;
                 this.m_handler.getFileIO().quickSave(model);
@@ -379,6 +373,12 @@ var Mareframe;
                 model.fromJSON(json);
                 this.importStage();
             };
+            GUIHandler.prototype.createNewChance = function (p_evt) {
+                var elmt = this.m_model.createNewElement(0);
+                this.addElementToStage(elmt);
+                elmt.update();
+                this.updateMiniTable([elmt]);
+            };
             GUIHandler.prototype.createNewDec = function (p_evt) {
                 var elmt = this.m_model.createNewElement(1);
                 this.addElementToStage(elmt);
@@ -394,7 +394,7 @@ var Mareframe;
             GUIHandler.prototype.createNewElement = function (p_evt) {
                 var elmt = this.m_model.createNewElement(undefined);
                 this.addElementToStage(elmt);
-                elmt.update();
+                // elmt.update();
                 this.updateMiniTable([elmt]);
             };
             GUIHandler.prototype.deleteSelected = function (p_evt) {

@@ -30,7 +30,7 @@
             getValues(): any[][] {
                 return this.m_values;
             }
-            setValues(p_val: number[][]): void {
+            setValues(p_val: z[][]): void {
                 this.m_values = p_val;
             }
             isUpdated(): boolean {

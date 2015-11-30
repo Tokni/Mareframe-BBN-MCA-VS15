@@ -404,13 +404,7 @@ module Mareframe {
                 this.m_model.setAutoUpdate(cb.currentTarget.checked);
                 console.log("auto update: " + this.m_model.m_autoUpdate);
             }
-            private createNewChance(p_evt: Event) {
 
-                var elmt = this.m_model.createNewElement(0)
-                this.addElementToStage(elmt);
-                elmt.update();
-                this.updateMiniTable([elmt]);
-            }
             private fullscreen(p_evt: Event) {
                 var model: Model = this.m_model;
                 this.m_handler.getFileIO().quickSave(model);
@@ -435,6 +429,14 @@ module Mareframe {
                 model.fromJSON(json);
                 this.importStage();
             }
+
+            private createNewChance(p_evt: Event) {
+
+                var elmt = this.m_model.createNewElement(0)
+                this.addElementToStage(elmt);
+                elmt.update();
+                this.updateMiniTable([elmt]);
+            }
             private createNewDec(p_evt: Event) {
 
                 var elmt = this.m_model.createNewElement(1)
@@ -453,7 +455,7 @@ module Mareframe {
 
                 var elmt = this.m_model.createNewElement(undefined)
                 this.addElementToStage(elmt);
-                elmt.update();
+               // elmt.update();
                 this.updateMiniTable([elmt]);
             }
 
