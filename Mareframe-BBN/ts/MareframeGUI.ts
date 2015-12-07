@@ -529,6 +529,8 @@ module Mareframe {
             }
 
             private populateElmtDetails(p_elmt: Element): void {
+                this.m_unsavedChanges = false;
+                console.log("unsaved changes: " + this.m_unsavedChanges);
                 console.log(p_elmt.getName() + " is updated: " + p_elmt.isUpdated());
                 //console.log(p_elmt)
                 //set dialog title
