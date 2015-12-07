@@ -301,7 +301,7 @@
                     if (added.indexOf(n) === -1) {
                         // console.log(data);
                         var currentColumn = math.flatten(Tools.makeSureItsAnArray(Tools.getColumn(data, n)));
-                        console.log("current column: " + currentColumn + " num: "+ n);
+                        //console.log("current column: " + currentColumn + " num: "+ n);
                         //Add column to new data headers¨
                         if (newDataHeaders.length < 1) {
                             newDataHeaders = Tools.makeSureItsAnArray(Tools.getColumn(data, n));
@@ -316,29 +316,29 @@
                         for (var i = n + 1; i <= columns; i++) {
                             var matchingColumn = true;
                             var columnValues = math.flatten(Tools.makeSureItsAnArray(Tools.getColumn(data, i)));
-                            console.log("checking column " + columnValues);
+                           // console.log("checking column " + columnValues);
                             //For each header value in column
                             for (var j = 0; j < Tools.numOfHeaderRows(data); j++) {
                                 //If the value is does not match the corrisponding value in current column, this is not a matching column
-                                console.log("checking value: " + data[j][i]);
+                               // console.log("checking value: " + data[j][i]);
                                 if (currentColumn[j] !==data[j][i]) {
-                                    console.log(data[j][i] + " does not match " + currentColumn[j])
+                                   // console.log(data[j][i] + " does not match " + currentColumn[j])
                                     matchingColumn = false;
                                     //  But if the value is part of the make-submatrix-element the column might be a matching column
                                     if (p_elmt !== undefined && p_elmt.getID() === data[j][0]) {
-                                        console.log("element is the make-submatrix-element");
+                                        //console.log("element is the make-submatrix-element");
                                         matchingColumn = true;
                                     }
                                 }
                                 //If the element was not found in current column and is not the make-submatrix-element break out of the loop
                                 if (!matchingColumn) {
-                                    console.log("not a matching column");
+                                   // console.log("not a matching column");
                                     break;
                                 }
                             }
                             //If this column is right, add it to the matrix
                             if (matchingColumn) {
-                                 console.log("matching column");
+                               //  console.log("matching column");
                                 added.push(i);
                                 var column = Tools.makeSureItsAnArray(Tools.getColumn(p_matrix, i - 1));
                                 newMatrix = math.concat(newMatrix, column)

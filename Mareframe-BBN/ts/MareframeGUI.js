@@ -1086,6 +1086,7 @@ var Mareframe;
                 //update = true;
             };
             GUIHandler.prototype.addToSelection = function (p_easelElmt) {
+                console.log("selected: " + this.m_selectedItems);
                 if (this.m_selectedItems.indexOf(p_easelElmt) === -1 && p_easelElmt.name.substr(0, 4) === "elmt") {
                     var elmt = this.m_model.getElement(p_easelElmt.name);
                     this.m_selectedItems.push(p_easelElmt);
@@ -1117,6 +1118,48 @@ var Mareframe;
                     }
                     this.m_updateMCAStage = true;
                 }
+                else if (this.m_model.m_bbnMode && this.m_selectedItems.indexOf(p_easelElmt) !== -1 && p_easelElmt.name.substr(0, 4) === "elmt") {
+                    console.log("selected: " + this.m_selectedItems);
+                    console.log("element already selected");
+                    var elmt = this.m_model.getElement(p_easelElmt.name);
+                    var newSelected = [];
+                    this.m_selectedItems.forEach(function (e) {
+                        console.log("checking " + e + " against " + p_easelElmt);
+                        if (e.toString() !== p_easelElmt.toString()) {
+                            console.log("not a match");
+                            newSelected.push(e);
+                        }
+                        else {
+                            console.log("match");
+                        }
+                    });
+                    this.m_selectedItems = newSelected;
+                    console.log("new selected: " + this.m_selectedItems);
+                    var easelElmt = p_easelElmt;
+                    var elmtType = this.m_model.getElement(easelElmt.name).getType();
+                    var shape = easelElmt.getChildAt(0);
+                    shape.graphics.clear().f(this.m_elementColors[elmtType][0]).s(this.m_elementColors[elmtType][1]);
+                    var elmtShapeType = 2;
+                    if (this.m_model.m_bbnMode)
+                        elmtShapeType = elmtType;
+                    switch (elmtShapeType) {
+                        case 0:
+                            //chance
+                            shape.graphics.drawEllipse(0, 0, 150, 30);
+                            break;
+                        case 1:
+                            //decision
+                            shape.graphics.drawRect(0, 0, 150, 30);
+                            break;
+                        case 2:
+                            //Value
+                            shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
+                            break;
+                        default:
+                            break;
+                    }
+                    this.m_updateMCAStage = true;
+                }
             };
             GUIHandler.prototype.setSelection = function (p_easelElmt) {
                 this.clearSelection();
@@ -1129,6 +1172,7 @@ var Mareframe;
                 return this.m_selectedItems;
             };
             GUIHandler.prototype.clearSelection = function () {
+                console.log("clear");
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
                     var easelElmt = this.m_selectedItems[i];
                     if (easelElmt.id != this.m_model.getElement(easelElmt.name).m_decisEaselElmt.id) {
