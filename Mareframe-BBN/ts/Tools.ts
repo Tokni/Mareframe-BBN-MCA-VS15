@@ -613,7 +613,7 @@
                             if (result.length === 0) {//This means there were no decisions that already existed
                                // console.log("there were no decisions that already existed");
                                 for (var i = 0; i < submatrices.length; i++) {
-                                   console.log("multiplying " + submatrices[i] + " size " + math.size(submatrices[i]) + " and " + parentValuesMatrix + " size " + math.size(parentValuesMatrix));
+                                  // console.log("multiplying " + submatrices[i] + " size " + math.size(submatrices[i]) + " and " + parentValuesMatrix + " size " + math.size(parentValuesMatrix));
                                     var newMatrix = Tools.makeSureItsAnArray(math.multiply(submatrices[i], parentValuesMatrix));
                                    // console.log("size of new matrix: " + math.size(newMatrix));
                                     result.push(newMatrix);

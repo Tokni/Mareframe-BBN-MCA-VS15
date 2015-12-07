@@ -12,7 +12,7 @@
             private m_values: number[][] = [];
             private m_updated: boolean = false;
             public m_easelElmt: createjs.Container = new createjs.Container();
-            public m_decisEaselElmt: createjs.Container = new createjs.Container();
+            public m_minitableEaselElmt: createjs.Container = new createjs.Container();
             private m_model: Model;
             private m_decision: number;
 
@@ -21,7 +21,7 @@
                 { this.m_id = p_id; }
                 else { this.m_id = "elmt" + p_id; }
                 if (p_type != undefined) {
-                    this.m_type = p_type;
+                    this.m_type = p_type; 
                 }
                 this.m_model = p_model;
                 this.getChildrenElements = this.getChildrenElements.bind(this);

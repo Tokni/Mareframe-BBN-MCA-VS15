@@ -260,7 +260,7 @@ var Mareframe;
                     // if (elmt.getType() !== 2) {
                     //  console.log(elmt.getName() + " minitable is being updated");
                     var backgroundColors = ["#c6c6c6", "#bfbfe0"];
-                    var decisionCont = elmt.m_decisEaselElmt;
+                    var decisionCont = elmt.m_minitableEaselElmt;
                     decisionCont.removeAllChildren();
                     if (elmt.getValues()[0].length > 2) {
                         var decisTextBox = new createjs.Text("Values is multidimensional", "0.8em trebuchet", "#303030");
@@ -308,7 +308,7 @@ var Mareframe;
                     decisionCont.x = elmt.m_easelElmt.x + 75;
                     decisionCont.y = elmt.m_easelElmt.y - 15;
                     decisionCont.name = elmt.getID();
-                    elmt.m_decisEaselElmt = decisionCont;
+                    elmt.m_minitableEaselElmt = decisionCont;
                     this.m_mcaContainer.addChild(decisionCont);
                     if (elmt.getType() == 2) {
                         decisionCont.visible = false;
@@ -1014,7 +1014,8 @@ var Mareframe;
                 var elmtIdent = p_evt.target.name;
                 var connected = false;
                 //console.log("attempting connection "+elmtIdent);
-                for (var i = 0; i < this.m_selectedItems.length; i++) {
+                console.log("selected length: " + this.m_selectedItems.length);
+                for (var i = 0; i < this.m_selectedItems.length; i += 2) {
                     var e = this.m_selectedItems[i];
                     if (e.name.substr(0, 4) === "elmt" && e.name !== elmtIdent) {
                         var outputElmt = this.m_model.getElement(elmtIdent);
@@ -1092,7 +1093,7 @@ var Mareframe;
                     this.m_selectedItems.push(p_easelElmt);
                     console.log("pushed " + p_easelElmt);
                     if (this.m_model.m_bbnMode) {
-                        this.m_selectedItems.push(elmt.m_decisEaselElmt);
+                        this.m_selectedItems.push(elmt.m_minitableEaselElmt);
                     }
                     var elmtType = elmt.getType();
                     //////console.log(e);
@@ -1160,6 +1161,7 @@ var Mareframe;
                     }
                     this.m_updateMCAStage = true;
                 }
+                console.log("selected: " + this.m_selectedItems);
             };
             GUIHandler.prototype.setSelection = function (p_easelElmt) {
                 this.clearSelection();
@@ -1175,7 +1177,7 @@ var Mareframe;
                 console.log("clear");
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
                     var easelElmt = this.m_selectedItems[i];
-                    if (easelElmt.id != this.m_model.getElement(easelElmt.name).m_decisEaselElmt.id) {
+                    if (easelElmt.id != this.m_model.getElement(easelElmt.name).m_minitableEaselElmt.id) {
                         var elmtType = this.m_model.getElement(easelElmt.name).getType();
                         var shape = easelElmt.getChildAt(0);
                         shape.graphics.clear().f(this.m_elementColors[elmtType][0]).s(this.m_elementColors[elmtType][1]);
