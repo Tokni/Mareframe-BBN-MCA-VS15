@@ -75,7 +75,6 @@ var Mareframe;
                                 if (!confirm("You have unsaved changes. Pressing OK will close the window and discard all changes.")) {
                                     return false;
                                 }
-                                $("#valuesTable_div").show();
                             }
                         }
                     });
@@ -1023,7 +1022,7 @@ var Mareframe;
                             alert("cannot create a cycle");
                         }
                         else if (inputElmt.getType() === 2 && outputElmt.getType() !== 3) {
-                            alert("Value nodes cannot have children");
+                            alert("Value cannot one have super-value children");
                         }
                         else {
                             var c = this.m_model.createNewConnection(inputElmt, outputElmt);
