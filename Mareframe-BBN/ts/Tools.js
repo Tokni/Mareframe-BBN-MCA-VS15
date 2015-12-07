@@ -57,12 +57,16 @@ var Mareframe;
                 }
             }; //borrowed code
             Tools.columnSumsAreValid = function (data, numOfHeaderRows) {
+                console.log("Checking if sum is valid");
                 var sum = 0;
                 for (var i = 1; i < data[data.length - 1].length; i++) {
                     for (var j = numOfHeaderRows; j < data.length; j++) {
                         sum += parseFloat(data[j][i]);
+                        console.log("number: " + parseFloat(data[j][i]));
                     }
-                    if (sum < 0.999 || sum > 1.001) {
+                    console.log("sum: " + sum);
+                    if (sum < 0.9999 || sum > 1.001) {
+                        console.log("invalid");
                         return false;
                     }
                     sum = 0;

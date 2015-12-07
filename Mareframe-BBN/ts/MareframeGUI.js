@@ -622,96 +622,91 @@ var Mareframe;
             ;
             GUIHandler.prototype.addEditFunction = function (p_elmt, p_editorMode) {
                 var originalDesc = p_elmt.getDescription();
+                var originalUserComments = p_elmt.getUserDescription();
                 console.log("ready for editing");
                 var mareframeGUI = this;
-                $(function () {
-                    $("#userDescription_div").dblclick(function () {
-                        $("#submit").show();
-                        var originalValue = $(this).text();
-                        $(this).addClass("editable");
-                        console.log("original value : " + originalValue);
-                        $(this).html("<input type='text' value='" + originalValue + "' />");
-                        $(this).children().first().focus();
-                        $(this).children().first().keypress(function (e) {
-                            if (e.which == 13) {
-                                var newText = $(this).val();
-                                console.log("new text: " + newText);
-                                if (newText.length < 1) {
-                                    newText = originalValue;
-                                }
-                                $(this).parent().text(newText);
-                                if (newText !== originalValue) {
-                                    console.log("unsaved changes");
-                                    mareframeGUI.m_unsavedChanges = true;
-                                }
-                            }
-                            $(this).parent().removeClass("editable");
-                        });
-                        $(this).children().first().blur(function () {
+                // $(function () {
+                $("#userDescription_div").dblclick(function () {
+                    $("#submit").show();
+                    $(this).addClass("editable");
+                    console.log("original value : " + originalUserComments);
+                    $(this).html("<input type='text' value='" + originalUserComments + "' />");
+                    $(this).children().first().focus();
+                    $(this).children().first().keypress(function (e) {
+                        if (e.which == 13) {
                             var newText = $(this).val();
                             console.log("new text: " + newText);
                             if (newText.length < 1) {
-                                newText = originalValue;
+                                $("#userDescription_div").html(originalUserComments);
+                                newText = originalUserComments;
                             }
                             $(this).parent().text(newText);
-                            if (newText !== originalValue) {
+                            if (newText !== originalUserComments) {
+                                console.log("unsaved changes");
                                 mareframeGUI.m_unsavedChanges = true;
                             }
-                            $(this).parent().removeClass("editable");
-                        });
+                            originalUserComments = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                        }
+                        $(this).parent().removeClass("editable");
+                    });
+                    $(this).children().first().blur(function () {
+                        var newText = $(this).val();
+                        console.log("new text: " + newText);
+                        if (newText.length < 1) {
+                            $("#userDescription_div").html(originalUserComments);
+                            newText = originalUserComments;
+                        }
+                        $(this).parent().text(newText);
+                        if (newText !== originalUserComments) {
+                            mareframeGUI.m_unsavedChanges = true;
+                        }
+                        originalUserComments = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                        $(this).parent().removeClass("editable");
                     });
                 });
+                // });
                 if (p_editorMode) {
                     // $(function () {
-                    //var originalValue = $("#description_div").text();
-                    var originalValue = originalDesc;
-                    console.log("original value: " + originalValue);
+                    console.log("original value: " + originalDesc);
                     $("#description_div").dblclick(function () {
                         $("#submit").show();
                         //var originalValue = $(this).text();
                         $(this).addClass("editable");
-                        $(this).html("<input type='text' value='" + originalValue + "' />"); //Prevents the box from becoming emtpy when clicked
+                        $(this).html("<input type='text' value='" + originalDesc + "' />"); //Prevents the box from becoming emtpy when clicked
                         $(this).children().first().focus();
                         $(this).children().first().keypress(function (e) {
                             if (e.which == 13) {
                                 var newText = $(this).val();
                                 $(this).parent().text(newText);
-                                console.log("newtext = " + newText + " length: " + newText.length);
-                                console.log("original text: " + originalValue);
                                 if (newText.length < 1) {
-                                    console.log("new text is empty");
-                                    $("#description_div").html(originalValue);
-                                    newText = originalValue;
-                                    console.log("text in box: " + $("#description_div").text());
+                                    $("#description_div").html(originalDesc);
+                                    newText = originalDesc;
                                 }
-                                else {
-                                    originalValue = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
-                                }
-                                if (newText !== originalValue) {
+                                if (newText !== originalDesc) {
                                     mareframeGUI.m_unsavedChanges = true;
                                 }
+                                originalDesc = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
                             }
                             $(this).parent().removeClass("editable");
                         });
                         $(this).children().first().blur(function () {
                             var newText = $(this).val();
                             console.log("newtext = " + newText + " length: " + newText.length);
-                            console.log("original text: " + originalValue);
+                            console.log("original text: " + originalDesc);
                             if (newText.length < 1) {
-                                $("#description_div").html(originalValue);
-                                newText = originalValue;
-                            }
-                            else {
-                                originalValue = newText;
+                                $("#description_div").html(originalDesc);
+                                newText = originalDesc;
                             }
                             $(this).parent().text(newText);
-                            if (newText !== originalValue) {
+                            if (newText !== originalDesc) {
                                 mareframeGUI.m_unsavedChanges = true;
                             }
+                            originalDesc = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
                             $(this).parent().removeClass("editable");
                         });
                         // });
                     });
+                    //Data table
                     $(function () {
                         $("td").dblclick(function () {
                             $("#submit").show();
@@ -860,6 +855,7 @@ var Mareframe;
                         });
                     }
                 }
+                this.m_unsavedChanges = false;
             };
             GUIHandler.prototype.updateValFnCP = function (p_controlPointX, p_controlPointY, p_flipped_numBool) {
                 //var functionSegments = 10;
@@ -1151,6 +1147,7 @@ var Mareframe;
                             case 2:
                                 //Value
                                 shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
+                                break;
                             default:
                                 break;
                         }

@@ -122,7 +122,7 @@ var Mareframe;
                         }
                     });
                 }
-                console.log("returned: " + decendants);
+                //console.log("returned: " + decendants);
                 return decendants;
             };
             Element.prototype.copyDefArray = function () {

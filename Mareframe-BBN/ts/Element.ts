@@ -123,7 +123,7 @@
                         }
                     });
                 }
-                console.log("returned: " + decendants);
+                //console.log("returned: " + decendants);
                 return decendants;
             }
 
