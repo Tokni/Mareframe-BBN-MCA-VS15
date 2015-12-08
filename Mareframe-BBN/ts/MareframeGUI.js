@@ -161,6 +161,7 @@ var Mareframe;
                 this.m_valueFnStage.addChild(this.m_controlP);
                 createjs.Ticker.addEventListener("tick", this.tick);
                 createjs.Ticker.setFPS(60);
+                //$("#debug").hide();
             }
             GUIHandler.prototype.loadModel = function (p_evt) {
                 ////console.log(this);
@@ -216,6 +217,10 @@ var Mareframe;
             ;
             GUIHandler.prototype.mouseUp = function (p_evt) {
                 //console.log("mouse up");
+                $("#mX").html("X: " + p_evt.stageX);
+                $("#mY").html("Y: " + p_evt.stageY);
+                $("#mAction").html("Action: mousedown");
+                $("#mTarget").html("Target: " + p_evt.target.name);
                 this.m_updateMCAStage = true;
             };
             GUIHandler.prototype.updateElement = function (p_elmt) {
@@ -324,7 +329,7 @@ var Mareframe;
                 this.updateModel();
             };
             GUIHandler.prototype.updateEditorMode = function () {
-                console.log("updating editormode");
+                //console.log("updating editormode");
                 if (this.m_editorMode) {
                     $(".advButton").show();
                     $("#reset").show();
@@ -938,6 +943,10 @@ var Mareframe;
                 ////console.log(this.m_model.getDataMatrix());
             };
             GUIHandler.prototype.mouseDown = function (p_evt) {
+                $("#mX").html("X: " + p_evt.stageX);
+                $("#mY").html("Y: " + p_evt.stageY);
+                $("#mAction").html("Action: mousedown");
+                $("#mTarget").html("Target: " + p_evt.target.name);
                 //////console.log("mouse down at: ("+e.stageX+","+e.stageY+")");
                 this.m_oldX = p_evt.stageX;
                 this.m_oldY = p_evt.stageY;
@@ -945,7 +954,7 @@ var Mareframe;
                 this.m_originalPressY = p_evt.stageY;
                 //////console.log("cnctool options: "+$("#cnctTool").button("option","checked"));
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
-                    var cnctChkbox = document.getElementById("cnctTool");
+                    var cnctChkbox = document.getElementById("cnctTool"); // What the hell no jQuery
                     if (cnctChkbox.checked) {
                         ////console.log("cnctTool enabled");
                         this.connectTo(p_evt);
@@ -963,11 +972,15 @@ var Mareframe;
                 if (!p_evt.nativeEvent.ctrlKey && this.m_selectedItems.indexOf(p_evt.target) === -1) {
                     this.clearSelection();
                 }
-                console.log("adding to selection: " + p_evt.target);
+                //console.log("adding to selection: " + p_evt.target);
                 this.addToSelection(p_evt.target);
             };
             GUIHandler.prototype.pressMove = function (p_evt) {
-                console.log("press move on target " + p_evt.target.name);
+                //console.log("press move on target " + p_evt.target.name);
+                $("#mX").html("X: " + p_evt.stageX);
+                $("#mY").html("Y: " + p_evt.stageY);
+                $("#mAction").html("Action: PressMove");
+                $("#mTarget").html("Target: " + p_evt.target.name);
                 if (p_evt.target.name === "hitarea") {
                     if (p_evt.nativeEvent.ctrlKey) {
                         ////console.log("orig: " + this.m_originalPressX + ", " + this.m_originalPressY + ". curr: " + p_evt.stageX + ", " + p_evt.stageY);
@@ -977,20 +990,28 @@ var Mareframe;
                     }
                     else if (this.m_editorMode) {
                         //console.log("panning");
+                        $("#mAction").html("Action: Panning");
                         this.m_mcaContainer.x += p_evt.stageX - this.m_oldX;
                         this.m_mcaContainer.y += p_evt.stageY - this.m_oldY;
                     }
                 }
                 else if (p_evt.target.name.substr(0, 4) === "elmt") {
-                    for (var i = 0; i < this.m_selectedItems.length; i++) {
-                        var elmt = this.m_selectedItems[i];
-                        elmt.x += p_evt.stageX - this.m_oldX;
-                        elmt.y += p_evt.stageY - this.m_oldY;
-                        console.log("selected elements: " + this.m_selectedItems);
-                        console.log("element: " + elmt.name);
-                        for (var j = 0; j < this.m_model.getElement(elmt.name).getConnections().length; j++) {
-                            var c = this.m_model.getElement(elmt.name).getConnections()[j];
-                            this.updateConnection(c);
+                    var connectTool = $("#cnctTool").prop("checked");
+                    if (connectTool) {
+                        //alert("connecting shit");
+                        $("#mAction").html("connecting shit");
+                    }
+                    else {
+                        for (var i = 0; i < this.m_selectedItems.length; i++) {
+                            var elmt = this.m_selectedItems[i];
+                            elmt.x += p_evt.stageX - this.m_oldX;
+                            elmt.y += p_evt.stageY - this.m_oldY;
+                            //console.log("selected elements: " + this.m_selectedItems);
+                            //        console.log("element: " + elmt.name);
+                            for (var j = 0; j < this.m_model.getElement(elmt.name).getConnections().length; j++) {
+                                var c = this.m_model.getElement(elmt.name).getConnections()[j];
+                                this.updateConnection(c);
+                            }
                         }
                     }
                 }
@@ -1014,7 +1035,7 @@ var Mareframe;
                 var elmtIdent = p_evt.target.name;
                 var connected = false;
                 //console.log("attempting connection "+elmtIdent);
-                console.log("selected length: " + this.m_selectedItems.length);
+                //console.log("selected length: " + this.m_selectedItems.length);
                 for (var i = 0; i < this.m_selectedItems.length; i += 2) {
                     var e = this.m_selectedItems[i];
                     if (e.name.substr(0, 4) === "elmt" && e.name !== elmtIdent) {
@@ -1087,11 +1108,11 @@ var Mareframe;
                 //update = true;
             };
             GUIHandler.prototype.addToSelection = function (p_easelElmt) {
-                console.log("selected: " + this.m_selectedItems);
+                //console.log("selected: " + this.m_selectedItems);
                 if (this.m_selectedItems.indexOf(p_easelElmt) === -1 && p_easelElmt.name.substr(0, 4) === "elmt") {
                     var elmt = this.m_model.getElement(p_easelElmt.name);
                     this.m_selectedItems.push(p_easelElmt);
-                    console.log("pushed " + p_easelElmt);
+                    //console.log("pushed " + p_easelElmt);
                     if (this.m_model.m_bbnMode) {
                         this.m_selectedItems.push(elmt.m_minitableEaselElmt);
                     }

@@ -154,6 +154,7 @@ module Mareframe {
                 this.m_valueFnStage.addChild(this.m_controlP);
                 createjs.Ticker.addEventListener("tick", this.tick);
                 createjs.Ticker.setFPS(60);
+               //$("#debug").hide();
 
             }
             private loadModel(p_evt: Event) {
@@ -218,6 +219,10 @@ module Mareframe {
 
             private mouseUp(p_evt: createjs.MouseEvent) {
                 //console.log("mouse up");
+                $("#mX").html("X: " + p_evt.stageX);
+                $("#mY").html("Y: " + p_evt.stageY);
+                $("#mAction").html("Action: mousedown");
+                $("#mTarget").html("Target: " + p_evt.target.name);
                 this.m_updateMCAStage = true;
             }
 
@@ -349,7 +354,7 @@ module Mareframe {
             }
 
             private updateEditorMode() {
-                console.log("updating editormode");
+                //console.log("updating editormode");
                 if (this.m_editorMode) {
                     $(".advButton").show();
                     $("#reset").show();
@@ -1061,6 +1066,10 @@ module Mareframe {
             }
 
             private mouseDown(p_evt: createjs.MouseEvent): void {
+                $("#mX").html("X: " + p_evt.stageX);
+                $("#mY").html("Y: " + p_evt.stageY);
+                $("#mAction").html("Action: mousedown");
+                $("#mTarget").html("Target: " + p_evt.target.name );
                 //////console.log("mouse down at: ("+e.stageX+","+e.stageY+")");
                 this.m_oldX = p_evt.stageX;
                 this.m_oldY = p_evt.stageY;
@@ -1068,7 +1077,7 @@ module Mareframe {
                 this.m_originalPressY = p_evt.stageY;
                 //////console.log("cnctool options: "+$("#cnctTool").button("option","checked"));
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
-                   var cnctChkbox: HTMLInputElement = <HTMLInputElement>document.getElementById("cnctTool")
+                   var cnctChkbox: HTMLInputElement = <HTMLInputElement>document.getElementById("cnctTool")   // What the hell no jQuery
                     if (cnctChkbox.checked) //check if connect tool is enabled
                     {
                         ////console.log("cnctTool enabled");
@@ -1086,13 +1095,16 @@ module Mareframe {
                 if (!p_evt.nativeEvent.ctrlKey && this.m_selectedItems.indexOf(p_evt.target) === -1) {
                     this.clearSelection();
                 }
-                console.log("adding to selection: " + p_evt.target);
+                //console.log("adding to selection: " + p_evt.target);
                 this.addToSelection(p_evt.target);
             }
 
             private pressMove(p_evt: createjs.MouseEvent): void {
-                console.log("press move on target " + p_evt.target.name);
-
+                //console.log("press move on target " + p_evt.target.name);
+                $("#mX").html("X: " + p_evt.stageX);
+                $("#mY").html("Y: " + p_evt.stageY);
+                $("#mAction").html("Action: PressMove");
+                $("#mTarget").html("Target: " + p_evt.target.name);
                 if (p_evt.target.name === "hitarea") {
                     if (p_evt.nativeEvent.ctrlKey) {
                         ////console.log("orig: " + this.m_originalPressX + ", " + this.m_originalPressY + ". curr: " + p_evt.stageX + ", " + p_evt.stageY);
@@ -1102,22 +1114,30 @@ module Mareframe {
                     } else if (this.m_editorMode){
 
                         //console.log("panning");
+                        $("#mAction").html("Action: Panning");
                         this.m_mcaContainer.x += p_evt.stageX - this.m_oldX;
                         this.m_mcaContainer.y += p_evt.stageY - this.m_oldY;
                     }
                 } else if (p_evt.target.name.substr(0, 4) === "elmt") {
-                    for (var i = 0; i < this.m_selectedItems.length; i++) {
-                        var elmt = this.m_selectedItems[i];
+                    var connectTool = $("#cnctTool").prop("checked");
+                    if (connectTool) {
+                        //alert("connecting shit");
+                        $("#mAction").html("connecting shit");
+                    }
+                    else {
+                        for (var i = 0; i < this.m_selectedItems.length; i++) {
+                            var elmt = this.m_selectedItems[i];
 
-                        elmt.x += p_evt.stageX - this.m_oldX;
-                        elmt.y += p_evt.stageY - this.m_oldY;
+                            elmt.x += p_evt.stageX - this.m_oldX;
+                            elmt.y += p_evt.stageY - this.m_oldY;
 
-                console.log("selected elements: " + this.m_selectedItems);
-                        console.log("element: " + elmt.name);
-                        for (var j = 0; j < this.m_model.getElement(elmt.name).getConnections().length; j++) {
-                            var c = this.m_model.getElement(elmt.name).getConnections()[j];
+                            //console.log("selected elements: " + this.m_selectedItems);
+                            //        console.log("element: " + elmt.name);
+                            for (var j = 0; j < this.m_model.getElement(elmt.name).getConnections().length; j++) {
+                                var c = this.m_model.getElement(elmt.name).getConnections()[j];
 
-                            this.updateConnection(c);
+                                this.updateConnection(c);
+                            }
                         }
                     }
                 }
@@ -1145,13 +1165,14 @@ module Mareframe {
                 var elmtIdent = p_evt.target.name;
                 var connected = false;
                 //console.log("attempting connection "+elmtIdent);
-                console.log("selected length: " + this.m_selectedItems.length);
+                //console.log("selected length: " + this.m_selectedItems.length);
                 for (var i = 0; i < this.m_selectedItems.length; i +=2) {//The reason for only taking every second elemnt is that the others are minitables
                     var e = this.m_selectedItems[i];
                     if (e.name.substr(0, 4) === "elmt" && e.name !== elmtIdent) {
                         var outputElmt: Element = this.m_model.getElement(elmtIdent);
                         var inputElmt: Element = this.m_model.getElement(e.name);
                         if (inputElmt.isAncestorOf(outputElmt)) { //Cannot connect to its ancestor. This would create a cycle
+                            
                             alert("cannot create a cycle");
                         }
                         else if (inputElmt.getType() === 2 && outputElmt.getType() !== 3 ) {
@@ -1226,11 +1247,11 @@ module Mareframe {
 
 
             private addToSelection(p_easelElmt: createjs.Container): void {
-                console.log("selected: " + this.m_selectedItems);
+                //console.log("selected: " + this.m_selectedItems);
                 if (this.m_selectedItems.indexOf(p_easelElmt) === -1 && p_easelElmt.name.substr(0, 4) === "elmt") {
                     var elmt = this.m_model.getElement(p_easelElmt.name)
                     this.m_selectedItems.push(p_easelElmt);
-                    console.log("pushed " + p_easelElmt);
+                    //console.log("pushed " + p_easelElmt);
                     if (this.m_model.m_bbnMode) {
                         this.m_selectedItems.push(elmt.m_minitableEaselElmt);
                     }
