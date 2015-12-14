@@ -381,7 +381,7 @@ var Mareframe;
                     var lowestElement = this.m_mcaSizeY;
                     console.log("hitarea position: " + this.m_mcaContainer.y);
                     this.m_model.getElementArr().forEach(function (e) {
-                        console.log("e y = " + (e.m_easelElmt.y + gui.m_mcaContainer.y) + " and lowestElement: " + lowestElement);
+                        //console.log("e y = " + (e.m_easelElmt.y + gui.m_mcaContainer.y) + " and lowestElement: " + lowestElement);
                         if (e.m_easelElmt.y + gui.m_mcaContainer.y > lowestElement) {
                             lowestElement = gui.m_mcaContainer.y + e.m_easelElmt.y + 30;
                         }
