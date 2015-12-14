@@ -196,9 +196,15 @@ module Mareframe {
             private setSize(p_width: number, p_height: number): void {
                 console.log("setting size");
                 this.m_mcaStageCanvas.height = p_height;
-                this.m_mcaStageCanvas.width = p_width;p_width
+                this.m_mcaStageCanvas.width = p_width;
                 this.m_mcaBackground.scaleY = p_height / this.m_mcaSizeY
-
+                this.m_mcaBackground.scaleX = p_width / this.m_mcaSizeX;
+            }
+            private increaseSize(p_x: number, p_y: number): void {
+                this.m_mcaBackground.scaleY = (this.m_mcaStageCanvas.height + p_y) / this.m_mcaSizeY
+                this.m_mcaBackground.scaleX = (this.m_mcaStageCanvas.width + p_x) / this.m_mcaSizeX;
+                this.m_mcaStageCanvas.height += p_y;
+                this.m_mcaStageCanvas.width += p_x;
             }
 
             private quickLoad() {
@@ -208,7 +214,7 @@ module Mareframe {
             }
 
             importStage(): void {
-                console.log("importing stage");
+                //console.log("importing stage");
                 this.m_mcaContainer.removeAllChildren();
                 //console.log(this);
                 var elmts = this.m_model.getElementArr();
@@ -234,12 +240,13 @@ module Mareframe {
             };
 
             private mouseUp(p_evt: createjs.MouseEvent) {
-                //console.log("mouse up");
+                console.log("mouse up");
                 $("#mX").html("X: " + p_evt.stageX);
                 $("#mY").html("Y: " + p_evt.stageY);
                 $("#mAction").html("Action: mousedown");
                 $("#mTarget").html("Target: " + p_evt.target.name);
                 this.m_updateMCAStage = true;
+
             }
 
             private updateElement(p_elmt: Element) {
@@ -285,7 +292,7 @@ module Mareframe {
             }
                         
             updateMiniTable(p_elmtArr: Element[]) {
-                console.log("updating minitable");
+                //console.log("updating minitable");
                 for (var j = 0; j < p_elmtArr.length; j++) {
                     var elmt = p_elmtArr[j];
                     //console.log(elmt.getName());
@@ -296,12 +303,12 @@ module Mareframe {
 
                         decisionCont.removeAllChildren();
 
-                            if (elmt.getValues()[0].length > 2) {
-                                var decisTextBox: createjs.Text = new createjs.Text("Values is multidimensional", "0.8em trebuchet", "#303030");
-                                decisionCont.addChild(decisTextBox);
-                            }
-                            else {
-                        for (var i = 0; i < elmt.getValues().length; i++) {
+                        if (elmt.getValues()[0].length > 2) {
+                            var decisTextBox: createjs.Text = new createjs.Text("Values is multidimensional", "0.8em trebuchet", "#303030");
+                            decisionCont.addChild(decisTextBox);
+                        }
+                        else {
+                            for (var i = 0; i < elmt.getValues().length; i++) {
 
                                 var backgroundColor: string;
                                 if (elmt.getDecision() == i && elmt.getType() == 1) {
@@ -451,7 +458,7 @@ module Mareframe {
             private fullscreen(p_evt: Event) {
                 var model: Model = this.m_model;
                 this.m_handler.getFileIO().quickSave(model);
-                console.log("in local storage: " +localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
+                //console.log("in local storage: " +localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
 
                 console.log("fullscreen pressed");
                 if (!this.m_fullscreen) {
@@ -463,16 +470,7 @@ module Mareframe {
                 else {
                     console.log("was in fullscreen");
                     $(".row").show();
-                    var gui = this;
-                    var lowestElement: number = this.m_mcaSizeY;
-                    console.log("hitarea position: " + this.m_mcaContainer.y);
-                    this.m_model.getElementArr().forEach(function (e) {
-                        //console.log("e y = " + (e.m_easelElmt.y + gui.m_mcaContainer.y) + " and lowestElement: " + lowestElement);
-                        if (e.m_easelElmt.y + gui.m_mcaContainer.y > lowestElement) {
-                            lowestElement = gui.m_mcaContainer.y + e.m_easelElmt.y + 30;
-                        }
-                    });
-                    this.setSize(this.m_mcaSizeX, lowestElement);
+                    this.updateSize();
                     this.m_fullscreen = false;
                 }
 
@@ -481,6 +479,29 @@ module Mareframe {
                 this.importStage();
             }
 
+            private updateSize(): void {
+                var gui = this;
+                var lowestElement: number = this.m_mcaSizeY;
+                var highestElement: number = $(window).height();
+                console.log("hitarea position: " + this.m_mcaContainer.y);
+                this.m_model.getElementArr().forEach(function (e) {
+                    //console.log("e y = " + (e.m_easelElmt.y + gui.m_mcaContainer.y) + " and lowestElement: " + lowestElement);
+                    if (e.m_easelElmt.y + gui.m_mcaContainer.y > lowestElement) {
+                        lowestElement = gui.m_mcaContainer.y + e.m_easelElmt.y + 30;
+                    }
+                    if (e.m_easelElmt.y + gui.m_mcaContainer.y < highestElement) {
+                        highestElement = e.m_easelElmt.y + gui.m_mcaContainer.y;
+                    }
+                });
+                console.log("highest element: " + highestElement);
+                if (highestElement > 50) {//Move elements up if highest element is too low
+                    var moveDistance = highestElement - 50;
+                    this.m_mcaContainer.y -= moveDistance;
+                    this.m_updateMCAStage = true;
+                    lowestElement -= moveDistance;
+                }
+                this.setSize(this.m_mcaSizeX, lowestElement); //Sets the height to be where the lowest element is
+            }
             private createNewChance(p_evt: Event) {
 
                 var elmt = this.m_model.createNewElement(0)
@@ -1179,12 +1200,15 @@ module Mareframe {
                         this.setSelection(this.m_model.getEaselElementsInBox(this.m_originalPressX, this.m_originalPressY, p_evt.stageX, p_evt.stageY));
                         this.m_selectionBox.graphics.clear().s("rgba(0,0,0,0.7)").setStrokeDash([2, 2], createjs.Ticker.getTime()).drawRect(this.m_originalPressX, this.m_originalPressY, p_evt.stageX - this.m_originalPressX, p_evt.stageY - this.m_originalPressY);
                         this.m_mcaContainer.addChild(this.m_selectionBox)
-                    } else if (this.m_editorMode){
-
-                        //console.log("panning");
-                        $("#mAction").html("Action: Panning");
-                        this.m_mcaContainer.x += p_evt.stageX - this.m_oldX;
-                        this.m_mcaContainer.y += p_evt.stageY - this.m_oldY;
+                    } else if (this.m_editorMode) {
+                        //console.log("elements off screen: " + this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
+                        if (!this.elementOffScreen(undefined, p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
+                            //console.log("panning");
+                            $("#mAction").html("Action: Panning");
+                            this.m_mcaContainer.x += p_evt.stageX - this.m_oldX;
+                            this.m_mcaContainer.y += p_evt.stageY - this.m_oldY;
+                            this.resizeWindow();
+                        }
                     }
                 } else if (p_evt.target.name.substr(0, 4) === "elmt") {
                     var connectTool = $("#cnctTool").prop("checked");
@@ -1193,17 +1217,20 @@ module Mareframe {
                         $("#mAction").html("connecting shit");
                     }
                     else {
-                        for (var i = 0; i < this.m_selectedItems.length; i++) {
-                            var elmt = this.m_selectedItems[i];
+                        if (!this.elementOffScreen(this.m_selectedItems, p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
+                            for (var i = 0; i < this.m_selectedItems.length; i++) {
+                                var elmt = this.m_selectedItems[i];
 
-                            elmt.x += p_evt.stageX - this.m_oldX;
-                            elmt.y += p_evt.stageY - this.m_oldY;
+                                elmt.x += p_evt.stageX - this.m_oldX;
+                                elmt.y += p_evt.stageY - this.m_oldY;
 
-                            //console.log("selected elements: " + this.m_selectedItems);
-                            //        console.log("element: " + elmt.name);
-                            for (var j = 0; j < this.m_model.getElement(elmt.name).getConnections().length; j++) {
-                                var c = this.m_model.getElement(elmt.name).getConnections()[j];
-                                this.updateConnection(c);
+                                //console.log("selected elements: " + this.m_selectedItems);
+                                //        console.log("element: " + elmt.name);
+                                for (var j = 0; j < this.m_model.getElement(elmt.name).getConnections().length; j++) {
+                                    var c = this.m_model.getElement(elmt.name).getConnections()[j];
+                                    this.updateConnection(c);
+                                }
+                                this.resizeWindow();
                             }
                         }
                     }
@@ -1212,7 +1239,66 @@ module Mareframe {
                 this.m_oldY = p_evt.stageY;
                 this.m_updateMCAStage = true;
             }
-
+            private resizeWindow():void {
+                var maxX: number = 0; // Right edge
+                var maxY: number = 0; //Bottom edge
+                var x: number;
+                var y: number;
+                var yEdge: number = 40; //The distance from the position to the bottom edge
+                var xEdge: number = 200; //Distance from the center to the right edge
+                var moveDistance: number = 10; //The distance to move the canvas in each step
+                var gui = this;
+                this.m_model.getElementArr().forEach(function (e) {
+                    x = e.m_easelElmt.x + gui.m_mcaContainer.x;
+                    y = e.m_easelElmt.y + gui.m_mcaContainer.y;
+                    if (x + xEdge > maxX) {
+                        maxX = x + xEdge;
+                    }
+                    if (y + yEdge> maxY) {
+                        maxY = y + yEdge;
+                    }
+                });
+                //console.log("max x: " + maxX + " canvas widht: " + this.m_mcaStageCanvas.width);
+                if (maxX > this.m_mcaStageCanvas.width) {
+                    this.increaseSize(moveDistance, 0);
+                    window.scrollBy(moveDistance, 0);
+                }
+                /*else if (maxX < this.m_mcaStageCanvas.width - 100 && this.m_mcaStageCanvas.width > this.m_mcaSizeX) {
+                    this.increaseSize(-moveDistance, 0);
+                }*/
+                //console.log("max y: " + maxY + " canvas heigth: " + this.m_mcaStageCanvas.height);
+                if (maxY > this.m_mcaStageCanvas.height) {
+                    this.increaseSize(0, moveDistance);
+                    window.scrollBy(0,moveDistance);
+                }
+            }
+            private elementOffScreen(array: any[] ,xMovement: number, yMovement:number): boolean {
+                //console.log("checking if elements are off screen");
+                var gui = this;
+                var elementOffScreen: boolean = false;
+                if (array === undefined) {//This means we have to check all elements
+                    array = [];
+                    this.m_model.getElementArr().forEach(function (e) {
+                        array.push(e.m_easelElmt);
+                        array.push(undefined); //This is needed because this is placeholder for minitables
+                    });
+                }
+                var miniTable: boolean = false;
+                array.forEach(function (e) {
+                    if (!miniTable) {
+                        // console.log("element x: " + (e.x + gui.m_mcaContainer.x));
+                        if (e.x + gui.m_mcaContainer.x - 80 + xMovement < 0) {
+                            //console.log("off screeen");
+                            elementOffScreen = true;
+                        } //console.log("element y: " + (e.y + gui.m_mcaContainer.y - 30 + yMovement));
+                        if (e.y + gui.m_mcaContainer.y - 30 + yMovement < 0) {
+                            elementOffScreen = true;
+                        }
+                    }
+                   miniTable = !miniTable; //every second element is a minitable
+                });
+                return elementOffScreen;
+            }
             private tick(): void {
                 if (this.m_updateMCAStage) {
                     this.m_updateMCAStage = false;

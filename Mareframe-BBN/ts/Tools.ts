@@ -249,7 +249,7 @@
             }
 
             static getValueWithCondition(p_values:any[][],p_rowElmt:any, p_conditionArray): number[] {
-                console.log("getting value " + p_rowElmt + " with condition " + p_conditionArray + " from " + p_values);
+                //console.log("getting value " + p_rowElmt + " with condition " + p_conditionArray + " from " + p_values);
                 var values: number[][] = Tools.makeSureItsTwoDimensional(p_values);
                 // //console.log("values table : \n " + values);
                 var valuesFound = [];
@@ -279,7 +279,7 @@
                         }
                     }
                 }
-                console.log("returned " + valuesFound);
+                //console.log("returned " + valuesFound);
                 return valuesFound;
             }
 
@@ -674,7 +674,7 @@
                     newValues = Tools.makeSureItsTwoDimensional(newValues);
                     p_element.setValues(newValues);
                 } else {//If it is a decision node
-                    console.log("decisions node begin");
+                    //console.log("decisions node begin");
                     element.setValues(Tools.fillEmptySpaces((element.copyDefArray())));
                     var values: any[] = element.getValues();
                     //Number of header rows is equal to number of rows in values minus number of rows in definition
@@ -701,19 +701,19 @@
                                 conditions = [];
                             }
                             conditions.push(values[i][0]);
-                            console.log("conditions: "+conditions);
+                           // console.log("conditions: "+conditions);
                             var value = 0;
                             //For each value node in the model
                             model.getElementArr().forEach(function (elmt) {
                                 if (elmt.getType() === 2) {
-                                console.log("value: " + elmt.getName());
+                                //console.log("value: " + elmt.getName());
                                     //If the node is not updated, update
                                     if (!elmt.isUpdated()) {
                                         elmt.update();
                                     }
                                     //Sum values that meet the conditions
                                     var valueArray = Tools.getValueWithCondition(elmt.getValues(), "Value", conditions);
-                                    console.log("value array: " + valueArray);
+                                    //console.log("value array: " + valueArray);
                                     //If there are several values that meet the condition, use the highest
                                     value += Tools.getHighest(valueArray);
                                 }
