@@ -715,79 +715,106 @@ var Mareframe;
                         // });
                     });
                     //Data table
+                    var editing = false;
                     $(function () {
                         $("td").dblclick(function () {
-                            $("#submit").show();
-                            var originalValue = $(this).text();
-                            console.log("original value : " + originalValue);
-                            $(this).addClass("editable");
-                            $(this).html("<input type='text' value='" + originalValue + "' />");
-                            $(this).children().first().focus();
-                            $(this).children().first().keypress(function (e) {
-                                if (e.which == 13) {
+                            console.log("editing: " + editing);
+                            if (!editing) {
+                                editing = true;
+                                $("#submit").show();
+                                var originalValue = $(this).text();
+                                console.log("original value : " + originalValue);
+                                $(this).addClass("editable");
+                                $(this).html("<input type='text' value='" + originalValue + "' />");
+                                $(this).children().first().focus();
+                                $(this).children().first().keypress(function (e) {
+                                    if (e.which == 13) {
+                                        var newText = $(this).val();
+                                        console.log("new text: " + newText);
+                                        if (isNaN(newText) || newText.length < 1) {
+                                            console.log("value is not a number");
+                                            // alert("Value must be a number");
+                                            //TODO find better solution than alert
+                                            $(this).parent().text(originalValue);
+                                        }
+                                        else {
+                                            $(this).parent().text(newText);
+                                            if (newText !== originalValue) {
+                                                mareframeGUI.m_unsavedChanges = true;
+                                            }
+                                        }
+                                        $(this).parent().removeClass("editable");
+                                        editing = false;
+                                    }
+                                });
+                                $(this).children().first().blur(function () {
                                     var newText = $(this).val();
-                                    console.log("new text: " + newText);
-                                    if (isNaN(newText)) {
-                                        console.log("value is not a number");
-                                        // alert("Value must be a number");
+                                    if (isNaN(newText) || newText.length < 1) {
+                                        //alert("Value must be a number");
+                                        console.log("orignal value: " + originalValue);
                                         //TODO find better solution than alert
                                         $(this).parent().text(originalValue);
                                     }
                                     else {
                                         $(this).parent().text(newText);
+                                        console.log(" new text: " + newText + " originalValue: " + originalValue);
                                         if (newText !== originalValue) {
+                                            mareframeGUI.m_unsavedChanges = true;
+                                        }
+                                        else {
+                                            mareframeGUI.m_unsavedChanges = false;
+                                        }
+                                    }
+                                    $(this).parent().removeClass("editable");
+                                    editing = false;
+                                });
+                            }
+                        });
+                        //TODO Prevent user from editing the top rows. That data should come from the child elements
+                        $("th").dblclick(function () {
+                            console.log("editing: " + editing);
+                            if (!editing) {
+                                editing = true;
+                                $("#submit").show();
+                                var originalText = $(this).text();
+                                $(this).addClass("editable");
+                                $(this).html("<input type='text' value='" + originalText + "' />");
+                                $(this).children().first().focus();
+                                $(this).children().first().keypress(function (e) {
+                                    if (e.which == 13) {
+                                        var newText = $(this).val();
+                                        if (newText.length < 1) {
+                                            //alert("Cell cannot be empty");
+                                            console.log("cell cannot be emtpy");
+                                            $(this).parent().text(originalText);
+                                        }
+                                        else {
+                                            $(this).parent().text(newText);
+                                            if (newText !== originalText) {
+                                                mareframeGUI.m_unsavedChanges = true;
+                                            }
+                                        }
+                                        $(this).parent().removeClass("editable");
+                                        editing = false;
+                                    }
+                                });
+                                $(this).children().first().blur(function () {
+                                    var newText = $(this).val();
+                                    if (newText.length < 1) {
+                                        //alert("Cell cannot be empty");
+                                        console.log("cell cannot be emtpy");
+                                        $(this).parent().text(originalText);
+                                    }
+                                    else {
+                                        $(this).parent().text(newText);
+                                        if (newText !== originalText) {
                                             mareframeGUI.m_unsavedChanges = true;
                                         }
                                     }
                                     $(this).parent().removeClass("editable");
-                                }
-                            });
-                            $(this).children().first().blur(function () {
-                                var newText = $(this).val();
-                                $(this).parent().text(newText);
-                                if (isNaN(newText)) {
-                                    alert("Value must be a number");
-                                    //TODO find better solution than alert
-                                    $(this).parent().text(originalValue);
-                                }
-                                else {
-                                    $(this).parent().text(newText);
-                                    console.log(" new text: " + newText + " originalValue: " + originalValue);
-                                    if (newText !== originalValue) {
-                                        mareframeGUI.m_unsavedChanges = true;
-                                    }
-                                    else {
-                                        mareframeGUI.m_unsavedChanges = false;
-                                    }
-                                }
-                                $(this).parent().removeClass("editable");
-                            });
-                        });
-                        //TODO Prevent user from editing the top rows. That data should come from the child elements
-                        $("th").dblclick(function () {
-                            $("#submit").show();
-                            var originalText = $(this).text();
-                            $(this).addClass("editable");
-                            $(this).html("<input type='text' value='" + originalText + "' />");
-                            $(this).children().first().focus();
-                            $(this).children().first().keypress(function (e) {
-                                if (e.which == 13) {
-                                    var newText = $(this).val();
-                                    $(this).parent().text(newText);
-                                    if (newText !== originalText) {
-                                        mareframeGUI.m_unsavedChanges = true;
-                                    }
-                                    $(this).parent().removeClass("editable");
-                                }
-                            });
-                            $(this).children().first().blur(function () {
-                                var newText = $(this).val();
-                                $(this).parent().text(newText);
-                                if (newText !== originalText) {
-                                    mareframeGUI.m_unsavedChanges = true;
-                                }
-                                $(this).parent().removeClass("editable");
-                            });
+                                    editing = false;
+                                });
+                            }
                         });
                     });
                 }
