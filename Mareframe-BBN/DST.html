@@ -65,7 +65,10 @@
 
         <div style="padding: 1em 1em 0.5em 1.4em; font-size: 0.7em">
             <button class="advButton" id="newDcmt">New Document</button>
-            <div class="LoadFileBtn advButton" id="lodDcmtDiv"><span class="advButton">Open Document</span><input class="advButton upload" type="file" id="lodDcmt" /></div>
+            <div class="LoadFileBtn advButton" id="lodDcmtDiv">
+                <span class="advButton">Open Document</span>
+                <input class="advButton upload" type="file" id="lodDcmt" />
+            </div>
 
             <button class="advButton" id="savDcmt">Save Document</button>
             <button class="advButton" id="resetDcmt">Reset</button>
@@ -89,6 +92,10 @@
         </div>
 
     </div>
+
+    <div id="autoUpdateStatus" class="modeStatus"></div>
+    <div id="modeStatus" class="modeStatus"></div>
+    
     <div id="MCAContainer" style="text-align:center">
 
         <!--MCA Tool canvas-->
@@ -142,6 +149,9 @@
     </div>
     
     <script>
+        function cnctPress() {
+            $this.hide();
+        };
         $("input[type=checkbox]").button();
         $("#valueFn_Linear").button();
         $("#valueFn_Flip").button();
@@ -153,7 +163,7 @@
         $("#newChance").button({ icons: { primary: "ui-icon-plus" } });
         $("#newValue").button({ icons: { primary: "ui-icon-plus" } });
         $("#deleteElmt").button({ icons: { primary: "ui-icon-trash" } });
-        $("#cnctTool").button({ icons: { primary: "ui-icon-link" } });
+        $("#cnctTool").button({ icons: { primary: "ui-icon-link" } }, cnctPress);
         $("#fullscreen").button({ icons: { primary: "ui-icon-zoomin" } });
         $("#editorMode").button({ icons: { primary: "ui-icon-link" } });
         $("#autoUpdate").button({ icons: { primary: "ui-icon-refresh" } });
