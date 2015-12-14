@@ -30,3 +30,9 @@ input[type="checkbox"] + label span {
 .button {
     margin:0;
 }
+
+.modeStatus {
+    text-align: center;
+    font-size: 2em;
+
+}

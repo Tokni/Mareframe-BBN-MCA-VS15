@@ -109,6 +109,7 @@ module Mareframe {
                 this.loadModel = this.loadModel.bind(this);
                 this.clickedDecision = this.clickedDecision.bind(this);
                 this.fullscreen = this.fullscreen.bind(this);
+                this.cnctStatus = this.cnctStatus.bind(this);
 
                 this.m_model = p_model;
                 this.m_mcaBackground.name = "hitarea";
@@ -139,12 +140,14 @@ module Mareframe {
                     $("#saveFile_div").hide();
                 });
                 $("#fullscreen").on("click", this.fullscreen);
+                $("#cnctTool").on("click", this.cnctStatus);
                 this.m_mcaBackground.addEventListener("pressup", this.mouseUp);
 
                 $("#lodDcmt").on("change", this.loadModel);
                 $("#lodDcmt").on("click", function () {
                     this.value = null;
                 });
+
 
                 this.m_mcaStage.addChild(this.m_mcaBackground);
                 this.m_mcaStage.addChild(this.m_mcaContainer);
@@ -154,9 +157,19 @@ module Mareframe {
                 this.m_valueFnStage.addChild(this.m_controlP);
                 createjs.Ticker.addEventListener("tick", this.tick);
                 createjs.Ticker.setFPS(60);
-               //$("#debug").hide();
+                $("#debug").hide();
 
             }
+
+            private cnctStatus(p_evt: Event) {
+                if ($("#cnctTool").prop("checked")) {
+                    $("#modeStatus").html("Connect Mode");
+                }
+                else {
+                    $("#modeStatus").html("Editor Mode");
+                }
+            }
+
             private loadModel(p_evt: Event) {
                 ////console.log(this);
                 ////console.log(this.m_handler);
@@ -401,15 +414,35 @@ module Mareframe {
             }
 
             public setEditorMode = function (cb) {
-                console.log(cb);
+                //console.log(cb);
+                
                 this.m_editorMode = cb.currentTarget.checked;
+                if (this.m_editorMode) {
+                    if ($("#cnctTool").prop("checked")) {
+                        $("#modeStatus").html("Connect Mode");
+                    }
+                    else {
+                        $("#modeStatus").html("Editor Mode");
+                    }
+                }
+                else {
+                    $("#modeStatus").html("");
+                }
+
                 this.updateEditorMode();
                 console.log("editormode: " + this.m_editorMode);
             }
             private setAutoUpdate = function (cb) {
-                console.log(cb);
+                //console.log(cb);
+                
                 this.m_model.setAutoUpdate(cb.currentTarget.checked);
-                console.log("auto update: " + this.m_model.m_autoUpdate);
+                if (cb.currentTarget.checked) {
+                    $("#autoUpdateStatus").html("Updating automatically");
+                }
+                else {
+                    $("#autoUpdateStatus").html("");
+                }
+                //console.log("auto update: " + this.m_model.m_autoUpdate);
             }
 
             private fullscreen(p_evt: Event) {
