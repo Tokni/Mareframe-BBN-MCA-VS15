@@ -16,7 +16,7 @@ var Mareframe;
                 this.m_valueFnSize = 100;
                 this.m_mcaStageCanvas = this.m_mcaStage.canvas;
                 this.m_selectionBox = new createjs.Shape();
-                this.m_mcaSizeX = 800;
+                this.m_mcaSizeX = $(window).width();
                 this.m_mcaSizeY = 480;
                 this.m_mcaContainer = new createjs.Container();
                 this.m_googleColors = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac", "#b77322", "#16d620", "#b91383", "#f4359e", "#9c5935", "#a9c413", "#2a778d", "#668d1c", "#bea413", "#0c5922", "#743411"];
@@ -182,8 +182,11 @@ var Mareframe;
                 this.updateMiniTable(this.m_model.getElementArr());
             };
             GUIHandler.prototype.setSize = function (p_width, p_height) {
+                console.log("setting size");
                 this.m_mcaStageCanvas.height = p_height;
                 this.m_mcaStageCanvas.width = p_width;
+                p_width;
+                this.m_mcaBackground.scaleY = p_height / this.m_mcaSizeY;
             };
             GUIHandler.prototype.quickLoad = function () {
                 console.log("quickLoad");
@@ -374,7 +377,16 @@ var Mareframe;
                 else {
                     console.log("was in fullscreen");
                     $(".row").show();
-                    this.setSize($(window).width(), 500);
+                    var gui = this;
+                    var lowestElement = this.m_mcaSizeY;
+                    console.log("hitarea position: " + this.m_mcaContainer.y);
+                    this.m_model.getElementArr().forEach(function (e) {
+                        console.log("e y = " + (e.m_easelElmt.y + gui.m_mcaContainer.y) + " and lowestElement: " + lowestElement);
+                        if (e.m_easelElmt.y + gui.m_mcaContainer.y > lowestElement) {
+                            lowestElement = gui.m_mcaContainer.y + e.m_easelElmt.y + 30;
+                        }
+                    });
+                    this.setSize(this.m_mcaSizeX, lowestElement);
                     this.m_fullscreen = false;
                 }
                 var json = JSON.parse(localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
@@ -715,7 +727,7 @@ var Mareframe;
                         // });
                     });
                     //Data table
-                    var editing = false;
+                    var editing = false; //this is used to make sure the text does not disapear when double clicking several times
                     $(function () {
                         $("td").dblclick(function () {
                             console.log("editing: " + editing);

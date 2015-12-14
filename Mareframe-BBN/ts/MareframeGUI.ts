@@ -16,7 +16,7 @@ module Mareframe {
             private m_valueFnSize: number = 100;
             private m_mcaStageCanvas: HTMLCanvasElement = <HTMLCanvasElement> this.m_mcaStage.canvas;
             private m_selectionBox: createjs.Shape = new createjs.Shape();
-            private m_mcaSizeX: number = 800;
+            private m_mcaSizeX: number = $(window).width();
             private m_mcaSizeY: number = 480;
             private m_mcaContainer: createjs.Container = new createjs.Container()
             private m_googleColors: string[] = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac", "#b77322", "#16d620", "#b91383", "#f4359e", "#9c5935", "#a9c413", "#2a778d", "#668d1c", "#bea413", "#0c5922", "#743411"];
@@ -112,7 +112,7 @@ module Mareframe {
 
                 this.m_model = p_model;
                 this.m_mcaBackground.name = "hitarea";
-
+                
                 this.updateEditorMode();
                 this.m_mcaBackground.addEventListener("mousedown", this.mouseDown);
 
@@ -181,8 +181,11 @@ module Mareframe {
             }
 
             private setSize(p_width: number, p_height: number): void {
+                console.log("setting size");
                 this.m_mcaStageCanvas.height = p_height;
-                this.m_mcaStageCanvas.width = p_width;
+                this.m_mcaStageCanvas.width = p_width;p_width
+                this.m_mcaBackground.scaleY = p_height / this.m_mcaSizeY
+
             }
 
             private quickLoad() {
@@ -427,8 +430,16 @@ module Mareframe {
                 else {
                     console.log("was in fullscreen");
                     $(".row").show();
-                    this.setSize($(window).width(), 500);
-                    
+                    var gui = this;
+                    var lowestElement: number = this.m_mcaSizeY;
+                    console.log("hitarea position: " + this.m_mcaContainer.y);
+                    this.m_model.getElementArr().forEach(function (e) {
+                        //console.log("e y = " + (e.m_easelElmt.y + gui.m_mcaContainer.y) + " and lowestElement: " + lowestElement);
+                        if (e.m_easelElmt.y + gui.m_mcaContainer.y > lowestElement) {
+                            lowestElement = gui.m_mcaContainer.y + e.m_easelElmt.y + 30;
+                        }
+                    });
+                    this.setSize(this.m_mcaSizeX, lowestElement);
                     this.m_fullscreen = false;
                 }
 
@@ -806,7 +817,7 @@ module Mareframe {
                        // });
                         });
                     //Data table
-                        var editing = false;
+                        var editing = false;//this is used to make sure the text does not disapear when double clicking several times
                         $(function () {
                             $("td").dblclick(function () {
                                 console.log("editing: " + editing);
@@ -1159,7 +1170,6 @@ module Mareframe {
                             //        console.log("element: " + elmt.name);
                             for (var j = 0; j < this.m_model.getElement(elmt.name).getConnections().length; j++) {
                                 var c = this.m_model.getElement(elmt.name).getConnections()[j];
-
                                 this.updateConnection(c);
                             }
                         }
@@ -1195,8 +1205,7 @@ module Mareframe {
                     if (e.name.substr(0, 4) === "elmt" && e.name !== elmtIdent) {
                         var outputElmt: Element = this.m_model.getElement(elmtIdent);
                         var inputElmt: Element = this.m_model.getElement(e.name);
-                        if (inputElmt.isAncestorOf(outputElmt)) { //Cannot connect to its ancestor. This would create a cycle
-                            
+                        if (inputElmt.isAncestorOf(outputElmt)) { //Cannot connect to its ancestor. This would create a cycle    
                             alert("cannot create a cycle");
                         }
                         else if (inputElmt.getType() === 2 && outputElmt.getType() !== 3 ) {
