@@ -2,6 +2,7 @@
     export module DST{
         export class Element {
             private m_data: any[][] = [];
+            private m_dateDim: number[] =[]; 
             private m_id: string = "elmtbroken"
             private m_name: string = "Element";
             private m_description: string = "write description here";
@@ -68,6 +69,37 @@
                 ////console.log(elmt.getName() + " parents: " + parents);
                 return parents;
             }
+
+            isParentOf(p_elmt: Element): boolean {
+                var retBool: boolean = false;
+                
+                for (var e in this.getChildrenElements() ) {
+                    //console.log("Element: " + p_elmt.getID() + "   ChildElement: " + this.getChildrenElements()[e].getID());
+                    if (this.getChildrenElements()[e].getID() == p_elmt.getID()) {
+                        
+                        retBool = true;
+                        break;
+                    }
+                }
+                console.log(" Is Parent Of: " + retBool);
+                return retBool;
+            }
+
+            isChildOf(p_elmt: Element): boolean {
+                var retBool: boolean = false;
+
+                for (var e in this.getParentElements() ) {
+                    //console.log("Element: " + p_elmt.getID() + "   ParentElement: " + this.getParentElements()[e].getID());
+                    if (this.getParentElements()[e].getID() == p_elmt.getID()) {
+                        
+                        retBool = true;
+                        break;
+                    }
+                }
+                console.log(" Is Child Of: " + retBool );
+                return retBool;
+            }
+
 
             getChildrenElements(): Element[] {
                 var children: Element[] = [];
@@ -191,16 +223,6 @@
 
             }
 
-            
-
-
-            
-            
-            
-            
-
-            
-
 	        //returns the different variables (conditions or choices) that belong to the element
             getMainValues(): any[]{
                 //console.log(this.m_data);
@@ -220,10 +242,6 @@
             }
 
             
-
-
-
-
             //MCA TOOL
             getData(p_index?: number, p_secondary?: number): any {
                 if (p_index != undefined) {
@@ -291,6 +309,7 @@
             }
 
             deleteConnection(p_connID: string): boolean {
+
                 var key = 0;
                 this.m_connections.every(function (p_conn: Connection) {
                     if (p_conn.getID() === p_connID)
@@ -300,11 +319,24 @@
                         return true;
                     }
                 });
+                console.log("Key: " + key + "  Lengthm_conn: " + this.m_connections.length) ;
                 if (key >= this.m_connections.length)
                     return false;
                 else {
+                    for (var index in this.m_connections) {
+                        console.log(this.m_name + "  EBefore: " + this.m_connections[index].getID());
+                    }
+
                     this.m_connections.splice(key, 1);
+
+                    console.log("m_conn Length: " + this.m_connections.length);
+                    for (var index in this.m_connections) {
+                        console.log(this.m_name + "  EAfter: " + this.m_connections[index].getID());
+                    }
+                    console.log("Total conections: " + this.m_model.getConnectionArr().length);
                     this.m_model.deleteConnection(p_connID);
+                    console.log("Total conections: " + this.m_model.getConnectionArr().length);
+
                     return true;
                 }
             }
@@ -339,6 +371,20 @@
               //  console.log("data: " + this.m_data);
                 this.m_weightingMethod = p_jsonElmt.elmtWghtMthd;
                 
+            }
+
+            getConnectionFrom(p_elmt: Element): Connection {
+                var retConnection: Connection = null;
+
+                for (var index in this.m_connections) {
+                    if (this.m_connections[index].getOutputElement().m_id == p_elmt.m_id) {
+                        retConnection = this.m_connections[index];
+                        break;
+                    }
+                } 
+
+                return retConnection;
+
             }
         }
     }

@@ -14,7 +14,8 @@ var Mareframe;
                 this.m_modelChanged = true;
                 this.m_dataMatrix = [];
                 this.m_autoUpdate = false;
-                this.m_bbnMode = p_bbnMode;
+                //this.m_bbnMode = p_bbnMode;
+                this.m_bbnMode = true;
                 this.createNewElement = this.createNewElement.bind(this);
                 this.deleteElement = this.deleteElement.bind(this);
                 ////console.log("model loaded")
@@ -336,17 +337,25 @@ var Mareframe;
                 if (key >= this.m_connectionArr.length)
                     return false;
                 else {
+                    console.log("Deleting connection: " + p_connID + "   ----------------");
                     var states = this.m_connectionArr[key].getInputElement().getData().length;
                     var data = this.m_connectionArr[key].getOutputElement().getData();
-                    var splicePos = 1 + Math.floor((data[data.length - 1].length / states));
-                    //console.log(states);
-                    //console.log(splicePos);
-                    for (var row = 0; row < data.length; row++) {
-                        if (data[row].length - 1 > splicePos)
-                            data[row].splice(splicePos);
-                    }
-                    //console.log(data);
-                    //console.log(this.m_connectionArr[key]);
+                    var dataIn = this.m_connectionArr[key].getInputElement().getData();
+                    var removeHeader = this.m_connectionArr[key].getInputElement().getID();
+                    console.log("Remove header: " + removeHeader);
+                    console.log("Original Data Out: " + data);
+                    console.log("Original Data In: " + dataIn);
+                    var dims = [0, 0, 0];
+                    data = DST.Tools.removeHeaderRow(removeHeader, data);
+                    //var splicePos = 1 + Math.floor((data[data.length - 1].length / states));
+                    //console.log("states: " + states);
+                    //console.log("splicepos: " + splicePos);
+                    //for (var row = 0; row < data.length;row++) {
+                    //    if(data[row].length-1 > splicePos)
+                    //        data[row].splice(splicePos);
+                    //}
+                    //console.log("New data: " + data);
+                    //console.log("ConnectionArr: " + this.m_connectionArr[key]);
                     this.m_connectionArr[key].getOutputElement().setData(data);
                     this.m_connectionArr.splice(key, 1);
                     //console.log(this.m_elementArr);

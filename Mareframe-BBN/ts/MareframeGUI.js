@@ -54,15 +54,32 @@ var Mareframe;
                     }
                 };
                 this.setEditorMode = function (cb) {
-                    console.log(cb);
+                    //console.log(cb);
                     this.m_editorMode = cb.currentTarget.checked;
+                    if (this.m_editorMode) {
+                        if ($("#cnctTool").prop("checked")) {
+                            $("#modeStatus").html("Connect Mode");
+                        }
+                        else {
+                            $("#modeStatus").html("Editor Mode");
+                        }
+                    }
+                    else {
+                        $("#modeStatus").html("");
+                    }
                     this.updateEditorMode();
                     console.log("editormode: " + this.m_editorMode);
                 };
                 this.setAutoUpdate = function (cb) {
-                    console.log(cb);
+                    //console.log(cb);
                     this.m_model.setAutoUpdate(cb.currentTarget.checked);
-                    console.log("auto update: " + this.m_model.m_autoUpdate);
+                    if (cb.currentTarget.checked) {
+                        $("#autoUpdateStatus").html("Updating automatically");
+                    }
+                    else {
+                        $("#autoUpdateStatus").html("");
+                    }
+                    //console.log("auto update: " + this.m_model.m_autoUpdate);
                 };
                 this.m_handler = p_handler;
                 this.saveChanges = this.saveChanges.bind(this);
@@ -121,10 +138,12 @@ var Mareframe;
                 this.loadModel = this.loadModel.bind(this);
                 this.clickedDecision = this.clickedDecision.bind(this);
                 this.fullscreen = this.fullscreen.bind(this);
+                this.cnctStatus = this.cnctStatus.bind(this);
                 this.m_model = p_model;
                 this.m_mcaBackground.name = "hitarea";
                 this.updateEditorMode();
                 this.m_mcaBackground.addEventListener("mousedown", this.mouseDown);
+                //this.m_mcaBackground.addEventListener("stagemouseup", this.mouseUp);
                 this.m_controlP.graphics.f("#0615b4").s("#2045ff").rr(0, 0, 6, 6, 2);
                 this.m_valFnBackground.addEventListener("pressmove", this.moveValFnCP);
                 this.m_valFnBackground.addEventListener("mousedown", this.downValFnCP);
@@ -148,6 +167,7 @@ var Mareframe;
                     $("#saveFile_div").hide();
                 });
                 $("#fullscreen").on("click", this.fullscreen);
+                $("#cnctTool").on("click", this.cnctStatus);
                 this.m_mcaBackground.addEventListener("pressup", this.mouseUp);
                 $("#lodDcmt").on("change", this.loadModel);
                 $("#lodDcmt").on("click", function () {
@@ -163,6 +183,14 @@ var Mareframe;
                 createjs.Ticker.setFPS(60);
                 //$("#debug").hide();
             }
+            GUIHandler.prototype.cnctStatus = function (p_evt) {
+                if ($("#cnctTool").prop("checked")) {
+                    $("#modeStatus").html("Connect Mode");
+                }
+                else {
+                    $("#modeStatus").html("Editor Mode");
+                }
+            };
             GUIHandler.prototype.loadModel = function (p_evt) {
                 ////console.log(this);
                 ////console.log(this.m_handler);
@@ -219,9 +247,15 @@ var Mareframe;
                 //console.log("mouse up");
                 $("#mX").html("X: " + p_evt.stageX);
                 $("#mY").html("Y: " + p_evt.stageY);
-                $("#mAction").html("Action: mousedown");
+                $("#mAction").html("Action: mouseUp");
                 $("#mTarget").html("Target: " + p_evt.target.name);
+                //var tmp: any = this.m_mcaContainer.getObjectUnderPoint(p_evt.stageX, p_evt.stageY, 0).name;
+                //$("#mTarget").html("Target: " + tmp );
                 this.m_updateMCAStage = true;
+            };
+            GUIHandler.prototype.mouseMove = function (p_evt) {
+                if ($("cnctTool").prop("checked")) {
+                }
             };
             GUIHandler.prototype.updateElement = function (p_elmt) {
                 p_elmt.m_easelElmt.removeAllChildren();
@@ -409,8 +443,12 @@ var Mareframe;
                 console.log("deleting");
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
                     var elmt = this.m_model.getElement(this.m_selectedItems[i].name);
+                    //for (var index in elmt.getConnections()) {
+                    //    console.log(elmt.getName() + "  Before: " + elmt.getConnections()[index].getID());
+                    //}
                     if (this.addToTrash(elmt)) {
                         ////console.log(this.m_trashBin);
+                        //alert("begin delete connections from " + elmt.getName() );
                         for (var j = 0; j < elmt.getConnections().length; j++) {
                             var conn = elmt.getConnections()[j];
                             if (conn.getOutputElement().getID() === elmt.getID()) {
@@ -426,8 +464,14 @@ var Mareframe;
                 for (var i = 0; i < this.m_trashBin.length; i++) {
                     this.m_model.deleteElement(this.m_trashBin[i].getID());
                 }
+                //alert("before update");
+                //this.m_mcaStage.update();
+                //alert("after update");
+                this.m_updateMCAStage = true;
+                //console.log(this.m_model.getConnectionArr());
+                //console.log(this.m_model.getElementArr());
                 this.importStage();
-                ////console.log(this.m_model.getConnectionArr());
+                //console.log("deleting done");
             };
             GUIHandler.prototype.addToTrash = function (p_obj) {
                 ////console.log(this.m_trashBin.indexOf(p_obj));
@@ -974,6 +1018,16 @@ var Mareframe;
                 $("#mY").html("Y: " + p_evt.stageY);
                 $("#mAction").html("Action: mousedown");
                 $("#mTarget").html("Target: " + p_evt.target.name);
+                if (p_evt.target.name.substr(0, 4) === "elmt") {
+                    var elmt = this.m_model.getElement(p_evt.target.name);
+                    console.log("");
+                    console.log("*********************");
+                    for (var i in elmt.getConnections()) {
+                        console.log(elmt.getName() + "  " + elmt.getConnections()[i].getID());
+                    }
+                    console.log("Data: " + elmt.getData());
+                    console.log("Values: " + elmt.getValues());
+                }
                 //////console.log("mouse down at: ("+e.stageX+","+e.stageY+")");
                 this.m_oldX = p_evt.stageX;
                 this.m_oldY = p_evt.stageY;
@@ -984,7 +1038,12 @@ var Mareframe;
                     var cnctChkbox = document.getElementById("cnctTool"); // What the hell no jQuery
                     if (cnctChkbox.checked) {
                         ////console.log("cnctTool enabled");
-                        this.connectTo(p_evt);
+                        if (!this.connectionExist(p_evt)) {
+                            this.connectTo(p_evt);
+                        }
+                        else {
+                            this.disconnectFrom(p_evt);
+                        }
                     }
                     else {
                         this.select(p_evt);
@@ -1026,7 +1085,7 @@ var Mareframe;
                     var connectTool = $("#cnctTool").prop("checked");
                     if (connectTool) {
                         //alert("connecting shit");
-                        $("#mAction").html("connecting shit");
+                        $("#mAction").html("connecting");
                     }
                     else {
                         for (var i = 0; i < this.m_selectedItems.length; i++) {
@@ -1058,6 +1117,17 @@ var Mareframe;
                 this.m_mcaContainer.removeAllChildren();
                 this.m_updateMCAStage = true;
             };
+            GUIHandler.prototype.disconnectFrom = function (p_evt) {
+            };
+            GUIHandler.prototype.connectionExist = function (p_evt) {
+                for (var i = 0; i < this.m_selectedItems.length; i += 2) {
+                    var e = this.m_selectedItems[i];
+                    var first = this.m_model.getElement(e.name);
+                    first.isChildOf(this.m_model.getElement(p_evt.target.name));
+                    first.isParentOf(this.m_model.getElement(p_evt.target.name));
+                }
+                return false;
+            };
             GUIHandler.prototype.connectTo = function (p_evt) {
                 var elmtIdent = p_evt.target.name;
                 var connected = false;
@@ -1069,7 +1139,47 @@ var Mareframe;
                         var outputElmt = this.m_model.getElement(elmtIdent);
                         var inputElmt = this.m_model.getElement(e.name);
                         if (inputElmt.isAncestorOf(outputElmt)) {
-                            alert("cannot create a cycle");
+                            if (inputElmt.isChildOf(outputElmt)) {
+                                //alert("Parent");
+                                var conn = outputElmt.getConnectionFrom(inputElmt);
+                                console.log("deleting connection: " + conn.getID() + "  From: " + outputElmt.getName() + "  To: " + inputElmt.getName());
+                                //for (var index in outputElmt.getConnections()) {
+                                //    console.log(outputElmt.getName() + "  Before: " + outputElmt.getConnections()[index].getID());
+                                //}
+                                //for (var index in inputElmt.getConnections()) {
+                                //    console.log(inputElmt.getName() + "  Before: " + inputElmt.getConnections()[index].getID());
+                                //}
+                                //this.m_model.deleteConnection( inputElmt.getConnectionFrom(outputElmt).getID() );
+                                //this.m_model.deleteConnection(conn.getID());
+                                //outputElmt.deleteConnection(inputElmt.getConnectionFrom(outputElmt).getID());
+                                console.log("connection from " + outputElmt.getName() + " to " + inputElmt.getName() + " named " + inputElmt.getConnectionFrom(outputElmt));
+                                console.log("connection from " + inputElmt.getName() + " to " + outputElmt.getName() + " named " + outputElmt.getConnectionFrom(inputElmt).getID());
+                                inputElmt.deleteConnection(outputElmt.getConnectionFrom(inputElmt).getID());
+                                outputElmt.deleteConnection(outputElmt.getConnectionFrom(inputElmt).getID());
+                                //for (var index in outputElmt.getConnections()) {
+                                //    console.log(outputElmt.getName() + "  After: " + outputElmt.getConnections()[index].getID());
+                                //}
+                                //for (var index in inputElmt.getConnections()) {
+                                //    console.log(inputElmt.getName() + "  After: " + inputElmt.getConnections()[index].getID());
+                                //}
+                                inputElmt.setUpdated(false);
+                                inputElmt.getAllDescendants().forEach(function (e) {
+                                    e.setUpdated(false);
+                                });
+                                //this.m_mcaContainer.removeChild(conn);
+                                //outputElmt.setUpdated(false);
+                                //outputElmt.getAllDescendants().forEach(function (e) {
+                                //    e.setUpdated(false);
+                                //    this.clear();
+                                //});
+                                //alert("updating");
+                                this.m_model.update();
+                                this.importStage();
+                                this.m_mcaStage.update();
+                            }
+                            else {
+                                alert("cannot create monkey a cycle");
+                            }
                         }
                         else if (inputElmt.getType() === 2 && outputElmt.getType() !== 3) {
                             alert("Value nodes cannot have children");
@@ -1096,6 +1206,8 @@ var Mareframe;
                 if (!connected) {
                     this.select(p_evt);
                 }
+                //this.m_mcaStage.update();
+                //alert("connection is done");
                 //this.select(elmtIdent);
             };
             GUIHandler.prototype.addConnectionToStage = function (p_connection) {
@@ -1138,6 +1250,9 @@ var Mareframe;
                 //console.log("selected: " + this.m_selectedItems);
                 if (this.m_selectedItems.indexOf(p_easelElmt) === -1 && p_easelElmt.name.substr(0, 4) === "elmt") {
                     var elmt = this.m_model.getElement(p_easelElmt.name);
+                    for (var i in elmt.getConnections) {
+                        console.log(elmt.getName() + "  " + elmt.getConnections[i].getID());
+                    }
                     this.m_selectedItems.push(p_easelElmt);
                     //console.log("pushed " + p_easelElmt);
                     if (this.m_model.m_bbnMode) {
@@ -1168,8 +1283,8 @@ var Mareframe;
                     this.m_updateMCAStage = true;
                 }
                 else if (this.m_model.m_bbnMode && this.m_selectedItems.indexOf(p_easelElmt) !== -1 && p_easelElmt.name.substr(0, 4) === "elmt") {
-                    console.log("selected: " + this.m_selectedItems);
-                    console.log("element already selected");
+                    //console.log("selected: " + this.m_selectedItems);
+                    //console.log("element already selected");
                     var elmt = this.m_model.getElement(p_easelElmt.name);
                     var newSelected = [];
                     this.m_selectedItems.forEach(function (e) {
@@ -1209,7 +1324,10 @@ var Mareframe;
                     }
                     this.m_updateMCAStage = true;
                 }
-                console.log("selected: " + this.m_selectedItems);
+                //for (var index in this.m_selectedItems) {
+                //    console.log("selected: " + this.m_selectedItems[index]);
+                //    for (var ind in this.m_selectedItems[index].
+                //}
             };
             GUIHandler.prototype.setSelection = function (p_easelElmt) {
                 this.clearSelection();

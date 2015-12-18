@@ -5,6 +5,7 @@ var Mareframe;
         var Element = (function () {
             function Element(p_id, p_model, p_type) {
                 this.m_data = [];
+                this.m_dateDim = [];
                 this.m_id = "elmtbroken";
                 this.m_name = "Element";
                 this.m_description = "write description here";
@@ -67,6 +68,30 @@ var Mareframe;
                 });
                 ////console.log(elmt.getName() + " parents: " + parents);
                 return parents;
+            };
+            Element.prototype.isParentOf = function (p_elmt) {
+                var retBool = false;
+                for (var e in this.getChildrenElements()) {
+                    //console.log("Element: " + p_elmt.getID() + "   ChildElement: " + this.getChildrenElements()[e].getID());
+                    if (this.getChildrenElements()[e].getID() == p_elmt.getID()) {
+                        retBool = true;
+                        break;
+                    }
+                }
+                console.log(" Is Parent Of: " + retBool);
+                return retBool;
+            };
+            Element.prototype.isChildOf = function (p_elmt) {
+                var retBool = false;
+                for (var e in this.getParentElements()) {
+                    //console.log("Element: " + p_elmt.getID() + "   ParentElement: " + this.getParentElements()[e].getID());
+                    if (this.getParentElements()[e].getID() == p_elmt.getID()) {
+                        retBool = true;
+                        break;
+                    }
+                }
+                console.log(" Is Child Of: " + retBool);
+                return retBool;
             };
             Element.prototype.getChildrenElements = function () {
                 var children = [];
@@ -274,11 +299,21 @@ var Mareframe;
                         return true;
                     }
                 });
+                console.log("Key: " + key + "  Lengthm_conn: " + this.m_connections.length);
                 if (key >= this.m_connections.length)
                     return false;
                 else {
+                    for (var index in this.m_connections) {
+                        console.log(this.m_name + "  EBefore: " + this.m_connections[index].getID());
+                    }
                     this.m_connections.splice(key, 1);
+                    console.log("m_conn Length: " + this.m_connections.length);
+                    for (var index in this.m_connections) {
+                        console.log(this.m_name + "  EAfter: " + this.m_connections[index].getID());
+                    }
+                    console.log("Total conections: " + this.m_model.getConnectionArr().length);
                     this.m_model.deleteConnection(p_connID);
+                    console.log("Total conections: " + this.m_model.getConnectionArr().length);
                     return true;
                 }
             };
@@ -308,6 +343,16 @@ var Mareframe;
                 this.m_data = p_jsonElmt.elmtData;
                 //  console.log("data: " + this.m_data);
                 this.m_weightingMethod = p_jsonElmt.elmtWghtMthd;
+            };
+            Element.prototype.getConnectionFrom = function (p_elmt) {
+                var retConnection = null;
+                for (var index in this.m_connections) {
+                    if (this.m_connections[index].getOutputElement().m_id == p_elmt.m_id) {
+                        retConnection = this.m_connections[index];
+                        break;
+                    }
+                }
+                return retConnection;
             };
             return Element;
         })();
