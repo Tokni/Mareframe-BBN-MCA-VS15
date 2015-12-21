@@ -1369,7 +1369,7 @@ var Mareframe;
                                 this.m_mcaStage.update();
                             }
                             else {
-                                alert("cannot create monkey a cycle");
+                                alert("cannot create a cycle");
                             }
                         }
                         else if (inputElmt.getType() === 2 && outputElmt.getType() !== 3) {

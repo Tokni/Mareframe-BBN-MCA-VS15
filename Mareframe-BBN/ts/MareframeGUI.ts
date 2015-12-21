@@ -1514,7 +1514,7 @@ module Mareframe {
                                 this.m_mcaStage.update();
                                 //alert("done updating");
                             } else {
-                                alert("cannot create monkey a cycle");
+                                alert("cannot create a cycle");
                         }
                         }
                         else if (inputElmt.getType() === 2 && outputElmt.getType() !== 3 ) {//type 3 is reserved for super value nodes (not implemented yet)
@@ -1571,11 +1571,9 @@ module Mareframe {
                 cont.addChild(arrowCont);
                 cont.addChild(conn);
 
-
                 this.m_mcaContainer.addChildAt(cont, 0);
                 p_connection.m_easelElmt = cont;
                 this.m_updateMCAStage = true;
-
             }
 
             private updateConnection(p_connection: Connection): void {
