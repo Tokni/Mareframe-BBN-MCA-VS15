@@ -113,10 +113,13 @@ var Mareframe;
                 }
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 this.allModeltoConsole = this.allModeltoConsole.bind(this);
 =======
                 this.click = this.click.bind(this);
 >>>>>>> 3789d3cf4acb8261c676001f5d9e5e30a96cbe33
+=======
+>>>>>>> parent of 3789d3c... updates in pressmove, mousedown and click
 =======
 >>>>>>> parent of 3789d3c... updates in pressmove, mousedown and click
                 this.pressMove = this.pressMove.bind(this);
