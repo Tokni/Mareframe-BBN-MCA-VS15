@@ -197,7 +197,6 @@
                 localStorage.setItem(p_model.getIdent(), json);
             }
             reset(): any {
-
                 var modelIdent: string = this.m_handler.getActiveModel().getIdent();
                 var jsonMdl: any = JSON.parse(localStorage.getItem(modelIdent));
                 if (jsonMdl) {

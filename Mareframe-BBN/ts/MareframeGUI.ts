@@ -1475,7 +1475,6 @@ module Mareframe {
                             break;
                         default:
                             break;
-
                     }
 
                     this.m_updateMCAStage = true;
@@ -1499,8 +1498,8 @@ module Mareframe {
                 console.log("clear");
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
                     var easelElmt = this.m_selectedItems[i];
-                    if (easelElmt.id != this.m_model.getElement(easelElmt.name).m_minitableEaselElmt.id) {
-                        var elmtType = this.m_model.getElement(easelElmt.name).getType();
+                    if (easelElmt.id != this.m_model.getElement(easelElmt.name).m_minitableEaselElmt.id) {//if this is not the minitable
+                        var elmtType = this.m_model.getElement(easelElmt.name).getType(); 
                         var shape: any = easelElmt.getChildAt(0);
                         shape.graphics.clear().f(this.m_elementColors[elmtType][0]).s(this.m_elementColors[elmtType][1]);
                         var elmtShapeType: number = 2;
@@ -1522,17 +1521,12 @@ module Mareframe {
                                 break;
                             default:
                                 break;
-
                         }
-                    }
-                    
+                    }                    
                 }
                 this.m_selectedItems = [];
                 this.m_updateMCAStage = true;
-            }
-
-            
+            }            
         }
-
     }
 }
