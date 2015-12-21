@@ -156,7 +156,7 @@
                     htmlString += "<tr>";
                     for (var j = 0; j < (data[0].length); j++) {
                         if (j === 0) {
-                            htmlString += "<th>" + data[i][j] + "</th>";
+                            htmlString += "<th><span class='defStateName'></span>" + data[i][j] + "</th>";
                         } else {
                             htmlString += "<td>" + Tools.round((data[i][j])) + "</td>";
                         }

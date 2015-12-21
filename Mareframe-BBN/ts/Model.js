@@ -419,7 +419,7 @@ var Mareframe;
                     var conn = p_jsonObject.connections[i];
                     var inpt = this.getElement(conn.connInput);
                     var c = this.createNewConnection(inpt, this.getElement(conn.connOutput));
-                    this.m_counter++;
+                    //this.m_counter++;
                     c.fromJSON(conn);
                     this.addConnection(c);
                 }
@@ -439,6 +439,7 @@ var Mareframe;
             };
             Model.prototype.createNewConnection = function (p_inputElmt, p_outputElmt) {
                 var c = new DST.Connection(p_inputElmt, p_outputElmt, this.m_bbnMode, "conn" + this.m_counter);
+                this.m_counter++;
                 return c;
             };
             Model.prototype.setDecision = function (p_elmtIdent, p_decisNumb) {

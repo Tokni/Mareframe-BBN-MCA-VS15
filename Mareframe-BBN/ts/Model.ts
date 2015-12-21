@@ -484,7 +484,7 @@
                     var conn = p_jsonObject.connections[i];
                     var inpt = this.getElement(conn.connInput);
                     var c = this.createNewConnection(inpt, this.getElement(conn.connOutput));
-                    this.m_counter++;
+                    //this.m_counter++;
                     c.fromJSON(conn);
                     this.addConnection(c);
                 }
@@ -508,6 +508,7 @@
 
             createNewConnection(p_inputElmt: Element, p_outputElmt: Element): Connection {
                 var c = new Connection(p_inputElmt, p_outputElmt, this.m_bbnMode, "conn" + this.m_counter);
+                this.m_counter++;
                 return c;
 
 
