@@ -81,7 +81,7 @@ module Mareframe {
                     $("#model_description").text("This is the Mareframe MCA tool. Data has been loaded into the table on the right. You may doubleclick on each element below, to access the properties panel for that element. If you doubleclick on one of the red or green elements, you may adjust the weights of it's child elements, and thus the data it points to. In the chart at the bottom, you will see the result of the analysis, with the tallest column being the highest scoring one.");
 
                 }
-
+                this.click = this.click.bind(this);
                 this.pressMove = this.pressMove.bind(this);
                 this.mouseDown = this.mouseDown.bind(this);
                 this.dblClick = this.dblClick.bind(this);
@@ -116,6 +116,7 @@ module Mareframe {
 
                 this.updateEditorMode();
                 this.m_mcaBackground.addEventListener("mousedown", this.mouseDown);
+                this.m_mcaBackground.addEventListener("click", this.click);
                 //this.m_mcaBackground.addEventListener("stagemouseup", this.mouseUp);
 
                 this.m_controlP.graphics.f("#0615b4").s("#2045ff").rr(0, 0, 6, 6, 2);
@@ -184,6 +185,7 @@ module Mareframe {
             }
 
             private selectAll(p_evt: Event) {
+                this.clearSelection();
                 for (var i = 0; i < this.m_model.getElementArr().length; i++) {
                     this.addToSelection(this.m_model.getElementArr()[i].m_easelElmt);
                 }
@@ -248,6 +250,55 @@ module Mareframe {
                 $("#mTarget").html("Target: " + p_evt.target.name);
                 //var tmp: any = this.m_mcaContainer.getObjectUnderPoint(p_evt.stageX, p_evt.stageY, 0).name;
                 //$("#mTarget").html("Target: " + tmp );
+                /*if (p_evt.target.name.substr(0, 4) === "elmt") {
+                    var elmt: Element = this.m_model.getElement(p_evt.target.name);
+                    if (this.m_model.m_bbnMode && this.m_selectedItems.indexOf(elmt.m_easelElmt) !== -1 && elmt.m_easelElmt.name.substr(0, 4) === "elmt") {//If element is already selected
+                        //console.log("selected: " + this.m_selectedItems);
+                        //console.log("element already selected");
+                        //var elmt = this.m_model.getElement(p_easelElmt.name);
+
+                        var newSelected: any[] = [];
+                        this.m_selectedItems.forEach(function (e) {
+                            console.log("checking " + e + " against " + elmt.m_easelElmt);
+                            if (e.toString() !== elmt.m_easelElmt.toString()) {
+                                console.log("not a match");
+                                newSelected.push(e);
+                            }
+                            else {
+                                console.log("match");
+                            }
+                        });
+                        this.m_selectedItems = newSelected;
+                        console.log("new selected: " + this.m_selectedItems);
+                        var easelElmt = elmt.m_easelElmt;
+                        var elmtType = this.m_model.getElement(easelElmt.name).getType();
+                        var shape: createjs.Shape = <createjs.Shape>easelElmt.getChildAt(0);
+                        shape.graphics.clear().f(this.m_elementColors[elmtType][0]).s(this.m_elementColors[elmtType][1]);
+                        var elmtShapeType: number = 2;
+                        if (this.m_model.m_bbnMode)
+                            elmtShapeType = elmtType;
+
+                        switch (elmtShapeType) {
+                            case 0:
+                                //chance
+                                shape.graphics.drawEllipse(0, 0, 150, 30);
+                                break;
+                            case 1:
+                                //decision
+                                shape.graphics.drawRect(0, 0, 150, 30);
+                                break;
+                            case 2:
+                                //Value
+                                shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
+                                break;
+                            default:
+                                break;
+                        }
+
+                        this.m_updateMCAStage = true;
+                    }
+                }*/
+
                 this.m_updateMCAStage = true;
 
             }
@@ -419,7 +470,26 @@ module Mareframe {
                     }
                 }
             }
-
+            private click(p_evt: createjs.MouseEvent) {
+                console.log("element clicked");
+                if (p_evt.target.name.substr(0, 4) === "elmt") {
+                    var cnctChkbox: HTMLInputElement = <HTMLInputElement>document.getElementById("cnctTool")   // What the hell no jQuery
+                    if (cnctChkbox.checked) //check if connect tool is enabled
+                    {
+                        ////console.log("cnctTool enabled");
+                        if (!this.connectionExist(p_evt)) {
+                            this.connectTo(p_evt);
+                        }
+                        else {
+                            this.disconnectFrom(p_evt);
+                        }
+                    } else {
+                        this.select(p_evt);
+                    }
+                } else {
+                    this.clearSelection();
+                }
+            }
             private setShowDescription = function (cb) {
                 this.m_showDescription = cb.currentTarget.checked;
                 if (this.m_showDescription) {
@@ -465,14 +535,13 @@ module Mareframe {
             }
 
             private fullscreen(p_evt: Event) {
-                console.log("in local storage: " +localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
+                //console.log("in local storage: " +localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
                 var model: Model = this.m_model;
                // this.m_handler.getFileIO().quickSave(model);
                 //var modelIdent = model.getIdent();
                 var json: string = JSON.stringify(model);
                 sessionStorage.setItem(model.getIdent(), json);
                 
-
                 console.log("fullscreen pressed");
                 if (!this.m_fullscreen) {
                     console.log("was not in fullscreen");
@@ -491,8 +560,7 @@ module Mareframe {
                 //json = JSON.parse(sessionStorage.getItem(modelIdent));
                 model.fromJSON(json);
                 this.importStage();
-                console.log("in local storage: " +localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
-
+                //console.log("in local storage: " +localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
             }
 
             private updateSize(): void {
@@ -609,7 +677,9 @@ module Mareframe {
                 if (this.m_editorMode) {
                     p_elmt.m_easelElmt.addEventListener("pressmove", this.pressMove);
                 }
+                p_elmt.m_easelElmt.addEventListener("click", this.click);
                 p_elmt.m_easelElmt.addEventListener("mousedown", this.mouseDown);
+                p_elmt.m_easelElmt.addEventListener("pressup", this.mouseUp);
                 p_elmt.m_easelElmt.on("dblclick", this.dblClick);
                 p_elmt.m_easelElmt.mouseChildren = false;
                 p_elmt.m_easelElmt.name = p_elmt.getID();
@@ -1183,6 +1253,7 @@ module Mareframe {
             }
 
             private mouseDown(p_evt: createjs.MouseEvent): void {
+                console.log("mouse down");
                 $("#mX").html("X: " + p_evt.stageX);
                 $("#mY").html("Y: " + p_evt.stageY);
                 $("#mAction").html("Action: mousedown");
@@ -1203,7 +1274,7 @@ module Mareframe {
                 this.m_originalPressX = p_evt.stageX;
                 this.m_originalPressY = p_evt.stageY;
                 //////console.log("cnctool options: "+$("#cnctTool").button("option","checked"));
-                if (p_evt.target.name.substr(0, 4) === "elmt") {
+                /*if (p_evt.target.name.substr(0, 4) === "elmt") {
                    var cnctChkbox: HTMLInputElement = <HTMLInputElement>document.getElementById("cnctTool")   // What the hell no jQuery
                     if (cnctChkbox.checked) //check if connect tool is enabled
                     {
@@ -1219,12 +1290,8 @@ module Mareframe {
                     }
                 } else {
                     this.clearSelection();
-                }
+                }*/
             }
-
-            
-            
-
 
             private select(p_evt: createjs.MouseEvent): void {
                 //////console.log("ctrl key: " + e.nativeEvent.ctrlKey);
@@ -1236,7 +1303,7 @@ module Mareframe {
             }
 
             private pressMove(p_evt: createjs.MouseEvent): void {
-                //console.log("press move on target " + p_evt.target.name);
+                console.log("press move on target " + p_evt.target.name);
                 $("#mX").html("X: " + p_evt.stageX);
                 $("#mY").html("Y: " + p_evt.stageY);
                 $("#mAction").html("Action: PressMove");
@@ -1264,21 +1331,35 @@ module Mareframe {
                         $("#mAction").html("connecting");
                     }
                     else {
+
                         if (!this.elementOffScreen(this.m_selectedItems, p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
-                        for (var i = 0; i < this.m_selectedItems.length; i++) {
-                            var elmt = this.m_selectedItems[i];
+                            for (var i = 0; i < this.m_selectedItems.length; i++) {
+                                var elmt1 = this.m_selectedItems[i];
 
-                            elmt.x += p_evt.stageX - this.m_oldX;
-                            elmt.y += p_evt.stageY - this.m_oldY;
+                                elmt1.x += p_evt.stageX - this.m_oldX;
+                                elmt1.y += p_evt.stageY - this.m_oldY;
 
-                            //console.log("selected elements: " + this.m_selectedItems);
-                            //        console.log("element: " + elmt.name);
-                            for (var j = 0; j < this.m_model.getElement(elmt.name).getConnections().length; j++) {
-                                var c = this.m_model.getElement(elmt.name).getConnections()[j];
-                                this.updateConnection(c);
+                                //console.log("selected elements: " + this.m_selectedItems);
+                                //        console.log("element: " + elmt.name);
+                                for (var j = 0; j < this.m_model.getElement(elmt1.name).getConnections().length; j++) {
+                                    var c = this.m_model.getElement(elmt1.name).getConnections()[j];
+                                    this.updateConnection(c);
+                                }
                             }
-                                this.resizeWindow();
+                            if (this.m_selectedItems.indexOf(p_evt.target) == -1) {
+                                //mo
+                                elmt1 = p_evt.target;
+                                elmt1.x += p_evt.stageX - this.m_oldX;
+                                elmt1.y += p_evt.stageY - this.m_oldY;
+                                for (var j = 0; j < this.m_model.getElement(elmt1.name).getConnections().length; j++) {
+                                    var c = this.m_model.getElement(elmt1.name).getConnections()[j];
+                                    this.updateConnection(c);
+                                }
+                                var minitable = this.m_model.getElement(elmt1.name).m_minitableEaselElmt;
+                                minitable.x += p_evt.stageX - this.m_oldX;
+                                minitable.y += p_evt.stageY - this.m_oldY;
                             }
+                            this.resizeWindow();
                         }
                     }
                 }
@@ -1600,7 +1681,7 @@ module Mareframe {
                 //    console.log("selected: " + this.m_selectedItems[index]);
                 //    for (var ind in this.m_selectedItems[index].
                 //}
-                
+             
             }
 
             private setSelection(p_easelElmt: createjs.Container[]): void {
