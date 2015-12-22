@@ -111,7 +111,8 @@ var Mareframe;
                 else {
                     $("#model_description").text("This is the Mareframe MCA tool. Data has been loaded into the table on the right. You may doubleclick on each element below, to access the properties panel for that element. If you doubleclick on one of the red or green elements, you may adjust the weights of it's child elements, and thus the data it points to. In the chart at the bottom, you will see the result of the analysis, with the tallest column being the highest scoring one.");
                 }
-                this.click = this.click.bind(this);
+                this.allModeltoConsole = this.allModeltoConsole.bind(this);
+                //this.click = this.click.bind(this);
                 this.pressMove = this.pressMove.bind(this);
                 this.mouseDown = this.mouseDown.bind(this);
                 this.dblClick = this.dblClick.bind(this);
@@ -144,13 +145,13 @@ var Mareframe;
                 this.m_mcaBackground.name = "hitarea";
                 this.updateEditorMode();
                 this.m_mcaBackground.addEventListener("mousedown", this.mouseDown);
-                this.m_mcaBackground.addEventListener("click", this.click);
                 //this.m_mcaBackground.addEventListener("stagemouseup", this.mouseUp);
                 this.m_controlP.graphics.f("#0615b4").s("#2045ff").rr(0, 0, 6, 6, 2);
                 this.m_valFnBackground.addEventListener("pressmove", this.moveValFnCP);
                 this.m_valFnBackground.addEventListener("mousedown", this.downValFnCP);
                 this.m_mcaBackground.addEventListener("pressmove", this.pressMove);
                 this.m_controlP.mouseChildren = false;
+                $("#debugButton").on("click", this.allModeltoConsole);
                 $("#valueFn_Linear").on("click", this.linearizeValFn);
                 $("#valueFn_Flip").on("click", this.flipValFn);
                 $("#newElmt").on("click", this.createNewElement);
@@ -185,6 +186,16 @@ var Mareframe;
                 createjs.Ticker.setFPS(60);
                 //$("#debug").hide();
             }
+            GUIHandler.prototype.allModeltoConsole = function (p_evt) {
+                console.log("All Model");
+                //console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
+                for (var i = 0; i < this.m_model.getElementArr().length; i++) {
+                    console.log("Element: " + this.m_model.getElementArr()[i].getID());
+                    for (var j = 0; j < this.m_model.getElementArr()[i].getConnections().length; j++) {
+                        console.log("   Conn: " + this.m_model.getElementArr()[i].getConnections()[j].getID());
+                    }
+                }
+            };
             GUIHandler.prototype.cnctStatus = function (p_evt) {
                 if ($("#cnctTool").prop("checked")) {
                     $("#modeStatus").html("Connect Mode");
@@ -203,7 +214,6 @@ var Mareframe;
                 this.m_handler.getFileIO().saveModel(this.m_model);
             };
             GUIHandler.prototype.selectAll = function (p_evt) {
-                this.clearSelection();
                 for (var i = 0; i < this.m_model.getElementArr().length; i++) {
                     this.addToSelection(this.m_model.getElementArr()[i].m_easelElmt);
                 }
@@ -227,8 +237,10 @@ var Mareframe;
             };
             GUIHandler.prototype.quickLoad = function () {
                 console.log("quickLoad");
+                this.clearSelection();
                 this.m_model.fromJSON(this.m_handler.getFileIO().reset());
                 this.importStage();
+                console.log("selected: " + this.m_selectedItems);
             };
             GUIHandler.prototype.importStage = function () {
                 //console.log("importing stage");
@@ -263,54 +275,6 @@ var Mareframe;
                 $("#mTarget").html("Target: " + p_evt.target.name);
                 //var tmp: any = this.m_mcaContainer.getObjectUnderPoint(p_evt.stageX, p_evt.stageY, 0).name;
                 //$("#mTarget").html("Target: " + tmp );
-                /*if (p_evt.target.name.substr(0, 4) === "elmt") {
-                    var elmt: Element = this.m_model.getElement(p_evt.target.name);
-                    if (this.m_model.m_bbnMode && this.m_selectedItems.indexOf(elmt.m_easelElmt) !== -1 && elmt.m_easelElmt.name.substr(0, 4) === "elmt") {//If element is already selected
-                        //console.log("selected: " + this.m_selectedItems);
-                        //console.log("element already selected");
-                        //var elmt = this.m_model.getElement(p_easelElmt.name);
-
-                        var newSelected: any[] = [];
-                        this.m_selectedItems.forEach(function (e) {
-                            console.log("checking " + e + " against " + elmt.m_easelElmt);
-                            if (e.toString() !== elmt.m_easelElmt.toString()) {
-                                console.log("not a match");
-                                newSelected.push(e);
-                            }
-                            else {
-                                console.log("match");
-                            }
-                        });
-                        this.m_selectedItems = newSelected;
-                        console.log("new selected: " + this.m_selectedItems);
-                        var easelElmt = elmt.m_easelElmt;
-                        var elmtType = this.m_model.getElement(easelElmt.name).getType();
-                        var shape: createjs.Shape = <createjs.Shape>easelElmt.getChildAt(0);
-                        shape.graphics.clear().f(this.m_elementColors[elmtType][0]).s(this.m_elementColors[elmtType][1]);
-                        var elmtShapeType: number = 2;
-                        if (this.m_model.m_bbnMode)
-                            elmtShapeType = elmtType;
-
-                        switch (elmtShapeType) {
-                            case 0:
-                                //chance
-                                shape.graphics.drawEllipse(0, 0, 150, 30);
-                                break;
-                            case 1:
-                                //decision
-                                shape.graphics.drawRect(0, 0, 150, 30);
-                                break;
-                            case 2:
-                                //Value
-                                shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
-                                break;
-                            default:
-                                break;
-                        }
-
-                        this.m_updateMCAStage = true;
-                    }
-                }*/
                 this.m_updateMCAStage = true;
             };
             GUIHandler.prototype.mouseMove = function (p_evt) {
@@ -454,29 +418,8 @@ var Mareframe;
                     }
                 }
             };
-            GUIHandler.prototype.click = function (p_evt) {
-                console.log("element clicked");
-                if (p_evt.target.name.substr(0, 4) === "elmt") {
-                    var cnctChkbox = document.getElementById("cnctTool"); // What the hell no jQuery
-                    if (cnctChkbox.checked) {
-                        ////console.log("cnctTool enabled");
-                        if (!this.connectionExist(p_evt)) {
-                            this.connectTo(p_evt);
-                        }
-                        else {
-                            this.disconnectFrom(p_evt);
-                        }
-                    }
-                    else {
-                        this.select(p_evt);
-                    }
-                }
-                else {
-                    this.clearSelection();
-                }
-            };
             GUIHandler.prototype.fullscreen = function (p_evt) {
-                //console.log("in local storage: " +localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
+                console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
                 var model = this.m_model;
                 // this.m_handler.getFileIO().quickSave(model);
                 //var modelIdent = model.getIdent();
@@ -499,7 +442,7 @@ var Mareframe;
                 //json = JSON.parse(sessionStorage.getItem(modelIdent));
                 model.fromJSON(json);
                 this.importStage();
-                //console.log("in local storage: " +localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
+                console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
             };
             GUIHandler.prototype.updateSize = function () {
                 var gui = this;
@@ -603,9 +546,7 @@ var Mareframe;
                 if (this.m_editorMode) {
                     p_elmt.m_easelElmt.addEventListener("pressmove", this.pressMove);
                 }
-                p_elmt.m_easelElmt.addEventListener("click", this.click);
                 p_elmt.m_easelElmt.addEventListener("mousedown", this.mouseDown);
-                p_elmt.m_easelElmt.addEventListener("pressup", this.mouseUp);
                 p_elmt.m_easelElmt.on("dblclick", this.dblClick);
                 p_elmt.m_easelElmt.mouseChildren = false;
                 p_elmt.m_easelElmt.name = p_elmt.getID();
@@ -786,7 +727,7 @@ var Mareframe;
             GUIHandler.prototype.addEditFunction = function (p_elmt, p_editorMode) {
                 var originalDesc = p_elmt.getDescription();
                 var originalUserComments = p_elmt.getUserDescription();
-                console.log("ready for editing");
+                console.log("Element: " + p_elmt.getName() + "ready for editing");
                 var mareframeGUI = this;
                 // $(function () {
                 $("#userDescription_div").dblclick(function () {
@@ -868,6 +809,9 @@ var Mareframe;
                             $(this).parent().removeClass("editable");
                         });
                         // });
+                    });
+                    $(".defStateName").button({
+                        icons: { primary: "ui-icon-minus" }
                     });
                     //Data table
                     var editing = false; //this is used to make sure the text does not disapear when double clicking several times
@@ -1135,7 +1079,7 @@ var Mareframe;
                     console.log("");
                     console.log("*********************");
                     for (var i in elmt.getConnections()) {
-                        console.log(elmt.getName() + "  " + elmt.getConnections()[i].getID());
+                        console.log(elmt.getID() + "  " + elmt.getConnections()[i].getID());
                     }
                     console.log("Data: " + elmt.getData());
                     console.log("Values: " + elmt.getValues());
@@ -1146,23 +1090,24 @@ var Mareframe;
                 this.m_originalPressX = p_evt.stageX;
                 this.m_originalPressY = p_evt.stageY;
                 //////console.log("cnctool options: "+$("#cnctTool").button("option","checked"));
-                /*if (p_evt.target.name.substr(0, 4) === "elmt") {
-                   var cnctChkbox: HTMLInputElement = <HTMLInputElement>document.getElementById("cnctTool")   // What the hell no jQuery
-                    if (cnctChkbox.checked) //check if connect tool is enabled
-                    {
+                if (p_evt.target.name.substr(0, 4) === "elmt") {
+                    var cnctChkbox = document.getElementById("cnctTool"); // What the hell no jQuery
+                    if (cnctChkbox.checked) {
                         ////console.log("cnctTool enabled");
-                        if ( !this.connectionExist(p_evt) ) {
-                        this.connectTo(p_evt);
+                        if (!this.connectionExist(p_evt)) {
+                            this.connectTo(p_evt);
                         }
                         else {
                             this.disconnectFrom(p_evt);
                         }
-                    } else {
+                    }
+                    else {
                         this.select(p_evt);
                     }
-                } else {
+                }
+                else {
                     this.clearSelection();
-                }*/
+                }
             };
             GUIHandler.prototype.select = function (p_evt) {
                 //////console.log("ctrl key: " + e.nativeEvent.ctrlKey);
@@ -1173,7 +1118,7 @@ var Mareframe;
                 this.addToSelection(p_evt.target);
             };
             GUIHandler.prototype.pressMove = function (p_evt) {
-                console.log("press move on target " + p_evt.target.name);
+                //console.log("press move on target " + p_evt.target.name);
                 $("#mX").html("X: " + p_evt.stageX);
                 $("#mY").html("Y: " + p_evt.stageY);
                 $("#mAction").html("Action: PressMove");
@@ -1205,30 +1150,17 @@ var Mareframe;
                     else {
                         if (!this.elementOffScreen(this.m_selectedItems, p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
                             for (var i = 0; i < this.m_selectedItems.length; i++) {
-                                var elmt1 = this.m_selectedItems[i];
-                                elmt1.x += p_evt.stageX - this.m_oldX;
-                                elmt1.y += p_evt.stageY - this.m_oldY;
+                                var elmt = this.m_selectedItems[i];
+                                elmt.x += p_evt.stageX - this.m_oldX;
+                                elmt.y += p_evt.stageY - this.m_oldY;
                                 //console.log("selected elements: " + this.m_selectedItems);
                                 //        console.log("element: " + elmt.name);
-                                for (var j = 0; j < this.m_model.getElement(elmt1.name).getConnections().length; j++) {
-                                    var c = this.m_model.getElement(elmt1.name).getConnections()[j];
+                                for (var j = 0; j < this.m_model.getElement(elmt.name).getConnections().length; j++) {
+                                    var c = this.m_model.getElement(elmt.name).getConnections()[j];
                                     this.updateConnection(c);
                                 }
+                                this.resizeWindow();
                             }
-                            if (this.m_selectedItems.indexOf(p_evt.target) == -1) {
-                                //mo
-                                elmt1 = p_evt.target;
-                                elmt1.x += p_evt.stageX - this.m_oldX;
-                                elmt1.y += p_evt.stageY - this.m_oldY;
-                                for (var j = 0; j < this.m_model.getElement(elmt1.name).getConnections().length; j++) {
-                                    var c = this.m_model.getElement(elmt1.name).getConnections()[j];
-                                    this.updateConnection(c);
-                                }
-                                var minitable = this.m_model.getElement(elmt1.name).m_minitableEaselElmt;
-                                minitable.x += p_evt.stageX - this.m_oldX;
-                                minitable.y += p_evt.stageY - this.m_oldY;
-                            }
-                            this.resizeWindow();
                         }
                     }
                 }
@@ -1311,9 +1243,11 @@ var Mareframe;
             GUIHandler.prototype.disconnectFrom = function (p_evt) {
             };
             GUIHandler.prototype.connectionExist = function (p_evt) {
+                console.log("selected: " + this.m_selectedItems);
                 for (var i = 0; i < this.m_selectedItems.length; i += 2) {
                     var e = this.m_selectedItems[i];
                     var first = this.m_model.getElement(e.name);
+                    console.log("element: " + first);
                     first.isChildOf(this.m_model.getElement(p_evt.target.name));
                     first.isParentOf(this.m_model.getElement(p_evt.target.name));
                 }

@@ -304,10 +304,11 @@
                 return this.m_elementArr[this.getObjectIndex(p_elmtStringId)];
             }
             private getObjectIndex(p_objectStringId: string): number {
-           //  console.log(" get object "  + p_objectStringId);
+             //console.log(" get object "  + p_objectStringId + " in list: "+ this.m_elementArr);
                 var key = 0;
                 if (p_objectStringId.substr(0, 4) === "elmt") {
                     this.m_elementArr.every(function (p_elmt) {
+                        //console.log("comparing with : " + p_elmt.getID());
                         if (p_elmt.getID() === p_objectStringId)
                             return false;
                         else {
@@ -328,6 +329,7 @@
                     console.log(p_objectStringId + " not found");
                     throw DOMException.NOT_FOUND_ERR;
                 }
+                //console.log("returned key: " + key);
                 return key;
             }
 
@@ -484,7 +486,7 @@
                     var conn = p_jsonObject.connections[i];
                     var inpt = this.getElement(conn.connInput);
                     var c = this.createNewConnection(inpt, this.getElement(conn.connOutput));
-                    this.m_counter++;
+                    //this.m_counter++;
                     c.fromJSON(conn);
                     this.addConnection(c);
                 }
@@ -508,6 +510,7 @@
 
             createNewConnection(p_inputElmt: Element, p_outputElmt: Element): Connection {
                 var c = new Connection(p_inputElmt, p_outputElmt, this.m_bbnMode, "conn" + this.m_counter);
+                this.m_counter++;
                 return c;
 
 

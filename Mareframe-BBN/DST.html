@@ -58,6 +58,7 @@
         <p id="mAction"></p>
         <p id="mTarget"></p>
         <p id="mConnect"></p>
+        <button id="debugButton"> Debug </button>
     </div>
     <div class="ui-widget ui-dialog ui-corner-all ui-widget-content header-bar" style="position: static">
         <div class="ui-widget-header ui-corner-all ui-dialog-titlebar" id="modelHeader">Model</div>
@@ -143,6 +144,7 @@
         <div class="editable ">
             <div id="defTable_div"></div>
         </div>
+        <button class="dialogButton" id="addDataRow">Add Data Row</button>
         <button class="dialogButton" id="submit">Submit changes</button>
         <button class="dialogButton" id="values">Show values</button>
         <div id="valuesTable_div"></div>
@@ -152,7 +154,9 @@
         function cnctPress() {
             $this.hide();
         };
+
         $("input[type=checkbox]").button();
+        $("debugButton").button({ icons: { primary: "ui-icon-document" } });
         $("#valueFn_Linear").button();
         $("#valueFn_Flip").button();
         $("#newDcmt").button({ icons: { primary: "ui-icon-document" } });

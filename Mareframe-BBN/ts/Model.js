@@ -261,10 +261,11 @@ var Mareframe;
                 return this.m_elementArr[this.getObjectIndex(p_elmtStringId)];
             };
             Model.prototype.getObjectIndex = function (p_objectStringId) {
-                //  console.log(" get object "  + p_objectStringId);
+                //console.log(" get object "  + p_objectStringId + " in list: "+ this.m_elementArr);
                 var key = 0;
                 if (p_objectStringId.substr(0, 4) === "elmt") {
                     this.m_elementArr.every(function (p_elmt) {
+                        //console.log("comparing with : " + p_elmt.getID());
                         if (p_elmt.getID() === p_objectStringId)
                             return false;
                         else {
@@ -287,6 +288,7 @@ var Mareframe;
                     console.log(p_objectStringId + " not found");
                     throw DOMException.NOT_FOUND_ERR;
                 }
+                //console.log("returned key: " + key);
                 return key;
             };
             Model.prototype.getEaselElementsInBox = function (p_x1, p_y1, p_x2, p_y2) {
@@ -419,7 +421,7 @@ var Mareframe;
                     var conn = p_jsonObject.connections[i];
                     var inpt = this.getElement(conn.connInput);
                     var c = this.createNewConnection(inpt, this.getElement(conn.connOutput));
-                    this.m_counter++;
+                    //this.m_counter++;
                     c.fromJSON(conn);
                     this.addConnection(c);
                 }
@@ -439,6 +441,7 @@ var Mareframe;
             };
             Model.prototype.createNewConnection = function (p_inputElmt, p_outputElmt) {
                 var c = new DST.Connection(p_inputElmt, p_outputElmt, this.m_bbnMode, "conn" + this.m_counter);
+                this.m_counter++;
                 return c;
             };
             Model.prototype.setDecision = function (p_elmtIdent, p_decisNumb) {
