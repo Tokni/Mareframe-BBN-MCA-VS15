@@ -82,13 +82,8 @@ module Mareframe {
 
                 }
 
-
                 this.allModeltoConsole = this.allModeltoConsole.bind(this);
-
                 //this.click = this.click.bind(this);
-
-
-
                 this.pressMove = this.pressMove.bind(this);
                 this.mouseDown = this.mouseDown.bind(this);
                 this.dblClick = this.dblClick.bind(this);
@@ -230,8 +225,10 @@ module Mareframe {
 
             private quickLoad() {
                 console.log("quickLoad");
+                this.clearSelection();
                 this.m_model.fromJSON(this.m_handler.getFileIO().reset());
                 this.importStage();
+                console.log("selected: " + this.m_selectedItems);
             }
 
             importStage(): void {
@@ -1206,6 +1203,7 @@ module Mareframe {
             }
 
             private mouseDown(p_evt: createjs.MouseEvent): void {
+                console.log("mouse down");
                 $("#mX").html("X: " + p_evt.stageX);
                 $("#mY").html("Y: " + p_evt.stageY);
                 $("#mAction").html("Action: mousedown");
@@ -1388,9 +1386,11 @@ module Mareframe {
             }
 
             private connectionExist(p_evt: createjs.MouseEvent): boolean {
+                console.log("selected: " + this.m_selectedItems);
                 for (var i = 0; i < this.m_selectedItems.length; i += 2) {//The reason for only taking every second elemnt is that the others are minitables
                     var e = this.m_selectedItems[i];
                     var first: Element = this.m_model.getElement(e.name);
+                    console.log("element: " + first);
                     first.isChildOf(this.m_model.getElement(p_evt.target.name));
                     first.isParentOf(this.m_model.getElement(p_evt.target.name));
 
@@ -1456,7 +1456,7 @@ module Mareframe {
                                 this.m_mcaStage.update();
                                 //alert("done updating");
                             } else {
-                                alert("cannot create monkey a cycle");
+                                alert("cannot create a cycle");
                         }
                         }
                         else if (inputElmt.getType() === 2 && outputElmt.getType() !== 3 ) {//type 3 is reserved for super value nodes (not implemented yet)
@@ -1513,11 +1513,9 @@ module Mareframe {
                 cont.addChild(arrowCont);
                 cont.addChild(conn);
 
-
                 this.m_mcaContainer.addChildAt(cont, 0);
                 p_connection.m_easelElmt = cont;
                 this.m_updateMCAStage = true;
-
             }
 
             private updateConnection(p_connection: Connection): void {

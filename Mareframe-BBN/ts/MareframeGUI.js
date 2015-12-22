@@ -237,8 +237,10 @@ var Mareframe;
             };
             GUIHandler.prototype.quickLoad = function () {
                 console.log("quickLoad");
+                this.clearSelection();
                 this.m_model.fromJSON(this.m_handler.getFileIO().reset());
                 this.importStage();
+                console.log("selected: " + this.m_selectedItems);
             };
             GUIHandler.prototype.importStage = function () {
                 //console.log("importing stage");
@@ -1067,6 +1069,7 @@ var Mareframe;
                 ////console.log(this.m_model.getDataMatrix());
             };
             GUIHandler.prototype.mouseDown = function (p_evt) {
+                console.log("mouse down");
                 $("#mX").html("X: " + p_evt.stageX);
                 $("#mY").html("Y: " + p_evt.stageY);
                 $("#mAction").html("Action: mousedown");
@@ -1240,9 +1243,11 @@ var Mareframe;
             GUIHandler.prototype.disconnectFrom = function (p_evt) {
             };
             GUIHandler.prototype.connectionExist = function (p_evt) {
+                console.log("selected: " + this.m_selectedItems);
                 for (var i = 0; i < this.m_selectedItems.length; i += 2) {
                     var e = this.m_selectedItems[i];
                     var first = this.m_model.getElement(e.name);
+                    console.log("element: " + first);
                     first.isChildOf(this.m_model.getElement(p_evt.target.name));
                     first.isParentOf(this.m_model.getElement(p_evt.target.name));
                 }
@@ -1298,7 +1303,7 @@ var Mareframe;
                                 this.m_mcaStage.update();
                             }
                             else {
-                                alert("cannot create monkey a cycle");
+                                alert("cannot create a cycle");
                             }
                         }
                         else if (inputElmt.getType() === 2 && outputElmt.getType() !== 3) {
