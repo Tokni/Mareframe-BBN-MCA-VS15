@@ -35,11 +35,19 @@ var Mareframe;
                 console.log("using model: " + loadModel);
                 if (loadModel !== null) {
                     this.m_fileHandler.loadModel(loadModel, this.m_activeModel, this.m_gui.importStage);
+                    this.m_resetModel = JSON.stringify(this.m_activeModel);
+                    console.log("reset model: " + this.m_resetModel);
                 }
                 else {
                     this.m_gui.setEditorMode(true);
                 }
             }
+            Handler.prototype.getResetModel = function () {
+                return this.m_resetModel;
+            };
+            Handler.prototype.setResetModel = function (p_modelString) {
+                this.m_resetModel = p_modelString;
+            };
             Handler.prototype.getGUI = function () {
                 return this.m_gui;
             };

@@ -199,6 +199,7 @@ module Mareframe {
             }
 
             private selectAll(p_evt: Event) {
+                this.clearSelection();
                 for (var i = 0; i < this.m_model.getElementArr().length; i++) {
                     this.addToSelection(this.m_model.getElementArr()[i].m_easelElmt);
                 }
@@ -224,6 +225,9 @@ module Mareframe {
             }
 
             private quickLoad() {
+                this.m_model.fromJSON(this.m_handler.getResetModel());
+                this.importStage();
+                /*
                 console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
                 console.log("quickLoad");
                 this.clearSelection();
@@ -236,7 +240,7 @@ module Mareframe {
                 else {
                     this.m_model.fromJSON(this.m_handler.getFileIO().reset());
                     this.importStage();
-                }
+                }*/
             }
 
             importStage(): void {
@@ -673,6 +677,19 @@ module Mareframe {
                     console.log(p_elmt.getData());
                     $("#defTable_div").html(s);
                     $("#defTable_div").show();
+                    var typeText: string;
+                    if (p_elmt.getType() === 0) {
+                        typeText = "Chance";
+                    }
+                    else if (p_elmt.getType() === 1) {
+                        typeText = "Decision";
+                    }
+                    else if (p_elmt.getType() === 2) {
+                        typeText = "Value";
+                    }
+                    console.log("??????????????????????????????????????????????????????????????");
+                    document.getElementById("info_name").innerHTML = p_elmt.getName();
+                    document.getElementById("info_type").innerHTML = typeText;
                     this.addEditFunction(p_elmt, this.m_editorMode);
                     
                     if (this.m_showDescription) {
@@ -840,6 +857,7 @@ module Mareframe {
                 var originalDesc = p_elmt.getDescription();
                 var originalUserComments = p_elmt.getUserDescription();
                 console.log("Element: " + p_elmt.getName() + "ready for editing");
+                var originalName: string = p_elmt.getName();
                 var mareframeGUI = this;
                // $(function () {
                     $("#userDescription_div").dblclick(function () {
@@ -883,6 +901,44 @@ module Mareframe {
                     });
                // });
                 if (p_editorMode) {
+                $("#info_name").dblclick(function () {
+                    $("#submit").show();
+                    $(this).addClass("editable");
+                    $(this).html("<input type='text' value='" + originalName + "' />");
+                    $(this).children().first().focus();
+                    $(this).children().first().keypress(function (e) {
+                        if (e.which == 13) {
+                            var newText = $(this).val();
+                            console.log("new text: " + newText);
+                            if (newText.length < 1) { //Must not update the text if the new text string is empty
+                                $("#info_name").html(originalName);
+                                newText = originalName;
+                            }
+                            $(this).parent().text(newText);
+                            if (newText !== originalName) {
+                                console.log("unsaved changes");
+                                mareframeGUI.m_unsavedChanges = true;
+                            }
+                            originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                        }
+                        $(this).parent().removeClass("editable");
+                    });
+                    $(this).children().first().blur(function () {
+                        var newText = $(this).val();
+                        console.log("new text: " + newText);
+                        if (newText.length < 1) { //Must not update the text if the new text string is empty
+                            $("#info_name").html(originalName);
+                            newText = originalName;
+                        }
+                        $(this).parent().text(newText);
+                        if (newText !== originalName) {
+                            mareframeGUI.m_unsavedChanges = true;
+                        }
+                        originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                        $(this).parent().removeClass("editable");
+                    });
+
+                });
                    // $(function () {
                         console.log("original value: " + originalDesc);
                         $("#description_div").dblclick(function () {
@@ -987,7 +1043,7 @@ module Mareframe {
                                     editing = true;
                                     $("#submit").show();
                                     var originalText = $(this).text();
-                                    $(this).addClass("editable");
+                                    $(this).addClass("editable"); //htmlString += "<th><span class='defStateName'></span>" + data[i][j] + "</th>";
                                     $(this).html("<input type='text' value='" + originalText + "' />");
                                     $(this).children().first().focus();
                                     $(this).children().first().keypress(function (e) {
@@ -1056,7 +1112,7 @@ module Mareframe {
                 var table = $("#defTable_div");
                 var newTable = [];
                 var newRow = [];
-
+                elmt.setName($("#info_name").text());
                 //console.log(this);
                 table.find("tr").each(function () {
                     $(this).find("th,td").each(function () {
@@ -1109,6 +1165,16 @@ module Mareframe {
                     //console.log(elmt.getData());
                 }
                 this.m_unsavedChanges = false;
+                var s = Tools.htmlTableFromArray("Definition", elmt.getData(), this.m_model);
+                console.log(s);
+                $("#defTable_div").html(s);
+                $(".defStateName").button({
+                    icons: { primary: "ui-icon-minus" }
+                });
+                this.m_updateMCAStage = true;
+                //console.log(this.m_model.getConnectionArr());
+                //console.log(this.m_model.getElementArr());
+                this.importStage();
             }
             
             private updateValFnCP(p_controlPointX: number, p_controlPointY: number, p_flipped_numBool: number): void {
@@ -1491,8 +1557,9 @@ module Mareframe {
                                 outputElmt.getAllDescendants().forEach(function (e) {
                                     e.setUpdated(false);
                                 });
-                                outputElmt.setUpdated(false);
-                                console.log("connection created from " + outputElmt.getID() + " to " + inputElmt.getID());
+                                inputElmt.setUpdated(false);
+                                //console.log("connection created from " + inputElmt.getID() + " to " + outputElmt.getID());
+                                //console.log(inputElmt.getID() + " is updated: " + inputElmt.isUpdated());
                             }
                         }
                     }

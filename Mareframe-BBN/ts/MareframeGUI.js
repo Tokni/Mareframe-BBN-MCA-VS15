@@ -214,6 +214,7 @@ var Mareframe;
                 this.m_handler.getFileIO().saveModel(this.m_model);
             };
             GUIHandler.prototype.selectAll = function (p_evt) {
+                this.clearSelection();
                 for (var i = 0; i < this.m_model.getElementArr().length; i++) {
                     this.addToSelection(this.m_model.getElementArr()[i].m_easelElmt);
                 }
@@ -236,11 +237,14 @@ var Mareframe;
                 this.m_mcaStageCanvas.width += p_x;
             };
             GUIHandler.prototype.quickLoad = function () {
+                this.m_model.fromJSON(this.m_handler.getResetModel());
+                this.importStage();
+                /*
                 console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
                 console.log("quickLoad");
                 this.clearSelection();
                 if (this.m_handler.getFileIO().reset() === null) {
-                    var loadModel = DST.Tools.getUrlParameter('model');
+                    var loadModel: string = Tools.getUrlParameter('model');
                     loadModel = "scotland";
                     console.log("using model: " + loadModel);
                     this.m_handler.getFileIO().loadModel(loadModel, this.m_handler.getActiveModel(), this.importStage);
@@ -248,7 +252,7 @@ var Mareframe;
                 else {
                     this.m_model.fromJSON(this.m_handler.getFileIO().reset());
                     this.importStage();
-                }
+                }*/
             };
             GUIHandler.prototype.importStage = function () {
                 //console.log("importing stage");
@@ -589,6 +593,19 @@ var Mareframe;
                     console.log(p_elmt.getData());
                     $("#defTable_div").html(s);
                     $("#defTable_div").show();
+                    var typeText;
+                    if (p_elmt.getType() === 0) {
+                        typeText = "Chance";
+                    }
+                    else if (p_elmt.getType() === 1) {
+                        typeText = "Decision";
+                    }
+                    else if (p_elmt.getType() === 2) {
+                        typeText = "Value";
+                    }
+                    console.log("??????????????????????????????????????????????????????????????");
+                    document.getElementById("info_name").innerHTML = p_elmt.getName();
+                    document.getElementById("info_type").innerHTML = typeText;
                     this.addEditFunction(p_elmt, this.m_editorMode);
                     if (this.m_showDescription) {
                         //set description
@@ -739,6 +756,7 @@ var Mareframe;
                 var originalDesc = p_elmt.getDescription();
                 var originalUserComments = p_elmt.getUserDescription();
                 console.log("Element: " + p_elmt.getName() + "ready for editing");
+                var originalName = p_elmt.getName();
                 var mareframeGUI = this;
                 // $(function () {
                 $("#userDescription_div").dblclick(function () {
@@ -781,6 +799,43 @@ var Mareframe;
                 });
                 // });
                 if (p_editorMode) {
+                    $("#info_name").dblclick(function () {
+                        $("#submit").show();
+                        $(this).addClass("editable");
+                        $(this).html("<input type='text' value='" + originalName + "' />");
+                        $(this).children().first().focus();
+                        $(this).children().first().keypress(function (e) {
+                            if (e.which == 13) {
+                                var newText = $(this).val();
+                                console.log("new text: " + newText);
+                                if (newText.length < 1) {
+                                    $("#info_name").html(originalName);
+                                    newText = originalName;
+                                }
+                                $(this).parent().text(newText);
+                                if (newText !== originalName) {
+                                    console.log("unsaved changes");
+                                    mareframeGUI.m_unsavedChanges = true;
+                                }
+                                originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                            }
+                            $(this).parent().removeClass("editable");
+                        });
+                        $(this).children().first().blur(function () {
+                            var newText = $(this).val();
+                            console.log("new text: " + newText);
+                            if (newText.length < 1) {
+                                $("#info_name").html(originalName);
+                                newText = originalName;
+                            }
+                            $(this).parent().text(newText);
+                            if (newText !== originalName) {
+                                mareframeGUI.m_unsavedChanges = true;
+                            }
+                            originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                            $(this).parent().removeClass("editable");
+                        });
+                    });
                     // $(function () {
                     console.log("original value: " + originalDesc);
                     $("#description_div").dblclick(function () {
@@ -887,7 +942,7 @@ var Mareframe;
                                 editing = true;
                                 $("#submit").show();
                                 var originalText = $(this).text();
-                                $(this).addClass("editable");
+                                $(this).addClass("editable"); //htmlString += "<th><span class='defStateName'></span>" + data[i][j] + "</th>";
                                 $(this).html("<input type='text' value='" + originalText + "' />");
                                 $(this).children().first().focus();
                                 $(this).children().first().keypress(function (e) {
@@ -954,6 +1009,7 @@ var Mareframe;
                 var table = $("#defTable_div");
                 var newTable = [];
                 var newRow = [];
+                elmt.setName($("#info_name").text());
                 //console.log(this);
                 table.find("tr").each(function () {
                     $(this).find("th,td").each(function () {
@@ -1004,6 +1060,16 @@ var Mareframe;
                     }
                 }
                 this.m_unsavedChanges = false;
+                var s = DST.Tools.htmlTableFromArray("Definition", elmt.getData(), this.m_model);
+                console.log(s);
+                $("#defTable_div").html(s);
+                $(".defStateName").button({
+                    icons: { primary: "ui-icon-minus" }
+                });
+                this.m_updateMCAStage = true;
+                //console.log(this.m_model.getConnectionArr());
+                //console.log(this.m_model.getElementArr());
+                this.importStage();
             };
             GUIHandler.prototype.updateValFnCP = function (p_controlPointX, p_controlPointY, p_flipped_numBool) {
                 //var functionSegments = 10;
@@ -1341,8 +1407,7 @@ var Mareframe;
                                 outputElmt.getAllDescendants().forEach(function (e) {
                                     e.setUpdated(false);
                                 });
-                                outputElmt.setUpdated(false);
-                                console.log("connection created from " + outputElmt.getID() + " to " + inputElmt.getID());
+                                inputElmt.setUpdated(false);
                             }
                         }
                     }

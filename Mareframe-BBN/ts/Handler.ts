@@ -12,6 +12,7 @@ module Mareframe {
             private m_activeModel: Model;
             private m_fileHandler: FileIO;
             private m_gui: GUIHandler;
+            private m_resetModel: String;
             constructor() {
                 var table1conn: any[][] = [
                     ["name1", "Monkey", "Tiger"],
@@ -43,13 +44,18 @@ module Mareframe {
                 console.log("using model: " + loadModel);
                 if (loadModel !== null) {
                     this.m_fileHandler.loadModel(loadModel, this.m_activeModel, this.m_gui.importStage);
-                    
+                    this.m_resetModel = JSON.stringify(this.m_activeModel);
+                    console.log("reset model: " + this.m_resetModel);
                 } else {
                     this.m_gui.setEditorMode(true);
                 }
             }
-            
-
+            getResetModel(): String {
+                return this.m_resetModel;
+            }
+            setResetModel(p_modelString: String): void {
+                this.m_resetModel = p_modelString;
+            }
             getGUI(): GUIHandler {
                 return this.m_gui;
             }

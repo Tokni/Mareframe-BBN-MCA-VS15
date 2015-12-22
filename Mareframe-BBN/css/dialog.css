@@ -40,3 +40,6 @@
 .editableTable .editable input[type=text]{
      
 }
+.info_div {
+    font-weight: bold;
+}
