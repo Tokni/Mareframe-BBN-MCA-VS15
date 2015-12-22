@@ -72,6 +72,7 @@ module Mareframe {
                     this.setEditorMode = this.setEditorMode.bind(this);
                     this.setAutoUpdate = this.setAutoUpdate.bind(this);
                     $("#MCADataTable").hide();
+                    $("#addDataRow").hide();
 
                     $("#model_description").text("This is the Mareframe BBN tool. You may doubleclick on each element below, to access the properties tables for that element.");
                     this.m_mcaStageCanvas.width = $(window).width();
@@ -83,6 +84,7 @@ module Mareframe {
                 }
 
                 this.allModeltoConsole = this.allModeltoConsole.bind(this);
+                this.addDataRowClick = this.addDataRowClick.bind(this);
                 //this.click = this.click.bind(this);
                 this.pressMove = this.pressMove.bind(this);
                 this.mouseDown = this.mouseDown.bind(this);
@@ -145,6 +147,7 @@ module Mareframe {
                 });
                 $("#fullscreen").on("click", this.fullscreen);
                 $("#cnctTool").on("click", this.cnctStatus);
+                $("#addDataRow").on("click", this.addDataRowClick)
                 this.m_mcaBackground.addEventListener("pressup", this.mouseUp);
 
                 $("#lodDcmt").on("change", this.loadModel);
@@ -161,9 +164,50 @@ module Mareframe {
                 this.m_valueFnStage.addChild(this.m_controlP);
                 createjs.Ticker.addEventListener("tick", this.tick);
                 createjs.Ticker.setFPS(60);
-                //$("#debug").hide();
+                $("#debug").hide();
 
             }
+
+            private addDataRowClick(p_evt: Event) {
+                console.log("doing tnifgs");
+                //$("#defTable_div").append("<p> hello </p>");
+                var elmt: Element = $("#detailsDialog").data("element");
+                var oldData: any[][] = [];
+                oldData = elmt.getData();
+                var newData: any[][] = [];
+
+                //newData = oldData;
+                //oldData[0] = elmt.getData(0);
+                //oldData[1] = elmt.getData(1);
+                //console.log("o0" + oldData[0]
+
+                //Tools.makeSureItsAnArray(oldData);
+                //var index = oldData.length;
+                //var newData: any[][] = [];
+                //newData = oldData;
+                console.log("oldDataLenght: " + oldData.length[0]);
+                console.log("oldData: " + oldData);
+                console.log("newData: " + newData);
+                //newData[oldData.length] = [];
+                for (var i = 0; i < oldData.length; i++) {
+                    console.log(i + "  " + oldData[i]);
+                    newData[i] = oldData[i];
+                } 
+                newData[oldData.length] = [];
+                console.log("oldDataLenght: " + oldData.length);
+                newData[oldData.length][0] = "StateName";
+                for (var i = 1; i < oldData[0].length; i++) {
+                    //newData[oldData.length][i] = 0;
+                    newData[oldData.length][i] = 0;
+                    console.log("old.len: " + oldData[0].length + "   i: " + i);
+                }
+
+                console.log("newData: " + newData);
+                elmt.setData(newData);
+
+
+            }
+
 
             private allModeltoConsole(p_evt: Event) {
                 console.log("All Model");
@@ -227,15 +271,22 @@ module Mareframe {
                 console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
                 console.log("quickLoad");
                 this.clearSelection();
-                if (this.m_handler.getFileIO().reset() === null) {
+                if (this.m_handler.getFileIO().reset() === null ) {
                     var loadModel: string = Tools.getUrlParameter('model');
                     loadModel = "scotland";
                     console.log("using model: " + loadModel);
                     this.m_handler.getFileIO().loadModel(loadModel, this.m_handler.getActiveModel(), this.importStage);
                 }
                 else {
+
                     this.m_model.fromJSON(this.m_handler.getFileIO().reset());
                     this.importStage();
+                    if (!this.m_model.getElementArr().length) {
+                        var loadModel: string = Tools.getUrlParameter('model');
+                        loadModel = "scotland";
+                        console.log("using model: " + loadModel);
+                        this.m_handler.getFileIO().loadModel(loadModel, this.m_handler.getActiveModel(), this.importStage);
+                    }
                 }
             }
 
@@ -841,6 +892,7 @@ module Mareframe {
                 var originalUserComments = p_elmt.getUserDescription();
                 console.log("Element: " + p_elmt.getName() + "ready for editing");
                 var mareframeGUI = this;
+                //$("#addDataRow").show();
                // $(function () {
                     $("#userDescription_div").dblclick(function () {
                         $("#submit").show();
@@ -934,6 +986,7 @@ module Mareframe {
                                 if (!editing) {
                                     editing = true;
                                     $("#submit").show();
+                                    
                                     var originalValue = $(this).text();
                                     console.log("original value : " + originalValue);
                                     $(this).addClass("editable");

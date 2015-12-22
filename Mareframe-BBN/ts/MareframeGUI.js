@@ -105,6 +105,7 @@ var Mareframe;
                     this.setEditorMode = this.setEditorMode.bind(this);
                     this.setAutoUpdate = this.setAutoUpdate.bind(this);
                     $("#MCADataTable").hide();
+                    $("#addDataRow").hide();
                     $("#model_description").text("This is the Mareframe BBN tool. You may doubleclick on each element below, to access the properties tables for that element.");
                     this.m_mcaStageCanvas.width = $(window).width();
                 }
@@ -112,6 +113,7 @@ var Mareframe;
                     $("#model_description").text("This is the Mareframe MCA tool. Data has been loaded into the table on the right. You may doubleclick on each element below, to access the properties panel for that element. If you doubleclick on one of the red or green elements, you may adjust the weights of it's child elements, and thus the data it points to. In the chart at the bottom, you will see the result of the analysis, with the tallest column being the highest scoring one.");
                 }
                 this.allModeltoConsole = this.allModeltoConsole.bind(this);
+                this.addDataRowClick = this.addDataRowClick.bind(this);
                 //this.click = this.click.bind(this);
                 this.pressMove = this.pressMove.bind(this);
                 this.mouseDown = this.mouseDown.bind(this);
@@ -171,6 +173,7 @@ var Mareframe;
                 });
                 $("#fullscreen").on("click", this.fullscreen);
                 $("#cnctTool").on("click", this.cnctStatus);
+                $("#addDataRow").on("click", this.addDataRowClick);
                 this.m_mcaBackground.addEventListener("pressup", this.mouseUp);
                 $("#lodDcmt").on("change", this.loadModel);
                 $("#lodDcmt").on("click", function () {
@@ -184,8 +187,42 @@ var Mareframe;
                 this.m_valueFnStage.addChild(this.m_controlP);
                 createjs.Ticker.addEventListener("tick", this.tick);
                 createjs.Ticker.setFPS(60);
-                //$("#debug").hide();
+                $("#debug").hide();
             }
+            GUIHandler.prototype.addDataRowClick = function (p_evt) {
+                console.log("doing tnifgs");
+                //$("#defTable_div").append("<p> hello </p>");
+                var elmt = $("#detailsDialog").data("element");
+                var oldData = [];
+                oldData = elmt.getData();
+                var newData = [];
+                //newData = oldData;
+                //oldData[0] = elmt.getData(0);
+                //oldData[1] = elmt.getData(1);
+                //console.log("o0" + oldData[0]
+                //Tools.makeSureItsAnArray(oldData);
+                //var index = oldData.length;
+                //var newData: any[][] = [];
+                //newData = oldData;
+                console.log("oldDataLenght: " + oldData.length[0]);
+                console.log("oldData: " + oldData);
+                console.log("newData: " + newData);
+                //newData[oldData.length] = [];
+                for (var i = 0; i < oldData.length; i++) {
+                    console.log(i + "  " + oldData[i]);
+                    newData[i] = oldData[i];
+                }
+                newData[oldData.length] = [];
+                console.log("oldDataLenght: " + oldData.length);
+                newData[oldData.length][0] = "StateName";
+                for (var i = 1; i < oldData[0].length; i++) {
+                    //newData[oldData.length][i] = 0;
+                    newData[oldData.length][i] = 0;
+                    console.log("old.len: " + oldData[0].length + "   i: " + i);
+                }
+                console.log("newData: " + newData);
+                elmt.setData(newData);
+            };
             GUIHandler.prototype.allModeltoConsole = function (p_evt) {
                 console.log("All Model");
                 //console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
@@ -248,6 +285,12 @@ var Mareframe;
                 else {
                     this.m_model.fromJSON(this.m_handler.getFileIO().reset());
                     this.importStage();
+                    if (!this.m_model.getElementArr().length) {
+                        var loadModel = DST.Tools.getUrlParameter('model');
+                        loadModel = "scotland";
+                        console.log("using model: " + loadModel);
+                        this.m_handler.getFileIO().loadModel(loadModel, this.m_handler.getActiveModel(), this.importStage);
+                    }
                 }
             };
             GUIHandler.prototype.importStage = function () {
@@ -740,6 +783,7 @@ var Mareframe;
                 var originalUserComments = p_elmt.getUserDescription();
                 console.log("Element: " + p_elmt.getName() + "ready for editing");
                 var mareframeGUI = this;
+                //$("#addDataRow").show();
                 // $(function () {
                 $("#userDescription_div").dblclick(function () {
                     $("#submit").show();
