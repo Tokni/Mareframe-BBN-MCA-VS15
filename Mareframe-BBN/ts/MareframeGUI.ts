@@ -81,24 +81,14 @@ module Mareframe {
                     $("#model_description").text("This is the Mareframe MCA tool. Data has been loaded into the table on the right. You may doubleclick on each element below, to access the properties panel for that element. If you doubleclick on one of the red or green elements, you may adjust the weights of it's child elements, and thus the data it points to. In the chart at the bottom, you will see the result of the analysis, with the tallest column being the highest scoring one.");
 
                 }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 
                 this.allModeltoConsole = this.allModeltoConsole.bind(this);
-=======
-                this.click = this.click.bind(this);
->>>>>>> 3789d3cf4acb8261c676001f5d9e5e30a96cbe33
-=======
 
->>>>>>> parent of 3789d3c... updates in pressmove, mousedown and click
-=======
+                //this.click = this.click.bind(this);
 
->>>>>>> parent of 3789d3c... updates in pressmove, mousedown and click
-=======
 
->>>>>>> parent of 3789d3c... updates in pressmove, mousedown and click
+
                 this.pressMove = this.pressMove.bind(this);
                 this.mouseDown = this.mouseDown.bind(this);
                 this.dblClick = this.dblClick.bind(this);
