@@ -146,6 +146,7 @@ var Mareframe;
             };
             FileIO.prototype.reset = function () {
                 var modelIdent = this.m_handler.getActiveModel().getIdent();
+                console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
                 var jsonMdl = JSON.parse(localStorage.getItem(modelIdent));
                 if (jsonMdl) {
                     return jsonMdl;

@@ -224,11 +224,19 @@ module Mareframe {
             }
 
             private quickLoad() {
+                console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
                 console.log("quickLoad");
                 this.clearSelection();
-                this.m_model.fromJSON(this.m_handler.getFileIO().reset());
-                this.importStage();
-                console.log("selected: " + this.m_selectedItems);
+                if (this.m_handler.getFileIO().reset() === null) {
+                    var loadModel: string = Tools.getUrlParameter('model');
+                    loadModel = "scotland";
+                    console.log("using model: " + loadModel);
+                    this.m_handler.getFileIO().loadModel(loadModel, this.m_handler.getActiveModel(), this.importStage);
+                }
+                else {
+                    this.m_model.fromJSON(this.m_handler.getFileIO().reset());
+                    this.importStage();
+                }
             }
 
             importStage(): void {
@@ -254,7 +262,7 @@ module Mareframe {
                 }                
                 this.m_updateMCAStage = true
 
-                //this.m_handler.getFileIO().quickSave(this.m_model); //This is commented out the because it was preventing reset to work properly
+                //this.m_handler.getFileIO().quickSave(this.m_model); //This is commented out the because it was preventing reset from working properly
             };
 
             private mouseUp(p_evt: createjs.MouseEvent) {
@@ -322,76 +330,76 @@ module Mareframe {
                 for (var j = 0; j < p_elmtArr.length; j++) {
                     var elmt = p_elmtArr[j];
                     //console.log(elmt.getName());
-                           // if (elmt.getType() !== 2) {
-                     //  console.log(elmt.getName() + " minitable is being updated");
-                        var backgroundColors = ["#c6c6c6", "#bfbfe0"]
-                        var decisionCont: createjs.Container = elmt.m_minitableEaselElmt
+                    // if (elmt.getType() !== 2) {
+                    //  console.log(elmt.getName() + " minitable is being updated");
+                    var backgroundColors = ["#c6c6c6", "#bfbfe0"]
+                    var decisionCont: createjs.Container = elmt.m_minitableEaselElmt
 
-                        decisionCont.removeAllChildren();
+                    decisionCont.removeAllChildren();
 
-                            if (elmt.getValues()[0].length > 2) {
-                                var decisTextBox: createjs.Text = new createjs.Text("Values is multidimensional", "0.8em trebuchet", "#303030");
-                                decisionCont.addChild(decisTextBox);
-                            }
-                            else {
+                    if (elmt.getValues()[0].length > 2) {
+                        var decisTextBox: createjs.Text = new createjs.Text("Values is multidimensional", "0.8em trebuchet", "#303030");
+                        decisionCont.addChild(decisTextBox);
+                    }
+                    else {
                         for (var i = 0; i < elmt.getValues().length; i++) {
 
-                                var backgroundColor: string;
-                                if (elmt.getDecision() == i && elmt.getType() == 1) {
-                                    backgroundColor = "#CCFFCC";
-                                }
-                                else {
-                                    backgroundColor = backgroundColors[i % 2];
-                                }
-                                var decisRect: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColor).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
-
-                                //   console.log("" + elmt.getValues());
-                                //console.log("substring 0-12: " + elmt.getValues()[i][0]);
-                                var decisName: createjs.Text = new createjs.Text(elmt.getValues()[i][0].substr(0, 12), "0.8em trebuchet", "#303030");
-                                decisName.textBaseline = "middle";
-                                decisName.maxWidth = 68;
-                                decisName.x = 2;
-                                decisName.y = 6 + (i * 12);
-
-                                decisionCont.addChild(decisRect);
-                                decisionCont.addChild(decisName);
-
-                                var valueData: number = elmt.getValues()[i][1];
-
-                                var decisBarBackgr: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColor).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
-
-                                var decisBar: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
-
-                                if (elmt.getType() === 0) {
-                                    var decisPercVal: createjs.Text = new createjs.Text(Math.floor(valueData * 100) + "%", "0.8em trebuchet", "#303030");
-                                } else {
-                                    decisBar.visible = false;
-                                    var decisPercVal: createjs.Text = new createjs.Text("" + Tools.round(valueData), "0.8em trebuchet", "#303030");
-
-                                }
-                                decisPercVal.textBaseline = "middle";
-                                decisPercVal.maxWidth = 22;
-                                decisPercVal.x = 71;
-                                decisPercVal.y = 6 + (i * 12);
-
-                                decisionCont.addChild(decisBarBackgr);
-                                decisionCont.addChild(decisBar);
-                                decisionCont.addChild(decisPercVal);
+                            var backgroundColor: string;
+                            if (elmt.getDecision() == i && elmt.getType() == 1) {
+                                backgroundColor = "#CCFFCC";
                             }
+                            else {
+                                backgroundColor = backgroundColors[i % 2];
+                            }
+                            var decisRect: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColor).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
+
+                            //   console.log("" + elmt.getValues());
+                            //console.log("substring 0-12: " + elmt.getValues()[i][0]);
+                            var decisName: createjs.Text = new createjs.Text(elmt.getValues()[i][0].substr(0, 12), "0.8em trebuchet", "#303030");
+                            decisName.textBaseline = "middle";
+                            decisName.maxWidth = 68;
+                            decisName.x = 2;
+                            decisName.y = 6 + (i * 12);
+
+                            decisionCont.addChild(decisRect);
+                            decisionCont.addChild(decisName);
+
+                            var valueData: number = elmt.getValues()[i][1];
+
+                            var decisBarBackgr: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColor).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
+
+                            var decisBar: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
+
+                            if (elmt.getType() === 0) {
+                                var decisPercVal: createjs.Text = new createjs.Text(Math.floor(valueData * 100) + "%", "0.8em trebuchet", "#303030");
+                            } else {
+                                decisBar.visible = false;
+                                var decisPercVal: createjs.Text = new createjs.Text("" + Tools.round(valueData), "0.8em trebuchet", "#303030");
+
+                            }
+                            decisPercVal.textBaseline = "middle";
+                            decisPercVal.maxWidth = 22;
+                            decisPercVal.x = 71;
+                            decisPercVal.y = 6 + (i * 12);
+
+                            decisionCont.addChild(decisBarBackgr);
+                            decisionCont.addChild(decisBar);
+                            decisionCont.addChild(decisPercVal);
                         }
-                        decisionCont.addEventListener("click", this.clickedDecision);
-                        decisionCont.x = elmt.m_easelElmt.x + 75;
-                        decisionCont.y = elmt.m_easelElmt.y - 15;
-                        decisionCont.name = elmt.getID();
-                        elmt.m_minitableEaselElmt = decisionCont;
-                        this.m_mcaContainer.addChild(decisionCont);
-
-                        if (elmt.getType() == 2) {
-                            decisionCont.visible = false;
-                       }
-
-                        this.m_updateMCAStage = true;
                     }
+                    decisionCont.addEventListener("click", this.clickedDecision);
+                    decisionCont.x = elmt.m_easelElmt.x + 75;
+                    decisionCont.y = elmt.m_easelElmt.y - 15;
+                    decisionCont.name = elmt.getID();
+                    elmt.m_minitableEaselElmt = decisionCont;
+                    this.m_mcaContainer.addChild(decisionCont);
+
+                    if (elmt.getType() == 2) {
+                        decisionCont.visible = false;
+                    }
+
+                    this.m_updateMCAStage = true;
+                }
                 //}
             }
 
@@ -568,6 +576,7 @@ module Mareframe {
                 console.log("deleting");
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
                     var elmt: Element = this.m_model.getElement(this.m_selectedItems[i].name);
+                    console.log("deleting: " + elmt.getName());
                     //for (var index in elmt.getConnections()) {
                     //    console.log(elmt.getName() + "  Before: " + elmt.getConnections()[index].getID());
                     //}
@@ -576,6 +585,7 @@ module Mareframe {
                         //alert("begin delete connections from " + elmt.getName() );
                         for (var j = 0; j < elmt.getConnections().length; j++) {
                             var conn: Connection = elmt.getConnections()[j];
+                            console.log("deleting connection " + conn.getID());
                             if (conn.getOutputElement().getID() === elmt.getID()) {
                                 conn.getInputElement().deleteConnection(conn.getID());
                             } else {
@@ -592,6 +602,7 @@ module Mareframe {
                 for (var i = 0; i < this.m_trashBin.length; i++) {
                     this.m_model.deleteElement(this.m_trashBin[i].getID());
                 }
+                this.m_trashBin = [];// empty trashbin
                 //alert("before update");
                 //this.m_mcaStage.update();
                 //alert("after update");
@@ -816,9 +827,6 @@ module Mareframe {
 
                             this.updateValFnCP(cPX, cPY, p_elmt.getData(3));
                             this.updateDataTableDiv(p_elmt);
-
-
-
                             break;
                         case 3://ahp
                     }
@@ -1091,6 +1099,9 @@ module Mareframe {
                     else {
                         elmt.setUpdated(false);
                         elmt.getAllDescendants().forEach(function (e) {
+                            e.setUpdated(false);
+                        });
+                        elmt.getAllDecisionAncestors().forEach(function (e) {
                             e.setUpdated(false);
                         });
                     }
@@ -1451,13 +1462,13 @@ module Mareframe {
                                 //});
                                 //alert("updating");
                                 this.m_model.update();
-                                
+
                                 this.importStage();
                                 this.m_mcaStage.update();
                                 //alert("done updating");
                             } else {
                                 alert("cannot create a cycle");
-                        }
+                            }
                         }
                         else if (inputElmt.getType() === 2 && outputElmt.getType() !== 3 ) {//type 3 is reserved for super value nodes (not implemented yet)
                             alert("Value nodes cannot have children");
@@ -1480,6 +1491,8 @@ module Mareframe {
                                 outputElmt.getAllDescendants().forEach(function (e) {
                                     e.setUpdated(false);
                                 });
+                                outputElmt.setUpdated(false);
+                                console.log("connection created from " + outputElmt.getID() + " to " + inputElmt.getID());
                             }
                         }
                     }

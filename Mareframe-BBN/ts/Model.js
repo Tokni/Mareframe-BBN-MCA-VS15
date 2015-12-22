@@ -100,7 +100,7 @@ var Mareframe;
                 var m = this;
                 console.log("updating model");
                 this.m_elementArr.forEach(function (p_elmt) {
-                    console.log(p_elmt.getName() + " has been updated: " + p_elmt.isUpdated());
+                    console.log(p_elmt.getID() + " has been updated: " + p_elmt.isUpdated());
                     if (!p_elmt.isUpdated()) {
                         p_elmt.update();
                     }
@@ -394,6 +394,7 @@ var Mareframe;
                 return { elements: this.m_elementArr, connections: this.m_connectionArr, mdlName: this.m_modelName, mainObj: this.m_mainObjective, dataMat: this.m_dataMatrix, mdlIdent: this.m_modelIdent };
             };
             Model.prototype.fromJSON = function (p_jsonObject) {
+                console.log("from json: p_jsonObject = " + p_jsonObject);
                 $("#modelHeader").html(p_jsonObject.mdlName);
                 var header = $("#model_header").html();
                 //Only append if model name has not been added

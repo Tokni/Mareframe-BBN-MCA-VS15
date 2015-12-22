@@ -32,9 +32,7 @@
                     dataStream = this.getMCADataStream();
                 }
 
-
-
-
+                
                 return dataStream;
             }
 
@@ -115,7 +113,7 @@
                 var m: Model = this;
                 console.log("updating model");
                 this.m_elementArr.forEach(function (p_elmt: Element) {
-                    console.log(p_elmt.getName() + " has been updated: " + p_elmt.isUpdated());
+                    console.log(p_elmt.getID() + " has been updated: " + p_elmt.isUpdated());
                     if (!p_elmt.isUpdated()) {
                         p_elmt.update();
                     }
@@ -447,7 +445,7 @@
 
             }
             fromJSON(p_jsonObject: any): void {
-
+                console.log("from json: p_jsonObject = " + p_jsonObject);
                 $("#modelHeader").html(p_jsonObject.mdlName);
                 var header = $("#model_header").html();
                 //Only append if model name has not been added

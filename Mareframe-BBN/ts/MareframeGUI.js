@@ -236,11 +236,19 @@ var Mareframe;
                 this.m_mcaStageCanvas.width += p_x;
             };
             GUIHandler.prototype.quickLoad = function () {
+                console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
                 console.log("quickLoad");
                 this.clearSelection();
-                this.m_model.fromJSON(this.m_handler.getFileIO().reset());
-                this.importStage();
-                console.log("selected: " + this.m_selectedItems);
+                if (this.m_handler.getFileIO().reset() === null) {
+                    var loadModel = DST.Tools.getUrlParameter('model');
+                    loadModel = "scotland";
+                    console.log("using model: " + loadModel);
+                    this.m_handler.getFileIO().loadModel(loadModel, this.m_handler.getActiveModel(), this.importStage);
+                }
+                else {
+                    this.m_model.fromJSON(this.m_handler.getFileIO().reset());
+                    this.importStage();
+                }
             };
             GUIHandler.prototype.importStage = function () {
                 //console.log("importing stage");
@@ -264,7 +272,7 @@ var Mareframe;
                     this.updateMiniTable(elmts);
                 }
                 this.m_updateMCAStage = true;
-                //this.m_handler.getFileIO().quickSave(this.m_model); //This is commented out the because it was preventing reset to work properly
+                //this.m_handler.getFileIO().quickSave(this.m_model); //This is commented out the because it was preventing reset from working properly
             };
             ;
             GUIHandler.prototype.mouseUp = function (p_evt) {
@@ -495,6 +503,7 @@ var Mareframe;
                 console.log("deleting");
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
                     var elmt = this.m_model.getElement(this.m_selectedItems[i].name);
+                    console.log("deleting: " + elmt.getName());
                     //for (var index in elmt.getConnections()) {
                     //    console.log(elmt.getName() + "  Before: " + elmt.getConnections()[index].getID());
                     //}
@@ -503,6 +512,7 @@ var Mareframe;
                         //alert("begin delete connections from " + elmt.getName() );
                         for (var j = 0; j < elmt.getConnections().length; j++) {
                             var conn = elmt.getConnections()[j];
+                            console.log("deleting connection " + conn.getID());
                             if (conn.getOutputElement().getID() === elmt.getID()) {
                                 conn.getInputElement().deleteConnection(conn.getID());
                             }
@@ -516,6 +526,7 @@ var Mareframe;
                 for (var i = 0; i < this.m_trashBin.length; i++) {
                     this.m_model.deleteElement(this.m_trashBin[i].getID());
                 }
+                this.m_trashBin = []; // empty trashbin
                 //alert("before update");
                 //this.m_mcaStage.update();
                 //alert("after update");
@@ -987,6 +998,9 @@ var Mareframe;
                         elmt.getAllDescendants().forEach(function (e) {
                             e.setUpdated(false);
                         });
+                        elmt.getAllDecisionAncestors().forEach(function (e) {
+                            e.setUpdated(false);
+                        });
                     }
                 }
                 this.m_unsavedChanges = false;
@@ -1327,6 +1341,8 @@ var Mareframe;
                                 outputElmt.getAllDescendants().forEach(function (e) {
                                     e.setUpdated(false);
                                 });
+                                outputElmt.setUpdated(false);
+                                console.log("connection created from " + outputElmt.getID() + " to " + inputElmt.getID());
                             }
                         }
                     }

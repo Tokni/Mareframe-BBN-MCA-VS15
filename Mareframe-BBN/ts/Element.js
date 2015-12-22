@@ -126,6 +126,15 @@ var Mareframe;
                 }
                 return ancestors;
             };
+            Element.prototype.getAllDecisionAncestors = function () {
+                var decisions = [];
+                this.getAllAncestors().forEach(function (e) {
+                    if (e.getType() === 1) {
+                        decisions.push(e);
+                    }
+                });
+                return decisions;
+            };
             Element.prototype.isAncestorOf = function (elmt) {
                 //  console.log("checking if " + this.getName() + " is an ancestor of " + elmt.getName() + ": " + (this.getAllAncestors().indexOf(elmt) > -1));
                 return (this.getAllAncestors().indexOf(elmt) > -1);

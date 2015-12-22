@@ -198,6 +198,7 @@
             }
             reset(): any {
                 var modelIdent: string = this.m_handler.getActiveModel().getIdent();
+                console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
                 var jsonMdl: any = JSON.parse(localStorage.getItem(modelIdent));
                 if (jsonMdl) {
                     return jsonMdl;

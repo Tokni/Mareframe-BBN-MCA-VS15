@@ -134,6 +134,17 @@
                 }
                 return ancestors;
             }
+
+            getAllDecisionAncestors(): Element[] {
+                var decisions: Element[] = [];
+                this.getAllAncestors().forEach(function (e) {
+                    if (e.getType() === 1) {
+                        decisions.push(e);
+                    }
+                });
+                    return decisions;
+            }
+
             isAncestorOf(elmt): boolean {
               //  console.log("checking if " + this.getName() + " is an ancestor of " + elmt.getName() + ": " + (this.getAllAncestors().indexOf(elmt) > -1));
                 return (this.getAllAncestors().indexOf(elmt) > -1);
