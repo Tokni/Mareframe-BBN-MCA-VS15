@@ -184,7 +184,7 @@ var Mareframe;
                 this.m_valueFnStage.addChild(this.m_controlP);
                 createjs.Ticker.addEventListener("tick", this.tick);
                 createjs.Ticker.setFPS(60);
-                //$("#debug").hide();
+                $("#debug").hide();
             }
             GUIHandler.prototype.allModeltoConsole = function (p_evt) {
                 console.log("All Model");

@@ -4,15 +4,11 @@
             static getValueFn(p_xVal, p_posX, p_posY) {
 
                 //var y = 0;
-
                 //var a = posY / ((posX -0.1) * (posX - 100.1)) + 100.1 / ((100.1 - 0.1) * (100.1 - posX));
                 //var b = - posY * (0.1 + 100.1) / ((posX - 0.1) * (posX - 100.1)) - 100.1 * (0.1 + posX) / ((100.1 - 0.1) * (100.1 - posX));
-
-                ////y = 0 * (xVal - posX) * (xVal - 1) / ((0 - posX) * (0 - 1)) + posY * (xVal - 0) * (xVal - 1) / ((posX - 0) * (posX - 1)) + 1 * (xVal - 0) * (xVal - posX) / ((1 - 0) * (1 - posX))
-
+                //y = 0 * (xVal - posX) * (xVal - 1) / ((0 - posX) * (0 - 1)) + posY * (xVal - 0) * (xVal - 1) / ((posX - 0) * (posX - 1)) + 1 * (xVal - 0) * (xVal - posX) / ((1 - 0) * (1 - posX))
                 //y =a*(xVal*xVal)+b*xVal+0
-
-                //////console.log("y=" + y);
+                //console.log("y=" + y);
                 //return y;
 
                 var A = 1 - 3 * p_posX + 3 * p_posX;
@@ -241,7 +237,6 @@
                             row = [row];
                         }
                         newMatrix.push(row);
-                       
                         //  console.log("newMatrix: " + newMatrix)
                     }
                 }

@@ -161,7 +161,7 @@ module Mareframe {
                 this.m_valueFnStage.addChild(this.m_controlP);
                 createjs.Ticker.addEventListener("tick", this.tick);
                 createjs.Ticker.setFPS(60);
-                //$("#debug").hide();
+                $("#debug").hide();
 
             }
 
