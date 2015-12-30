@@ -87,6 +87,9 @@
                     var total: number = 0.0;
                     p_elmt.getData(1).forEach(function (val: number) { total += val; });
                     for (var i = 0; i < p_elmt.getData()[0].length; i++) {
+                        //console.log("Element: " + p_elmt.getID());
+                        //console.log("ElementData: " + p_elmt.getData(0, i) );
+                        //console.log("a connection " + p_model.getConnection(p_elmt.getData(0, i)).getID());
                         var childWeights: number[][] = this.getWeights(p_model.getConnection(p_elmt.getData(0, i)).getInputElement(), p_model);
                         for (var j = 0; j < childWeights.length; j++) {
                             childWeights[j][1] *= (p_elmt.getData()[1][i] / total);
@@ -872,7 +875,7 @@
             }
            
             static fillDataTable(p_dataTable: any[][]) {
-               // console.log("filling table: " + p_dataTable);
+                console.log("filling table: " + p_dataTable);
                 console.log(p_dataTable);
                 var headerRows: any[][] = [];
                 var data: any[][] = [];

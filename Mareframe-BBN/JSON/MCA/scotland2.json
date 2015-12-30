@@ -592,11 +592,20 @@
   "mdlDesc": "",
   "mainObj": "elmtGoal",
   "dataMat": [
-    [ "leaveblank", "elmtAttr1", "elmtAttr2", "elmtAttr3", "elmtAttr4", "elmtAttr5", "elmtAttr6", "elmtAttr7", "elmtAttr8", "elmtAttr9", "elmtAttrA", "elmtAttrB", "elmtAttrC", "elmtAttr11", "elmtAttr12", "elmtAttr13", "elmtAttr14", "elmtAttr15", "elmtAttr16", "elmtAttr17", "elmtAttr18", "elmtAttr19", "elmtAttr1A", "elmtAttr1B", "elmtAttr1C" ],
-    [ "elmtCurPath", 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-    [ "elmtMMEY", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-    [ "elmtDifCod", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-    [ "units", "", "Euro Revenue", "Euro Revenue", "Euro Revenue", "Euro Revenue", "", "SSB", "SSB", "", "Indicator Value", "", "", "", "Full time jobs", "Full time jobs", "Full time jobs", "Full time jobs", "", "", "", "", "", "", "" ]
-
+    //[ "leaveblank", "elmtAttr1", "elmtAttr2", "elmtAttr3", "elmtAttr4", "elmtAttr5", "elmtAttr6", "elmtAttr7", "elmtAttr8", "elmtAttr9", "elmtAttrA", "elmtAttrB", "elmtAttrC", "elmtAttr11", "elmtAttr12", "elmtAttr13", "elmtAttr14", "elmtAttr15", "elmtAttr16", "elmtAttr17", "elmtAttr18", "elmtAttr19", "elmtAttr1A", "elmtAttr1B", "elmtAttr1C" ],
+    //[ "elmtCurPath", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    //[ "elmtMMEY",    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    //[ "elmtDifCod",  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    //[ "units", "", "Euro Revenue", "Euro Revenue", "Euro Revenue", "Euro Revenue", "", "SSB", "SSB", "", "Indicator Value", "", "", "", "Full time jobs", "Full time jobs", "Full time jobs", "Full time jobs", "", "", "", "", "", "", "" ]
   ]
 }
+
+//[ "elmtCurPath", 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+//[ "elmtCurPath", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 ],
+//[ "elmtCurPath", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+
+
+[ "leaveblank", "elmtFishStock2020", "elmtCO2Emissions2020", "elmtSeaFloor2020", "elmtEmployment2020", "elmtExports2020", "elmtProductivity2020", "elmtEBITDA/Rev.2020", "elmtFishStock2030", "elmtCO2Emissions2030", "elmtSeaFloor2030", "elmtEmployment2030", "elmtExports2030", "elmtProductivity2030", "elmtEBITDA/Rev.2030" ],
+    [ "elmtStatusQuo", 0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [ "elmtFMSY", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    [ "units", "fs", "co2", "sf", "emp", "exp", "por", "ebit", "fs", "co2", "sf", "emp", "exp", "por", "ebit" ]

@@ -47,7 +47,7 @@
                 this.m_decision = n;
             }
             update(): void {
-                //console.log("Updating element " + this.getName() );
+                console.log("Updating element " + this.getName() );
                 if (this.m_type !== 1) {
                  //   console.log("This is not a decision node");
                     //Definition table in decision nodes does not rely on parents
@@ -375,11 +375,11 @@
                 this.m_easelElmt.y = p_jsonElmt.posY;
                 this.m_id = p_jsonElmt.elmtID;
                 this.m_name = p_jsonElmt.elmtName;
-               // console.log("name: " + this.m_name);
+                //console.log("FromJSONname: " + this.m_name);
                 this.m_description = p_jsonElmt.elmtDesc;
                 this.m_type = p_jsonElmt.elmtType;
                 this.m_data = p_jsonElmt.elmtData;
-              //  console.log("data: " + this.m_data);
+                //console.log("FromJSONdata: " + this.m_data);
                 this.m_weightingMethod = p_jsonElmt.elmtWghtMthd;
                 
             }

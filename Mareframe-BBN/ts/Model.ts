@@ -13,11 +13,11 @@
             private m_mainObjective: Element;
             private m_autoUpdate: boolean = false;
             constructor(p_bbnMode: boolean) {
-                //this.m_bbnMode = p_bbnMode;
-                this.m_bbnMode = true;
+                this.m_bbnMode = p_bbnMode;
+                //this.m_bbnMode = true;
                 this.createNewElement = this.createNewElement.bind(this);
                 this.deleteElement = this.deleteElement.bind(this);
-                ////console.log("model loaded")
+                console.log("model loaded")
                 ////console.log(this);
 
             };
@@ -161,9 +161,11 @@
     	
 
                 ////console.log(tempMatrix);
+                //console.log("DataMatrix: " + this.m_dataMatrix);
+                //console.log("numWeights: " + weightsArr.length);
                 for (var i = 0; i < weightsArr.length; i++) {
+                    //console.log("Elemet** " + this.getElement(this.m_dataMatrix[0][i + 1]).getData());
                     var elmtData = this.getElement(this.m_dataMatrix[0][i + 1]).getData();
-
                     //set minimum and maximum values
                     var maxVal = elmtData[5];
                     var minVal = elmtData[4];
@@ -200,10 +202,11 @@
 
                 }
                 for (var i = 1; i < tempMatrix.length - 1; i++) {
+                    //console.log("tmpMat" + tempMatrix);
                     tempMatrix[i][0] = this.getElement(tempMatrix[i][0]).getName();
                 }
 
-
+                //console.log("FinalScore: " + tempMatrix);
                 return tempMatrix;
             }
 
@@ -212,17 +215,23 @@
                 if (p_addHeader) {
                     tempMatrix.push(['string', 'number']);
                 }
+                console.log("DataMatrix: " + this.m_dataMatrix);
                 switch (p_elmt.getType()) {
                     case 2: //scenario
+                        console.log("type 2, scenario");
                         for (var i = 1; i < this.m_dataMatrix[0].length; i++) {
+                            //console.log("
                             tempMatrix.push([this.m_dataMatrix[0][i], this.m_dataMatrix[p_elmt.getData(0)][i]]);
+                            console.log("******TempMatrix: " + i + "   " + tempMatrix);
                         }
                         break;
                     case 0: //attribute
+                        console.log("Type 0, attibute");
                         //set minimum and maximum values
                         var maxVal = p_elmt.getData(5);
+                        //var maxVal = 100000;
                         var minVal = p_elmt.getData(4);
-
+                        //var minVal = -100000;
                         //check if data is within min-max values, and expand as necessary
                         for (var i = 1; i < this.m_dataMatrix.length - 1; i++) {
                             if (this.m_dataMatrix[i][p_elmt.getData(0)] > maxVal) {
@@ -242,13 +251,22 @@
 
                             var toAdd = [this.getElement(this.m_dataMatrix[i][0]).getName(), this.m_dataMatrix[i][p_elmt.getData(0)]];
                             if (!p_addHeader) {
-                                toAdd.push(Mareframe.DST.Tools.getValueFn(Math.abs(p_elmt.getData(3) - ((this.m_dataMatrix[i][p_elmt.getData(0)] - minVal) / (maxVal - minVal))), Math.abs(p_elmt.getData(3) - ((p_elmt.getData(1) / 100))), 1 - (p_elmt.getData(2) / 100)));
+                                //console.log("elmtData: " + p_elmt.getData());
+                                //console.log("elmtData(1): " + p_elmt.getData(1));
+                                //console.log("elmtData(2): " + p_elmt.getData(2));
+                                //console.log("elmtData(3): " + p_elmt.getData(3));
+                                //console.log("elmtData(0): " + p_elmt.getData(0));
+                                //console.log("minvalue: " + minVal);
+                                //console.log("maxValue: " + maxVal);
+                                toAdd.push(Mareframe.DST.Tools.getValueFn(Math.abs(p_elmt.getData(3) -(this.m_dataMatrix[i][p_elmt.getData(0)] - minVal) / (maxVal - minVal)), Math.abs(p_elmt.getData(3) -p_elmt.getData(1) / 100), 1 - p_elmt.getData(2) / 100 ) );
                             }
                             ////console.log(elmt.getData()[1]);
                             tempMatrix.push(toAdd);
+                            //console.log("******attrTempMatrix: " + i + "   " + tempMatrix);
                         }
                         break;
                     case 1: //sub-objective
+                        console.log("Type 1, sub-objective");
                         var total = 0.0;
                         p_elmt.getData(1).forEach(function (val) { total += val; });
                         ////console.log(total + " : " + elmt.getName());
@@ -267,10 +285,12 @@
 
                             }
                             ////console.log(result + " " + elmt.getName()+"; "+tempArr+" "+tempEl.getName());
-                            tempMatrix.push([tempEl.getName(), result * (p_elmt.getData(1,i) / total)]);
+                            tempMatrix.push([tempEl.getName(), result * (p_elmt.getData(1, i) / total)]);
+                            //console.log("******SubTempMatrix: " + i + "   " + tempMatrix);
                         }
                         break;
                 }
+                console.log("WeigthedData: " + tempMatrix);
                 return tempMatrix;
             }
 

@@ -59,6 +59,7 @@
         <p id="mTarget"></p>
         <p id="mConnect"></p>
         <button id="debugButton"> Debug </button>
+        <button id="debugConnect"> Connections </button>
     </div>
     <div class="ui-widget ui-dialog ui-corner-all ui-widget-content header-bar" style="position: static">
         <div class="ui-widget-header ui-corner-all ui-dialog-titlebar" id="modelHeader">Model</div>
@@ -100,7 +101,7 @@
     <div id="MCAContainer" style="text-align:center">
 
         <!--MCA Tool canvas-->
-        <canvas id="MCATool" width="800" height="480" style="display:inline-block"></canvas>
+        <canvas id="MCATool" width="1000" height="600" style="display:inline-block"></canvas>
 
 
         <!--Data Table-->
@@ -128,6 +129,8 @@
 
     <!--Popup Dialog-->
     <div id="detailsDialog">
+        <!--<div id="elementName"><span>Element Name: </span><span>Name</span><span>Change name</span></div>-->
+        <!--<div id="elememtType"></div>-->
         <div id="weightingMethodSelector"></div>
         <div id="valueFn_div">
             <canvas id="valueFn_canvas" width="100" height="100"></canvas>
@@ -135,12 +138,7 @@
             <button class="button" id="valueFn_Flip">Flip Direction</button>
         </div>
         <div id="sliders_div"></div>
-        <div class="info_div"style="width: 30%; overflow: hidden;">
-            <div class="info_div"style="width: 80px; float: left;"> Name: </div>
-            <div class="info_div"id="info_name" style="margin-left: 50px;">  </div>
-            <div class="info_div"style="width: 80px; float: left;"> Type: </div>
-            <div class="info_div"id="info_type" style="margin-left: 50px;">  </div>
-        </div>
+        <div id="datatable_div"></div>
         <div id="description_div"></div>
         <div id="chart_div"></div>
         <input class="dialogButton" type="checkbox" id="showDescription" checked>
@@ -162,6 +160,8 @@
 
         $("input[type=checkbox]").button();
         $("debugButton").button({ icons: { primary: "ui-icon-document" } });
+        $("debugConnect").button({ icons: { primary: "ui-icon-document" } });
+        
         $("#valueFn_Linear").button();
         $("#valueFn_Flip").button();
         $("#newDcmt").button({ icons: { primary: "ui-icon-document" } });
