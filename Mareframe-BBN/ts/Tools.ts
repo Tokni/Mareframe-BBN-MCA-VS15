@@ -71,8 +71,8 @@
                         console.log("number: "+ parseFloat(data[j][i]));
                     }
                     console.log("sum: " + sum);
-                    if (sum < 0.9999 || sum > 1.001) {
-                        console.log("invalid");
+                    if (sum < 0.999 || sum > 1.001) {
+                        console.log("invalid sum");
                         return false;
                     }
                     sum = 0;

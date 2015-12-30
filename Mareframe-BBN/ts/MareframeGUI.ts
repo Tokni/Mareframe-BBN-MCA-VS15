@@ -710,6 +710,8 @@ module Mareframe {
                 $("#detailsDialog").dialog({
                     title: p_elmt.getName()
                 });
+                document.getElementById("info_name").innerHTML = p_elmt.getName();
+                this.addEditFunction(p_elmt, this.m_editorMode);
                 if (this.m_model.m_bbnMode) {
                     //bbn mode only
                     $("#detailsDialog").data("element", p_elmt);
@@ -719,6 +721,18 @@ module Mareframe {
                     console.log(p_elmt.getData());
                     $("#defTable_div").html(s);
                     $("#defTable_div").show();
+                    var typeText: string;
+                    if (p_elmt.getType() === 0) {
+                        typeText = "Chance";
+                    }
+                    else if (p_elmt.getType() === 1) {
+                        typeText = "Decision";
+                    }
+                    else if (p_elmt.getType() === 2) {
+                        typeText = "Value";
+                    }
+                    document.getElementById("info_name").innerHTML = p_elmt.getName();
+                    document.getElementById("info_type").innerHTML = typeText;
                     this.addEditFunction(p_elmt, this.m_editorMode);
                     
                     if (this.m_showDescription) {
@@ -747,7 +761,8 @@ module Mareframe {
 
                 } else {
                     //MCA mode only
-
+                    $("#info_type").hide();
+                    $("#info_type_tag").hide();
                     //console.log(tableMat);
                     var chartOptions: Object = {
                         width: 700,
@@ -888,12 +903,14 @@ module Mareframe {
                 }
             };
             private addEditFunction(p_elmt: Element, p_editorMode: boolean) {
-                var originalDesc = p_elmt.getDescription();
-                var originalUserComments = p_elmt.getUserDescription();
-                console.log("Element: " + p_elmt.getName() + "ready for editing");
-                var mareframeGUI = this;
-                $("#addDataRow").show();
-               // $(function () {
+                    var originalName: string = p_elmt.getName();
+                    var mareframeGUI = this;
+                if (this.m_model.m_bbnMode) {
+                    var originalDesc = p_elmt.getDescription();
+                    var originalUserComments = p_elmt.getUserDescription();
+                    console.log("Element: " + p_elmt.getName() + "ready for editing");
+                    $("#addDataRow").show();
+                    // $(function () {
                     $("#userDescription_div").dblclick(function () {
                         $("#submit").show();
                         $(this).addClass("editable");
@@ -933,9 +950,47 @@ module Mareframe {
                         });
 
                     });
-               // });
-                if (p_editorMode) {
-                   // $(function () {
+                    // });
+                    if (p_editorMode) {
+                        $("#info_name").dblclick(function () {
+                            $("#submit").show();
+                            $(this).addClass("editable");
+                            $(this).html("<input type='text' value='" + originalName + "' />");
+                            $(this).children().first().focus();
+                            $(this).children().first().keypress(function (e) {
+                                if (e.which == 13) {
+                                    var newText = $(this).val();
+                                    console.log("new text: " + newText);
+                                    if (newText.length < 1) { //Must not update the text if the new text string is empty
+                                        $("#info_name").html(originalName);
+                                        newText = originalName;
+                                    }
+                                    $(this).parent().text(newText);
+                                    if (newText !== originalName) {
+                                        console.log("unsaved changes");
+                                        mareframeGUI.m_unsavedChanges = true;
+                                    }
+                                    originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                                }
+                                $(this).parent().removeClass("editable");
+                            });
+                            $(this).children().first().blur(function () {
+                                var newText = $(this).val();
+                                console.log("new text: " + newText);
+                                if (newText.length < 1) { //Must not update the text if the new text string is empty
+                                    $("#info_name").html(originalName);
+                                    newText = originalName;
+                                }
+                                $(this).parent().text(newText);
+                                if (newText !== originalName) {
+                                    mareframeGUI.m_unsavedChanges = true;
+                                }
+                                originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                                $(this).parent().removeClass("editable");
+                            });
+
+                        });
+                        // $(function () {
                         console.log("original value: " + originalDesc);
                         $("#description_div").dblclick(function () {
                             $("#submit").show();
@@ -973,12 +1028,12 @@ module Mareframe {
                                 originalDesc = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
                                 $(this).parent().removeClass("editable");
                             });
-                       // });
+                            // });
                         });
                         $(".defStateName").button({
                             icons: { primary: "ui-icon-minus" }
                         });
-                    //Data table
+                        //Data table
                         var editing = false;//this is used to make sure the text does not disapear when double clicking several times
                         $(function () {
                             $("td").dblclick(function () {
@@ -986,7 +1041,7 @@ module Mareframe {
                                 if (!editing) {
                                     editing = true;
                                     $("#submit").show();
-                                    
+
                                     var originalValue = $(this).text();
                                     console.log("original value : " + originalValue);
                                     $(this).addClass("editable");
@@ -1032,8 +1087,8 @@ module Mareframe {
                                         editing = false;
                                     });
                                 }
-                                });
-                        //TODO Prevent user from editing the top rows. That data should come from the child elements
+                            });
+                            //TODO Prevent user from editing the top rows. That data should come from the child elements
                             $("th").dblclick(function () {
                                 console.log("editing: " + editing);
                                 if (!editing) {
@@ -1078,11 +1133,55 @@ module Mareframe {
                                         editing = false;
                                     });
                                 }
-                        });
+                            });
 
-                    });
+                        });
+                    }
                 }
-            };
+                else {
+                    if (p_editorMode) {
+                        $("#info_name").dblclick(function () {
+                            $("#submit").show();
+                            $(this).addClass("editable");
+                            $(this).html("<input type='text' value='" + originalName + "' />");
+                            $(this).children().first().focus();
+                            $(this).children().first().keypress(function (e) {
+                                if (e.which == 13) {
+                                    var newText = $(this).val();
+                                    console.log("new text: " + newText);
+                                    if (newText.length < 1) { //Must not update the text if the new text string is empty
+                                        $("#info_name").html(originalName);
+                                        newText = originalName;
+                                    }
+                                    $(this).parent().text(newText);
+                                    if (newText !== originalName) {
+                                        p_elmt.setName(newText);
+                                        mareframeGUI.addElementToStage(p_elmt);//repaints the element
+                                    }
+                                    originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                                }
+                                $(this).parent().removeClass("editable");
+                            });
+                            $(this).children().first().blur(function () {
+                                var newText = $(this).val();
+                                console.log("new text: " + newText);
+                                if (newText.length < 1) { //Must not update the text if the new text string is empty
+                                    $("#info_name").html(originalName);
+                                    newText = originalName;
+                                }
+                                $(this).parent().text(newText);
+                                if (newText !== originalName) {
+                                    p_elmt.setName(newText);
+                                    mareframeGUI.addElementToStage(p_elmt);//repaints the element
+                                }
+                                originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                                $(this).parent().removeClass("editable");
+                            });
+
+                        });
+                    }
+                }
+            }
             private showValues() {
                 var elmt: Element =  $("#detailsDialog").data("element");
                 console.log("Data: " + elmt.getData());
@@ -1107,7 +1206,7 @@ module Mareframe {
                 var table = $("#defTable_div");
                 var newTable = [];
                 var newRow = [];
-
+                elmt.setName($("#info_name").text());
                 //console.log(this);
                 table.find("tr").each(function () {
                     $(this).find("th,td").each(function () {
@@ -1160,6 +1259,8 @@ module Mareframe {
                     //console.log(elmt.getData());
                 }
                 this.m_unsavedChanges = false;
+                //this.m_updateMCAStage = true;
+                this.addElementToStage(elmt);//repaint the element. This is necessary if the name of the elemnt has been changed
             }           
             private updateValFnCP(p_controlPointX: number, p_controlPointY: number, p_flipped_numBool: number): void {
                 //var functionSegments = 10;
@@ -1521,7 +1622,7 @@ module Mareframe {
                                 outputElmt.getAllDescendants().forEach(function (e) {
                                     e.setUpdated(false);
                                 });
-                                outputElmt.setUpdated(false);
+                                inputElmt.setUpdated(false);
                                 console.log("connection created from " + outputElmt.getID() + " to " + inputElmt.getID());
                             }
                         }
