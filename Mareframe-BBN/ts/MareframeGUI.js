@@ -662,6 +662,8 @@ var Mareframe;
                 this.addEditFunction(p_elmt, this.m_editorMode);
                 if (this.m_model.m_bbnMode) {
                     //bbn mode only
+                    $("#elementType").hide();
+                    console.log("hiding selector");
                     $("#detailsDialog").data("element", p_elmt);
                     $("#detailsDialog").data("model", this.m_model);
                     var s = DST.Tools.htmlTableFromArray("Definition", p_elmt.getData(), this.m_model);
