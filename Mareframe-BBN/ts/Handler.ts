@@ -40,9 +40,9 @@ module Mareframe {
 
                 
                 var loadModel: string = Tools.getUrlParameter('model');
-                loadModel = "scotland";
+                //loadModel = "scotland";
                 //loadModel = "sicily";
-                //loadModel = "baltic";
+                loadModel = "baltic";
                 //loadModel = "northSea";
                 //loadModel = "blackSea";
                 //loadModel = "iceland";

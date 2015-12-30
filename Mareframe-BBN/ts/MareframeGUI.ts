@@ -82,6 +82,9 @@ module Mareframe {
                     $("#model_description").text("This is the Mareframe MCA tool. Data has been loaded into the table on the right. You may doubleclick on each element below, to access the properties panel for that element. If you doubleclick on one of the red or green elements, you may adjust the weights of it's child elements, and thus the data it points to. In the chart at the bottom, you will see the result of the analysis, with the tallest column being the highest scoring one.");
                     this.setEditorMode = this.setEditorMode.bind(this);
                     this.m_editorMode = false;
+                    $("#elementType").hide();
+                    //$("#MCAelmtType").hide();
+                    //$("#MCAweightingMethod").hide();
                 }
 
                 this.allModeltoConsole = this.allModeltoConsole.bind(this);
@@ -116,6 +119,8 @@ module Mareframe {
                 this.clickedDecision = this.clickedDecision.bind(this);
                 this.fullscreen = this.fullscreen.bind(this);
                 this.cnctStatus = this.cnctStatus.bind(this);
+                this.optionTypeChange = this.optionTypeChange.bind(this);
+                this.optionMethodChange = this.optionMethodChange.bind(this);
 
                 this.m_model = p_model;
                 this.m_mcaBackground.name = "hitarea";
@@ -129,6 +134,8 @@ module Mareframe {
                 this.m_valFnBackground.addEventListener("mousedown", this.downValFnCP);
                 this.m_mcaBackground.addEventListener("pressmove", this.pressMove);
                 this.m_controlP.mouseChildren = false;
+                $("#MCAelmtType").on("change", this.optionTypeChange);
+                $("#MCAWeightingMethod").on("change", this.optionMethodChange);
                 $("#debugButton").on("click", this.allModeltoConsole);
                 $("#debugConnect").on("click", this.allConnectionstoConsole);
                 $("#valueFn_Linear").on("click", this.linearizeValFn);
@@ -170,6 +177,19 @@ module Mareframe {
                 $("#debug").hide();
                 this.updateEditorMode();
 
+            }
+            private optionTypeChange(p_evt: Event) {
+
+                //console.log("Element name: " + p_evt.target.id);
+                var elmt: Element = $("#detailsDialog").data("element");
+                
+                elmt.setType(p_evt.target.value);
+
+                
+            }
+            private optionMethodChange(p_evt: Event) {
+                var elmt: Element = $("#detailsDialog").data("element");
+                elmt.setMethod(p_evt.target.value);
             }
             private allConnectionstoConsole(p_evt: Event) {
                 for (var i = 0; i < this.m_model.getConnectionArr().length; i++) {
@@ -481,6 +501,7 @@ module Mareframe {
                         $("#newChance").hide();
                         $("#newDec").hide();
                         $("#newValue").hide();
+                        $("#elementType").show();
                     }
                 } else {
                     $(".advButton").hide();
@@ -764,6 +785,7 @@ module Mareframe {
                     //MCA mode only
                     $("#info_type").hide();
                     $("#info_type_tag").hide();
+                    $("#detailsDialog").data("element", p_elmt);
                     //console.log(tableMat);
                     var chartOptions: Object = {
                         width: 700,
@@ -907,11 +929,11 @@ module Mareframe {
                     var originalName: string = p_elmt.getName();
                     var mareframeGUI = this;
                 if (this.m_model.m_bbnMode) {
-                    var originalDesc = p_elmt.getDescription();
-                    var originalUserComments = p_elmt.getUserDescription();
-                    console.log("Element: " + p_elmt.getName() + "ready for editing");
-                    $("#addDataRow").show();
-                    // $(function () {
+                var originalDesc = p_elmt.getDescription();
+                var originalUserComments = p_elmt.getUserDescription();
+                console.log("Element: " + p_elmt.getName() + "ready for editing");
+                $("#addDataRow").show();
+               // $(function () {
                     $("#userDescription_div").dblclick(function () {
                         $("#submit").show();
                         $(this).addClass("editable");
@@ -951,8 +973,8 @@ module Mareframe {
                         });
 
                     });
-                    // });
-                    if (p_editorMode) {
+               // });
+                if (p_editorMode) {
                         $("#info_name").dblclick(function () {
                             $("#submit").show();
                             $(this).addClass("editable");
@@ -991,7 +1013,7 @@ module Mareframe {
                             });
 
                         });
-                        // $(function () {
+                   // $(function () {
                         console.log("original value: " + originalDesc);
                         $("#description_div").dblclick(function () {
                             $("#submit").show();
@@ -1029,12 +1051,12 @@ module Mareframe {
                                 originalDesc = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
                                 $(this).parent().removeClass("editable");
                             });
-                            // });
+                       // });
                         });
                         $(".defStateName").button({
                             icons: { primary: "ui-icon-minus" }
                         });
-                        //Data table
+                    //Data table
                         var editing = false;//this is used to make sure the text does not disapear when double clicking several times
                         $(function () {
                             $("td").dblclick(function () {
@@ -1042,7 +1064,7 @@ module Mareframe {
                                 if (!editing) {
                                     editing = true;
                                     $("#submit").show();
-
+                                    
                                     var originalValue = $(this).text();
                                     console.log("original value : " + originalValue);
                                     $(this).addClass("editable");
@@ -1088,8 +1110,8 @@ module Mareframe {
                                         editing = false;
                                     });
                                 }
-                            });
-                            //TODO Prevent user from editing the top rows. That data should come from the child elements
+                                });
+                        //TODO Prevent user from editing the top rows. That data should come from the child elements
                             $("th").dblclick(function () {
                                 console.log("editing: " + editing);
                                 if (!editing) {
@@ -1177,10 +1199,10 @@ module Mareframe {
                                 }
                                 originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
                                 $(this).parent().removeClass("editable");
-                            });
-
                         });
-                    }
+
+                    });
+                }
                 }
             }
             private showValues() {

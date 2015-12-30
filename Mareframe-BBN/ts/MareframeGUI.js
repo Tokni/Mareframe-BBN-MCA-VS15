@@ -113,6 +113,7 @@ var Mareframe;
                     $("#model_description").text("This is the Mareframe MCA tool. Data has been loaded into the table on the right. You may doubleclick on each element below, to access the properties panel for that element. If you doubleclick on one of the red or green elements, you may adjust the weights of it's child elements, and thus the data it points to. In the chart at the bottom, you will see the result of the analysis, with the tallest column being the highest scoring one.");
                     this.setEditorMode = this.setEditorMode.bind(this);
                     this.m_editorMode = false;
+                    $("#elementType").hide();
                 }
                 this.allModeltoConsole = this.allModeltoConsole.bind(this);
                 this.allConnectionstoConsole = this.allConnectionstoConsole.bind(this);
@@ -146,6 +147,8 @@ var Mareframe;
                 this.clickedDecision = this.clickedDecision.bind(this);
                 this.fullscreen = this.fullscreen.bind(this);
                 this.cnctStatus = this.cnctStatus.bind(this);
+                this.optionTypeChange = this.optionTypeChange.bind(this);
+                this.optionMethodChange = this.optionMethodChange.bind(this);
                 this.m_model = p_model;
                 this.m_mcaBackground.name = "hitarea";
                 this.updateEditorMode = this.updateEditorMode.bind(this);
@@ -156,6 +159,8 @@ var Mareframe;
                 this.m_valFnBackground.addEventListener("mousedown", this.downValFnCP);
                 this.m_mcaBackground.addEventListener("pressmove", this.pressMove);
                 this.m_controlP.mouseChildren = false;
+                $("#MCAelmtType").on("change", this.optionTypeChange);
+                $("#MCAWeightingMethod").on("change", this.optionMethodChange);
                 $("#debugButton").on("click", this.allModeltoConsole);
                 $("#debugConnect").on("click", this.allConnectionstoConsole);
                 $("#valueFn_Linear").on("click", this.linearizeValFn);
@@ -194,6 +199,15 @@ var Mareframe;
                 $("#debug").hide();
                 this.updateEditorMode();
             }
+            GUIHandler.prototype.optionTypeChange = function (p_evt) {
+                //console.log("Element name: " + p_evt.target.id);
+                var elmt = $("#detailsDialog").data("element");
+                elmt.setType(p_evt.target.value);
+            };
+            GUIHandler.prototype.optionMethodChange = function (p_evt) {
+                var elmt = $("#detailsDialog").data("element");
+                elmt.setMethod(p_evt.target.value);
+            };
             GUIHandler.prototype.allConnectionstoConsole = function (p_evt) {
                 for (var i = 0; i < this.m_model.getConnectionArr().length; i++) {
                     console.log("Id: " + this.m_model.getConnectionArr()[i].getID() + "  InElmt: " + this.m_model.getConnectionArr()[i].getInputElement().getName() + "  OutElmt: " + this.m_model.getConnectionArr()[i].getOutputElement().getName());
@@ -469,6 +483,7 @@ var Mareframe;
                         $("#newChance").hide();
                         $("#newDec").hide();
                         $("#newValue").hide();
+                        $("#elementType").show();
                     }
                 }
                 else {
@@ -694,6 +709,7 @@ var Mareframe;
                     //MCA mode only
                     $("#info_type").hide();
                     $("#info_type_tag").hide();
+                    $("#detailsDialog").data("element", p_elmt);
                     //console.log(tableMat);
                     var chartOptions = {
                         width: 700,
