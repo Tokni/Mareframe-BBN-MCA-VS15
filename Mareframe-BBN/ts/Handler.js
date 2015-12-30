@@ -66,8 +66,8 @@ var Mareframe;
             };
             Handler.prototype.addNewModel = function () {
                 var bbnMode = (DST.Tools.getUrlParameter('bbn') == "true");
-                //bbnMode = true;
-                bbnMode = false;
+                bbnMode = true;
+                //bbnMode = false;
                 var mdl = new DST.Model(bbnMode);
                 console.log("BBN mode is: " + mdl.m_bbnMode);
                 this.setActiveModel(mdl);

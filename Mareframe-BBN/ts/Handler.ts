@@ -75,8 +75,8 @@ module Mareframe {
             }
             addNewModel(): Model {
                 var bbnMode = (Tools.getUrlParameter('bbn') == "true");
-                //bbnMode = true;
-                bbnMode = false;
+                bbnMode = true;
+                //bbnMode = false;
                 var mdl = new Model(bbnMode);
                 console.log("BBN mode is: " + mdl.m_bbnMode);
                 this.setActiveModel(mdl);

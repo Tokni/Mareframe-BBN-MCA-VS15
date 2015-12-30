@@ -269,6 +269,7 @@ var Mareframe;
                 this.m_handler.getFileIO().saveModel(this.m_model);
             };
             GUIHandler.prototype.selectAll = function (p_evt) {
+                this.clearSelection();
                 for (var i = 0; i < this.m_model.getElementArr().length; i++) {
                     this.addToSelection(this.m_model.getElementArr()[i].m_easelElmt);
                 }
