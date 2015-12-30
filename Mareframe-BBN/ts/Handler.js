@@ -31,7 +31,7 @@ var Mareframe;
                 this.m_activeModel = this.addNewModel();
                 this.m_gui = new DST.GUIHandler(this.m_activeModel, this);
                 var loadModel = DST.Tools.getUrlParameter('model');
-                //loadModel = "scotland";
+                loadModel = "scotland";
                 //loadModel = "sicily";
                 //loadModel = "baltic";
                 //loadModel = "northSea";
