@@ -129,8 +129,25 @@
 
     <!--Popup Dialog-->
     <div id="detailsDialog">
-        <!--<div id="elementName"><span>Element Name: </span><span>Name</span><span>Change name</span></div>-->
-        <!--<div id="elememtType"></div>-->
+        <div id="elementName"><span>Element Name: </span><span>Name</span><span>Change name</span></div>
+        <div id="elementType">
+            <form >
+                <fieldset>
+                    <label for = "MCAelmtType" >Type of Element</label>
+                    <select name="MCAelmtType" id="MCAelmtType">
+                        <option id="optionAttribute" value="0">Attribute</option>
+                        <option id="optionObjective" value="1">Objective</option>
+                        <option id="optionAlternative" value="2">Alternative</option>
+                    </select>
+
+                    <label for="MCAWeightingMethod">Type of Weighting Method</label>
+                    <select name="MCAWeightingMethod" id="MCAWeightingMethod">
+                        <option id="optionSwingDirect" value="1">Swing / Direct</option>
+                        <option id="optionValueFunction" value="2">Value Function</option>
+                    </select>
+                </fieldset>
+            </form>
+        </div>
         <div id="weightingMethodSelector"></div>
         <div id="valueFn_div">
             <canvas id="valueFn_canvas" width="100" height="100"></canvas>

@@ -42,12 +42,12 @@ module Mareframe {
                 var loadModel: string = Tools.getUrlParameter('model');
                 //loadModel = "scotland";
                 //loadModel = "sicily";
-                loadModel = "baltic";
+                //loadModel = "baltic";
                 //loadModel = "northSea";
                 //loadModel = "blackSea";
                 //loadModel = "iceland";
                 //loadModel = "cadiz";
-                //loadModel = "test";
+                loadModel = "test";
                 console.log("using model: " + loadModel);
                 if (loadModel !== null) {
                     this.m_fileHandler.loadModel(loadModel, this.m_activeModel, this.m_gui.importStage);
@@ -75,8 +75,8 @@ module Mareframe {
             }
             addNewModel(): Model {
                 var bbnMode = (Tools.getUrlParameter('bbn') == "true");
-                bbnMode = true;
-                //bbnMode = false;
+                //bbnMode = true;
+                bbnMode = false;
                 var mdl = new Model(bbnMode);
                 console.log("BBN mode is: " + mdl.m_bbnMode);
                 this.setActiveModel(mdl);

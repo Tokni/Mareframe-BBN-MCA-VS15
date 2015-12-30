@@ -82,6 +82,9 @@ module Mareframe {
                     $("#model_description").text("This is the Mareframe MCA tool. Data has been loaded into the table on the right. You may doubleclick on each element below, to access the properties panel for that element. If you doubleclick on one of the red or green elements, you may adjust the weights of it's child elements, and thus the data it points to. In the chart at the bottom, you will see the result of the analysis, with the tallest column being the highest scoring one.");
                     this.setEditorMode = this.setEditorMode.bind(this);
                     this.m_editorMode = false;
+                    $("#elementType").hide();
+                    //$("#MCAelmtType").hide();
+                    //$("#MCAweightingMethod").hide();
                 }
 
                 this.allModeltoConsole = this.allModeltoConsole.bind(this);
@@ -116,6 +119,8 @@ module Mareframe {
                 this.clickedDecision = this.clickedDecision.bind(this);
                 this.fullscreen = this.fullscreen.bind(this);
                 this.cnctStatus = this.cnctStatus.bind(this);
+                this.optionTypeChange = this.optionTypeChange.bind(this);
+                this.optionMethodChange = this.optionMethodChange.bind(this);
 
                 this.m_model = p_model;
                 this.m_mcaBackground.name = "hitarea";
@@ -129,6 +134,8 @@ module Mareframe {
                 this.m_valFnBackground.addEventListener("mousedown", this.downValFnCP);
                 this.m_mcaBackground.addEventListener("pressmove", this.pressMove);
                 this.m_controlP.mouseChildren = false;
+                $("#MCAelmtType").on("change", this.optionTypeChange);
+                $("#MCAWeightingMethod").on("change", this.optionMethodChange);
                 $("#debugButton").on("click", this.allModeltoConsole);
                 $("#debugConnect").on("click", this.allConnectionstoConsole);
                 $("#valueFn_Linear").on("click", this.linearizeValFn);
@@ -170,6 +177,19 @@ module Mareframe {
                 $("#debug").hide();
                 this.updateEditorMode();
 
+            }
+            private optionTypeChange(p_evt: Event) {
+
+                //console.log("Element name: " + p_evt.target.id);
+                var elmt: Element = $("#detailsDialog").data("element");
+                
+                elmt.setType(p_evt.target.value);
+
+                
+            }
+            private optionMethodChange(p_evt: Event) {
+                var elmt: Element = $("#detailsDialog").data("element");
+                elmt.setMethod(p_evt.target.value);
             }
             private allConnectionstoConsole(p_evt: Event) {
                 for (var i = 0; i < this.m_model.getConnectionArr().length; i++) {
@@ -480,6 +500,7 @@ module Mareframe {
                         $("#newChance").hide();
                         $("#newDec").hide();
                         $("#newValue").hide();
+                        $("#elementType").show();
                     }
                 } else {
                     $(".advButton").hide();
@@ -747,7 +768,7 @@ module Mareframe {
 
                 } else {
                     //MCA mode only
-
+                    $("#detailsDialog").data("element", p_elmt);
                     //console.log(tableMat);
                     var chartOptions: Object = {
                         width: 700,
