@@ -209,7 +209,7 @@
             }
             
             loadModel(p_modelStringIdent: string, p_activeModelInstance: Model, p_updateGui: Function): any {
-                //console.log("attempting to load " + p_modelStringIdent);
+                console.log("attempting to load " + p_modelStringIdent);
                 var path: string = "JSON/";
                 if (p_activeModelInstance.m_bbnMode) {
                     path += "BBN/";
@@ -238,12 +238,17 @@
                     case "sicily":
                         path += "sicily.json";
                         break;
+                    case "test":
+                        path += "test.json";
+                        break;
                     default:
+                        console.log("NO such file exists!!");
                         break;
                 }
-                //console.log("resulting path is: " + path);
+                console.log("resulting path is: " + path);
+                //console.log("Data: " + JSON.stringify(data));
                 jQuery.getJSON(path, function (data) {
-                    console.log(JSON.stringify(data));
+                    //console.log(JSON.stringify(data));
                     p_activeModelInstance.fromJSON(data);
                     p_updateGui();
                 });

@@ -80,10 +80,12 @@ module Mareframe {
                 }
                 else {
                     $("#model_description").text("This is the Mareframe MCA tool. Data has been loaded into the table on the right. You may doubleclick on each element below, to access the properties panel for that element. If you doubleclick on one of the red or green elements, you may adjust the weights of it's child elements, and thus the data it points to. In the chart at the bottom, you will see the result of the analysis, with the tallest column being the highest scoring one.");
-
+                    this.setEditorMode = this.setEditorMode.bind(this);
+                    this.m_editorMode = false;
                 }
 
                 this.allModeltoConsole = this.allModeltoConsole.bind(this);
+                this.allConnectionstoConsole = this.allConnectionstoConsole.bind(this);
                 this.addDataRowClick = this.addDataRowClick.bind(this);
                 //this.click = this.click.bind(this);
                 this.pressMove = this.pressMove.bind(this);
@@ -118,7 +120,7 @@ module Mareframe {
                 this.m_model = p_model;
                 this.m_mcaBackground.name = "hitarea";
 
-                this.updateEditorMode();
+                this.updateEditorMode = this.updateEditorMode.bind(this);
                 this.m_mcaBackground.addEventListener("mousedown", this.mouseDown);
                 //this.m_mcaBackground.addEventListener("stagemouseup", this.mouseUp);
 
@@ -128,6 +130,7 @@ module Mareframe {
                 this.m_mcaBackground.addEventListener("pressmove", this.pressMove);
                 this.m_controlP.mouseChildren = false;
                 $("#debugButton").on("click", this.allModeltoConsole);
+                $("#debugConnect").on("click", this.allConnectionstoConsole);
                 $("#valueFn_Linear").on("click", this.linearizeValFn);
                 $("#valueFn_Flip").on("click", this.flipValFn);
                 $("#newElmt").on("click", this.createNewElement);
@@ -165,9 +168,14 @@ module Mareframe {
                 createjs.Ticker.addEventListener("tick", this.tick);
                 createjs.Ticker.setFPS(60);
                 $("#debug").hide();
+                this.updateEditorMode();
 
             }
-
+            private allConnectionstoConsole(p_evt: Event) {
+                for (var i = 0; i < this.m_model.getConnectionArr().length; i++) {
+                    console.log("Id: " + this.m_model.getConnectionArr()[i].getID() + "  InElmt: " + this.m_model.getConnectionArr()[i].getInputElement().getName() + "  OutElmt: " + this.m_model.getConnectionArr()[i].getOutputElement().getName());
+                }
+            }
             private addDataRowClick(p_evt: Event) {
                 console.log("doing tnifgs");
                 //$("#defTable_div").append("<p> hello </p>");
@@ -205,10 +213,15 @@ module Mareframe {
                 console.log("newData: " + newData);
                 elmt.setData(newData);
 
+                elmt.update();
+                elmt.setUpdated(false);
+
+                elmt.getAllDescendants().forEach(function (e) {
+                    e.setUpdated(false);
+                });
+
 
             }
-
-
             private allModeltoConsole(p_evt: Event) {
                 console.log("All Model");
                 //console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
@@ -218,9 +231,11 @@ module Mareframe {
                         console.log("   Conn: " + this.m_model.getElementArr()[i].getConnections()[j].getID());
                     }
                 }
+                //for (var i = 0; i < this.m_model.getConnectionArr().length; i++) {
+                //    console.log("Id: " + this.m_model.getConnectionArr()[i].getID + "  InElmt: " + this.m_model.getConnectionArr()[i].getInputElement + "  OutElmt: " + this.m_model.getConnectionArr()[i].getOutputElement);
+                //}
                      
             }
-
             private cnctStatus(p_evt: Event) {
                 if ($("#cnctTool").prop("checked")) {
                     $("#modeStatus").html("Connect Mode");
@@ -229,30 +244,25 @@ module Mareframe {
                     $("#modeStatus").html("Editor Mode");
                 }
             }
-
             private loadModel(p_evt: Event) {
                 ////console.log(this);
                 ////console.log(this.m_handler);
                 this.m_handler.getFileIO().loadfromGenie(this.m_model, this.importStage);
             }
-
             private saveModel(p_evt: Event) {
                 $("#saveFile_div").show();
                 this.m_handler.getFileIO().saveModel(this.m_model);
                 
             }
-
             private selectAll(p_evt: Event) {
                 for (var i = 0; i < this.m_model.getElementArr().length; i++) {
                     this.addToSelection(this.m_model.getElementArr()[i].m_easelElmt);
                 }
-            }
-                       
+            }                      
             private updateModel() {
                 this.m_model.update();
                 this.updateMiniTable(this.m_model.getElementArr());
             }
-
             private setSize(p_width: number, p_height: number): void {
                 console.log("setting size");
                 this.m_mcaStageCanvas.height = p_height;
@@ -266,7 +276,6 @@ module Mareframe {
                 this.m_mcaStageCanvas.height += p_y;
                 this.m_mcaStageCanvas.width += p_x;
             }
-
             private quickLoad() {
                 console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
                 console.log("quickLoad");
@@ -289,7 +298,6 @@ module Mareframe {
                     }
                 }
             }
-
             importStage(): void {
                 //console.log("importing stage");
                 this.m_mcaContainer.removeAllChildren();
@@ -315,7 +323,6 @@ module Mareframe {
 
                 //this.m_handler.getFileIO().quickSave(this.m_model); //This is commented out the because it was preventing reset from working properly
             };
-
             private mouseUp(p_evt: createjs.MouseEvent) {
                 console.log("mouse up");
                 $("#mX").html("X: " + p_evt.stageX);
@@ -327,13 +334,11 @@ module Mareframe {
                 this.m_updateMCAStage = true;
 
             }
-
             private mouseMove(p_evt: createjs.MouseEvent) {
                 if ($("cnctTool").prop("checked")) {
 
                 } 
             }
-
             private updateElement(p_elmt: Element) {
                 p_elmt.m_easelElmt.removeAllChildren();
 
@@ -374,8 +379,7 @@ module Mareframe {
 
                 if (this.m_model.m_bbnMode) {                       
                 }
-            }
-                        
+            }                        
             updateMiniTable(p_elmtArr: Element[]) {
                 //console.log("updating minitable");
                 for (var j = 0; j < p_elmtArr.length; j++) {
@@ -453,16 +457,14 @@ module Mareframe {
                 }
                 //}
             }
-
             private clickedDecision(p_evt: createjs.MouseEvent) {
                 //console.log("clicked a decision");
                 //console.log(p_evt);
                 this.m_model.setDecision(p_evt.currentTarget.name, Math.floor(p_evt.localY / 12));
                 this.updateModel();
             }
-
             private updateEditorMode() {
-                //console.log("updating editormode");
+                console.log("updating editormode");
                 if (this.m_editorMode) {
                     $(".advButton").show();
                     $("#reset").show();
@@ -495,7 +497,6 @@ module Mareframe {
                     }
                 }
             }
-
             private setShowDescription = function (cb) {
                 this.m_showDescription = cb.currentTarget.checked;
                 if (this.m_showDescription) {
@@ -507,7 +508,6 @@ module Mareframe {
                     $("#showDescription").siblings('label').html("Show description");
                 }
             }
-
             public setEditorMode = function (cb) {
                 //console.log(cb);
                 
@@ -523,8 +523,10 @@ module Mareframe {
                 else {
                     $("#modeStatus").html("");
                 }
+                
 
                 this.updateEditorMode();
+                
                 console.log("editormode: " + this.m_editorMode);
             }
             private setAutoUpdate = function (cb) {
@@ -539,7 +541,6 @@ module Mareframe {
                 }
                 //console.log("auto update: " + this.m_model.m_autoUpdate);
             }
-
             private fullscreen(p_evt: Event) {
                 console.log("in local storage: " +localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
                 var model: Model = this.m_model;
@@ -570,7 +571,6 @@ module Mareframe {
                 console.log("in local storage: " +localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
 
             }
-
             private updateSize(): void {
                 var gui = this;
                 var lowestElement: number = this.m_mcaSizeY;
@@ -622,7 +622,6 @@ module Mareframe {
                // elmt.update();
                 this.updateMiniTable([elmt]);
             }
-
             private deleteSelected(p_evt: Event) {                
                 console.log("deleting");
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
@@ -663,7 +662,6 @@ module Mareframe {
                 this.importStage();
                 //console.log("deleting done");
             }
-
             private addToTrash(p_obj: any): boolean {
                 ////console.log(this.m_trashBin.indexOf(p_obj));
                 if (this.m_trashBin.indexOf(p_obj) === -1) {
@@ -674,7 +672,6 @@ module Mareframe {
                     return false;
                 }             
             }
-
             private addElementToStage(p_elmt: Element) {
                 this.updateElement(p_elmt);
 
@@ -696,7 +693,6 @@ module Mareframe {
                 this.m_mcaContainer.addChild(p_elmt.m_easelElmt);
                 this.m_updateMCAStage = true;
             }
-
             private dblClick(p_evt: createjs.MouseEvent) {
                 ////console.log(this);
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
@@ -705,7 +701,6 @@ module Mareframe {
                     $("#detailsDialog").dialog("open");
                 }
             }
-
             private populateElmtDetails(p_elmt: Element): void {
                 this.m_unsavedChanges = false;
                 console.log("unsaved changes: " + this.m_unsavedChanges);
@@ -788,8 +783,11 @@ module Mareframe {
                     }
                     switch (p_elmt.getMethod()) {
                         case 0://direct or undefined
+                            console.log("WeigthMethodDirect");
+                            console.log("Weigthed data: " + this.m_model.getWeightedData(p_elmt, false));
                             break;
                         case 1://swing
+                            console.log("WeigthMethodSwing");
                             var sliderHtml = "";
                             $("#sliders_div").empty();
 
@@ -804,6 +802,7 @@ module Mareframe {
                                         value: p_elmt.getData(1, count),
                                         slide: function (event, ui) {
                                             p_elmt.setData(ui.value, 1, count);
+                                            console.log("Slide: " + ui.value);
                                             $("#inp_" + id).val(ui.value);
                                             this.updateFinalScores();
                                         }.bind(_this)
@@ -831,7 +830,9 @@ module Mareframe {
 
                             break;
                         case 2://valueFn
+                            console.log("WeigthMethodValueFn");
                             var tableMat = this.m_model.getWeightedData(p_elmt, false);
+                            console.log("getWeigthedData: " + tableMat);
                             var cPX: number = p_elmt.getData(1);
                             var cPY: number = p_elmt.getData(2);
                             ////console.log("draw line");
@@ -886,13 +887,12 @@ module Mareframe {
                     document.getElementById("description_div").innerHTML = p_elmt.getDescription();
                 }
             };
-
             private addEditFunction(p_elmt: Element, p_editorMode: boolean) {
                 var originalDesc = p_elmt.getDescription();
                 var originalUserComments = p_elmt.getUserDescription();
                 console.log("Element: " + p_elmt.getName() + "ready for editing");
                 var mareframeGUI = this;
-                //$("#addDataRow").show();
+                $("#addDataRow").show();
                // $(function () {
                     $("#userDescription_div").dblclick(function () {
                         $("#submit").show();
@@ -1083,7 +1083,6 @@ module Mareframe {
                     });
                 }
             };
-
             private showValues() {
                 var elmt: Element =  $("#detailsDialog").data("element");
                 console.log("Data: " + elmt.getData());
@@ -1094,7 +1093,6 @@ module Mareframe {
                 $("#valuesTable_div").show();
                 $("#values").prop("disabled", true);
             }
-
             private saveChanges() {
                 var elmt: Element = $("#detailsDialog").data("element");
                 var oldData: any[][] = elmt.getData();
@@ -1162,8 +1160,7 @@ module Mareframe {
                     //console.log(elmt.getData());
                 }
                 this.m_unsavedChanges = false;
-            }
-            
+            }           
             private updateValFnCP(p_controlPointX: number, p_controlPointY: number, p_flipped_numBool: number): void {
                 //var functionSegments = 10;
                 this.m_valueFnContainer.removeAllChildren();
@@ -1178,8 +1175,9 @@ module Mareframe {
                 //update = true;
                 $("#valueFn_div").show();
             }
-
             private updateDataTableDiv(p_elmt: Element): void {
+                console.log("tableMat: " + tableMat);
+                //alert("pause");
                 var tableMat = this.m_model.getWeightedData(p_elmt, false);
                 tableMat.splice(0, 0, ["Scenario", "Value", "Weight"]);
 
@@ -1189,13 +1187,10 @@ module Mareframe {
                 table.draw(tableData, { 'allowHtml': true, 'alternatingRowStyle': true, 'width': '100%', 'height': '100%' });
                 $('.google-visualization-table-table').width("100%");
             }
-
             private downValFnCP(p_evt: createjs.MouseEvent): void {
                 this.m_oldX = p_evt.stageX;
                 this.m_oldY = p_evt.stageY;
             }
-
-
             private moveValFnCP(p_evt: createjs.MouseEvent) {
                 var elmt = this.m_model.getElement(p_evt.target.name);
                 this.m_controlP.x = p_evt.stageX;
@@ -1207,15 +1202,13 @@ module Mareframe {
 
                 //update = true;
                 this.updateFinalScores();
+                console.log("ElementData: " + elmt.getData());
             }
-
-
             private linearizeValFn(): void {
 
                 this.moveValFnCP(<createjs.MouseEvent>{ stageX: 50, stageY: 50, target: { name: $("#valueFn_Linear").data("name") } });
 
             }
-
             private flipValFn(): void {
 
 
@@ -1227,21 +1220,14 @@ module Mareframe {
                 //update = true;
                 this.updateFinalScores();
             }
-
-
             private getValueFnLine(p_xValue: number, p_color: string): createjs.Graphics {
                 return new createjs.Graphics().beginStroke(p_color).mt(p_xValue, 0).lt(p_xValue, this.m_valueFnSize);
             }
-
-
-
             private updateFinalScores(): void {
                 var data = google.visualization.arrayToDataTable(this.m_model.getFinalScore());
                 data.removeRow(data.getNumberOfRows() - 1);
                 this.m_finalScoreChart.draw(data, this.m_finalScoreChartOptions);
             }
-
-
             private updateTable(p_matrix: any[][]): void {
                 var tableHTML = "";
 
@@ -1262,10 +1248,9 @@ module Mareframe {
                     topRow = false;
                 }
                 $("#editableDataTable").html(tableHTML);
-                ////console.log("original datamatrix");
+                //console.log("original datamatrix" + this.m_model.getDataMatrix());
                 ////console.log(this.m_model.getDataMatrix());
             }
-
             private mouseDown(p_evt: createjs.MouseEvent): void {
                 console.log("mouse down");
                 $("#mX").html("X: " + p_evt.stageX);
@@ -1306,11 +1291,6 @@ module Mareframe {
                     this.clearSelection();
                 }
             }
-
-            
-            
-
-
             private select(p_evt: createjs.MouseEvent): void {
                 //////console.log("ctrl key: " + e.nativeEvent.ctrlKey);
                 if (!p_evt.nativeEvent.ctrlKey && this.m_selectedItems.indexOf(p_evt.target) === -1) {
@@ -1319,7 +1299,6 @@ module Mareframe {
                 //console.log("adding to selection: " + p_evt.target);
                 this.addToSelection(p_evt.target);
             }
-
             private pressMove(p_evt: createjs.MouseEvent): void {
                 //console.log("press move on target " + p_evt.target.name);
                 $("#mX").html("X: " + p_evt.stageX);
@@ -1327,19 +1306,22 @@ module Mareframe {
                 $("#mAction").html("Action: PressMove");
                 $("#mTarget").html("Target: " + p_evt.target.name);
                 if (p_evt.target.name === "hitarea") {
+                    console.log("editorMode: " + this.m_editorMode);
                     if (p_evt.nativeEvent.ctrlKey) {
                         ////console.log("orig: " + this.m_originalPressX + ", " + this.m_originalPressY + ". curr: " + p_evt.stageX + ", " + p_evt.stageY);
                         this.setSelection(this.m_model.getEaselElementsInBox(this.m_originalPressX, this.m_originalPressY, p_evt.stageX, p_evt.stageY));
                         this.m_selectionBox.graphics.clear().s("rgba(0,0,0,0.7)").setStrokeDash([2, 2], createjs.Ticker.getTime()).drawRect(this.m_originalPressX, this.m_originalPressY, p_evt.stageX - this.m_originalPressX, p_evt.stageY - this.m_originalPressY);
                         this.m_mcaContainer.addChild(this.m_selectionBox)
                     } else if (this.m_editorMode) {
-                        //console.log("elements off screen: " + this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
+                        console.log("elements off screen: "); // + this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
                         if (!this.elementOffScreen(undefined, p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
-                        //console.log("panning");
+                        console.log("panning");
                         $("#mAction").html("Action: Panning");
                         this.m_mcaContainer.x += p_evt.stageX - this.m_oldX;
                         this.m_mcaContainer.y += p_evt.stageY - this.m_oldY;
-                            this.resizeWindow();
+
+                        this.resizeWindow();
+                        
                         }
                     }
                 } else if (p_evt.target.name.substr(0, 4) === "elmt") {
@@ -1439,16 +1421,13 @@ module Mareframe {
                     this.m_selectionBox.graphics.clear();
                 }
             }
-
             private clear(): void {
                 this.m_mcaContainer.removeAllChildren();
                 this.m_updateMCAStage = true;
             }
-
             private disconnectFrom(p_evt): void {
 
             }
-
             private connectionExist(p_evt: createjs.MouseEvent): boolean {
                 console.log("selected: " + this.m_selectedItems);
                 for (var i = 0; i < this.m_selectedItems.length; i += 2) {//The reason for only taking every second elemnt is that the others are minitables
@@ -1462,8 +1441,6 @@ module Mareframe {
 
                 return false;
             }
-
-
             private connectTo(p_evt: createjs.MouseEvent): void {
                 var elmtIdent = p_evt.target.name;
                 var connected = false;
@@ -1557,7 +1534,6 @@ module Mareframe {
                 //alert("connection is done");
                 //this.select(elmtIdent);
             }
-
             private addConnectionToStage(p_connection: Connection): void {
                 var line = new createjs.Graphics().beginStroke(p_connection.getColor()).mt(p_connection.getInputElement().m_easelElmt.x, p_connection.getInputElement().m_easelElmt.y).lt(p_connection.getOutputElement().m_easelElmt.x, p_connection.getOutputElement().m_easelElmt.y);
                 var conn = new createjs.Shape(line);
@@ -1583,7 +1559,6 @@ module Mareframe {
                 p_connection.m_easelElmt = cont;
                 this.m_updateMCAStage = true;
             }
-
             private updateConnection(p_connection: Connection): void {
                 //stage.removeChild(c.easelElmt);
                 var temp: createjs.Shape = <createjs.Shape>p_connection.m_easelElmt.getChildAt(1);
@@ -1597,8 +1572,6 @@ module Mareframe {
                 //stage.addChildAt(c.easelElmt, 0);
                 //update = true;
             }
-
-
             private addToSelection(p_easelElmt: createjs.Container): void {
                 //console.log("selected: " + this.m_selectedItems);
                 if (this.m_selectedItems.indexOf(p_easelElmt) === -1 && p_easelElmt.name.substr(0, 4) === "elmt") {
@@ -1689,7 +1662,6 @@ module Mareframe {
                 //}
                 
             }
-
             private setSelection(p_easelElmt: createjs.Container[]): void {
                 this.clearSelection();
                 ////console.log(p_easelElmt);
@@ -1697,11 +1669,9 @@ module Mareframe {
                     this.addToSelection(p_easelElmt[i]);
                 }
             }
-
             getSelected(): any[] {
                 return this.m_selectedItems;
             }
-
             private clearSelection(): void {
                 console.log("clear");
                 for (var i = 0; i < this.m_selectedItems.length; i++) {

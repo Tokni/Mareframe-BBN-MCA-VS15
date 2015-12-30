@@ -26,8 +26,10 @@
         { "connInput": "elmtAttr4", "connOutput": "elmtEnv", "connID": "conn7" },
         { "connInput": "elmtAttr5", "connOutput": "elmtEnv", "connID": "conn8" }
     ],
-    "mdlName": "The Strait of Sicily",
-    "mainObj": "elmtGoal",
+  "mdlName": "The Strait of Sicily",
+  "mdlIdent": "sicily",
+  "mainObj": "elmtGoal",
+
     "dataMat": [
         [ "leaveblank", "Attribute 1", "Attribute 2", "Attribute 3", "Attribute 4", "Attribute 5" ],
         [ "elmtMSYwoL", 340, 2400, 443, 255, 6680 ],

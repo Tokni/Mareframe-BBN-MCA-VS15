@@ -111,8 +111,11 @@ var Mareframe;
                 }
                 else {
                     $("#model_description").text("This is the Mareframe MCA tool. Data has been loaded into the table on the right. You may doubleclick on each element below, to access the properties panel for that element. If you doubleclick on one of the red or green elements, you may adjust the weights of it's child elements, and thus the data it points to. In the chart at the bottom, you will see the result of the analysis, with the tallest column being the highest scoring one.");
+                    this.setEditorMode = this.setEditorMode.bind(this);
+                    this.m_editorMode = false;
                 }
                 this.allModeltoConsole = this.allModeltoConsole.bind(this);
+                this.allConnectionstoConsole = this.allConnectionstoConsole.bind(this);
                 this.addDataRowClick = this.addDataRowClick.bind(this);
                 //this.click = this.click.bind(this);
                 this.pressMove = this.pressMove.bind(this);
@@ -145,7 +148,7 @@ var Mareframe;
                 this.cnctStatus = this.cnctStatus.bind(this);
                 this.m_model = p_model;
                 this.m_mcaBackground.name = "hitarea";
-                this.updateEditorMode();
+                this.updateEditorMode = this.updateEditorMode.bind(this);
                 this.m_mcaBackground.addEventListener("mousedown", this.mouseDown);
                 //this.m_mcaBackground.addEventListener("stagemouseup", this.mouseUp);
                 this.m_controlP.graphics.f("#0615b4").s("#2045ff").rr(0, 0, 6, 6, 2);
@@ -154,6 +157,7 @@ var Mareframe;
                 this.m_mcaBackground.addEventListener("pressmove", this.pressMove);
                 this.m_controlP.mouseChildren = false;
                 $("#debugButton").on("click", this.allModeltoConsole);
+                $("#debugConnect").on("click", this.allConnectionstoConsole);
                 $("#valueFn_Linear").on("click", this.linearizeValFn);
                 $("#valueFn_Flip").on("click", this.flipValFn);
                 $("#newElmt").on("click", this.createNewElement);
@@ -188,7 +192,13 @@ var Mareframe;
                 createjs.Ticker.addEventListener("tick", this.tick);
                 createjs.Ticker.setFPS(60);
                 $("#debug").hide();
+                this.updateEditorMode();
             }
+            GUIHandler.prototype.allConnectionstoConsole = function (p_evt) {
+                for (var i = 0; i < this.m_model.getConnectionArr().length; i++) {
+                    console.log("Id: " + this.m_model.getConnectionArr()[i].getID() + "  InElmt: " + this.m_model.getConnectionArr()[i].getInputElement().getName() + "  OutElmt: " + this.m_model.getConnectionArr()[i].getOutputElement().getName());
+                }
+            };
             GUIHandler.prototype.addDataRowClick = function (p_evt) {
                 console.log("doing tnifgs");
                 //$("#defTable_div").append("<p> hello </p>");
@@ -222,6 +232,11 @@ var Mareframe;
                 }
                 console.log("newData: " + newData);
                 elmt.setData(newData);
+                elmt.update();
+                elmt.setUpdated(false);
+                elmt.getAllDescendants().forEach(function (e) {
+                    e.setUpdated(false);
+                });
             };
             GUIHandler.prototype.allModeltoConsole = function (p_evt) {
                 console.log("All Model");
@@ -232,6 +247,9 @@ var Mareframe;
                         console.log("   Conn: " + this.m_model.getElementArr()[i].getConnections()[j].getID());
                     }
                 }
+                //for (var i = 0; i < this.m_model.getConnectionArr().length; i++) {
+                //    console.log("Id: " + this.m_model.getConnectionArr()[i].getID + "  InElmt: " + this.m_model.getConnectionArr()[i].getInputElement + "  OutElmt: " + this.m_model.getConnectionArr()[i].getOutputElement);
+                //}
             };
             GUIHandler.prototype.cnctStatus = function (p_evt) {
                 if ($("#cnctTool").prop("checked")) {
@@ -438,7 +456,7 @@ var Mareframe;
                 this.updateModel();
             };
             GUIHandler.prototype.updateEditorMode = function () {
-                //console.log("updating editormode");
+                console.log("updating editormode");
                 if (this.m_editorMode) {
                     $(".advButton").show();
                     $("#reset").show();
@@ -691,8 +709,11 @@ var Mareframe;
                     }
                     switch (p_elmt.getMethod()) {
                         case 0:
+                            console.log("WeigthMethodDirect");
+                            console.log("Weigthed data: " + this.m_model.getWeightedData(p_elmt, false));
                             break;
                         case 1:
+                            console.log("WeigthMethodSwing");
                             var sliderHtml = "";
                             $("#sliders_div").empty();
                             for (var i = 0; i < p_elmt.getData(0).length; i++) {
@@ -706,6 +727,7 @@ var Mareframe;
                                         value: p_elmt.getData(1, count),
                                         slide: function (event, ui) {
                                             p_elmt.setData(ui.value, 1, count);
+                                            console.log("Slide: " + ui.value);
                                             $("#inp_" + id).val(ui.value);
                                             this.updateFinalScores();
                                         }.bind(_this)
@@ -732,7 +754,9 @@ var Mareframe;
                             $("#sliders_div").show();
                             break;
                         case 2:
+                            console.log("WeigthMethodValueFn");
                             var tableMat = this.m_model.getWeightedData(p_elmt, false);
+                            console.log("getWeigthedData: " + tableMat);
                             var cPX = p_elmt.getData(1);
                             var cPY = p_elmt.getData(2);
                             ////console.log("draw line");
@@ -783,7 +807,7 @@ var Mareframe;
                 var originalUserComments = p_elmt.getUserDescription();
                 console.log("Element: " + p_elmt.getName() + "ready for editing");
                 var mareframeGUI = this;
-                //$("#addDataRow").show();
+                $("#addDataRow").show();
                 // $(function () {
                 $("#userDescription_div").dblclick(function () {
                     $("#submit").show();
@@ -1064,6 +1088,8 @@ var Mareframe;
                 $("#valueFn_div").show();
             };
             GUIHandler.prototype.updateDataTableDiv = function (p_elmt) {
+                console.log("tableMat: " + tableMat);
+                //alert("pause");
                 var tableMat = this.m_model.getWeightedData(p_elmt, false);
                 tableMat.splice(0, 0, ["Scenario", "Value", "Weight"]);
                 var tableData = google.visualization.arrayToDataTable(tableMat);
@@ -1085,6 +1111,7 @@ var Mareframe;
                 this.updateDataTableDiv(elmt);
                 //update = true;
                 this.updateFinalScores();
+                console.log("ElementData: " + elmt.getData());
             };
             GUIHandler.prototype.linearizeValFn = function () {
                 this.moveValFnCP({ stageX: 50, stageY: 50, target: { name: $("#valueFn_Linear").data("name") } });
@@ -1123,7 +1150,7 @@ var Mareframe;
                     topRow = false;
                 }
                 $("#editableDataTable").html(tableHTML);
-                ////console.log("original datamatrix");
+                //console.log("original datamatrix" + this.m_model.getDataMatrix());
                 ////console.log(this.m_model.getDataMatrix());
             };
             GUIHandler.prototype.mouseDown = function (p_evt) {
@@ -1182,6 +1209,7 @@ var Mareframe;
                 $("#mAction").html("Action: PressMove");
                 $("#mTarget").html("Target: " + p_evt.target.name);
                 if (p_evt.target.name === "hitarea") {
+                    console.log("editorMode: " + this.m_editorMode);
                     if (p_evt.nativeEvent.ctrlKey) {
                         ////console.log("orig: " + this.m_originalPressX + ", " + this.m_originalPressY + ". curr: " + p_evt.stageX + ", " + p_evt.stageY);
                         this.setSelection(this.m_model.getEaselElementsInBox(this.m_originalPressX, this.m_originalPressY, p_evt.stageX, p_evt.stageY));
@@ -1189,9 +1217,9 @@ var Mareframe;
                         this.m_mcaContainer.addChild(this.m_selectionBox);
                     }
                     else if (this.m_editorMode) {
-                        //console.log("elements off screen: " + this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
+                        console.log("elements off screen: "); // + this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
                         if (!this.elementOffScreen(undefined, p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
-                            //console.log("panning");
+                            console.log("panning");
                             $("#mAction").html("Action: Panning");
                             this.m_mcaContainer.x += p_evt.stageX - this.m_oldX;
                             this.m_mcaContainer.y += p_evt.stageY - this.m_oldY;
