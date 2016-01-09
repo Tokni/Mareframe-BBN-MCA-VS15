@@ -202,55 +202,16 @@ var Mareframe;
             GUIHandler.prototype.optionTypeChange = function (p_evt) {
                 //console.log("Element name: " + p_evt.target.id);
                 var elmt = $("#detailsDialog").data("element");
-                elmt.setType(p_evt.target.value);
+                //elmt.setType(p_evt.target.value);
             };
             GUIHandler.prototype.optionMethodChange = function (p_evt) {
                 var elmt = $("#detailsDialog").data("element");
-                elmt.setMethod(p_evt.target.value);
+                //elmt.setMethod(p_evt.target.value);
             };
             GUIHandler.prototype.allConnectionstoConsole = function (p_evt) {
                 for (var i = 0; i < this.m_model.getConnectionArr().length; i++) {
                     console.log("Id: " + this.m_model.getConnectionArr()[i].getID() + "  InElmt: " + this.m_model.getConnectionArr()[i].getInputElement().getName() + "  OutElmt: " + this.m_model.getConnectionArr()[i].getOutputElement().getName());
                 }
-            };
-            GUIHandler.prototype.addDataRowClick = function (p_evt) {
-                console.log("doing tnifgs");
-                //$("#defTable_div").append("<p> hello </p>");
-                var elmt = $("#detailsDialog").data("element");
-                var oldData = [];
-                oldData = elmt.getData();
-                var newData = [];
-                //newData = oldData;
-                //oldData[0] = elmt.getData(0);
-                //oldData[1] = elmt.getData(1);
-                //console.log("o0" + oldData[0]
-                //Tools.makeSureItsAnArray(oldData);
-                //var index = oldData.length;
-                //var newData: any[][] = [];
-                //newData = oldData;
-                console.log("oldDataLenght: " + oldData.length[0]);
-                console.log("oldData: " + oldData);
-                console.log("newData: " + newData);
-                //newData[oldData.length] = [];
-                for (var i = 0; i < oldData.length; i++) {
-                    console.log(i + "  " + oldData[i]);
-                    newData[i] = oldData[i];
-                }
-                newData[oldData.length] = [];
-                console.log("oldDataLenght: " + oldData.length);
-                newData[oldData.length][0] = "StateName";
-                for (var i = 1; i < oldData[0].length; i++) {
-                    //newData[oldData.length][i] = 0;
-                    newData[oldData.length][i] = 0;
-                    console.log("old.len: " + oldData[0].length + "   i: " + i);
-                }
-                console.log("newData: " + newData);
-                elmt.setData(newData);
-                elmt.update();
-                elmt.setUpdated(false);
-                elmt.getAllDescendants().forEach(function (e) {
-                    e.setUpdated(false);
-                });
             };
             GUIHandler.prototype.allModeltoConsole = function (p_evt) {
                 console.log("All Model");
@@ -666,7 +627,8 @@ var Mareframe;
                     console.log("hiding selector");
                     $("#detailsDialog").data("element", p_elmt);
                     $("#detailsDialog").data("model", this.m_model);
-                    var s = DST.Tools.htmlTableFromArray("Definition", p_elmt.getData(), this.m_model);
+                    console.log("data: " + p_elmt.getData());
+                    var s = DST.Tools.htmlTableFromArray("Definition", p_elmt, this.m_model, this.m_editorMode);
                     console.log(p_elmt.getData());
                     $("#defTable_div").html(s);
                     $("#defTable_div").show();
@@ -840,11 +802,11 @@ var Mareframe;
             GUIHandler.prototype.addEditFunction = function (p_elmt, p_editorMode) {
                 var originalName = p_elmt.getName();
                 var mareframeGUI = this;
+                var model = this.m_model;
                 if (this.m_model.m_bbnMode) {
                     var originalDesc = p_elmt.getDescription();
                     var originalUserComments = p_elmt.getUserDescription();
                     console.log("Element: " + p_elmt.getName() + "ready for editing");
-                    $("#addDataRow").show();
                     // $(function () {
                     $("#userDescription_div").dblclick(function () {
                         $("#submit").show();
@@ -886,6 +848,25 @@ var Mareframe;
                     });
                     // });
                     if (p_editorMode) {
+                        if (p_elmt.getType() !== 2) {
+                            $("#addDataRow").show();
+                            $(".minus").button({
+                                icons: { primary: "ui-icon-minus" }
+                            });
+                            //Add function to minus button
+                            $(".minus").click(function () {
+                                var row = this.id;
+                                mareframeGUI.removeRow(p_elmt, row);
+                                //create the html table again
+                                var s = DST.Tools.htmlTableFromArray("Definition", p_elmt, model, p_editorMode);
+                                $("#defTable_div").html(s);
+                                //Add the edit function again
+                                mareframeGUI.addEditFunction(p_elmt, p_editorMode);
+                            });
+                        }
+                        else {
+                            $("#addDataRow").hide();
+                        }
                         $("#info_name").dblclick(function () {
                             $("#submit").show();
                             $(this).addClass("editable");
@@ -963,9 +944,6 @@ var Mareframe;
                             });
                             // });
                         });
-                        $(".defStateName").button({
-                            icons: { primary: "ui-icon-minus" }
-                        });
                         //Data table
                         var editing = false; //this is used to make sure the text does not disapear when double clicking several times
                         $(function () {
@@ -1023,7 +1001,7 @@ var Mareframe;
                                 }
                             });
                             //TODO Prevent user from editing the top rows. That data should come from the child elements
-                            $("th").dblclick(function () {
+                            $(".editable_cell").dblclick(function () {
                                 console.log("editing: " + editing);
                                 if (!editing) {
                                     editing = true;
@@ -1120,7 +1098,7 @@ var Mareframe;
                 console.log("Values: " + elmt.getValues());
                 console.log(elmt.getValues());
                 console.log("size of values: " + math.size(elmt.getValues()));
-                $("#valuesTable_div").html(DST.Tools.htmlTableFromArray("Values", elmt.getValues(), $("#detailsDialog").data("model")));
+                $("#valuesTable_div").html(DST.Tools.htmlTableFromArray("Values", elmt, $("#detailsDialog").data("model"), this.m_editorMode));
                 $("#valuesTable_div").show();
                 $("#values").prop("disabled", true);
             };
@@ -1142,24 +1120,27 @@ var Mareframe;
                 //console.log(this);
                 table.find("tr").each(function () {
                     $(this).find("th,td").each(function () {
-                        //console.log("text to be added: " + $(this).text());
-                        //console.log("does it exsist: " + $.inArray($(this).text(), newRow) === -1)
-                        var value = $(this).text();
-                        //Don't add the same value twice if it is in one of the header cells
-                        //(Better solution: check before the text is saved in the cell)
-                        if ($.inArray(value, newRow) === -1 || !isNaN(value)) {
-                            //Convert to number
-                            if (!isNaN(value)) {
-                                value = Number(value);
+                        if ($(this).text().length > 0) {
+                            //console.log("text to be added: " + $(this).text());
+                            //console.log("does it exsist: " + $.inArray($(this).text(), newRow) === -1)
+                            var value = $(this).text();
+                            //Don't add the same value twice if it is in one of the header cells
+                            //(Better solution: check before the text is saved in the cell)
+                            if ($.inArray(value, newRow) === -1 || !isNaN(value)) {
+                                //Convert to number
+                                if (!isNaN(value)) {
+                                    value = Number(value);
+                                }
+                                console.log("pushing " + value);
+                                newRow.push(value);
                             }
-                            newRow.push(value);
                         }
                     });
                     newTable.push(newRow);
                     newRow = [];
                 });
                 //console.log(newTable);
-                //Remove header row with title the "Definition"
+                //Remove header row with the title "Definition"
                 newTable.splice(0, 1);
                 //Reset the headerrows. (Better solution would be to prevent the user from editing them
                 for (var i = 0; i < DST.Tools.numOfHeaderRows(oldData); i++) {
@@ -1190,6 +1171,7 @@ var Mareframe;
                 }
                 this.m_unsavedChanges = false;
                 //this.m_updateMCAStage = true;
+                //this.m_mcaContainer.removeChild(elmt.m_easelElmt);
                 this.addElementToStage(elmt); //repaint the element. This is necessary if the name of the elemnt has been changed
             };
             GUIHandler.prototype.updateValFnCP = function (p_controlPointX, p_controlPointY, p_flipped_numBool) {
@@ -1273,20 +1255,17 @@ var Mareframe;
                 ////console.log(this.m_model.getDataMatrix());
             };
             GUIHandler.prototype.mouseDown = function (p_evt) {
-                console.log("mouse down");
+                //console.log("mouse down");
                 $("#mX").html("X: " + p_evt.stageX);
                 $("#mY").html("Y: " + p_evt.stageY);
                 $("#mAction").html("Action: mousedown");
                 $("#mTarget").html("Target: " + p_evt.target.name);
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
                     var elmt = this.m_model.getElement(p_evt.target.name);
-                    console.log("");
-                    console.log("*********************");
+                    //console.log("");
+                    //console.log("*********************");
                     for (var i in elmt.getConnections()) {
-                        console.log(elmt.getID() + "  " + elmt.getConnections()[i].getID());
                     }
-                    console.log("Data: " + elmt.getData());
-                    console.log("Values: " + elmt.getValues());
                 }
                 //////console.log("mouse down at: ("+e.stageX+","+e.stageY+")");
                 this.m_oldX = p_evt.stageX;
@@ -1328,7 +1307,7 @@ var Mareframe;
                 $("#mAction").html("Action: PressMove");
                 $("#mTarget").html("Target: " + p_evt.target.name);
                 if (p_evt.target.name === "hitarea") {
-                    console.log("editorMode: " + this.m_editorMode);
+                    //console.log("editorMode: " + this.m_editorMode);
                     if (p_evt.nativeEvent.ctrlKey) {
                         ////console.log("orig: " + this.m_originalPressX + ", " + this.m_originalPressY + ". curr: " + p_evt.stageX + ", " + p_evt.stageY);
                         this.setSelection(this.m_model.getEaselElementsInBox(this.m_originalPressX, this.m_originalPressY, p_evt.stageX, p_evt.stageY));
@@ -1336,9 +1315,9 @@ var Mareframe;
                         this.m_mcaContainer.addChild(this.m_selectionBox);
                     }
                     else if (this.m_editorMode) {
-                        console.log("elements off screen: "); // + this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
+                        //console.log("elements off screen: "); // + this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
                         if (!this.elementOffScreen(undefined, p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
-                            console.log("panning");
+                            //console.log("panning");
                             $("#mAction").html("Action: Panning");
                             this.m_mcaContainer.x += p_evt.stageX - this.m_oldX;
                             this.m_mcaContainer.y += p_evt.stageY - this.m_oldY;
@@ -1705,6 +1684,43 @@ var Mareframe;
                 }
                 this.m_selectedItems = [];
                 this.m_updateMCAStage = true;
+            };
+            GUIHandler.prototype.addDataRowClick = function (p_evt) {
+                console.log("add row");
+                var elmt = $("#detailsDialog").data("element");
+                elmt.setData(DST.Tools.addDataRow(elmt));
+                elmt.update();
+                //Create the html tabel again and add the edit function again
+                var s = DST.Tools.htmlTableFromArray("Definition", elmt, this.m_model, this.m_editorMode);
+                $("#defTable_div").html(s);
+                this.addEditFunction(elmt, this.m_editorMode);
+                var newStateName = elmt.getData()[elmt.getData().length - 1][0];
+                //Add default values for the new state in all children
+                elmt.getChildrenElements().forEach(function (e) {
+                    e.setData(e.updateHeaderRows(e.getData()));
+                    e.setData(e.addDefaultDataInEmptyCells(e.getData(), elmt, newStateName));
+                });
+                elmt.getAllDescendants().forEach(function (e) {
+                    e.setUpdated(false);
+                });
+            };
+            GUIHandler.prototype.removeRow = function (p_element, p_n) {
+                console.log("remove row " + p_n + " in " + p_element.getName());
+                var data = DST.Tools.makeSureItsTwoDimensional(p_element.getData());
+                var state = data[p_n][0];
+                if (data.length - DST.Tools.numOfHeaderRows(data) < 3) {
+                    alert("Can not be less than two outcomes");
+                }
+                else {
+                    p_element.setData(DST.Tools.removeRow(p_element.getData(), p_n));
+                    //Remove this state from all children data tables
+                    p_element.getChildrenElements().forEach(function (e) {
+                        e.setData(DST.Tools.removeState(e.getData(), p_element, state));
+                    });
+                    p_element.getAllDescendants().forEach(function (e) {
+                        e.setUpdated(false);
+                    });
+                }
             };
             return GUIHandler;
         })();

@@ -69,6 +69,7 @@ module Mareframe {
                     
                     $("#submit").on("click", this.saveChanges);
                     $("#values").on("click", this.showValues);
+                   
                     this.setEditorMode = this.setEditorMode.bind(this);
                     this.setAutoUpdate = this.setAutoUpdate.bind(this);
                     $("#MCADataTable").hide();
@@ -183,65 +184,20 @@ module Mareframe {
                 //console.log("Element name: " + p_evt.target.id);
                 var elmt: Element = $("#detailsDialog").data("element");
                 
-                elmt.setType(p_evt.target.value);
+                //elmt.setType(p_evt.target.value);
 
                 
             }
             private optionMethodChange(p_evt: Event) {
                 var elmt: Element = $("#detailsDialog").data("element");
-                elmt.setMethod(p_evt.target.value);
+                //elmt.setMethod(p_evt.target.value);
             }
             private allConnectionstoConsole(p_evt: Event) {
                 for (var i = 0; i < this.m_model.getConnectionArr().length; i++) {
                     console.log("Id: " + this.m_model.getConnectionArr()[i].getID() + "  InElmt: " + this.m_model.getConnectionArr()[i].getInputElement().getName() + "  OutElmt: " + this.m_model.getConnectionArr()[i].getOutputElement().getName());
                 }
             }
-            private addDataRowClick(p_evt: Event) {
-                console.log("doing tnifgs");
-                //$("#defTable_div").append("<p> hello </p>");
-                var elmt: Element = $("#detailsDialog").data("element");
-                var oldData: any[][] = [];
-                oldData = elmt.getData();
-                var newData: any[][] = [];
-
-                //newData = oldData;
-                //oldData[0] = elmt.getData(0);
-                //oldData[1] = elmt.getData(1);
-                //console.log("o0" + oldData[0]
-
-                //Tools.makeSureItsAnArray(oldData);
-                //var index = oldData.length;
-                //var newData: any[][] = [];
-                //newData = oldData;
-                console.log("oldDataLenght: " + oldData.length[0]);
-                console.log("oldData: " + oldData);
-                console.log("newData: " + newData);
-                //newData[oldData.length] = [];
-                for (var i = 0; i < oldData.length; i++) {
-                    console.log(i + "  " + oldData[i]);
-                    newData[i] = oldData[i];
-                } 
-                newData[oldData.length] = [];
-                console.log("oldDataLenght: " + oldData.length);
-                newData[oldData.length][0] = "StateName";
-                for (var i = 1; i < oldData[0].length; i++) {
-                    //newData[oldData.length][i] = 0;
-                    newData[oldData.length][i] = 0;
-                    console.log("old.len: " + oldData[0].length + "   i: " + i);
-                }
-
-                console.log("newData: " + newData);
-                elmt.setData(newData);
-
-                elmt.update();
-                elmt.setUpdated(false);
-
-                elmt.getAllDescendants().forEach(function (e) {
-                    e.setUpdated(false);
-                });
-
-
-            }
+            
             private allModeltoConsole(p_evt: Event) {
                 console.log("All Model");
                 //console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
@@ -696,8 +652,7 @@ module Mareframe {
             }
             private addElementToStage(p_elmt: Element) {
                 this.updateElement(p_elmt);
-
-
+                
                 p_elmt.m_easelElmt.regX = 75;
                 p_elmt.m_easelElmt.regY = 15;
                 if (p_elmt.m_easelElmt.x <= 0 && p_elmt.m_easelElmt.y <= 0) {
@@ -740,8 +695,8 @@ module Mareframe {
                     console.log("hiding selector");
                     $("#detailsDialog").data("element", p_elmt);
                     $("#detailsDialog").data("model", this.m_model);
-                    
-                    var s = Tools.htmlTableFromArray("Definition", p_elmt.getData(), this.m_model);
+                    console.log("data: " + p_elmt.getData());
+                    var s = Tools.htmlTableFromArray("Definition", p_elmt, this.m_model, this.m_editorMode);
                     console.log(p_elmt.getData());
                     $("#defTable_div").html(s);
                     $("#defTable_div").show();
@@ -930,20 +885,36 @@ module Mareframe {
             private addEditFunction(p_elmt: Element, p_editorMode: boolean) {
                     var originalName: string = p_elmt.getName();
                     var mareframeGUI = this;
-                if (this.m_model.m_bbnMode) {
-                var originalDesc = p_elmt.getDescription();
-                var originalUserComments = p_elmt.getUserDescription();
-                console.log("Element: " + p_elmt.getName() + "ready for editing");
-                $("#addDataRow").show();
-               // $(function () {
-                    $("#userDescription_div").dblclick(function () {
-                        $("#submit").show();
-                        $(this).addClass("editable");
-                        console.log("original value : " + originalUserComments);
-                        $(this).html("<input type='text' value='" + originalUserComments + "' />");
-                        $(this).children().first().focus();
-                        $(this).children().first().keypress(function (e) {
-                            if (e.which == 13) {
+                    var model: Model = this.m_model;
+                    if (this.m_model.m_bbnMode) {
+                        var originalDesc = p_elmt.getDescription();
+                        var originalUserComments = p_elmt.getUserDescription();
+                        console.log("Element: " + p_elmt.getName() + "ready for editing");
+                        // $(function () {
+                        $("#userDescription_div").dblclick(function () {
+                            $("#submit").show();
+                            $(this).addClass("editable");
+                            console.log("original value : " + originalUserComments);
+                            $(this).html("<input type='text' value='" + originalUserComments + "' />");
+                            $(this).children().first().focus();
+                            $(this).children().first().keypress(function (e) {
+                                if (e.which == 13) {
+                                    var newText = $(this).val();
+                                    console.log("new text: " + newText);
+                                    if (newText.length < 1) { //Must not update the text if the new text string is empty
+                                        $("#userDescription_div").html(originalUserComments);
+                                        newText = originalUserComments;
+                                    }
+                                    $(this).parent().text(newText);
+                                    if (newText !== originalUserComments) {
+                                        console.log("unsaved changes");
+                                        mareframeGUI.m_unsavedChanges = true;
+                                    }
+                                    originalUserComments = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                                }
+                                $(this).parent().removeClass("editable");
+                            });
+                            $(this).children().first().blur(function () {
                                 var newText = $(this).val();
                                 console.log("new text: " + newText);
                                 if (newText.length < 1) { //Must not update the text if the new text string is empty
@@ -952,38 +923,57 @@ module Mareframe {
                                 }
                                 $(this).parent().text(newText);
                                 if (newText !== originalUserComments) {
-                                    console.log("unsaved changes");
                                     mareframeGUI.m_unsavedChanges = true;
                                 }
                                 originalUserComments = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
-                            }
-                            $(this).parent().removeClass("editable");
-                        });
-                        $(this).children().first().blur(function () {
-                            var newText = $(this).val();
-                            console.log("new text: " + newText);
-                            if (newText.length < 1) { //Must not update the text if the new text string is empty
-                                $("#userDescription_div").html(originalUserComments);
-                                newText = originalUserComments;
-                            }
-                            $(this).parent().text(newText);
-                            if (newText !== originalUserComments) {
-                                mareframeGUI.m_unsavedChanges = true;
-                            }
-                            originalUserComments = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
-                            $(this).parent().removeClass("editable");
-                        });
+                                $(this).parent().removeClass("editable");
+                            });
 
-                    });
-               // });
-                if (p_editorMode) {
-                        $("#info_name").dblclick(function () {
-                            $("#submit").show();
-                            $(this).addClass("editable");
-                            $(this).html("<input type='text' value='" + originalName + "' />");
-                            $(this).children().first().focus();
-                            $(this).children().first().keypress(function (e) {
-                                if (e.which == 13) {
+                        });
+                        // });
+                        if (p_editorMode) {
+                            if (p_elmt.getType() !== 2) {//If it is a chance or a decision node
+                                $("#addDataRow").show();
+                                $(".minus").button({
+                                    icons: { primary: "ui-icon-minus" }
+                                });
+                                //Add function to minus button
+                                $(".minus").click(function () {
+                                    var row: number = this.id
+                                    mareframeGUI.removeRow(p_elmt, row);
+                                    //create the html table again
+                                    var s = Tools.htmlTableFromArray("Definition", p_elmt, model, p_editorMode);
+                                    $("#defTable_div").html(s);
+                                    //Add the edit function again
+                                    mareframeGUI.addEditFunction(p_elmt, p_editorMode);
+                                });
+                            }
+                            else {
+                                $("#addDataRow").hide();
+                            }
+                            $("#info_name").dblclick(function () {
+                                $("#submit").show();
+                                $(this).addClass("editable");
+                                $(this).html("<input type='text' value='" + originalName + "' />");
+                                $(this).children().first().focus();
+                                $(this).children().first().keypress(function (e) {
+                                    if (e.which == 13) {
+                                        var newText = $(this).val();
+                                        console.log("new text: " + newText);
+                                        if (newText.length < 1) { //Must not update the text if the new text string is empty
+                                            $("#info_name").html(originalName);
+                                            newText = originalName;
+                                        }
+                                        $(this).parent().text(newText);
+                                        if (newText !== originalName) {
+                                            console.log("unsaved changes");
+                                            mareframeGUI.m_unsavedChanges = true;
+                                        }
+                                        originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                                    }
+                                    $(this).parent().removeClass("editable");
+                                });
+                                $(this).children().first().blur(function () {
                                     var newText = $(this).val();
                                     console.log("new text: " + newText);
                                     if (newText.length < 1) { //Must not update the text if the new text string is empty
@@ -992,139 +982,137 @@ module Mareframe {
                                     }
                                     $(this).parent().text(newText);
                                     if (newText !== originalName) {
-                                        console.log("unsaved changes");
                                         mareframeGUI.m_unsavedChanges = true;
                                     }
                                     originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
-                                }
-                                $(this).parent().removeClass("editable");
-                            });
-                            $(this).children().first().blur(function () {
-                                var newText = $(this).val();
-                                console.log("new text: " + newText);
-                                if (newText.length < 1) { //Must not update the text if the new text string is empty
-                                    $("#info_name").html(originalName);
-                                    newText = originalName;
-                                }
-                                $(this).parent().text(newText);
-                                if (newText !== originalName) {
-                                    mareframeGUI.m_unsavedChanges = true;
-                                }
-                                originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
-                                $(this).parent().removeClass("editable");
-                            });
+                                    $(this).parent().removeClass("editable");
+                                });
 
-                        });
-                   // $(function () {
-                        console.log("original value: " + originalDesc);
-                        $("#description_div").dblclick(function () {
-                            $("#submit").show();
-                            //var originalValue = $(this).text();
-                            $(this).addClass("editable");
-                            $(this).html("<input type='text' value='" + originalDesc + "' />"); //Prevents the box from becoming emtpy when clicked
-                            $(this).children().first().focus();
-                            $(this).children().first().keypress(function (e) {
-                                if (e.which == 13) {//If enter is pressed
+                            });
+                            // $(function () {
+                            console.log("original value: " + originalDesc);
+                            $("#description_div").dblclick(function () {
+                                $("#submit").show();
+                                //var originalValue = $(this).text();
+                                $(this).addClass("editable");
+                                $(this).html("<input type='text' value='" + originalDesc + "' />"); //Prevents the box from becoming emtpy when clicked
+                                $(this).children().first().focus();
+                                $(this).children().first().keypress(function (e) {
+                                    if (e.which == 13) {//If enter is pressed
+                                        var newText = $(this).val();
+                                        $(this).parent().text(newText);
+                                        if (newText.length < 1) { //Must not update the text if the new text string is empty
+                                            $("#description_div").html(originalDesc);
+                                            newText = originalDesc;
+                                        }
+                                        if (newText !== originalDesc) {
+                                            mareframeGUI.m_unsavedChanges = true;
+                                        }
+                                        originalDesc = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                                    }
+                                    $(this).parent().removeClass("editable");
+                                });
+                                $(this).children().first().blur(function () { //If user has clicked outside the box
                                     var newText = $(this).val();
-                                    $(this).parent().text(newText);
-                                    if (newText.length < 1) { //Must not update the text if the new text string is empty
+                                    console.log("newtext = " + newText + " length: " + newText.length);
+                                    console.log("original text: " + originalDesc);
+                                    if (newText.length < 1) {
                                         $("#description_div").html(originalDesc);
                                         newText = originalDesc;
                                     }
+                                    $(this).parent().text(newText);
                                     if (newText !== originalDesc) {
                                         mareframeGUI.m_unsavedChanges = true;
                                     }
                                     originalDesc = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
-                                }
-                                $(this).parent().removeClass("editable");
+                                    $(this).parent().removeClass("editable");
+                                });
+                                // });
                             });
-                            $(this).children().first().blur(function () { //If user has clicked outside the box
-                                var newText = $(this).val();
-                                console.log("newtext = " + newText + " length: " + newText.length);
-                                console.log("original text: " + originalDesc);
-                                if (newText.length < 1) {
-                                    $("#description_div").html(originalDesc);
-                                    newText = originalDesc;
-                                }
-                                $(this).parent().text(newText);
-                                if (newText !== originalDesc) {
-                                    mareframeGUI.m_unsavedChanges = true;
-                                }
-                                originalDesc = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
-                                $(this).parent().removeClass("editable");
-                            });
-                       // });
-                        });
-                        $(".defStateName").button({
-                            icons: { primary: "ui-icon-minus" }
-                        });
-                    //Data table
-                        var editing = false;//this is used to make sure the text does not disapear when double clicking several times
-                        $(function () {
-                            $("td").dblclick(function () {
-                                console.log("editing: " + editing);
-                                if (!editing) {
-                                    editing = true;
-                                    $("#submit").show();
-                                    
-                                    var originalValue = $(this).text();
-                                    console.log("original value : " + originalValue);
-                                    $(this).addClass("editable");
-                                    $(this).html("<input type='text' value='" + originalValue + "' />");
-                                    $(this).children().first().focus();
-                                    $(this).children().first().keypress(function (e) {//if enter is pressed
-                                        if (e.which == 13) {
+                            //Data table
+                            var editing = false;//this is used to make sure the text does not disapear when double clicking several times
+                            $(function () {
+                                $("td").dblclick(function () {
+                                    console.log("editing: " + editing);
+                                    if (!editing) {
+                                        editing = true;
+                                        $("#submit").show();
+
+                                        var originalValue = $(this).text();
+                                        console.log("original value : " + originalValue);
+                                        $(this).addClass("editable");
+                                        $(this).html("<input type='text' value='" + originalValue + "' />");
+                                        $(this).children().first().focus();
+                                        $(this).children().first().keypress(function (e) {//if enter is pressed
+                                            if (e.which == 13) {
+                                                var newText = $(this).val();
+                                                console.log("new text: " + newText);
+                                                if (isNaN(newText) || newText.length < 1) {
+                                                    console.log("value is not a number");
+                                                    // alert("Value must be a number");
+                                                    //TODO find better solution than alert
+                                                    $(this).parent().text(originalValue);
+                                                } else {
+                                                    $(this).parent().text(newText);
+                                                    if (newText !== originalValue) {
+                                                        mareframeGUI.m_unsavedChanges = true;
+                                                    }
+                                                }
+                                                $(this).parent().removeClass("editable");
+                                                editing = false;
+                                            }
+                                        });
+                                        $(this).children().first().blur(function () {//if the user has clicked outside the table
                                             var newText = $(this).val();
-                                            console.log("new text: " + newText);
                                             if (isNaN(newText) || newText.length < 1) {
-                                                console.log("value is not a number");
-                                                // alert("Value must be a number");
+                                                //alert("Value must be a number");
+                                                console.log("orignal value: " + originalValue);
                                                 //TODO find better solution than alert
                                                 $(this).parent().text(originalValue);
                                             } else {
                                                 $(this).parent().text(newText);
+                                                console.log(" new text: " + newText + " originalValue: " + originalValue);
                                                 if (newText !== originalValue) {
                                                     mareframeGUI.m_unsavedChanges = true;
+                                                }
+                                                else {
+                                                    mareframeGUI.m_unsavedChanges = false;
                                                 }
                                             }
                                             $(this).parent().removeClass("editable");
                                             editing = false;
-                                        }
-                                    });
-                                    $(this).children().first().blur(function () {//if the user has clicked outside the table
-                                        var newText = $(this).val();
-                                        if (isNaN(newText) || newText.length < 1) {
-                                            //alert("Value must be a number");
-                                            console.log("orignal value: " + originalValue);
-                                            //TODO find better solution than alert
-                                            $(this).parent().text(originalValue);
-                                        } else {
-                                            $(this).parent().text(newText);
-                                            console.log(" new text: " + newText + " originalValue: " + originalValue);
-                                            if (newText !== originalValue) {
-                                                mareframeGUI.m_unsavedChanges = true;
-                                            }
-                                            else {
-                                                mareframeGUI.m_unsavedChanges = false;
-                                            }
-                                        }
-                                        $(this).parent().removeClass("editable");
-                                        editing = false;
-                                    });
-                                }
+                                        });
+                                    }
                                 });
-                        //TODO Prevent user from editing the top rows. That data should come from the child elements
-                            $("th").dblclick(function () {
-                                console.log("editing: " + editing);
-                                if (!editing) {
-                                    editing = true;
-                                    $("#submit").show();
-                                    var originalText = $(this).text();
-                                    $(this).addClass("editable");
-                                    $(this).html("<input type='text' value='" + originalText + "' />");
-                                    $(this).children().first().focus();
-                                    $(this).children().first().keypress(function (e) {
-                                        if (e.which == 13) {//if enter is pressed
+                                //TODO Prevent user from editing the top rows. That data should come from the child elements
+                                $(".editable_cell").dblclick(function () {
+                                    console.log("editing: " + editing);
+                                    if (!editing) {
+                                        editing = true;
+                                        $("#submit").show();
+                                        var originalText = $(this).text();
+                                        $(this).addClass("editable");
+                                        $(this).html("<input type='text' value='" + originalText + "' />");
+                                        $(this).children().first().focus();
+                                        $(this).children().first().keypress(function (e) {
+                                            if (e.which == 13) {//if enter is pressed
+                                                var newText = $(this).val();
+                                                if (newText.length < 1) {
+                                                    //alert("Cell cannot be empty");
+                                                    console.log("cell cannot be emtpy");
+                                                    $(this).parent().text(originalText);
+                                                }
+                                                else {
+                                                    $(this).parent().text(newText);
+                                                    if (newText !== originalText) {
+                                                        mareframeGUI.m_unsavedChanges = true;
+                                                    }
+                                                }
+                                                $(this).parent().removeClass("editable");
+                                                editing = false;
+                                            }
+                                        });
+                                        $(this).children().first().blur(function () {//if the user has click outside the cell
                                             var newText = $(this).val();
                                             if (newText.length < 1) {
                                                 //alert("Cell cannot be empty");
@@ -1139,30 +1127,13 @@ module Mareframe {
                                             }
                                             $(this).parent().removeClass("editable");
                                             editing = false;
-                                        }
-                                    });
-                                    $(this).children().first().blur(function () {//if the user has click outside the cell
-                                        var newText = $(this).val();
-                                        if (newText.length < 1) {
-                                            //alert("Cell cannot be empty");
-                                            console.log("cell cannot be emtpy");
-                                            $(this).parent().text(originalText);
-                                        }
-                                        else {
-                                            $(this).parent().text(newText);
-                                            if (newText !== originalText) {
-                                                mareframeGUI.m_unsavedChanges = true;
-                                            }
-                                        }
-                                        $(this).parent().removeClass("editable");
-                                        editing = false;
-                                    });
-                                }
-                            });
+                                        });
+                                    }
+                                });
 
-                        });
+                            });
+                        }
                     }
-                }
                 else {
                     if (p_editorMode) {
                         $("#info_name").dblclick(function () {
@@ -1213,7 +1184,7 @@ module Mareframe {
                 console.log("Values: " + elmt.getValues());
                 console.log(elmt.getValues());
                 console.log("size of values: " + math.size(elmt.getValues()));
-                $("#valuesTable_div").html(Tools.htmlTableFromArray("Values", elmt.getValues(), $("#detailsDialog").data("model")));
+                $("#valuesTable_div").html(Tools.htmlTableFromArray("Values", elmt, $("#detailsDialog").data("model"), this.m_editorMode));
                 $("#valuesTable_div").show();
                 $("#values").prop("disabled", true);
             }
@@ -1235,24 +1206,27 @@ module Mareframe {
                 //console.log(this);
                 table.find("tr").each(function () {
                     $(this).find("th,td").each(function () {
-                        //console.log("text to be added: " + $(this).text());
-                        //console.log("does it exsist: " + $.inArray($(this).text(), newRow) === -1)
-                        var value: any = $(this).text();
-                        //Don't add the same value twice if it is in one of the header cells
-                        //(Better solution: check before the text is saved in the cell)
-                        if ($.inArray(value, newRow) === -1 || !isNaN(value)) {	
-                            //Convert to number
-                            if (!isNaN(value)) {
-                                value = Number(value);
+                        if ($(this).text().length > 0) {//This prevents the function from adding the minus column
+                            //console.log("text to be added: " + $(this).text());
+                            //console.log("does it exsist: " + $.inArray($(this).text(), newRow) === -1)
+                            var value: any = $(this).text();
+                            //Don't add the same value twice if it is in one of the header cells
+                            //(Better solution: check before the text is saved in the cell)
+                            if ($.inArray(value, newRow) === -1 || !isNaN(value)) {	
+                                //Convert to number
+                                if (!isNaN(value)) {
+                                    value = Number(value);
+                                }
+                                console.log("pushing " + value);
+                                newRow.push(value);
                             }
-                            newRow.push(value);
                         }
                     });
                     newTable.push(newRow);
                     newRow = [];
                 });
                 //console.log(newTable);
-                //Remove header row with title the "Definition"
+                //Remove header row with the title "Definition"
                 newTable.splice(0, 1);
                 //Reset the headerrows. (Better solution would be to prevent the user from editing them
                 for (var i = 0; i < Tools.numOfHeaderRows(oldData); i++) {                  
@@ -1261,7 +1235,6 @@ module Mareframe {
                     }
                     newTable[i][0] = oldData[i][0];
                 }
-
                 if (!Tools.columnSumsAreValid(newTable, Tools.numOfHeaderRows(elmt.getData())) && elmt.getType() == 0) {
                     //Should also show which row is unvalid (maybe right after the user has changed the value)
                     alert("The values in each column must add up to 1");
@@ -1285,6 +1258,7 @@ module Mareframe {
                 }
                 this.m_unsavedChanges = false;
                 //this.m_updateMCAStage = true;
+                //this.m_mcaContainer.removeChild(elmt.m_easelElmt);
                 this.addElementToStage(elmt);//repaint the element. This is necessary if the name of the elemnt has been changed
             }           
             private updateValFnCP(p_controlPointX: number, p_controlPointY: number, p_flipped_numBool: number): void {
@@ -1378,20 +1352,20 @@ module Mareframe {
                 ////console.log(this.m_model.getDataMatrix());
             }
             private mouseDown(p_evt: createjs.MouseEvent): void {
-                console.log("mouse down");
+                //console.log("mouse down");
                 $("#mX").html("X: " + p_evt.stageX);
                 $("#mY").html("Y: " + p_evt.stageY);
                 $("#mAction").html("Action: mousedown");
                 $("#mTarget").html("Target: " + p_evt.target.name);
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
                     var elmt: Element = this.m_model.getElement(p_evt.target.name);
-                    console.log("");
-                    console.log("*********************");
+                    //console.log("");
+                    //console.log("*********************");
                     for (var i in elmt.getConnections()) {
-                        console.log(elmt.getID() + "  " + elmt.getConnections()[i].getID())
+                        //console.log(elmt.getID() + "  " + elmt.getConnections()[i].getID())
                     }
-                    console.log("Data: " + elmt.getData());
-                    console.log("Values: " + elmt.getValues());
+                    //console.log("Data: " + elmt.getData());
+                    //console.log("Values: " + elmt.getValues());
                 }
                 //////console.log("mouse down at: ("+e.stageX+","+e.stageY+")");
                 this.m_oldX = p_evt.stageX;
@@ -1432,16 +1406,16 @@ module Mareframe {
                 $("#mAction").html("Action: PressMove");
                 $("#mTarget").html("Target: " + p_evt.target.name);
                 if (p_evt.target.name === "hitarea") {
-                    console.log("editorMode: " + this.m_editorMode);
+                    //console.log("editorMode: " + this.m_editorMode);
                     if (p_evt.nativeEvent.ctrlKey) {
                         ////console.log("orig: " + this.m_originalPressX + ", " + this.m_originalPressY + ". curr: " + p_evt.stageX + ", " + p_evt.stageY);
                         this.setSelection(this.m_model.getEaselElementsInBox(this.m_originalPressX, this.m_originalPressY, p_evt.stageX, p_evt.stageY));
                         this.m_selectionBox.graphics.clear().s("rgba(0,0,0,0.7)").setStrokeDash([2, 2], createjs.Ticker.getTime()).drawRect(this.m_originalPressX, this.m_originalPressY, p_evt.stageX - this.m_originalPressX, p_evt.stageY - this.m_originalPressY);
                         this.m_mcaContainer.addChild(this.m_selectionBox)
                     } else if (this.m_editorMode) {
-                        console.log("elements off screen: "); // + this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
+                        //console.log("elements off screen: "); // + this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
                         if (!this.elementOffScreen(undefined, p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
-                        console.log("panning");
+                        //console.log("panning");
                         $("#mAction").html("Action: Panning");
                         this.m_mcaContainer.x += p_evt.stageX - this.m_oldX;
                         this.m_mcaContainer.y += p_evt.stageY - this.m_oldY;
@@ -1830,7 +1804,46 @@ module Mareframe {
                 }
                 this.m_selectedItems = [];
                 this.m_updateMCAStage = true;
-            }            
+            }
+            private addDataRowClick(p_evt: Event) {
+                console.log("add row");
+                var elmt: Element = $("#detailsDialog").data("element");
+                elmt.setData(Tools.addDataRow(elmt));
+
+                elmt.update();
+                //Create the html tabel again and add the edit function again
+                var s = Tools.htmlTableFromArray("Definition", elmt, this.m_model, this.m_editorMode);
+                $("#defTable_div").html(s);
+                this.addEditFunction(elmt, this.m_editorMode);
+
+                var newStateName: String = elmt.getData()[elmt.getData().length - 1][0];
+                //Add default values for the new state in all children
+                elmt.getChildrenElements().forEach(function (e) {
+                    e.setData(e.updateHeaderRows(e.getData()));
+                    e.setData(e.addDefaultDataInEmptyCells(e.getData(), elmt, newStateName));
+                });
+                elmt.getAllDescendants().forEach(function (e) {
+                    e.setUpdated(false);
+                });
+            }
+            private removeRow(p_element: Element, p_n: number) {
+                console.log("remove row " + p_n + " in " + p_element.getName());
+                var data: any[][] = Tools.makeSureItsTwoDimensional(p_element.getData());
+                var state: String = data[p_n][0];
+                if (data.length - Tools.numOfHeaderRows(data) < 3) {
+                    alert("Can not be less than two outcomes");
+                }
+                else {
+                    p_element.setData(Tools.removeRow(p_element.getData(), p_n));
+                    //Remove this state from all children data tables
+                    p_element.getChildrenElements().forEach(function (e) {
+                        e.setData(Tools.removeState(e.getData(), p_element, state));
+                    });
+                    p_element.getAllDescendants().forEach(function (e) {
+                        e.setUpdated(false);
+                    });
+                }
+            }       
         }
     }
 }
