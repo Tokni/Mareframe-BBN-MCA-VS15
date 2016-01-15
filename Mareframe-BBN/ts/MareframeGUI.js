@@ -75,14 +75,29 @@ var Mareframe;
                     this.m_model.setAutoUpdate(cb.currentTarget.checked);
                     if (cb.currentTarget.checked) {
                         $("#autoUpdateStatus").html("Updating automatically");
+                        $("#updateMdl").hide();
                     }
                     else {
                         $("#autoUpdateStatus").html("");
+                        $("#updateMdl").show();
                     }
                     //console.log("auto update: " + this.m_model.m_autoUpdate);
                 };
                 this.m_handler = p_handler;
                 this.saveChanges = this.saveChanges.bind(this);
+                //Change layout if it is not in marefram mode
+                if (!this.m_handler.isMareframMode()) {
+                    $("#logo").attr("src", "img/tokni_logo.png");
+                    $("#logo").attr("style", "height:80px");
+                    $("#webpage").attr("href", "http://www.tokni.com");
+                    $(".europe-map-back").hide();
+                    $("#model_description").text("This is the BBN tool. You may doubleclick on each element below, to access the properties tables for that element.");
+                    $(".europe-map-zoom").hide();
+                    $(".col-md-2").hide();
+                    $(".col-md-6").hide();
+                    $("#ui_css").attr("href", "jQueryUI/jquery-ui_light.css");
+                    $("#dialog_css").attr("href", "css/dialog_tokni.css");
+                }
                 var mareframeGUI = this;
                 if (p_model.m_bbnMode) {
                     $("#detailsDialog").dialog({
@@ -106,7 +121,6 @@ var Mareframe;
                     this.setAutoUpdate = this.setAutoUpdate.bind(this);
                     $("#MCADataTable").hide();
                     $("#addDataRow").hide();
-                    $("#model_description").text("This is the Mareframe BBN tool. You may doubleclick on each element below, to access the properties tables for that element.");
                     this.m_mcaStageCanvas.width = $(window).width();
                 }
                 else {
@@ -198,6 +212,9 @@ var Mareframe;
                 createjs.Ticker.setFPS(60);
                 $("#debug").hide();
                 this.updateEditorMode();
+                if (this.m_model.getAutoUpdate()) {
+                    $("#updateMdl").hide();
+                }
             }
             GUIHandler.prototype.optionTypeChange = function (p_evt) {
                 //console.log("Element name: " + p_evt.target.id);
@@ -624,12 +641,11 @@ var Mareframe;
                 if (this.m_model.m_bbnMode) {
                     //bbn mode only
                     $("#elementType").hide();
-                    console.log("hiding selector");
+                    //console.log("hiding selector");
                     $("#detailsDialog").data("element", p_elmt);
                     $("#detailsDialog").data("model", this.m_model);
-                    console.log("data: " + p_elmt.getData());
+                    //console.log("data: " + p_elmt.getData());
                     var s = DST.Tools.htmlTableFromArray("Definition", p_elmt, this.m_model, this.m_editorMode);
-                    console.log(p_elmt.getData());
                     $("#defTable_div").html(s);
                     $("#defTable_div").show();
                     var typeText;
@@ -1094,10 +1110,10 @@ var Mareframe;
             };
             GUIHandler.prototype.showValues = function () {
                 var elmt = $("#detailsDialog").data("element");
-                console.log("Data: " + elmt.getData());
-                console.log("Values: " + elmt.getValues());
-                console.log(elmt.getValues());
-                console.log("size of values: " + math.size(elmt.getValues()));
+                //console.log("Data: " + elmt.getData());
+                //console.log("Values: " + elmt.getValues());
+                //console.log(elmt.getValues());
+                //console.log("size of values: " + math.size(elmt.getValues()));
                 $("#valuesTable_div").html(DST.Tools.htmlTableFromArray("Values", elmt, $("#detailsDialog").data("model"), this.m_editorMode));
                 $("#valuesTable_div").show();
                 $("#values").prop("disabled", true);
@@ -1131,7 +1147,7 @@ var Mareframe;
                                 if (!isNaN(value)) {
                                     value = Number(value);
                                 }
-                                console.log("pushing " + value);
+                                //console.log("pushing " + value);
                                 newRow.push(value);
                             }
                         }
@@ -1155,18 +1171,16 @@ var Mareframe;
                 }
                 else {
                     elmt.setData(newTable);
+                    elmt.setUpdated(false);
+                    elmt.getAllDescendants().forEach(function (e) {
+                        e.setUpdated(false);
+                    });
+                    elmt.getAllDecisionAncestors().forEach(function (e) {
+                        e.setUpdated(false);
+                    });
                     if (model.getAutoUpdate()) {
                         this.updateModel();
                         console.log("auto update is on");
-                    }
-                    else {
-                        elmt.setUpdated(false);
-                        elmt.getAllDescendants().forEach(function (e) {
-                            e.setUpdated(false);
-                        });
-                        elmt.getAllDecisionAncestors().forEach(function (e) {
-                            e.setUpdated(false);
-                        });
                     }
                 }
                 this.m_unsavedChanges = false;
@@ -1301,7 +1315,7 @@ var Mareframe;
                 this.addToSelection(p_evt.target);
             };
             GUIHandler.prototype.pressMove = function (p_evt) {
-                //console.log("press move on target " + p_evt.target.name);
+                console.log("press move on target " + p_evt.target.name);
                 $("#mX").html("X: " + p_evt.stageX);
                 $("#mY").html("Y: " + p_evt.stageY);
                 $("#mAction").html("Action: PressMove");
@@ -1602,17 +1616,16 @@ var Mareframe;
                     var elmt = this.m_model.getElement(p_easelElmt.name);
                     var newSelected = [];
                     this.m_selectedItems.forEach(function (e) {
-                        console.log("checking " + e + " against " + p_easelElmt);
+                        //console.log("checking " + e + " against " + p_easelElmt);
                         if (e.toString() !== p_easelElmt.toString()) {
-                            console.log("not a match");
+                            //console.log("not a match");
                             newSelected.push(e);
                         }
                         else {
-                            console.log("match");
                         }
                     });
                     this.m_selectedItems = newSelected;
-                    console.log("new selected: " + this.m_selectedItems);
+                    //console.log("new selected: " + this.m_selectedItems);
                     var easelElmt = p_easelElmt;
                     var elmtType = this.m_model.getElement(easelElmt.name).getType();
                     var shape = easelElmt.getChildAt(0);
@@ -1654,7 +1667,7 @@ var Mareframe;
                 return this.m_selectedItems;
             };
             GUIHandler.prototype.clearSelection = function () {
-                console.log("clear");
+                //console.log("clear");
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
                     var easelElmt = this.m_selectedItems[i];
                     if (easelElmt.id != this.m_model.getElement(easelElmt.name).m_minitableEaselElmt.id) {
@@ -1686,7 +1699,7 @@ var Mareframe;
                 this.m_updateMCAStage = true;
             };
             GUIHandler.prototype.addDataRowClick = function (p_evt) {
-                console.log("add row");
+                //console.log("add row");
                 var elmt = $("#detailsDialog").data("element");
                 elmt.setData(DST.Tools.addDataRow(elmt));
                 elmt.update();
@@ -1705,7 +1718,7 @@ var Mareframe;
                 });
             };
             GUIHandler.prototype.removeRow = function (p_element, p_n) {
-                console.log("remove row " + p_n + " in " + p_element.getName());
+                //console.log("remove row " + p_n + " in " + p_element.getName());
                 var data = DST.Tools.makeSureItsTwoDimensional(p_element.getData());
                 var state = data[p_n][0];
                 if (data.length - DST.Tools.numOfHeaderRows(data) < 3) {

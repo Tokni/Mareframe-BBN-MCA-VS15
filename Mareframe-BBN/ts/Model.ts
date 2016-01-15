@@ -11,7 +11,7 @@
             private m_modelChanged: boolean = true;
             private m_dataMatrix: any[][] = [];
             private m_mainObjective: Element;
-            private m_autoUpdate: boolean = false;
+            private m_autoUpdate: boolean = true; //auto update is on by default
             constructor(p_bbnMode: boolean) {
                 this.m_bbnMode = p_bbnMode;
                 //this.m_bbnMode = true;
@@ -465,7 +465,7 @@
 
             }
             fromJSON(p_jsonObject: any): void {
-                console.log("from json: p_jsonObject = " + p_jsonObject);
+                //console.log("from json: p_jsonObject = " + p_jsonObject);
                 $("#modelHeader").html(p_jsonObject.mdlName);
                 var header = $("#model_header").html();
                 //Only append if model name has not been added
@@ -543,10 +543,16 @@
                 else {
                     elmt.setDecision(p_decisNumb);
                 }
+                this.getElementArr().forEach(function (e) {
+                    e.setUpdated(false);
+                });/*
+                This is commented out because createSubMatrix did not work properly when only updating some of the elements.
+                This solution is not optimal, but it forces the program to update every element without looking at decisions first and then focusing on decision.
+                The problem occured when first one decision was set and the model was updated and then another decision was set. 
                 elmt.getAllDescendants().forEach(function (e: Element) {
                     e.setUpdated(false);
                     console.log(e.getName() + " not updated");
-                });
+                });*/
                 console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
             }
 

@@ -48,7 +48,7 @@ var Mareframe;
                 this.m_decision = n;
             };
             Element.prototype.update = function () {
-                console.log("Updating element " + this.getName());
+                //console.log("Updating element " + this.getName() );
                 if (this.m_type !== 1) {
                     //   console.log("This is not a decision node");
                     //Definition table in decision nodes does not rely on parents

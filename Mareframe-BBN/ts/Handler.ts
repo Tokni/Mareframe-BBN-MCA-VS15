@@ -13,6 +13,7 @@ module Mareframe {
             private m_fileHandler: FileIO;
             private m_gui: GUIHandler;
             private m_resetModel: String;
+            private m_mareframeMode: Boolean;
             constructor() {
                 //var table1conn: any[][] = [
                 //    ["name1", "Monkey", "Tiger"],
@@ -34,20 +35,27 @@ module Mareframe {
                 //Tools.removeHeaderRow("name1", table1conn);
 
                 console.log("handler started");
+                this.m_mareframeMode = false;  //This sets the layout to Tokni mode
                 this.m_fileHandler = new FileIO(this);
                 this.m_activeModel = this.addNewModel();
                 this.m_gui = new GUIHandler(this.m_activeModel,this);
 
                 
                 var loadModel: string = Tools.getUrlParameter('model');
-                //loadModel = "scotland";
-                //loadModel = "sicily";
-                loadModel = "baltic";
-                //loadModel = "northSea";
-                //loadModel = "blackSea";
-                //loadModel = "iceland";
-                //loadModel = "cadiz";
-                //loadModel = "test";
+                if (this.m_mareframeMode) {
+                    //loadModel = "scotland";
+                    //loadModel = "sicily";
+                    loadModel = "baltic";
+                    //loadModel = "northSea";
+                    //loadModel = "blackSea";
+                    //loadModel = "iceland";
+                    //loadModel = "cadiz";
+                    //loadModel = "test";
+                }
+                else {//Tokni mode
+                    loadModel = "resturant";
+                }
+
                 console.log("using model: " + loadModel);
                 if (loadModel !== null) {
                     this.m_fileHandler.loadModel(loadModel, this.m_activeModel, this.m_gui.importStage);
@@ -87,6 +95,9 @@ module Mareframe {
             }
             getActiveModel(): Model {
                 return this.m_activeModel;
+            }
+            isMareframMode(): Boolean {
+                return this.m_mareframeMode;
             }
         }
     }

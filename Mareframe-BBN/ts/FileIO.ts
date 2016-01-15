@@ -238,6 +238,9 @@
                     case "sicily":
                         path += "sicily.json";
                         break;
+                    case "resturant":
+                        path += "ResturantExample.json";
+                        break;
                     case "test":
                         path += "test.json";
                         break;

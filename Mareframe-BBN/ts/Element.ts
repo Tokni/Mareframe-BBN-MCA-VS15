@@ -47,7 +47,7 @@
                 this.m_decision = n;
             }
             update(): void {
-                console.log("Updating element " + this.getName() );
+                //console.log("Updating element " + this.getName() );
                 if (this.m_type !== 1) {
                  //   console.log("This is not a decision node");
                     //Definition table in decision nodes does not rely on parents

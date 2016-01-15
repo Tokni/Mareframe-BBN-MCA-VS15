@@ -13,7 +13,7 @@ var Mareframe;
                 this.m_modelPath = "./";
                 this.m_modelChanged = true;
                 this.m_dataMatrix = [];
-                this.m_autoUpdate = false;
+                this.m_autoUpdate = true; //auto update is on by default
                 this.m_bbnMode = p_bbnMode;
                 //this.m_bbnMode = true;
                 this.createNewElement = this.createNewElement.bind(this);
@@ -415,7 +415,7 @@ var Mareframe;
                 return { elements: this.m_elementArr, connections: this.m_connectionArr, mdlName: this.m_modelName, mainObj: this.m_mainObjective, dataMat: this.m_dataMatrix, mdlIdent: this.m_modelIdent };
             };
             Model.prototype.fromJSON = function (p_jsonObject) {
-                console.log("from json: p_jsonObject = " + p_jsonObject);
+                //console.log("from json: p_jsonObject = " + p_jsonObject);
                 $("#modelHeader").html(p_jsonObject.mdlName);
                 var header = $("#model_header").html();
                 //Only append if model name has not been added
@@ -475,10 +475,16 @@ var Mareframe;
                 else {
                     elmt.setDecision(p_decisNumb);
                 }
-                elmt.getAllDescendants().forEach(function (e) {
+                this.getElementArr().forEach(function (e) {
+                    e.setUpdated(false);
+                }); /*
+                This is commented out because createSubMatrix did not work properly when only updating some of the elements.
+                This solution is not optimal, but it forces the program to update every element without looking at decisions first and then focusing on decision.
+                The problem occured when first one decision was set and the model was updated and then another decision was set.
+                elmt.getAllDescendants().forEach(function (e: Element) {
                     e.setUpdated(false);
                     console.log(e.getName() + " not updated");
-                });
+                });*/
                 console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
             };
             return Model;
