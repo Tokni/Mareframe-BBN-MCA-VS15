@@ -54,7 +54,7 @@ module Mareframe {
                     $("#logo").attr("style", "height:80px");
                     $("#webpage").attr("href", "http://www.tokni.com");
                     $(".europe-map-back").hide();
-                    $("#model_description").text("This is the BBN tool. You may doubleclick on each element below, to access the properties tables for that element.");
+                    $("#model_description").text("This is the BBN tool. Red nodes represent decision nodes, blue nodes represent chance nodes, and yellow nodes represent value nodes. You may doubleclick on each node below, to access the properties tables for that node. To set a decision double click on a choice in the table next to decision nodes.");
                     $(".europe-map-zoom").hide();
                     $(".col-md-2").hide();
                     $(".col-md-6").hide();
@@ -130,6 +130,7 @@ module Mareframe {
                 this.selectAll = this.selectAll.bind(this);
                 this.saveModel = this.saveModel.bind(this);
                 this.loadModel = this.loadModel.bind(this);
+                this.selectModel = this.selectModel.bind(this);
                 this.clickedDecision = this.clickedDecision.bind(this);
                 this.fullscreen = this.fullscreen.bind(this);
                 this.cnctStatus = this.cnctStatus.bind(this);
@@ -148,6 +149,8 @@ module Mareframe {
                 this.m_valFnBackground.addEventListener("mousedown", this.downValFnCP);
                 this.m_mcaBackground.addEventListener("pressmove", this.pressMove);
                 this.m_controlP.mouseChildren = false;
+
+                $("#selectModel").on("change", this.selectModel);
                 $("#MCAelmtType").on("change", this.optionTypeChange);
                 $("#MCAWeightingMethod").on("change", this.optionMethodChange);
                 $("#debugButton").on("click", this.allModeltoConsole);
@@ -236,9 +239,10 @@ module Mareframe {
                     $("#modeStatus").html("Editor Mode");
                 }
             }
-            private loadModel(p_evt: Event) {
-                ////console.log(this);
-                ////console.log(this.m_handler);
+            private selectModel(p_evt: Event) {
+                this.m_handler.getFileIO().loadModel($("#selectModel").val(), this.m_model, this.importStage);
+            }
+            private loadModel(p_evt:Event) {
                 this.m_handler.getFileIO().loadfromGenie(this.m_model, this.importStage);
             }
             private saveModel(p_evt: Event) {
@@ -390,7 +394,7 @@ module Mareframe {
                         decisionCont.addChild(decisTextBox);
                     }
                     else {
-                        for (var i = 0; i < elmt.getValues().length; i++) {
+                        for (var i = Tools.numOfHeaderRows(elmt.getValues()); i < elmt.getValues().length; i++) {
 
                             var backgroundColor: string;
                             if (elmt.getDecision() == i && elmt.getType() == 1) {
@@ -451,10 +455,12 @@ module Mareframe {
                 //}
             }
             private clickedDecision(p_evt: createjs.MouseEvent) {
-                //console.log("clicked a decision");
-                //console.log(p_evt);
-                this.m_model.setDecision(p_evt.currentTarget.name, Math.floor(p_evt.localY / 12));
-                this.updateModel();
+                if (!this.m_editorMode) {// Setting decision while in editor mode messes with the calculations
+                    //console.log("clicked a decision");
+                    //console.log(p_evt);
+                    this.m_model.setDecision(p_evt.currentTarget.name, Math.floor(p_evt.localY / 12));
+                    this.updateModel();
+                }
             }
             private updateEditorMode() {
                 console.log("updating editormode");
@@ -485,10 +491,12 @@ module Mareframe {
                     for (var i = 0; i < elementArr.length; i++) {
                         if (this.m_editorMode) {
                             elementArr[i].m_easelElmt.addEventListener("pressmove", this.pressMove);
+                            this.m_model.setDecision(elementArr[i].getID(), elementArr[i].getDecision());//Unsets all decisions
                         } else {
                             elementArr[i].m_easelElmt.removeEventListener("pressmove", this.pressMove);
                         }
                     }
+                    this.updateMiniTable(this.m_model.getElementArr());//This updates minitables in all elements
                 }
             }
             private setShowDescription = function (cb) {
@@ -1415,6 +1423,7 @@ module Mareframe {
                 this.addToSelection(p_evt.target);
             }
             private pressMove(p_evt: createjs.MouseEvent): void {
+                var gui = this;
                 console.log("press move on target " + p_evt.target.name);
                 $("#mX").html("X: " + p_evt.stageX);
                 $("#mY").html("Y: " + p_evt.stageY);
@@ -1431,10 +1440,24 @@ module Mareframe {
                         //console.log("elements off screen: "); // + this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
                         if (!this.elementOffScreen(undefined, p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
                         //console.log("panning");
-                        $("#mAction").html("Action: Panning");
-                        this.m_mcaContainer.x += p_evt.stageX - this.m_oldX;
-                        this.m_mcaContainer.y += p_evt.stageY - this.m_oldY;
+                            $("#mAction").html("Action: Panning");
+                        //This moves all elements instead of the background
+                            this.m_model.getElementArr().forEach(function (e) {
+                                e.m_easelElmt.x += p_evt.stageX - gui.m_oldX;
+                                e.m_easelElmt.y += p_evt.stageY - gui.m_oldY;
+                                e.m_minitableEaselElmt.x += p_evt.stageX - gui.m_oldX;
+                                e.m_minitableEaselElmt.y += p_evt.stageY - gui.m_oldY;
 
+                                //console.log("selected elements: " + this.m_selectedItems);
+                                //        console.log("element: " + elmt.name);
+                                for (var j = 0; j < e.getConnections().length; j++) {
+                                    var c = e.getConnections()[j];
+                                    gui.updateConnection(c);
+                                }
+                            });
+                        /*this.m_mcaContainer.x += p_evt.stageX - this.m_oldX;
+                        this.m_mcaContainer.y += p_evt.stageY - this.m_oldY;
+                            */
                         this.resizeWindow();
                         
                         }
@@ -1858,7 +1881,8 @@ module Mareframe {
                         e.setUpdated(false);
                     });
                 }
-            }       
+            }   
+            
         }
     }
 }

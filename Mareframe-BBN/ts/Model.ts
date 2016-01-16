@@ -465,7 +465,7 @@
 
             }
             fromJSON(p_jsonObject: any): void {
-                //console.log("from json: p_jsonObject = " + p_jsonObject);
+                console.log("from json: p_jsonObject = " + p_jsonObject);
                 $("#modelHeader").html(p_jsonObject.mdlName);
                 var header = $("#model_header").html();
                 //Only append if model name has not been added

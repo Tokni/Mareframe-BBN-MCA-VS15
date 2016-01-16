@@ -302,7 +302,7 @@
             }
 
             static getValueWithCondition(p_values:any[][],p_elmt: Element, p_condition): number[] {
-                console.log("getting value with condition " + p_condition + " from " + p_values);
+                //console.log("getting value with condition " + p_condition + " from " + p_values);
                 var values: any[][] = Tools.makeSureItsTwoDimensional(p_values);
                 // //console.log("values table : \n " + values);
                 var valuesFound = [];
@@ -334,18 +334,18 @@
                         }
                     }
                 }
-                console.log("returned " + valuesFound);
+                //console.log("returned " + valuesFound);
                 return valuesFound;
             }
 
             static createSubMatrices(p_matrix: any[][], p_elmt: Element, p_data: any[][]) {
                 if (p_elmt !== undefined) {
-                    console.log("create sub matrix from " + p_matrix + " size " + math.size(p_matrix) + " for values " + p_elmt.getName());
+                    //console.log("create sub matrix from " + p_matrix + " size " + math.size(p_matrix) + " for values " + p_elmt.getName());
                 }
                 var data = Tools.makeSureItsTwoDimensional(p_data);
                 p_matrix = Tools.makeSureItsTwoDimensional(p_matrix);
                 //console.log("data: " + (data) + " size " + math.size(data));
-                console.log(data);
+                //console.log(data);
                 var subMatrices = [];
                 var columns = math.size(p_matrix).valueOf()[1];
                 var newDataHeaders: any[][] = [];
@@ -577,10 +577,10 @@
             static calculateValues(p_model: Model, p_element: Element) {
                 var model: Model = p_model;
                 var element: Element = p_element;
-                   console.log("calculate values for " + p_element.getName());
+                   //console.log("calculate values for " + p_element.getName());
                 var dataHeaders: any[][] = []; //the header rows from data
                 var data: any[][] = element.getData();
-                console.log("data: " + data + " size " + math.size(data));
+                //console.log("data: " + data + " size " + math.size(data));
                 //console.log(data);
                 for (var i = 0; i < Tools.numOfHeaderRows(data); i++) {
                     var newRow: any[] = [];
@@ -593,27 +593,27 @@
                 if (element.getType() !== 1) {//If its a chance or value node
                     var headerRows = []; //Used to add decisions to value matrix
                     var newValues = Tools.getMatrixWithoutHeader(data);
-                    console.log(newValues);
+                    //console.log(newValues);
                     element.getParentElements().forEach(function (elmt) {
-                         console.log("parent: " + elmt.getName());
+                         //console.log("parent: " + elmt.getName());
                         if (elmt.getType() === 0) {//If Parent is a chance
                             //  console.log("dataheaders: " + dataHeaders);
                             //Parent must be updated
                             if (!elmt.isUpdated()) {
-                                  console.log("updating " + elmt.getName());
+                                  //console.log("updating " + elmt.getName());
                                 elmt.update();
-                                 console.log(elmt.getName() + " has been updated");
+                                 //console.log(elmt.getName() + " has been updated");
                             }
                             //console.log("parent values: " + Tools.arrayToString(elmt.getValues()));
                             var parentValuesMatrix = Tools.getMatrixWithoutHeader(elmt.getValues());
-                            console.log("current element: " + element.getName());
-                            console.log("parent: " + elmt.getName());
-                            console.log("new values: " + newValues);
+                           // console.log("current element: " + element.getName());
+                           // console.log("parent: " + elmt.getName());
+                            //console.log("new values: " + newValues);
                             var temp = Tools.createSubMatrices(newValues, elmt, dataHeaders);
                             //console.log("newValues: " + newValues);
                             var submatrices = temp[0];
                             //console.log("submatrices have size: " + math.size(submatrices));
-                            console.log(submatrices);
+                            //console.log(submatrices);
                             dataHeaders = temp[1];
                             //console.log("data headers: " + dataHeaders);
                             var result = [];
@@ -686,7 +686,7 @@
                             //console.log("newValues: " + newValues);
                             //console.log(newValues);
                         } else if (elmt.getType() === 1) {//If Parent is a decision
-                            console.log("parent is a decision");
+                            //console.log("parent is a decision");
                                //console.log("headerrows: " + headerRows + " size " + math.size(headerRows));
                             //   console.log("checking if " + elmt.getID() + " is in headerrows");
                             //Only add if it does not already exist
@@ -706,7 +706,7 @@
                             }
                              //console.log("new header rows: " + headerRows);
                          }
-                        console.log("done with parent " + elmt.getName());
+                        //console.log("done with parent " + elmt.getName());
                     });
                     newValues = Tools.convertToArray(Tools.makeSureItsTwoDimensional(newValues));
                     if (math.size(newValues).length === 2 && math.size(newValues)[0] === 1) {//Its a one dimensional array inside another array
@@ -738,7 +738,7 @@
                     newValues = Tools.makeSureItsTwoDimensional(newValues);
                     p_element.setValues(newValues);
                 } else {//If it is a decision node
-                    console.log("decisions node begin");
+                    //console.log("decisions node begin");
                     element.setValues(Tools.fillEmptySpaces((element.copyDefArray())));
                     var values: any[] = element.getValues();
                     //Number of header rows is equal to number of rows in values minus number of rows in definition
@@ -766,19 +766,19 @@
                             }
                             conditions.push(values[i][0]);*/
                             var conditions = values[i][0];
-                            console.log("conditions: "+conditions);
+                            //console.log("conditions: "+conditions);
                             var value = 0;
                             //For each value node in the model
                             model.getElementArr().forEach(function (elmt) {
                                 if (elmt.getType() === 2) {
-                                console.log("value: " + elmt.getName());
+                                //console.log("value: " + elmt.getName());
                                     //If the node is not updated, update
                                     if (!elmt.isUpdated()) {
                                         elmt.update();
                                     }
                                     //Sum values that meet the conditions
                                     var valueArray = Tools.getValueWithCondition(elmt.getValues(),element, conditions);
-                                    console.log("value array: " + valueArray);
+                                    //console.log("value array: " + valueArray);
                                     //If there are several values that meet the condition, use the highest
                                     value += Tools.getHighest(valueArray);
                                 }
@@ -791,7 +791,7 @@
                     //     console.log("decisions end");
                     p_element.setValues(values);
                 }
-                 console.log("done calculatint values for " + p_element.getName());
+                 //console.log("done calculatint values for " + p_element.getName());
             }
             static isOneDimensional(p_array: any[][]): Boolean {
                 //console.log(p_array.length);

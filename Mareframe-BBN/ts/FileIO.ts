@@ -241,15 +241,17 @@
                     case "resturant":
                         path += "ResturantExample.json";
                         break;
+                    case "happiness":
+                        path += "HappinessExample.json";
+                        break;
                     case "test":
                         path += "test.json";
-                        break;
+                        break; 
                     default:
                         console.log("NO such file exists!!");
                         break;
                 }
                 console.log("resulting path is: " + path);
-                //console.log("Data: " + JSON.stringify(data));
                 jQuery.getJSON(path, function (data) {
                     //console.log(JSON.stringify(data));
                     p_activeModelInstance.fromJSON(data);
