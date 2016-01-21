@@ -128,6 +128,8 @@
             }
 
             static htmlTableFromArray(p_header: string, p_elmt: Element, p_model: Model, p_editorMode: boolean) {
+                console.log("header: " + p_header);
+                console.log("type of elmt: " + p_elmt.getType());
                 var data: any[][];
                 if (p_header === "Definition") {
                     data = p_elmt.getData();
@@ -136,6 +138,15 @@
                     data = p_elmt.getValues();
                 }
                 var numOfHeaderRows = Tools.numOfHeaderRows(data);
+                if (p_elmt.getType() === 2 && p_header === "Values") {//Find best decision by finding the highest value
+                    var highest: number = 1;
+                    for (var i = 2; i < data.length; i++) {
+                        if (data[numOfHeaderRows][i] > data[numOfHeaderRows][highest]) {
+                            highest = i;
+                        }
+                    }
+                    console.log("highest is : " + highest);
+                }
                 //console.log("p_header: " + p_header);
                 //console.log("data: " + data);
                 var htmlString = "";
@@ -146,7 +157,7 @@
                 }
                 for (var i = 0; i < numOfHeaderRows; i++) {
                     htmlString += "<tr>";
-                    if (p_editorMode && p_header === "Definition" && p_elmt.getType() !== 2 ) { htmlString += "<th></th>"; }
+                    if (p_editorMode && p_header === "Definition" && p_elmt.getType() !== 2 ) { htmlString += "<th></th>"; }//Create empty cell above minus cells
                     for (var j = 0; j < (data[0].length); j++) {
                         if (j === 0) {
                             htmlString += "<th>" + p_model.getElement(data[i][j]).getName() + "</th>";
@@ -159,6 +170,7 @@
                 }
                 //console.log("numOfHeaderRows: " + numOfHeaderRows);
                 //console.log("data.length: " + data.length);
+                
                 for (var i = numOfHeaderRows; i < data.length; i++) {
                     htmlString += "<tr>";
                     if (p_editorMode && p_header === "Definition" && p_elmt.getType() !== 2 ) { htmlString += "<th><button class='minus' id='"+ i+ "'></button></th>"; }//add minus button
@@ -166,7 +178,12 @@
                         if (j === 0) {
                             htmlString += "<th><div class='editable_cell'> " + data[i][j] + "</div></th>";
                         } else {
-                            htmlString += "<td>" + Tools.round((data[i][j])) + "</td>";
+                            if ( j === highest) {//mark highest if it is the value table of a value node
+                                htmlString += "<td> <b>" + Tools.round((data[i][j])) + "</b></td>";
+                            }
+                            else {
+                                htmlString += "<td>" + Tools.round((data[i][j])) + "</td>";
+                            }
                         }
 
                     }

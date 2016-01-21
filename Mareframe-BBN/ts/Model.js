@@ -469,7 +469,7 @@ var Mareframe;
             Model.prototype.setDecision = function (p_elmtIdent, p_decisNumb) {
                 var elmt = this.getElement(p_elmtIdent);
                 if (elmt.getDecision() == p_decisNumb) {
-                    console.log("unsetting decision");
+                    //console.log("unsetting decision");
                     elmt.setDecision(undefined);
                 }
                 else {
@@ -485,7 +485,7 @@ var Mareframe;
                     e.setUpdated(false);
                     console.log(e.getName() + " not updated");
                 });*/
-                console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
+                //console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
             };
             return Model;
         })();

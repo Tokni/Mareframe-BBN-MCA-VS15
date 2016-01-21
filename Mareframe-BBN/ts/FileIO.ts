@@ -11,17 +11,16 @@
                 this.reset = this.reset.bind(this);
             }
             saveModel(p_model: Model): void {
-                //console.log("generating download link");
+                console.log("generating download link");
                 // encode the data into base64
                 var datastream = p_model.saveModel();
                 var base64: string = window.btoa(datastream);
                 
-
                 // create an a tag
                 var a: any = $("#downloadLink").get(0);
 
                 a.href = 'data:application/octet-stream;base64,' + base64;
-                a.download = "test.xdsl";
+                a.download = "model.xdsl";
                 a.innerHTML = 'Download';
                 
 
@@ -186,6 +185,7 @@
                         };
                     })(loadedFile);
                     fileInputObj.val = '';
+                    console.log("loadfile " + loadedFile);
                     reader.readAsText(loadedFile);
                 } else {
                     alert('The File APIs are not fully supported in this browser.');
@@ -244,11 +244,14 @@
                     case "happiness":
                         path += "HappinessExample.json";
                         break;
+                    case "investment":
+                        path += "InvestmentExample.json";
+                        break;
                     case "test":
                         path += "test.json";
                         break; 
                     default:
-                        console.log("NO such file exists!!");
+                        console.log("NO such file exists!");
                         break;
                 }
                 console.log("resulting path is: " + path);

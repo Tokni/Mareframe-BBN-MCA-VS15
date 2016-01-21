@@ -91,7 +91,7 @@ var Mareframe;
                     $("#logo").attr("style", "height:80px");
                     $("#webpage").attr("href", "http://www.tokni.com");
                     $(".europe-map-back").hide();
-                    $("#model_description").text("This is the BBN tool. Red nodes represent decision nodes, blue nodes represent chance nodes, and yellow nodes represent value nodes. You may doubleclick on each node below, to access the properties tables for that node. To set a decision double click on a choice in the table next to decision nodes.");
+                    $("#model_description").text("This is the BBN tool. Red nodes represent decision nodes, blue nodes represent chance nodes, and yellow nodes represent value nodes. You may doubleclick on each node below, to access the properties tables for that node. To set a decision click on a choice in the table next to decision nodes.");
                     $(".europe-map-zoom").hide();
                     $(".col-md-2").hide();
                     $(".col-md-6").hide();
@@ -202,6 +202,7 @@ var Mareframe;
                 this.m_mcaBackground.addEventListener("pressup", this.mouseUp);
                 $("#lodDcmt").on("change", this.loadModel);
                 $("#lodDcmt").on("click", function () {
+                    console.log("click");
                     this.value = null;
                 });
                 this.m_mcaStage.addChild(this.m_mcaBackground);
@@ -257,6 +258,7 @@ var Mareframe;
                 this.m_handler.getFileIO().loadModel($("#selectModel").val(), this.m_model, this.importStage);
             };
             GUIHandler.prototype.loadModel = function (p_evt) {
+                console.log("load model");
                 this.m_handler.getFileIO().loadfromGenie(this.m_model, this.importStage);
             };
             GUIHandler.prototype.saveModel = function (p_evt) {
@@ -292,7 +294,7 @@ var Mareframe;
                 this.clearSelection();
                 if (this.m_handler.getFileIO().reset() === null) {
                     var loadModel = DST.Tools.getUrlParameter('model');
-                    loadModel = "scotland";
+                    loadModel = this.m_model.getIdent();
                     console.log("using model: " + loadModel);
                     this.m_handler.getFileIO().loadModel(loadModel, this.m_handler.getActiveModel(), this.importStage);
                 }
@@ -485,7 +487,7 @@ var Mareframe;
                             elementArr[i].m_easelElmt.removeEventListener("pressmove", this.pressMove);
                         }
                     }
-                    this.updateMiniTable(this.m_model.getElementArr()); //This updates minitables in all elements
+                    this.updateModel();
                 }
             };
             GUIHandler.prototype.fullscreen = function (p_evt) {

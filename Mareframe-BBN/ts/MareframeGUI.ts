@@ -54,7 +54,7 @@ module Mareframe {
                     $("#logo").attr("style", "height:80px");
                     $("#webpage").attr("href", "http://www.tokni.com");
                     $(".europe-map-back").hide();
-                    $("#model_description").text("This is the BBN tool. Red nodes represent decision nodes, blue nodes represent chance nodes, and yellow nodes represent value nodes. You may doubleclick on each node below, to access the properties tables for that node. To set a decision double click on a choice in the table next to decision nodes.");
+                    $("#model_description").text("This is the BBN tool. Red nodes represent decision nodes, blue nodes represent chance nodes, and yellow nodes represent value nodes. You may doubleclick on each node below, to access the properties tables for that node. To set a decision click on a choice in the table next to decision nodes.");
                     $(".europe-map-zoom").hide();
                     $(".col-md-2").hide();
                     $(".col-md-6").hide();
@@ -75,7 +75,7 @@ module Mareframe {
                                     $("#valuesTable_div").show();
                                 }
                             }
-                        });
+                    });
                     $("#detailsDialog").on('dialogclose', function (event) {
                         console.log("closing window");
                         $("#valuesTable_div").hide();
@@ -179,6 +179,7 @@ module Mareframe {
 
                 $("#lodDcmt").on("change", this.loadModel);
                 $("#lodDcmt").on("click", function () {
+                    console.log("click");
                     this.value = null;
                 });
 
@@ -201,14 +202,14 @@ module Mareframe {
             private optionTypeChange(p_evt: Event) {
 
                 //console.log("Element name: " + p_evt.target.id);
-                var elmt: Element = $("#detailsDialog").data("element");
+                var elmt: any = $("#detailsDialog").data("element");
                 
                 //elmt.setType(p_evt.target.value);
 
                 
             }
             private optionMethodChange(p_evt: Event) {
-                var elmt: Element = $("#detailsDialog").data("element");
+                var elmt: any = $("#detailsDialog").data("element");
                 //elmt.setMethod(p_evt.target.value);
             }
             private allConnectionstoConsole(p_evt: Event) {
@@ -242,7 +243,8 @@ module Mareframe {
             private selectModel(p_evt: Event) {
                 this.m_handler.getFileIO().loadModel($("#selectModel").val(), this.m_model, this.importStage);
             }
-            private loadModel(p_evt:Event) {
+            private loadModel(p_evt: Event) {
+                console.log("load model");
                 this.m_handler.getFileIO().loadfromGenie(this.m_model, this.importStage);
             }
             private saveModel(p_evt: Event) {
@@ -279,7 +281,7 @@ module Mareframe {
                 this.clearSelection();
                 if (this.m_handler.getFileIO().reset() === null ) {
                     var loadModel: string = Tools.getUrlParameter('model');
-                    loadModel = "scotland";
+                    loadModel = this.m_model.getIdent();
                     console.log("using model: " + loadModel);
                     this.m_handler.getFileIO().loadModel(loadModel, this.m_handler.getActiveModel(), this.importStage);
                 }
@@ -496,7 +498,7 @@ module Mareframe {
                             elementArr[i].m_easelElmt.removeEventListener("pressmove", this.pressMove);
                         }
                     }
-                    this.updateMiniTable(this.m_model.getElementArr());//This updates minitables in all elements
+                    this.updateModel();
                 }
             }
             private setShowDescription = function (cb) {
@@ -1204,7 +1206,7 @@ module Mareframe {
                 }
             }
             private showValues() {
-                var elmt: Element =  $("#detailsDialog").data("element");
+                var elmt: any =  $("#detailsDialog").data("element");
                 //console.log("Data: " + elmt.getData());
                 //console.log("Values: " + elmt.getValues());
                 //console.log(elmt.getValues());
@@ -1214,7 +1216,7 @@ module Mareframe {
                 $("#values").prop("disabled", true);
             }
             private saveChanges() {
-                var elmt: Element = $("#detailsDialog").data("element");
+                var elmt: any = $("#detailsDialog").data("element");
                 var oldData: any[][] = elmt.getData();
                 var model: Model = this.m_model;
                 //Save user description
@@ -1845,7 +1847,7 @@ module Mareframe {
             }
             private addDataRowClick(p_evt: Event) {
                 //console.log("add row");
-                var elmt: Element = $("#detailsDialog").data("element");
+                var elmt: any = $("#detailsDialog").data("element");
                 elmt.setData(Tools.addDataRow(elmt));
 
                 elmt.update();

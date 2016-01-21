@@ -117,6 +117,8 @@ var Mareframe;
                 return counter;
             };
             Tools.htmlTableFromArray = function (p_header, p_elmt, p_model, p_editorMode) {
+                console.log("header: " + p_header);
+                console.log("type of elmt: " + p_elmt.getType());
                 var data;
                 if (p_header === "Definition") {
                     data = p_elmt.getData();
@@ -125,6 +127,15 @@ var Mareframe;
                     data = p_elmt.getValues();
                 }
                 var numOfHeaderRows = Tools.numOfHeaderRows(data);
+                if (p_elmt.getType() === 2 && p_header === "Values") {
+                    var highest = 1;
+                    for (var i = 2; i < data.length; i++) {
+                        if (data[numOfHeaderRows][i] > data[numOfHeaderRows][highest]) {
+                            highest = i;
+                        }
+                    }
+                    console.log("highest is : " + highest);
+                }
                 //console.log("p_header: " + p_header);
                 //console.log("data: " + data);
                 var htmlString = "";
@@ -138,7 +149,7 @@ var Mareframe;
                     htmlString += "<tr>";
                     if (p_editorMode && p_header === "Definition" && p_elmt.getType() !== 2) {
                         htmlString += "<th></th>";
-                    }
+                    } //Create empty cell above minus cells
                     for (var j = 0; j < (data[0].length); j++) {
                         if (j === 0) {
                             htmlString += "<th>" + p_model.getElement(data[i][j]).getName() + "</th>";
@@ -161,7 +172,12 @@ var Mareframe;
                             htmlString += "<th><div class='editable_cell'> " + data[i][j] + "</div></th>";
                         }
                         else {
-                            htmlString += "<td>" + Tools.round((data[i][j])) + "</td>";
+                            if (j === highest) {
+                                htmlString += "<td> <b>" + Tools.round((data[i][j])) + "</b></td>";
+                            }
+                            else {
+                                htmlString += "<td>" + Tools.round((data[i][j])) + "</td>";
+                            }
                         }
                     }
                     htmlString += "</tr>";

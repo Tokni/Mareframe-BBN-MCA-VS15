@@ -537,7 +537,7 @@
             setDecision(p_elmtIdent: string, p_decisNumb: number): void {
                 var elmt: Element = this.getElement(p_elmtIdent);
                 if (elmt.getDecision() == p_decisNumb) {
-                    console.log("unsetting decision");
+                    //console.log("unsetting decision");
                     elmt.setDecision(undefined)
                 }
                 else {
@@ -553,7 +553,7 @@
                     e.setUpdated(false);
                     console.log(e.getName() + " not updated");
                 });*/
-                console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
+                //console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
             }
 
 
