@@ -12,7 +12,7 @@
     <link href="css/dialog.css" rel="stylesheet" />
     <link href="css/debug.css" rel="stylesheet" />
 
-    <link href="jQueryUI/jquery-ui.css" rel="stylesheet" />
+    <link id="ui_css" href="jQueryUI/jquery-ui_original.css" rel="stylesheet" />
     <link href="css/DST.css" rel="stylesheet" />
     
 </head>
@@ -39,8 +39,8 @@
             <div class="col-lg-8">
                 <div class="page-header">
                     <h1 id="model_header">
-                        <a href="http://www.mareframe-fp7.org/">
-                            <img src="img/logo_mareframe.png">
+                        <a id="webpage"href="http://www.mareframe-fp7.org/">
+                            <img id="logo" src="img/logo_mareframe.png">
                         </a>
                     </h1>
                 </div>
@@ -70,30 +70,38 @@
 
 
         <div style="padding: 1em 1em 0.5em 1.4em; font-size: 0.7em">
-            <div style="float:left">
-                <button class="advButton" id="newDcmt">New Document</button>
-                <div class="LoadFileBtn advButton" id="lodDcmtDiv">
-                    <span class="advButton">Open Document</span>
-                    <input class="advButton upload" type="file" id="lodDcmt" />
-                </div>
+            <label for="selctModel">Select a model</label>
+            <select id="selectModel">
+                <option value="resturant"selected="selected">Opening a Resturant</option>
+                <option value="happiness" >Happiness</option>
+                <option value="investment"> Investment Decision</option>
+            </select>
 
-                <button class="advButton" id="savDcmt">Save Document</button>
-                <button class="advButton" id="resetDcmt">Reset</button>
-                <button class="advButton" id="newElmt">New Element</button>
-                <button class="advButton" id="newChance">New Chance</button>
-                <button class="advButton" id="newDec">New Decision</button>
-                <button class="advButton" id="newValue">New Value</button>
-                <button class="advButton" id="deleteElmt">Delete Element</button>
-                <button class="advButton" id="selectAllElmt">Select All</button>
-                <input class="advButton" type="checkbox" id="cnctTool">
-                <label for="cnctTool" class="advButton">Connect Tool</label>
+            <button class="advButton" id="newDcmt">New Document</button>
+
+            <div class="LoadFileBtn advButton" id="lodDcmtDiv">
+                <input class="advButton upload" type="file" id="lodDcmt" />
+                <span class="advButton">Open Document</span>
+            </div>
+
+            <button class="advButton" id="savDcmt">Save Document</button>
+            <button class="advButton" id="resetDcmt">Reset</button>
+            <button class="advButton" id="newElmt">New Element</button>
+            <button class="advButton" id="newChance">New Chance</button>
+            <button class="advButton" id="newDec">New Decision</button>
+            <button class="advButton" id="newValue">New Value</button>
+            <button class="advButton" id="deleteElmt">Delete Element</button>
+            <button class="advButton" id="selectAllElmt">Select All</button>
+            <input class="advButton" type="checkbox" id="cnctTool">
+            <label for="cnctTool" class="advButton">Connect Tool</label> 
             </div>
             <div style="float:right">
-                <button class="button" id="fullscreen"> Fullscreen</button>
+                <input class="button" type="checkbox" id="fullscreen">
+                <label for="fullscreen" class="button">Fullscreen</label>
                 <input class="button" type="checkbox" id="editorMode">
                 <label for="editorMode" class="button">Editor Mode</label>
-                <input class="button" type="checkbox" id="autoUpdate">
-                <label for="autoUpdate" class="button">Automatically update</label>
+                <input class="button" type="checkbox" id="autoUpdate" checked>
+                <label for="autoUpdate" class="button" >Automatically update</label>
                 <button class="button" id="updateMdl">Update</button>
             </div>
         </div>
@@ -194,6 +202,8 @@
         <button class="dialogButton dialogDiv" id="submit">Submit changes</button>
         <button class="dialogButton dialogDiv" id="values">Show values</button>
         <div id="valuesTable_div"></div>
+        <div id="userDescription_div"> </div>
+    </div>
     </div> <!--end detailsDialog-->
     
     <script>
@@ -239,13 +249,13 @@
             modal: false,
             close: function () {
                 console.log("closing dialog html");
-                $("#valuesTable_div").hide();
-                $("#weightingMethodSelector").hide();
-                $("#valueFn_div").hide();
-                $("#sliders_div").hide();
-                $("#datatable_div").hide();
-                $("#description_div").hide();
-                $("#chart_div").hide();
+                    $("#valuesTable_div").hide();
+                    $("#weightingMethodSelector").hide();
+                    $("#valueFn_div").hide();
+                    $("#sliders_div").hide();
+                    $("#datatable_div").hide();
+                    $("#description_div").hide();
+                    $("#chart_div").hide();
             }, // end close
             //beforeclose: function (){ console.log("beforeclosing dialog");},
             buttons: {

@@ -52,19 +52,33 @@ module Mareframe {
             constructor(p_model: Model, p_handler: Handler) {
                 this.m_handler = p_handler;
                 this.saveChanges = this.saveChanges.bind(this);
+                //Change layout if it is not in marefram mode
+                if (!this.m_handler.isMareframMode()) {
+                    $("#logo").attr("src", "img/tokni_logo.png");
+                    $("#logo").attr("style", "height:80px");
+                    $("#webpage").attr("href", "http://www.tokni.com");
+                    $(".europe-map-back").hide();
+                    $("#model_description").text("This is the BBN tool. Red nodes represent decision nodes, blue nodes represent chance nodes, and yellow nodes represent value nodes. You may doubleclick on each node below, to access the properties tables for that node. To set a decision click on a choice in the table next to decision nodes.");
+                    $(".europe-map-zoom").hide();
+                    $(".col-md-2").hide();
+                    $(".col-md-6").hide();
+                    $("#ui_css").attr("href", "jQueryUI/jquery-ui_light.css");
+                    $("#dialog_css").attr("href", "css/dialog_tokni.css");
+
+                }
 
                 var mareframeGUI = this;
                 if (p_model.m_bbnMode) {
                     $("#detailsDialog").on("closedialog", function (event, ui) {
                         console.log("MFGUI colsing dialog BBN");
-                        if (mareframeGUI.m_unsavedChanges) {
-                            console.log("unsaved changes");
-                            if (!confirm("You have unsaved changes. Pressing OK will close the window and discard all changes.")) {
-                                return false;
-                            }
-                            $("#valuesTable_div").show();
-                        } 
-                    });
+                                if (mareframeGUI.m_unsavedChanges) {
+                                    console.log("unsaved changes");
+                                    if (!confirm("You have unsaved changes. Pressing OK will close the window and discard all changes.")) {
+                                        return false;
+                                    }
+                                    $("#valuesTable_div").show();
+                                }
+                        });
 
                 
 
@@ -83,17 +97,17 @@ module Mareframe {
                         console.log("closing window GUI");
                         $("#valuesTable_div").hide();
                     });
-
+                    
                     $("#submit").on("click", this.saveChanges);
                     $("#values").on("click", this.showValues);
+                   
                     this.setEditorMode = this.setEditorMode.bind(this);
                     this.setAutoUpdate = this.setAutoUpdate.bind(this);
                     $("#MCADataTable").hide();
                     $("#addDataRow").hide();
-
-                    $("#model_description").text("This is the Mareframe BBN tool. You may doubleclick on each element below, to access the properties tables for that element.");
                     this.m_mcaStageCanvas.width = $(window).width();
-
+                    
+                    
                 }
                 else {
                     $("#model_description").text("This is the Mareframe MCA tool. Data has been loaded into the table on the right. You may doubleclick on each element below, to access the properties panel for that element. If you doubleclick on one of the red or green elements, you may adjust the weights of it's child elements, and thus the data it points to. In the chart at the bottom, you will see the result of the analysis, with the tallest column being the highest scoring one.");
@@ -140,6 +154,7 @@ module Mareframe {
                 this.selectAll = this.selectAll.bind(this);
                 this.saveModel = this.saveModel.bind(this);
                 this.loadModel = this.loadModel.bind(this);
+                this.selectModel = this.selectModel.bind(this);
                 this.clickedDecision = this.clickedDecision.bind(this);
                 this.fullscreen = this.fullscreen.bind(this);
                 this.cnctStatus = this.cnctStatus.bind(this);
@@ -159,6 +174,8 @@ module Mareframe {
                 this.m_valFnBackground.addEventListener("mousedown", this.downValFnCP);
                 this.m_mcaBackground.addEventListener("pressmove", this.pressMove);
                 this.m_controlP.mouseChildren = false;
+
+                $("#selectModel").on("change", this.selectModel);
                 $("#MCAelmtType").on("change", this.optionTypeChange);
                 $("#MCAWeightingMethod").on("change", this.optionMethodChange);
                 $("#debugButton").on("click", this.allModeltoConsole);
@@ -189,6 +206,7 @@ module Mareframe {
 
                 $("#lodDcmt").on("change", this.loadModel);
                 $("#lodDcmt").on("click", function () {
+                    console.log("click");
                     this.value = null;
                 });
 
@@ -232,7 +250,10 @@ module Mareframe {
                 //var originalName: any = $('"#' + p_evt.target.id + '"')[0];
                 var originalName: any = $("#" + p_evt.target.id)[0].textContent;
                 console.log("id: " + originalName );
-                
+                if (this.m_model.getAutoUpdate()) {
+                    $("#updateMdl").hide();
+                }
+
                 $(id).addClass("editable");
                 $(id).html("<input type='text' value='" + originalName + "' />");
                 $(id).children().first().focus();
@@ -243,9 +264,9 @@ module Mareframe {
                         if (newText.length < 1) { //Must not update the text if the new text string is empty
                             $("#info_name").html(originalName);
                             newText = originalName;
-                        }
+            }
                         $(this).parent().text(newText);
-                        
+
                         originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
                         var tableX = id.slice(10).split("x")[0];
                         var tableY = id.slice(10).split("x")[1];
@@ -326,7 +347,7 @@ module Mareframe {
                                  deleteIndex = k;
                             }
                         }
-
+                
                         for (var e in this.m_model.getElementArr()) {
                             if (this.m_model.getElementArr()[e].getType() === 0) {
                                 this.m_model.getElementArr()[e].deleteValueAtIndex(deleteIndex);
@@ -366,15 +387,15 @@ module Mareframe {
                                 altKeyes[index++] = e;
                             }
                         }
-                        
+
                         elmt.setDataMin(0);
                         elmt.setDataMax(100);
                         elmt.setDataBaseLine(50)
                         elmt.m_dataUnit = "Unit";
-                     
+                
                         for (var j in altKeyes) {
                             elmt.pushValueToDataArr(50);
-                        }
+            }
                         
                         
                         elmt.setType(100);
@@ -459,7 +480,7 @@ module Mareframe {
                         break;
                     default:
                         console.log("You done goofed" + $("#MCAWeightingMethod").val() );
-                }
+            }
                 
                 this.populateElmtDetails(elmt);
                 this.m_updateMCAStage = true;
@@ -483,39 +504,6 @@ module Mareframe {
                 //oldData[1] = elmt.getData(1);
                 //console.log("o0" + oldData[0]
 
-                //Tools.makeSureItsAnArray(oldData);
-                //var index = oldData.length;
-                //var newData: any[][] = [];
-                //newData = oldData;
-                console.log("oldDataLenght: " + oldData.length[0]);
-                console.log("oldData: " + oldData);
-                console.log("newData: " + newData);
-                //newData[oldData.length] = [];
-                for (var i = 0; i < oldData.length; i++) {
-                    console.log(i + "  " + oldData[i]);
-                    newData[i] = oldData[i];
-                } 
-                newData[oldData.length] = [];
-                console.log("oldDataLenght: " + oldData.length);
-                newData[oldData.length][0] = "StateName";
-                for (var i = 1; i < oldData[0].length; i++) {
-                    //newData[oldData.length][i] = 0;
-                    newData[oldData.length][i] = 0;
-                    console.log("old.len: " + oldData[0].length + "   i: " + i);
-                }
-
-                console.log("newData: " + newData);
-                elmt.setData(newData);
-
-                elmt.update();
-                elmt.setUpdated(false);
-
-                elmt.getAllDescendants().forEach(function (e) {
-                    e.setUpdated(false);
-                });
-
-
-            }
             private allModeltoConsole(p_evt: Event) {
                 console.log("All Model");
                 //console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
@@ -538,16 +526,19 @@ module Mareframe {
                     $("#modeStatus").html("Editor Mode");
                 }
             }
+            private selectModel(p_evt: Event) {
+                this.m_handler.getFileIO().loadModel($("#selectModel").val(), this.m_model, this.importStage);
+            }
             private loadModel(p_evt: Event) {
                 ////console.log(this);
                 ////console.log(this.m_handler);
                 if (this.m_model.m_bbnMode) {
-                    this.m_handler.getFileIO().loadfromGenie(this.m_model, this.importStage);
+                this.m_handler.getFileIO().loadfromGenie(this.m_model, this.importStage);
                 } else {
                     this.m_handler.getFileIO().loadMCAModelFromFile(this.m_model, this.importStage);
                     if (this.m_model.getMainObjective() != undefined)
                         this.m_hasGoal = true; 
-                }
+            }
                 this.updateAtributeIndex();
             }
             private saveModel(p_evt: Event) {
@@ -556,7 +547,7 @@ module Mareframe {
                 var model = this.m_model;
                 $("#saveFile_div").show().dblclick(function () {
                     //console.log("DC filname");
-                    
+                
                     var $filename = $("#filename");
                     var oldText = $filename.html();
                     $filename.html("<input type='text' value= '" + oldText + "'>");
@@ -568,7 +559,7 @@ module Mareframe {
                             if (newText.length < 1) { //Must not update the text if the new text string is empty
                                 $filename.html(oldText);
                                 newText = oldText;
-                            }
+            }
                             $filename.text(newText);
                             
                             oldText = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
@@ -594,9 +585,9 @@ module Mareframe {
             private updateModel() {
                 
                 if (this.m_model.m_bbnMode == true) {
-                    this.m_model.update();
-                    this.updateMiniTable(this.m_model.getElementArr());
-                }
+                this.m_model.update();
+                this.updateMiniTable(this.m_model.getElementArr());
+            }
                 else {
                 }
 
@@ -620,7 +611,7 @@ module Mareframe {
                 this.clearSelection();
                 if (this.m_handler.getFileIO().reset() === null ) {
                     var loadModel: string = Tools.getUrlParameter('model');
-                    loadModel = "scotland";
+                    loadModel = this.m_model.getIdent();
                     console.log("using model: " + loadModel);
                     this.m_handler.getFileIO().loadModel(loadModel, this.m_handler.getActiveModel(), this.importStage);
                 }
@@ -686,7 +677,7 @@ module Mareframe {
                 if (p_elmt.m_dstType === 1) {
                     shape.graphics.f(this.m_elementColors[p_elmt.getType()-100][0]).s(this.m_elementColors[p_elmt.getType()-100][1]);
                 } else {
-                    shape.graphics.f(this.m_elementColors[p_elmt.getType()][0]).s(this.m_elementColors[p_elmt.getType()][1]);
+                shape.graphics.f(this.m_elementColors[p_elmt.getType()][0]).s(this.m_elementColors[p_elmt.getType()][1]);
                 }
                 var elmtShapeType: number = 2;
                 if (this.m_model.m_bbnMode) {
@@ -712,7 +703,7 @@ module Mareframe {
                 if (p_elmt.m_dstType === 1) {
                     var label = new createjs.Text(p_elmt.getName().substr(0, 24), "1em trebuchet", this.m_elementColors[p_elmt.getType()-100][1]);
                 } else {
-                    var label = new createjs.Text(p_elmt.getName().substr(0, 24), "1em trebuchet", this.m_elementColors[p_elmt.getType()][1]);
+                var label = new createjs.Text(p_elmt.getName().substr(0, 24), "1em trebuchet", this.m_elementColors[p_elmt.getType()][1]);
                 }
                 //var label = new createjs.Text(p_elmt.getName().substr(0, 24), "1em trebuchet", this.m_elementColors[p_elmt.getType()][1]);
                 label.textAlign = "center";
@@ -744,7 +735,7 @@ module Mareframe {
                         decisionCont.addChild(decisTextBox);
                     }
                     else {
-                        for (var i = 0; i < elmt.getValues().length; i++) {
+                        for (var i = Tools.numOfHeaderRows(elmt.getValues()); i < elmt.getValues().length; i++) {
 
                             var backgroundColor: string;
                             if (elmt.getDecision() == i && elmt.getType() == 1) {
@@ -805,10 +796,12 @@ module Mareframe {
                 //}
             }
             private clickedDecision(p_evt: createjs.MouseEvent) {
+                if (!this.m_editorMode) {// Setting decision while in editor mode messes with the calculations
                 //console.log("clicked a decision");
                 //console.log(p_evt);
                 this.m_model.setDecision(p_evt.currentTarget.name, Math.floor(p_evt.localY / 12));
                 this.updateModel();
+            }
             }
             private updateEditorMode() {
                 //console.log("updating editormode");
@@ -839,10 +832,12 @@ module Mareframe {
                     for (var i = 0; i < elementArr.length; i++) {
                         if (this.m_editorMode) {
                             elementArr[i].m_easelElmt.addEventListener("pressmove", this.pressMove);
+                            this.m_model.setDecision(elementArr[i].getID(), elementArr[i].getDecision());//Unsets all decisions
                         } else {
                             elementArr[i].m_easelElmt.removeEventListener("pressmove", this.pressMove);
                         }
                     }
+                    this.updateModel();
                 }
             }
             private setShowDescription = function (cb) {
@@ -883,9 +878,11 @@ module Mareframe {
                 this.m_model.setAutoUpdate(cb.currentTarget.checked);
                 if (cb.currentTarget.checked) {
                     $("#autoUpdateStatus").html("Updating automatically");
+                    $("#updateMdl").hide();
                 }
                 else {
                     $("#autoUpdateStatus").html("");
+                    $("#updateMdl").show();
                 }
                 //console.log("auto update: " + this.m_model.m_autoUpdate);
             }
@@ -943,7 +940,7 @@ module Mareframe {
                 this.setSize(this.m_mcaSizeX, lowestElement); //Sets the height to be where the lowest element is
             }
             private createNewChance(p_evt: Event) {
-                
+
                 var elmt = this.m_model.createNewElement(0);
                 
                 this.addElementToStage(elmt);
@@ -1031,7 +1028,6 @@ module Mareframe {
             private addElementToStage(p_elmt: Element) {
                 this.updateElement(p_elmt);
 
-
                 p_elmt.m_easelElmt.regX = 75;
                 p_elmt.m_easelElmt.regY = 15;
                 if (p_elmt.m_easelElmt.x <= 0 && p_elmt.m_easelElmt.y <= 0) {
@@ -1082,7 +1078,7 @@ module Mareframe {
                 if (this.m_model.m_bbnMode) {
                     //bbn mode only
                     $("#elementType").hide();
-                    console.log("hiding selector");
+                    //console.log("hiding selector");
                     $("#detailsDialog").data("element", p_elmt);
                     $("#detailsDialog").data("model", this.m_model);
                     
@@ -1307,11 +1303,11 @@ module Mareframe {
             private addEditFunction(p_elmt: Element, p_editorMode: boolean) {
                     var originalName: string = p_elmt.getName();
                     var mareframeGUI = this;
+                    var model: Model = this.m_model;
                 if (this.m_model.m_bbnMode) {
                 var originalDesc = p_elmt.getDescription();
                 var originalUserComments = p_elmt.getUserDescription();
                 console.log("Element: " + p_elmt.getName() + "ready for editing");
-                $("#addDataRow").show();
                // $(function () {
                     $("#userDescription_div").dblclick(function () {
                         $("#submit").show();
@@ -1354,6 +1350,25 @@ module Mareframe {
                     });
                // });
                 if (p_editorMode) {
+                            if (p_elmt.getType() !== 2) {//If it is a chance or a decision node
+                                $("#addDataRow").show();
+                                $(".minus").button({
+                                    icons: { primary: "ui-icon-minus" }
+                                });
+                                //Add function to minus button
+                                $(".minus").click(function () {
+                                    var row: number = this.id
+                                    mareframeGUI.removeRow(p_elmt, row);
+                                    //create the html table again
+                                    var s = Tools.htmlTableFromArray("Definition", p_elmt, model, p_editorMode);
+                                    $("#defTable_div").html(s);
+                                    //Add the edit function again
+                                    mareframeGUI.addEditFunction(p_elmt, p_editorMode);
+                                });
+                            }
+                            else {
+                                $("#addDataRow").hide();
+                            }
                         $("#info_name").dblclick(function () {
                             $("#submit").show();
                             $(this).addClass("editable");
@@ -1432,9 +1447,6 @@ module Mareframe {
                             });
                        // });
                         });
-                        $(".defStateName").button({
-                            icons: { primary: "ui-icon-minus" }
-                        });
                     //Data table
                         var editing = false;//this is used to make sure the text does not disapear when double clicking several times
                         $(function () {
@@ -1491,7 +1503,7 @@ module Mareframe {
                                 }
                                 });
                         //TODO Prevent user from editing the top rows. That data should come from the child elements
-                            $("th").dblclick(function () {
+                                $(".editable_cell").dblclick(function () {
                                 console.log("editing: " + editing);
                                 if (!editing) {
                                     editing = true;
@@ -1601,7 +1613,6 @@ module Mareframe {
                 $("#values").prop("disabled", true);
             }
             private saveChanges() {
-                //var elmt: Element = $("#detailsDialog").data("element");
                 var elmt: any = $("#detailsDialog").data("element");
                 var oldData: any[][] = elmt.getData();
                 var model: Model = this.m_model;
@@ -1619,6 +1630,7 @@ module Mareframe {
                 //console.log(this);
                 table.find("tr").each(function () {
                     $(this).find("th,td").each(function () {
+                        if ($(this).text().length > 0) {//This prevents the function from adding the minus column
                         //console.log("text to be added: " + $(this).text());
                         //console.log("does it exsist: " + $.inArray($(this).text(), newRow) === -1)
                         var value: any = $(this).text();
@@ -1629,14 +1641,16 @@ module Mareframe {
                             if (!isNaN(value)) {
                                 value = Number(value);
                             }
+                                //console.log("pushing " + value);
                             newRow.push(value);
+                        }
                         }
                     });
                     newTable.push(newRow);
                     newRow = [];
                 });
                 //console.log(newTable);
-                //Remove header row with title the "Definition"
+                //Remove header row with the title "Definition"
                 newTable.splice(0, 1);
                 //Reset the headerrows. (Better solution would be to prevent the user from editing them
                 for (var i = 0; i < Tools.numOfHeaderRows(oldData); i++) {                  
@@ -1645,17 +1659,11 @@ module Mareframe {
                     }
                     newTable[i][0] = oldData[i][0];
                 }
-
                 if (!Tools.columnSumsAreValid(newTable, Tools.numOfHeaderRows(elmt.getData())) && elmt.getType() == 0) {
                     //Should also show which row is unvalid (maybe right after the user has changed the value)
                     alert("The values in each column must add up to 1");
                 } else {
                     elmt.setData(newTable);
-                    if (model.getAutoUpdate()) {
-                        this.updateModel();
-                        console.log("auto update is on");
-                    }
-                    else {
                         elmt.setUpdated(false);
                         elmt.getAllDescendants().forEach(function (e) {
                             e.setUpdated(false);
@@ -1663,12 +1671,16 @@ module Mareframe {
                         elmt.getAllDecisionAncestors().forEach(function (e) {
                             e.setUpdated(false);
                         });
+                    if (model.getAutoUpdate()) {
+                        this.updateModel();
+                        console.log("auto update is on");
                     }
                     //console.log("new table after submit:");
                     //console.log(elmt.getData());
                 }
                 this.m_unsavedChanges = false;
                 //this.m_updateMCAStage = true;
+                //this.m_mcaContainer.removeChild(elmt.m_easelElmt);
                 this.addElementToStage(elmt);//repaint the element. This is necessary if the name of the elemnt has been changed
             }           
             private updateValFnCP(p_controlPointX: number, p_controlPointY: number, p_flipped_numBool: number): void {
@@ -1725,7 +1737,7 @@ module Mareframe {
                 var tm: any = $("#valueFn_Flip").data("name");
                 var tm2: string = tm.toString();
                 var elmt = this.m_model.getElement(tm2);
-                
+
                 elmt.m_valueFunctionFlip = Math.abs(elmt.m_valueFunctionFlip - 1);
                 this.updateValFnCP(elmt.m_valueFunctionX, elmt.m_valueFunctionY, elmt.m_valueFunctionFlip);
                 this.updateDataTableDiv(elmt);
@@ -1797,8 +1809,8 @@ module Mareframe {
                                 }
                                 else if (row[i] / p_matrix[2][i] < 0.85) {
                                     var t = " ;color:blue; ";
-                                }
-                                else {
+                        }
+                        else {
                                     var t = " ;color:yellow; ";
                                 }
                             }
@@ -1827,10 +1839,10 @@ module Mareframe {
                 $("#mTarget").html("Target: " + p_evt.target.name);
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
                     var elmt: Element = this.m_model.getElement(p_evt.target.name);
-                    console.log("");
-                    console.log("*********************");
+                    //console.log("");
+                    //console.log("*********************");
                     for (var i in elmt.getConnections()) {
-                        console.log(elmt.getID() + "  " + elmt.getConnections()[i].getID())
+                        //console.log(elmt.getID() + "  " + elmt.getConnections()[i].getID())
                     }
                     
                     console.log("Values: " + elmt.getValues());
@@ -1863,17 +1875,17 @@ module Mareframe {
                 //////console.log("cnctool options: "+$("#cnctTool").button("option","checked"));
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
                    var cnctChkbox: HTMLInputElement = <HTMLInputElement>document.getElementById("cnctTool")   // What the hell no jQuery
-                   if (cnctChkbox.checked) //check if connect tool is enabled
-                   {
+                    if (cnctChkbox.checked) //check if connect tool is enabled
+                    {
                        if (this.m_model.m_bbnMode) {
-                           ////console.log("cnctTool enabled");
+                        ////console.log("cnctTool enabled");
                            if (!this.connectionExist(p_evt)) {
-                               this.connectTo(p_evt);
-                           }
-                           else {
-                               this.disconnectFrom(p_evt);
-                           }
-                       } else {
+                        this.connectTo(p_evt);
+                        }
+                        else {
+                            this.disconnectFrom(p_evt);
+                        }
+                    } else {
                            console.log("connencting MCA");
                            if (!this.connectionExist(p_evt))
                                this.connctToMCAElement(p_evt);
@@ -1883,7 +1895,7 @@ module Mareframe {
 
                        }
                     } else {
-                           this.select(p_evt);
+                        this.select(p_evt);
                     }
                    
                 } else {
@@ -1899,26 +1911,41 @@ module Mareframe {
                 this.addToSelection(p_evt.target);
             }
             private pressMove(p_evt: createjs.MouseEvent): void {
-                //console.log("press move on target " + p_evt.target.name);
+                var gui = this;
+                console.log("press move on target " + p_evt.target.name);
                 $("#mX").html("X: " + p_evt.stageX);
                 $("#mY").html("Y: " + p_evt.stageY);
                 $("#mAction").html("Action: PressMove");
                 $("#mTarget").html("Target: " + p_evt.target.name);
                 if (p_evt.target.name === "hitarea") {
-                    console.log("editorMode: " + this.m_editorMode);
+                    //console.log("editorMode: " + this.m_editorMode);
                     if (p_evt.nativeEvent.ctrlKey) {
                         ////console.log("orig: " + this.m_originalPressX + ", " + this.m_originalPressY + ". curr: " + p_evt.stageX + ", " + p_evt.stageY);
                         this.setSelection(this.m_model.getEaselElementsInBox(this.m_originalPressX, this.m_originalPressY, p_evt.stageX, p_evt.stageY));
                         this.m_selectionBox.graphics.clear().s("rgba(0,0,0,0.7)").setStrokeDash([2, 2], createjs.Ticker.getTime()).drawRect(this.m_originalPressX, this.m_originalPressY, p_evt.stageX - this.m_originalPressX, p_evt.stageY - this.m_originalPressY);
                         this.m_mcaContainer.addChild(this.m_selectionBox)
                     } else if (this.m_editorMode) {
-                        console.log("elements off screen: "); // + this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
+                        //console.log("elements off screen: "); // + this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
                         if (!this.elementOffScreen(undefined, p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
-                        console.log("panning");
+                        //console.log("panning");
                         $("#mAction").html("Action: Panning");
-                        this.m_mcaContainer.x += p_evt.stageX - this.m_oldX;
-                        this.m_mcaContainer.y += p_evt.stageY - this.m_oldY;
+                        //This moves all elements instead of the background
+                            this.m_model.getElementArr().forEach(function (e) {
+                                e.m_easelElmt.x += p_evt.stageX - gui.m_oldX;
+                                e.m_easelElmt.y += p_evt.stageY - gui.m_oldY;
+                                e.m_minitableEaselElmt.x += p_evt.stageX - gui.m_oldX;
+                                e.m_minitableEaselElmt.y += p_evt.stageY - gui.m_oldY;
 
+                                //console.log("selected elements: " + this.m_selectedItems);
+                                //        console.log("element: " + elmt.name);
+                                for (var j = 0; j < e.getConnections().length; j++) {
+                                    var c = e.getConnections()[j];
+                                    gui.updateConnection(c);
+                                }
+                            });
+                        /*this.m_mcaContainer.x += p_evt.stageX - this.m_oldX;
+                        this.m_mcaContainer.y += p_evt.stageY - this.m_oldY;
+                            */
                         this.resizeWindow();
                         
                         }
@@ -2203,8 +2230,8 @@ module Mareframe {
             private updateConnection(p_connection: Connection): void {
                 //stage.removeChild(c.easelElmt);
                // if (this.m_model.m_bbnMode) {
-                    var temp: createjs.Shape = <createjs.Shape>p_connection.m_easelElmt.getChildAt(1);
-                    temp.graphics.clear().beginStroke(p_connection.getColor()).mt(p_connection.getInputElement().m_easelElmt.x, p_connection.getInputElement().m_easelElmt.y).lt(p_connection.getOutputElement().m_easelElmt.x, p_connection.getOutputElement().m_easelElmt.y);
+                var temp: createjs.Shape = <createjs.Shape>p_connection.m_easelElmt.getChildAt(1);
+                temp.graphics.clear().beginStroke(p_connection.getColor()).mt(p_connection.getInputElement().m_easelElmt.x, p_connection.getInputElement().m_easelElmt.y).lt(p_connection.getOutputElement().m_easelElmt.x, p_connection.getOutputElement().m_easelElmt.y);
                 //}
                 p_connection.m_easelElmt.getChildAt(0).x = ((p_connection.getInputElement().m_easelElmt.x - p_connection.getOutputElement().m_easelElmt.x) / 2) + p_connection.getOutputElement().m_easelElmt.x;
                 p_connection.m_easelElmt.getChildAt(0).y = ((p_connection.getInputElement().m_easelElmt.y - p_connection.getOutputElement().m_easelElmt.y) / 2) + p_connection.getOutputElement().m_easelElmt.y;
@@ -2234,7 +2261,7 @@ module Mareframe {
                         shape.graphics.clear().f(this.m_elementColors[elmtType-100][2]).s(this.m_elementColors[elmtType-100][1]);
                     }
                     else {
-                        shape.graphics.clear().f(this.m_elementColors[elmtType][2]).s(this.m_elementColors[elmtType][1]);
+                    shape.graphics.clear().f(this.m_elementColors[elmtType][2]).s(this.m_elementColors[elmtType][1]);
                     }
                     
 
@@ -2267,17 +2294,17 @@ module Mareframe {
 
                     var newSelected: any[] = [];
                     this.m_selectedItems.forEach(function (e) {
-                        console.log("checking " + e + " against " + p_easelElmt);
+                        //console.log("checking " + e + " against " + p_easelElmt);
                         if (e.toString() !== p_easelElmt.toString()) {
-                            console.log("not a match");
+                            //console.log("not a match");
                             newSelected.push(e);
                         }
                         else {
-                            console.log("match");
+                            //console.log("match");
                         }
                     });
                     this.m_selectedItems = newSelected;
-                    console.log("new selected: " + this.m_selectedItems);
+                    //console.log("new selected: " + this.m_selectedItems);
                     var easelElmt = p_easelElmt;
                     var elmtType = this.m_model.getElement(easelElmt.name).getType();
                     var shape: createjs.Shape = <createjs.Shape>easelElmt.getChildAt(0);
@@ -2323,7 +2350,7 @@ module Mareframe {
                 return this.m_selectedItems;
             }
             private clearSelection(): void {
-                console.log("clear");
+                //console.log("clear");
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
                     var easelElmt = this.m_selectedItems[i];
                     if (easelElmt.id != this.m_model.getElement(easelElmt.name).m_minitableEaselElmt.id) {//if this is not the minitable
@@ -2334,7 +2361,7 @@ module Mareframe {
                             shape.graphics.clear().f(this.m_elementColors[elmtType-100][0]).s(this.m_elementColors[elmtType-100][1]);
                         }
                         else {
-                            shape.graphics.clear().f(this.m_elementColors[elmtType][0]).s(this.m_elementColors[elmtType][1]);
+                        shape.graphics.clear().f(this.m_elementColors[elmtType][0]).s(this.m_elementColors[elmtType][1]);
                         }
                         
                         var elmtShapeType: number = 2;
@@ -2381,7 +2408,47 @@ module Mareframe {
                     this.m_updateMCAStage = true;
                     this.importStage();
                 }
-            }          
+            }            
+            private addDataRowClick(p_evt: Event) {
+                //console.log("add row");
+                var elmt: any = $("#detailsDialog").data("element");
+                elmt.setData(Tools.addDataRow(elmt));
+
+                elmt.update();
+                //Create the html tabel again and add the edit function again
+                var s = Tools.htmlTableFromArray("Definition", elmt, this.m_model, this.m_editorMode);
+                $("#defTable_div").html(s);
+                this.addEditFunction(elmt, this.m_editorMode);
+
+                var newStateName: String = elmt.getData()[elmt.getData().length - 1][0];
+                //Add default values for the new state in all children
+                elmt.getChildrenElements().forEach(function (e) {
+                    e.setData(e.updateHeaderRows(e.getData()));
+                    e.setData(e.addDefaultDataInEmptyCells(e.getData(), elmt, newStateName));
+                });
+                elmt.getAllDescendants().forEach(function (e) {
+                    e.setUpdated(false);
+                });
+            }
+            private removeRow(p_element: Element, p_n: number) {
+                //console.log("remove row " + p_n + " in " + p_element.getName());
+                var data: any[][] = Tools.makeSureItsTwoDimensional(p_element.getData());
+                var state: String = data[p_n][0];
+                if (data.length - Tools.numOfHeaderRows(data) < 3) {
+                    alert("Can not be less than two outcomes");
+                }
+                else {
+                    p_element.setData(Tools.removeRow(p_element.getData(), p_n));
+                    //Remove this state from all children data tables
+                    p_element.getChildrenElements().forEach(function (e) {
+                        e.setData(Tools.removeState(e.getData(), p_element, state));
+                    });
+                    p_element.getAllDescendants().forEach(function (e) {
+                        e.setUpdated(false);
+                    });
+                }
+            }   
+            
         }
     }
 }

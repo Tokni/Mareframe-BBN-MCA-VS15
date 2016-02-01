@@ -122,7 +122,7 @@ var Mareframe;
                 this.m_decision = n;
             };
             Element.prototype.update = function () {
-                console.log("Updating element " + this.getName());
+                //console.log("Updating element " + this.getName() );
                 if (this.m_type !== 1) {
                     //   console.log("This is not a decision node");
                     //Definition table in decision nodes does not rely on parents
@@ -285,6 +285,28 @@ var Mareframe;
                     data.push(p_originalData[i]);
                 }
                 // console.log(data);
+                return data;
+            };
+            Element.prototype.addDefaultDataInEmptyCells = function (p_originalData, p_editedElmt, p_addedState) {
+                console.log("adding default values in " + this.getName());
+                var data = DST.Tools.makeSureItsTwoDimensional(p_originalData);
+                var elmtType = this.getType();
+                var rows = data.length;
+                var columns = data[0].length;
+                for (var i = 0; i < rows; i++) {
+                    if (data[i][0] === p_editedElmt.getID()) {
+                        console.log("found row");
+                        for (var j = 0; j < columns; j++) {
+                            if (data[i][j] === p_addedState) {
+                                console.log("found column");
+                                for (var n = DST.Tools.numOfHeaderRows(data); n < rows; n++) {
+                                    console.log("adding " + (1 / (rows - DST.Tools.numOfHeaderRows(data))));
+                                    data[n].splice(j, 0, (1 / (rows - DST.Tools.numOfHeaderRows(data))));
+                                }
+                            }
+                        }
+                    }
+                }
                 return data;
             };
             //returns the different variables (conditions or choices) that belong to the element

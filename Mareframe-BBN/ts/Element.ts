@@ -46,10 +46,10 @@
                 else { this.m_id = "elmt" + p_id; }
                 if (p_type != undefined) {
                     if (this.m_dstType === 1) {
-                        this.m_type = p_type;
+                    this.m_type = p_type; 
                     } else {
                         this.m_type = p_type;
-                    }
+                }
                 }
                 else {
                     //console.log("type not defined");
@@ -138,7 +138,7 @@
                 this.m_decision = n;
             }
             update(): void {
-                console.log("Updating element " + this.getName() );
+                //console.log("Updating element " + this.getName() );
                 if (this.m_type !== 1) {
                  //   console.log("This is not a decision node");
                     //Definition table in decision nodes does not rely on parents
@@ -312,7 +312,30 @@
                 }
                // console.log(data);
                 return data;
+            }
 
+            addDefaultDataInEmptyCells(p_originalData: any[][], p_editedElmt: Element, p_addedState: String): any[][]{
+                console.log("adding default values in " + this.getName());
+                var data:any[][] = Tools.makeSureItsTwoDimensional(p_originalData);
+                var elmtType: number = this.getType();
+                var rows: number = data.length;
+                var columns: number = data[0].length;
+               
+                for (var i = 0; i < rows; i++) {
+                    if (data[i][0] === p_editedElmt.getID()) {//This is the right row
+                        console.log("found row");
+                        for (var j = 0; j < columns; j++) { 
+                            if (data[i][j] === p_addedState) {//This is the right column
+                                console.log("found column");
+                                for (var n = Tools.numOfHeaderRows(data); n < rows; n++) { //For each row in this column add a default value
+                                    console.log("adding " + (1 / (rows - Tools.numOfHeaderRows(data))));
+                                    data[n].splice(j, 0, (1 / (rows - Tools.numOfHeaderRows(data))));
+                                }
+                            }
+                        }
+                    }
+                }
+                return data;
             }
 	        //returns the different variables (conditions or choices) that belong to the element
             getMainValues(): any[]{
@@ -330,7 +353,7 @@
                 }
                 ////console.log("new row: " + row);
                 return row;
-            }          
+            }
             //MCA TOOL
             getDataArr(p_index?: number, p_secondary?: number): any {
                 if (p_index != undefined) {
@@ -479,7 +502,7 @@
                     elmtName: this.getName(),
                     elmtDesc: this.getDescription(),
                     elmtType: this.getType(),
-                    
+
                     elmtWghtMthd: this.getMethod(),
                     elmtDstType: this.m_dstType,
                     elmtDataMin: this.m_dataMin,
@@ -507,7 +530,7 @@
                 };
             }
             fromJSON(p_jsonElmt: any): void {
-                // console.log("element.fromJSON()");
+               // console.log("element.fromJSON()");
                 //console.log(p_jsonElmt);
                 this.m_easelElmt.x = p_jsonElmt.posX;
                 this.m_easelElmt.y = p_jsonElmt.posY;
@@ -519,7 +542,7 @@
                 //this.m_data = p_jsonElmt.elmtData;
                 //console.log("FromJSONdata: " + this.m_data);
                 this.m_weightingMethod = p_jsonElmt.elmtWghtMthd;
-
+                
                 switch (this.m_weightingMethod) {
                     case 0: break;
                     case 1:
@@ -559,7 +582,7 @@
                 //this.m_data = p_jsonElmt.elmtData;
                 //console.log("FromJSONdata: " + this.m_data);
                 this.m_weightingMethod = p_jsonElmt.elmtWghtMthd;
-                
+
             }
             getConnectionFrom(p_elmt: Element): Connection {
                 var retConnection: Connection = null;

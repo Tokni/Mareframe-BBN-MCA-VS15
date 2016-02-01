@@ -14,6 +14,7 @@
             private m_autoUpdate: boolean = false;
             private m_altIndex: number[] = [];
 
+            private m_autoUpdate: boolean = true; //auto update is on by default
             constructor(p_bbnMode: boolean) {
                 this.m_bbnMode = p_bbnMode;
                 //this.m_bbnMode = true;
@@ -39,7 +40,7 @@
                     dataStream = this.getMCADataStream();
                 }
 
-
+                
                 return dataStream;
             }
             private getBBNDataStream(): string {
@@ -95,16 +96,16 @@
 
                             dataStream += '</utility>\n';
                     }
-
+                    
                 });
 
                 dataStream += '</nodes>\n<extensions>\n<genie version="1.0" name="' + this.getName() + '" faultnameformat="nodestate"><comment></comment>\n'
                 this.m_elementArr.forEach(function (elmt: Element) {
                     dataStream += '<node id="' + elmt.getID() + '">\n' +
-                        '<name>' + elmt.getName() + '</name>\n' +
-                        '<interior color="aaaaaa" />\n' +
-                        '<outline color="000080" />\n' +
-                        '<font color="000000" name="Arial" size="8" />\n' +
+                    '<name>' + elmt.getName() + '</name>\n' +
+                    '<interior color="aaaaaa" />\n' +
+                    '<outline color="000080" />\n' +
+                    '<font color="000000" name="Arial" size="8" />\n' +
                         '<position>' + (elmt.m_easelElmt.x - 75) + ' ' + (elmt.m_easelElmt.y - 15) + ' ' + (elmt.m_easelElmt.x + 75) + ' ' + (elmt.m_easelElmt.y + 15) + '</position>\n</node>\n';
                 });
                 dataStream += '</genie>\n</extensions>\n</smile>\n'
@@ -223,10 +224,10 @@
                 console.log("MainObj: " + this.m_mainObjective);
 
                 if (this.m_mainObjective != null) {
-                    var weightsArr = Tools.getWeights(this.m_mainObjective, this);
+                var weightsArr = Tools.getWeights(this.m_mainObjective, this);
                     console.log("______:::::*******************************************Weigths:  " + weightsArr);
-
-                    for (var i = 0; i < weightsArr.length; i++) {
+    	
+                for (var i = 0; i < weightsArr.length; i++) {
                         var tmp = tempMatrix[0][i + 1];
                         var elmt = this.getElement(tempMatrix[0][i + 1]);
                         tempMatrix[0][i + 1] = elmt.getName();
@@ -236,36 +237,36 @@
                         var flip = elmt.m_valueFunctionFlip;
                         var x = elmt.m_valueFunctionX;
                         var y = elmt.m_valueFunctionY;
-                        //check if data is within min-max values, and expand as necessary
-                        for (var j = 1; j < tempMatrix.length - 1; j++) {
-                            if (tempMatrix[j][i + 1] > maxVal) {
-                                maxVal = tempMatrix[j][i + 1];
-                            }
+                    //check if data is within min-max values, and expand as necessary
+                    for (var j = 1; j < tempMatrix.length - 1; j++) {
+                        if (tempMatrix[j][i + 1] > maxVal) {
+                            maxVal = tempMatrix[j][i + 1];
                         }
+                    }
 
-                        for (var j = 1; j < tempMatrix.length - 1; j++) {
-                            if (tempMatrix[j][i + 1] < minVal) {
-                                minVal = tempMatrix[j][i + 1];
-                            }
+                    for (var j = 1; j < tempMatrix.length - 1; j++) {
+                        if (tempMatrix[j][i + 1] < minVal) {
+                            minVal = tempMatrix[j][i + 1];
                         }
+                    }
 
                         for (var j = 3; j < tempMatrix.length - 2; j++) {
-                            
+            
                             //tempMatrix[j][i + 1] = Mareframe.DST.Tools.getValueFn(Math.abs(elmtData[3] - ((tempMatrix[j][i + 1] - minVal) / (maxVal - minVal))), Math.abs(elmtData[3] - ((elmtData[1] / 100))), 1 - (elmtData[2] / 100));
                             tempMatrix[j][i + 1] = Mareframe.DST.Tools.getValueFn(Math.abs(flip - ((tempMatrix[j][i + 1] - minVal) / (maxVal - minVal))), Math.abs(flip - ((x / 100))), 1 - (y / 100));
 
-                            tempMatrix[j][i + 1] *= weightsArr[i][1];
-                            tempMatrix[j][i + 1] = (Math.round(1000 * tempMatrix[j][i + 1])) / 1000;
-                        }
-
+                        tempMatrix[j][i + 1] *= weightsArr[i][1];
+                        tempMatrix[j][i + 1] = (Math.round(1000 * tempMatrix[j][i + 1])) / 1000;
                     }
+
+                }
                     for (var j = 3; j < tempMatrix.length - 2; j++) {
                         elmt = this.getElement(tempMatrix[j][0]);
                         tempMatrix[j][0] = elmt.getName();
-                    }
+                }
 
                     
-                }
+            }
                 else {
                     console.log("There is no main objective yet.");
                 }
@@ -306,10 +307,10 @@
                                     var denom = (maxVal - minVal);
                                     var frac = nom/denom;
                                    toAdd.push(Mareframe.DST.Tools.getValueFn(Math.abs(p_elmt.m_valueFunctionFlip - (p_elmt.getDataArrAtIndex(i - 2) - minVal) / (maxVal - minVal)), Math.abs(p_elmt.m_valueFunctionFlip - p_elmt.m_valueFunctionX / 100), 1 - p_elmt.m_valueFunctionY / 100));                          
-                                }
+                            }
                                 console.log("toAdd: " + toAdd);
                                 tempMatrix.push(toAdd);
-                            }
+                        }
                         } else {
 
                         }
@@ -352,7 +353,7 @@
                 if (this.m_bbnMode === false) {
                     var e = new Element("elmt" + this.m_counter, this, p_type, 1);
                 } else {
-                    var e = new Element("elmt" + this.m_counter, this, p_type);
+                var e = new Element("elmt" + this.m_counter, this, p_type);
                 }
                 //var e = new Element("elmt" + this.m_counter, this, p_type);
                 this.m_counter++;
@@ -384,7 +385,7 @@
                 return this.m_elementArr[this.getObjectIndex(p_elmtStringId)];
             }
             private getObjectIndex(p_objectStringId: string): number {
-                //console.log(" get object "  + p_objectStringId + " in list: "+ this.m_elementArr);
+             //console.log(" get object "  + p_objectStringId + " in list: "+ this.m_elementArr);
                 var key = 0;
                 if (p_objectStringId.substr(0, 4) === "elmt") {
                     this.m_elementArr.every(function (p_elmt) {
@@ -465,34 +466,34 @@
                     return false;
                 else {
                     console.log("Deleting connection: " + p_connID + "   ----------------");
-
+                    
                     if (this.m_bbnMode) {
                         var states: number = this.m_connectionArr[key].getInputElement().getDataOld().length;
                         var data = this.m_connectionArr[key].getOutputElement().getDataOld();
                         var dataIn = this.m_connectionArr[key].getInputElement().getDataOld();
-                        var removeHeader = this.m_connectionArr[key].getInputElement().getID();
-                        console.log("Remove header: " + removeHeader);
-                        console.log("Original Data Out: " + data);
-                        console.log("Original Data In: " + dataIn);
+                    var removeHeader = this.m_connectionArr[key].getInputElement().getID();
+                    console.log("Remove header: " + removeHeader);
+                    console.log("Original Data Out: " + data);
+                    console.log("Original Data In: " + dataIn);
+                    
+                    var dims: number[] = [0, 0, 0];
+                    data = Tools.removeHeaderRow(removeHeader, data);
+                    //var splicePos = 1 + Math.floor((data[data.length - 1].length / states));
+                    //console.log("states: " + states);
+                    //console.log("splicepos: " + splicePos);
+                    //for (var row = 0; row < data.length;row++) {
+                    //    if(data[row].length-1 > splicePos)
+                    //        data[row].splice(splicePos);
+                    //}
+                    //console.log("New data: " + data);
+                    //console.log("ConnectionArr: " + this.m_connectionArr[key]);
+                    this.m_connectionArr[key].getOutputElement().setData(data);
 
-                        var dims: number[] = [0, 0, 0];
-                        data = Tools.removeHeaderRow(removeHeader, data);
-                        //var splicePos = 1 + Math.floor((data[data.length - 1].length / states));
-                        //console.log("states: " + states);
-                        //console.log("splicepos: " + splicePos);
-                        //for (var row = 0; row < data.length;row++) {
-                        //    if(data[row].length-1 > splicePos)
-                        //        data[row].splice(splicePos);
-                        //}
-                        //console.log("New data: " + data);
-                        //console.log("ConnectionArr: " + this.m_connectionArr[key]);
-                        this.m_connectionArr[key].getOutputElement().setData(data);
+                    this.m_connectionArr.splice(key, 1);
 
-                        this.m_connectionArr.splice(key, 1);
-
-                        //console.log(this.m_elementArr);
-                        return true;
-                    }
+                    //console.log(this.m_elementArr);
+                    return true;
+                }
                     else {
                         //updates the data of the element connected to the deletetee
                         var elmtOut = this.m_connectionArr[key].getOutputElement();
@@ -624,8 +625,8 @@
                 }
                 if (!this.m_bbnMode)
                     if (p_jsonObject.mainObj !== "") {
-                        this.m_mainObjective = this.getElement(p_jsonObject.mainObj);
-                        
+                    this.m_mainObjective = this.getElement(p_jsonObject.mainObj);
+
                     }
                     else p_jsonObject.mainObj = undefined;
 
@@ -653,17 +654,23 @@
             setDecision(p_elmtIdent: string, p_decisNumb: number): void {
                 var elmt: Element = this.getElement(p_elmtIdent);
                 if (elmt.getDecision() == p_decisNumb) {
-                    console.log("unsetting decision");
+                    //console.log("unsetting decision");
                     elmt.setDecision(undefined)
                 }
                 else {
                     elmt.setDecision(p_decisNumb);
                 }
+                this.getElementArr().forEach(function (e) {
+                    e.setUpdated(false);
+                });/*
+                This is commented out because createSubMatrix did not work properly when only updating some of the elements.
+                This solution is not optimal, but it forces the program to update every element without looking at decisions first and then focusing on decision.
+                The problem occured when first one decision was set and the model was updated and then another decision was set. 
                 elmt.getAllDescendants().forEach(function (e: Element) {
                     e.setUpdated(false);
                     console.log(e.getName() + " not updated");
-                });
-                console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
+                });*/
+                //console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
             }
         }
     }

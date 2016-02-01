@@ -27,7 +27,6 @@
                 var datastream = p_model.saveModel();
                 var base64: string = window.btoa(datastream);
                 
-
                 // create an a tag
                 var a: any = $("#downloadLink").get(0);
 
@@ -54,9 +53,9 @@
                     //loadedFile.path 
 
                     ////console.log(loadedFile);
-                    
+
                     var reader = new FileReader();
-                    
+
                     reader.onload = (function (theFile) {
                         return function (e) {
                             ////console.log(e.target.result);
@@ -205,6 +204,7 @@
                     })(loadedFile);
                     
                     fileInputObj.val = '';
+                    console.log("loadfile " + loadedFile);
                     reader.readAsText(loadedFile);
                     
                 } else {
@@ -225,7 +225,7 @@
                 else {
                     return null;
                 }
-            }           
+            }
             loadModel(p_modelStringIdent: string, p_activeModelInstance: Model, p_updateGui: Function): any {
                 console.log("attempting to load " + p_modelStringIdent);
                 var path: string = "JSON/";
@@ -256,6 +256,15 @@
                     case "sicily":
                         path += "sicily.json";
                         break;
+                    case "resturant":
+                        path += "ResturantExample.json";
+                        break;
+                    case "happiness":
+                        path += "HappinessExample.json";
+                        break;
+                    case "investment":
+                        path += "InvestmentExample.json";
+                        break;
                     case "test":
                         path += "test.json";
                         break;
@@ -267,7 +276,6 @@
                         break;
                 }
                 console.log("resulting path is: " + path);
-                //console.log("Data: " + JSON.stringify(data));
                 jQuery.getJSON(path, function (data) {
                     console.log("stringyfied Json: " + JSON.stringify(data));
                     console.log("Pure json: " + data);
