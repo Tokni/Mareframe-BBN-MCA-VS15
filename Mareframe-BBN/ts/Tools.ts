@@ -135,12 +135,12 @@
                 return counter
             }
 
-            static htmlTableFromArray(p_header: string, p_elmt: Element, p_model: Model, p_editorMode: boolean) {
+            static htmlTableFromArray(p_header: string, p_elmt: Element, p_model: Model, p_editorMode: boolean) :string {
                 console.log("header: " + p_header);
                 console.log("type of elmt: " + p_elmt.getType());
                 var data: any[][];
                 if (p_header === "Definition") {
-                    data = p_elmt.getData();
+                    data = p_elmt.getDataOld();
                 }
                 else if (p_header === "Values") {
                     data = p_elmt.getValues();
@@ -228,7 +228,7 @@
             }
             static addDataRow(p_elmt: Element): any[][] {
                 var oldData: any[][] = [];
-                oldData = p_elmt.getData();
+                oldData = p_elmt.getDataOld();
                 var newData: any[][] = [];
                 //Copy every row to new data
                 for (var i = 0; i < oldData.length; i++) {

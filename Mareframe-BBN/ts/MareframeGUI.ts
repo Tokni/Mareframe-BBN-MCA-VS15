@@ -242,74 +242,74 @@ module Mareframe {
                 console.log("AttrIndex: " + this.m_attributeIndex);
             }
             private editTableData(p_evt: Event) {
-                //document.attributes(
-                this.updateAtributeIndex();
-                var gui = this;
-                console.log("id: " + '"#' + p_evt.target.id + '"');
-                var id: string = "#" + p_evt.target.id;
-                //var originalName: any = $('"#' + p_evt.target.id + '"')[0];
-                var originalName: any = $("#" + p_evt.target.id)[0].textContent;
-                console.log("id: " + originalName );
-                if (this.m_model.getAutoUpdate()) {
-                    $("#updateMdl").hide();
-                }
+            //    //document.attributes(
+            //    this.updateAtributeIndex();
+            //    var gui = this;
+            //    console.log("id: " + '"#' + p_evt.target.id + '"');
+            //    var id: string = "#" + p_evt.target.id;
+            //    //var originalName: any = $('"#' + p_evt.target.id + '"')[0];
+            //    var originalName: any = $("#" + p_evt.target.id)[0].textContent;
+            //    console.log("id: " + originalName );
+            //    if (this.m_model.getAutoUpdate()) {
+            //        $("#updateMdl").hide();
+            //    }
 
-                $(id).addClass("editable");
-                $(id).html("<input type='text' value='" + originalName + "' />");
-                $(id).children().first().focus();
-                $(id).children().first().keypress(function (e) {
-                    if (e.which == 13) {
-                        var newText = $(this).val();
-                        console.log("new text1: " + newText);
-                        if (newText.length < 1) { //Must not update the text if the new text string is empty
-                            $("#info_name").html(originalName);
-                            newText = originalName;
-            }
-                        $(this).parent().text(newText);
+            //    $(id).addClass("editable");
+            //    $(id).html("<input type='text' value='" + originalName + "' />");
+            //    $(id).children().first().focus();
+            //    $(id).children().first().keypress(function (e) {
+            //        if (e.which == 13) {
+            //            var newText = $(this).val();
+            //            console.log("new text1: " + newText);
+            //            if (newText.length < 1) { //Must not update the text if the new text string is empty
+            //                $("#info_name").html(originalName);
+            //                newText = originalName;
+            //}
+            //            $(this).parent().text(newText);
 
-                        originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
-                        var tableX = id.slice(10).split("x")[0];
-                        var tableY = id.slice(10).split("x")[1];
-                        console.log("tableX: " + tableX + "  tableY: " + tableY);
-                        console.log("atrributeIndex: " + gui.m_attributeIndex);
-                        if (parseInt(tableX) !== 0) {
-                            var elmt: Element = gui.m_model.getElementArr()[gui.m_attributeIndex[parseInt(tableX) - 1]];
-                            console.log("element: " + elmt.getName());
-                            if (parseInt(tableY) === 0) {
-                                elmt.setName(originalName);
-                            }
-                            if (parseInt(tableY) === 1) {
-                                elmt.setDataMin(parseFloat(originalName));
-                            }
-                            if (parseInt(tableY) > 1 && parseInt(tableY) < gui.m_alternativCount + 2) {
-                                elmt.changeDataArrAtIndex(parseInt(tableY) - 2 , parseFloat(originalName));
-                            }
-                            if (parseInt(tableY) === gui.m_alternativCount + 2) {
-                                elmt.m_dataUnit = originalName;
-                            }
-                            if (parseInt(tableY) === gui.m_alternativCount + 3) {
-                                elmt.setDataMax(parseFloat(originalName));
-                            }
-                        }
-                        gui.updateTable(gui.m_model.getDataMatrix(true));
-                        gui.updateFinalScores();
-                    }
-                    $(this).parent().removeClass("editable");
-                });
-                $(id).children().first().blur(function () {
-                    var newText = $(this).val();
-                    console.log("new text2: " + newText);
-                    if (newText.length < 1) { //Must not update the text if the new text string is empty
-                        $("#info_name").html(originalName);
-                        newText = originalName;
-                    }
-                    $(this).parent().text(newText);
+            //            originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+            //            var tableX = id.slice(10).split("x")[0];
+            //            var tableY = id.slice(10).split("x")[1];
+            //            console.log("tableX: " + tableX + "  tableY: " + tableY);
+            //            console.log("atrributeIndex: " + gui.m_attributeIndex);
+            //            if (parseInt(tableX) !== 0) {
+            //                var elmt: Element = gui.m_model.getElementArr()[gui.m_attributeIndex[parseInt(tableX) - 1]];
+            //                console.log("element: " + elmt.getName());
+            //                if (parseInt(tableY) === 0) {
+            //                    elmt.setName(originalName);
+            //                }
+            //                if (parseInt(tableY) === 1) {
+            //                    elmt.setDataMin(parseFloat(originalName));
+            //                }
+            //                if (parseInt(tableY) > 1 && parseInt(tableY) < gui.m_alternativCount + 2) {
+            //                    elmt.changeDataArrAtIndex(parseInt(tableY) - 2 , parseFloat(originalName));
+            //                }
+            //                if (parseInt(tableY) === gui.m_alternativCount + 2) {
+            //                    elmt.m_dataUnit = originalName;
+            //                }
+            //                if (parseInt(tableY) === gui.m_alternativCount + 3) {
+            //                    elmt.setDataMax(parseFloat(originalName));
+            //                }
+            //            }
+            //            gui.updateTable(gui.m_model.getDataMatrix(true));
+            //            gui.updateFinalScores();
+            //        }
+            //        $(this).parent().removeClass("editable");
+            //    });
+            //    $(id).children().first().blur(function () {
+            //        var newText = $(this).val();
+            //        console.log("new text2: " + newText);
+            //        if (newText.length < 1) { //Must not update the text if the new text string is empty
+            //            $("#info_name").html(originalName);
+            //            newText = originalName;
+            //        }
+            //        $(this).parent().text(newText);
                    
-                    originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
-                    $(this).parent().removeClass("editable");
-                });
+            //        originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+            //        $(this).parent().removeClass("editable");
+            //    });
                 
-                //this.updateFinalScores();
+            //    //this.updateFinalScores();
 
             }
             private optionTypeChange(p_evt: Event) {        
@@ -490,20 +490,20 @@ module Mareframe {
                     console.log("Id: " + this.m_model.getConnectionArr()[i].getID() + "  InElmt: " + this.m_model.getConnectionArr()[i].getInputElement().getName() + "  OutElmt: " + this.m_model.getConnectionArr()[i].getOutputElement().getName());
                 }
             }
-            private addDataRowClick(p_evt: Event) {
-                console.log("doing tnifgs");
-                //$("#defTable_div").append("<p> hello </p>");
-                //var elmt: Element = $("#detailsDialog").data("element");
-                var elmt: any = $("#detailsDialog").data("element");
-                var oldData: any[][] = [];
-                oldData = elmt.getData();
-                var newData: any[][] = [];
+            //private addDataRowClick(p_evt: Event) {
+            //    console.log("doing tnifgs");
+            //    //$("#defTable_div").append("<p> hello </p>");
+            //    //var elmt: Element = $("#detailsDialog").data("element");
+            //    var elmt: any = $("#detailsDialog").data("element");
+            //    var oldData: any[][] = [];
+            //    oldData = elmt.getData();
+            //    var newData: any[][] = [];
 
-                //newData = oldData;
-                //oldData[0] = elmt.getData(0);
-                //oldData[1] = elmt.getData(1);
-                //console.log("o0" + oldData[0]
-
+            //    //newData = oldData;
+            //    //oldData[0] = elmt.getData(0);
+            //    //oldData[1] = elmt.getData(1);
+            //    //console.log("o0" + oldData[0]
+            //}
             private allModeltoConsole(p_evt: Event) {
                 console.log("All Model");
                 //console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
@@ -1081,8 +1081,8 @@ module Mareframe {
                     //console.log("hiding selector");
                     $("#detailsDialog").data("element", p_elmt);
                     $("#detailsDialog").data("model", this.m_model);
-                    
-                    var s = Tools.htmlTableFromArray("Definition", p_elmt.getDataOld(), this.m_model);
+
+                    var s = Tools.htmlTableFromArray("Definition", p_elmt.getDataOld(), this.m_model, this.m_editorMode);
                     console.log(p_elmt.getDataOld());
                     $("#defTable_div").html(s);
                     $("#defTable_div").show();
@@ -1608,7 +1608,7 @@ module Mareframe {
                 console.log("size of values: " + math.size(elmt.getValues()));
                 var mdl: any = $("#detailsDialog").data("model");
                 //$("#valuesTable_div").html(Tools.htmlTableFromArray("Values", elmt.getValues(), $("#detailsDialog").data("model")));
-                $("#valuesTable_div").html(Tools.htmlTableFromArray("Values", elmt.getValues(), mdl));
+                $("#valuesTable_div").html( Tools.htmlTableFromArray("Values", elmt.getValues(), mdl, this.m_editorMode) );
                 $("#valuesTable_div").show();
                 $("#values").prop("disabled", true);
             }
@@ -2432,16 +2432,16 @@ module Mareframe {
             }
             private removeRow(p_element: Element, p_n: number) {
                 //console.log("remove row " + p_n + " in " + p_element.getName());
-                var data: any[][] = Tools.makeSureItsTwoDimensional(p_element.getData());
+                var data: any[][] = Tools.makeSureItsTwoDimensional(p_element.getDataOld());
                 var state: String = data[p_n][0];
                 if (data.length - Tools.numOfHeaderRows(data) < 3) {
                     alert("Can not be less than two outcomes");
                 }
                 else {
-                    p_element.setData(Tools.removeRow(p_element.getData(), p_n));
+                    p_element.setData(Tools.removeRow(p_element.getDataOld(), p_n));
                     //Remove this state from all children data tables
                     p_element.getChildrenElements().forEach(function (e) {
-                        e.setData(Tools.removeState(e.getData(), p_element, state));
+                        e.setData(Tools.removeState(e.getDataOld(), p_element, state));
                     });
                     p_element.getAllDescendants().forEach(function (e) {
                         e.setUpdated(false);

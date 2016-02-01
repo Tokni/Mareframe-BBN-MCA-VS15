@@ -152,6 +152,7 @@ var Mareframe;
                         };
                     })(loadedFile);
                     fileInputObj.val = '';
+                    console.log("loadfile " + loadedFile);
                     reader.readAsText(loadedFile);
                 }
                 else {
@@ -204,6 +205,15 @@ var Mareframe;
                     case "sicily":
                         path += "sicily.json";
                         break;
+                    case "resturant":
+                        path += "ResturantExample.json";
+                        break;
+                    case "happiness":
+                        path += "HappinessExample.json";
+                        break;
+                    case "investment":
+                        path += "InvestmentExample.json";
+                        break;
                     case "test":
                         path += "test.json";
                         break;
@@ -215,7 +225,6 @@ var Mareframe;
                         break;
                 }
                 console.log("resulting path is: " + path);
-                //console.log("Data: " + JSON.stringify(data));
                 jQuery.getJSON(path, function (data) {
                     console.log("stringyfied Json: " + JSON.stringify(data));
                     console.log("Pure json: " + data);

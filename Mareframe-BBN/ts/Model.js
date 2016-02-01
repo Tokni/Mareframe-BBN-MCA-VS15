@@ -13,8 +13,9 @@ var Mareframe;
                 this.m_modelPath = "./";
                 this.m_modelChanged = true;
                 this.m_dataMatrix = [];
-                this.m_autoUpdate = false;
+                //private m_autoUpdate: boolean = false;
                 this.m_altIndex = [];
+                this.m_autoUpdate = true; //auto update is on by default
                 this.m_bbnMode = p_bbnMode;
                 //this.m_bbnMode = true;
                 this.createNewElement = this.createNewElement.bind(this);
@@ -596,17 +597,23 @@ var Mareframe;
             Model.prototype.setDecision = function (p_elmtIdent, p_decisNumb) {
                 var elmt = this.getElement(p_elmtIdent);
                 if (elmt.getDecision() == p_decisNumb) {
-                    console.log("unsetting decision");
+                    //console.log("unsetting decision");
                     elmt.setDecision(undefined);
                 }
                 else {
                     elmt.setDecision(p_decisNumb);
                 }
-                elmt.getAllDescendants().forEach(function (e) {
+                this.getElementArr().forEach(function (e) {
+                    e.setUpdated(false);
+                }); /*
+                This is commented out because createSubMatrix did not work properly when only updating some of the elements.
+                This solution is not optimal, but it forces the program to update every element without looking at decisions first and then focusing on decision.
+                The problem occured when first one decision was set and the model was updated and then another decision was set.
+                elmt.getAllDescendants().forEach(function (e: Element) {
                     e.setUpdated(false);
                     console.log(e.getName() + " not updated");
-                });
-                console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
+                });*/
+                //console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
             };
             return Model;
         })();

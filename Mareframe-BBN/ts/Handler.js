@@ -27,18 +27,19 @@ var Mareframe;
                 //Tools.removeHeaderRow("name3", table3conn);
                 //Tools.removeHeaderRow("name1", table1conn);
                 console.log("handler started");
+                this.m_mareframeMode = false; //This sets the layout to Tokni mode
                 this.m_fileHandler = new DST.FileIO(this);
                 this.m_activeModel = this.addNewModel();
                 this.m_gui = new DST.GUIHandler(this.m_activeModel, this);
                 var loadModel = DST.Tools.getUrlParameter('model');
-                //loadModel = "scotland";
-                //loadModel = "sicily";
-                //loadModel = "baltic";
-                //loadModel = "northSea";
-                //loadModel = "blackSea";
-                //loadModel = "iceland";
-                //loadModel = "cadiz";
-                //loadModel = "test";
+                if (this.m_mareframeMode) {
+                    //loadModel = "scotland";
+                    //loadModel = "sicily";
+                    loadModel = "baltic";
+                }
+                else {
+                    loadModel = "resturant";
+                }
                 console.log("using model: " + loadModel);
                 if (loadModel !== null) {
                     this.m_fileHandler.loadModel(loadModel, this.m_activeModel, this.m_gui.importStage);
@@ -83,6 +84,9 @@ var Mareframe;
             //sdfghj
             Handler.prototype.getActiveModel = function () {
                 return this.m_activeModel;
+            };
+            Handler.prototype.isMareframMode = function () {
+                return this.m_mareframeMode;
             };
             return Handler;
         })();

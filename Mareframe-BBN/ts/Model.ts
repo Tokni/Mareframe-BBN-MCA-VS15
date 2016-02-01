@@ -11,7 +11,7 @@
             private m_modelChanged: boolean = true;
             private m_dataMatrix: any[][] = [];
             private m_mainObjective: Element;
-            private m_autoUpdate: boolean = false;
+            //private m_autoUpdate: boolean = false;
             private m_altIndex: number[] = [];
 
             private m_autoUpdate: boolean = true; //auto update is on by default

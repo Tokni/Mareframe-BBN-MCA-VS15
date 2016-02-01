@@ -1,0 +1,38 @@
+{
+    "elements": [
+        { "posX": 860, "posY": 190, "elmtID": "elmtStatusQuo", "elmtName": "Status Quo", "elmtDesc": "Business as usual", "elmtType": 2, "elmtData": [ 1 ], "elmtWghtMthd": 0 },
+     
+        { "posX": 650, "posY": 150, "elmtID": "elmtA1", "elmtName": "Atr 1", "elmtDesc": "", "elmtType": 0, "elmtData": [ 1, 50, 50, 0, -50, 100 ], "elmtWghtMthd": 2 },
+        { "posX": 650, "posY": 200, "elmtID": "elmtA2", "elmtName": "Atr 2", "elmtDesc": "", "elmtType": 0, "elmtData": [ 2, 50, 50, 0, -50, 100 ], "elmtWghtMthd": 2 },
+        { "posX": 650, "posY": 300, "elmtID": "elmtA3", "elmtName": "Atr 3", "elmtDesc": "", "elmtType": 0, "elmtData": [ 3, 50, 50, 0, -50, 100 ], "elmtWghtMthd": 2 },
+        { "posX": 650, "posY": 350, "elmtID": "elmtA4", "elmtName": "Atr 4", "elmtDesc": "", "elmtType": 0, "elmtData": [ 4, 50, 50, 0, -50, 100 ], "elmtWghtMthd": 2 },
+
+        { "posX": 230, "posY": 180, "elmtID": "elmt2020", "elmtName": "2020", "elmtDesc": "2020", "elmtType": 1, "elmtData": [ [ "conn3", "conn4" ], [ 25, 75 ] ], "elmtWghtMthd": 1 },
+        { "posX": 230, "posY": 320, "elmtID": "elmt2030", "elmtName": "2030", "elmtDesc": "2030", "elmtType": 1, "elmtData": [ [ "conn5", "conn6" ], [ 40, 60 ] ], "elmtWghtMthd": 1 },
+
+        { "posX": 120, "posY": 250, "elmtID": "elmtGoal", "elmtName": "Goal", "elmtDesc": "Goal", "elmtType": 3, "elmtData": [ [ "conn1", "conn2" ], [ 75, 25 ] ], "elmtWghtMthd": 1 } 
+    ],
+    "connections": [
+        { "connInput": "elmt2020", "connOutput": "elmtGoal", "connID": "conn1" },
+        { "connInput": "elmt2030", "connOutput": "elmtGoal", "connID": "conn2" },
+       
+
+        { "connInput": "elmtA1", "connOutput": "elmt2020", "connID": "conn3" },
+        { "connInput": "elmtA2", "connOutput": "elmt2020", "connID": "conn4" },
+        { "connInput": "elmtA3", "connOutput": "elmt2030", "connID": "conn5" },
+        { "connInput": "elmtA4", "connOutput": "elmt2030", "connID": "conn6" }
+       ],
+  "mdlName": "For Testing",
+  
+
+  "mdlIdent": "test",
+  "mdlDesc": "",
+  "mainObj": "elmtGoal",
+  "dataMat": [
+    [ "leaveblank", "elmtA1", "elmtA2", "elmtA3", "elmtA4" ],
+    [ "elmtStatusQuo", 10, 25, 60, 80 ],
+
+    [ "units", "fs", "co2", "sf", "emp" ]
+
+  ]
+}
