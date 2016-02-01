@@ -5,6 +5,10 @@ var Mareframe;
         var Tools = (function () {
             function Tools() {
             }
+            Tools.saveFileFormSubmit = function () {
+                var formData = document.forms["saveFileForm"]["saveFileName"];
+                console.log(" Submit: " + formData);
+            };
             Tools.getValueFn = function (p_xVal, p_posX, p_posY) {
                 //var y = 0;
                 //var a = posY / ((posX -0.1) * (posX - 100.1)) + 100.1 / ((100.1 - 0.1) * (100.1 - posX));
@@ -75,22 +79,22 @@ var Mareframe;
             };
             Tools.getWeights = function (p_elmt, p_model) {
                 var weightsArr = [];
-                if (p_elmt.getType() != 0 && p_elmt.getType() != 2) {
+                if (p_elmt.getType() != 100 && p_elmt.getType() != 102) {
                     var total = 0.0;
-                    p_elmt.getData(1).forEach(function (val) { total += val; });
-                    for (var i = 0; i < p_elmt.getData()[0].length; i++) {
-                        //console.log("Element: " + p_elmt.getID());
-                        //console.log("ElementData: " + p_elmt.getData(0, i) );
-                        //console.log("a connection " + p_model.getConnection(p_elmt.getData(0, i)).getID());
-                        var childWeights = this.getWeights(p_model.getConnection(p_elmt.getData(0, i)).getInputElement(), p_model);
+                    //p_elmt.getData(1).forEach(function (val: number) { total += val; });
+                    for (var i = 0; i < p_elmt.m_swingWeightsArr.length; i++) {
+                        total += p_elmt.m_swingWeightsArr[i][1];
+                    }
+                    for (var k = 0; k < p_elmt.m_swingWeightsArr.length; k++) {
+                        var childWeights = this.getWeights(p_model.getConnection(p_elmt.m_swingWeightsArr[k][0]).getInputElement(), p_model);
                         for (var j = 0; j < childWeights.length; j++) {
-                            childWeights[j][1] *= (p_elmt.getData()[1][i] / total);
+                            childWeights[j][1] *= (p_elmt.m_swingWeightsArr[k][1] / total);
                         }
                         weightsArr = weightsArr.concat(childWeights);
                     }
                 }
                 else {
-                    weightsArr.push([p_elmt.getData[0], 1]);
+                    weightsArr.push([p_elmt.getDataArr[0], 1]);
                 }
                 return weightsArr;
             };
@@ -162,13 +166,14 @@ var Mareframe;
             };
             Tools.getColumn = function (p_matrix, index) {
                 //console.log("get column " + index + " from " + p_matrix + " size " + math.size(p_matrix));
+                console.log("math: " + p_matrix);
                 var rows = math.size(p_matrix).valueOf()[0];
                 var range = math.range(0, rows);
                 //console.log("returned: " + math.subset(matrix, math.index(range, index)))
                 return math.subset(p_matrix, math.index(range, index));
             };
             Tools.getRow = function (p_matrix, p_index) {
-                // console.log("get row " + p_index + " from " + p_matrix)
+                console.log("get row " + p_index + " from " + p_matrix);
                 var columns = math.size(p_matrix).valueOf()[1];
                 var range = [];
                 var oneDimensional;
@@ -184,7 +189,7 @@ var Mareframe;
             Tools.concatMatrices = function (p_list) {
                 var matrix = p_list[0];
                 for (var i = 1; i < p_list.length; i++) {
-                    //console.log("concatting " + matrix + " size " + math.size(matrix) + " and " + p_list[i] + " size: " + math.size(p_list[i]));
+                    console.log("concatting " + matrix + " size " + math.size(matrix) + " and " + p_list[i] + " size: " + math.size(p_list[i]));
                     matrix = math.concat(matrix, p_list[i]);
                 }
                 //console.log((matrix));
@@ -203,7 +208,7 @@ var Mareframe;
                 return p_array;
             };
             Tools.getMatrixWithoutHeader = function (p_matrix) {
-                // console.log("get matrix without header from " + p_matrix)
+                console.log("get matrix without header from " + p_matrix);
                 p_matrix = Tools.makeSureItsTwoDimensional(p_matrix);
                 var numOfColumns;
                 var numOfRows;
@@ -232,7 +237,7 @@ var Mareframe;
                 return newMatrix;
             };
             Tools.getValueWithCondition = function (p_values, p_rowElmt, p_conditionArray) {
-                //console.log("getting value " + p_rowElmt + " with condition " + p_conditionArray + " from " + p_values);
+                console.log("getting value " + p_rowElmt + " with condition " + p_conditionArray + " from " + p_values);
                 var values = Tools.makeSureItsTwoDimensional(p_values);
                 // //console.log("values table : \n " + values);
                 var valuesFound = [];
@@ -266,7 +271,7 @@ var Mareframe;
                 return valuesFound;
             };
             Tools.createSubMatrices = function (p_matrix, p_elmt, p_data) {
-                //console.log("create sub matrix from " + p_matrix + " size " + math.size(p_matrix) + " for values " + p_elmt.getID());
+                console.log("create sub matrix from " + p_matrix + " size " + math.size(p_matrix) + " for values " + p_elmt.getID());
                 var data = Tools.makeSureItsTwoDimensional(p_data);
                 p_matrix = Tools.makeSureItsTwoDimensional(p_matrix);
                 //console.log("data: " + (data) + " size " + math.size(data));
@@ -352,7 +357,7 @@ var Mareframe;
                 //return subMatrices;
             };
             Tools.convertToArray = function (p_matrix) {
-                // //console.log("converting to array: " + matrix)
+                console.log("converting to array: " + p_matrix);
                 var rows = math.size(p_matrix).valueOf()[0];
                 var columns = math.size(p_matrix).valueOf()[1];
                 var array = [];
@@ -373,10 +378,9 @@ var Mareframe;
                 }
                 return array;
             };
-            //This method removes p_element from p_dataheader and addds the new row p_newRow
-            //While also making sure the number of columns match
+            //This method removes p_element from p_dataheader and addds the new row p_newRow           //While also making sure the number of columns match
             Tools.updateDataHeader = function (p_dataHeader, p_newRow, p_element) {
-                //    console.log("inserting " + Tools.arrayToString(p_newRow) + " size: " + math.size(p_newRow) + " into " +p_dataHeader + " size " + math.size(p_dataHeader));
+                console.log("inserting " + p_newRow + " size: " + math.size(p_newRow) + " into " + p_dataHeader + " size " + math.size(p_dataHeader));
                 var rowsInDataHeader = math.size(p_dataHeader)[0];
                 var columnsInDataHeader = math.size(p_dataHeader)[1];
                 //Delete p_element row from data header
@@ -474,7 +478,7 @@ var Mareframe;
                 return p_dataHeader;
             };
             Tools.insertNewHeaderRowAtBottom = function (p_newRow, p_table) {
-                // console.log("inserting " + p_newRow + " in to " + p_table + " size " + math.size(p_table));
+                console.log("inserting " + p_newRow + " in to " + p_table + " size " + math.size(p_table));
                 var tempTable = p_newRow.slice();
                 //console.log("temp table: " + tempTable);
                 if (p_table.length !== 0) {
@@ -498,8 +502,8 @@ var Mareframe;
                 var element = p_element;
                 console.log("calculate values for " + p_element.getID());
                 var dataHeaders = []; //the header rows from data
-                var data = element.getData();
-                //     console.log("data: " + data + " size " + math.size(data));
+                var data = element.getDataOld();
+                console.log("data: " + data + " size " + math.size(data));
                 for (var i = 0; i < Tools.numOfHeaderRows(data); i++) {
                     var newRow = [];
                     for (var j = 0; j < data[0].length; j++) {
@@ -507,7 +511,7 @@ var Mareframe;
                     }
                     dataHeaders.push(newRow);
                 }
-                //console.log("data headers: " + dataHeaders);
+                console.log("data headers: " + dataHeaders);
                 if (element.getType() !== 1) {
                     var headerRows = []; //Used to add decisions to value matrix
                     // var takenIntoAccount = [];
@@ -625,7 +629,7 @@ var Mareframe;
                     //Inserting the elemnt id first in each row
                     for (var i = 0; i < newValues.length; i++) {
                         //   console.log("unshifting " + data[i + Tools.numOfHeaderRows(element.getData())][0])
-                        newValues[i].unshift(data[i + Tools.numOfHeaderRows(element.getData())][0]);
+                        newValues[i].unshift(data[i + Tools.numOfHeaderRows(element.getDataOld())][0]);
                     }
                     // console.log("new values: \n" + newValues);
                     // console.log("size: " + math.size(newValues));
@@ -649,7 +653,7 @@ var Mareframe;
                     element.setValues(Tools.fillEmptySpaces((element.copyDefArray())));
                     var values = element.getValues();
                     //Number of header rows is equal to number of rows in values minus number of rows in definition
-                    var numOfHeaderRows = values.length - element.getData().length;
+                    var numOfHeaderRows = values.length - element.getDataOld().length;
                     //If there are no header rows add an empty column for the values
                     if (numOfHeaderRows === 0) {
                         for (var i = 0; i < values.length; i++) {
@@ -715,8 +719,7 @@ var Mareframe;
                 }
                 // console.log("result: " + p_table);
                 return p_table;
-            };
-            //Convert the array to only contain one of each element
+            }; //Convert the array to only contain one of each element
             Tools.removeDuplicates = function (p_array) {
                 p_array = Tools.makeSureItsTwoDimensional(p_array);
                 var newArray = [p_array[0][0]];
@@ -732,7 +735,7 @@ var Mareframe;
                 return newArray;
             };
             Tools.addNewHeaderRow = function (p_newRow, p_table) {
-                //         console.log("Adding array: " + p_newRow + " size " + math.size(p_newRow));
+                console.log("Adding array: " + p_newRow + " size " + math.size(p_newRow));
                 var array = Tools.makeSureItsTwoDimensional(p_newRow.slice());
                 //Convert the array to only contain one of each element
                 array = Tools.removeDuplicates(array);
@@ -791,14 +794,14 @@ var Mareframe;
                 }
             };
             Tools.updateConcerningDecisions = function (element) {
-                // console.log("updating concerning decisions " + element.getName());
+                console.log("updating concerning decisions " + element.getName());
                 var rowsToDelete = [];
                 // console.log("all ancestors for " + element.getName() +": "  + element.getAllAncestors());
                 element.getAllAncestors().forEach(function (elmt) {
                     if (elmt.getType() === 1 && elmt.getDecision() !== undefined) {
                         //   console.log("checking: " + elmt.getName());
                         var values = element.getValues();
-                        var decision = elmt.getData()[elmt.getDecision()][0];
+                        var decision = elmt.getDataOld()[elmt.getDecision()][0];
                         //console.log("choice is made: " + decision + " in elemnent " + elmt.getName());
                         //  console.log("values: " + values + " size: " + math.size(values));
                         var newValues = [];

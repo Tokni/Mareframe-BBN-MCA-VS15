@@ -31,7 +31,7 @@ var Mareframe;
                 this.m_activeModel = this.addNewModel();
                 this.m_gui = new DST.GUIHandler(this.m_activeModel, this);
                 var loadModel = DST.Tools.getUrlParameter('model');
-                loadModel = "scotland";
+                //loadModel = "scotland";
                 //loadModel = "sicily";
                 //loadModel = "baltic";
                 //loadModel = "northSea";
@@ -42,6 +42,10 @@ var Mareframe;
                 console.log("using model: " + loadModel);
                 if (loadModel !== null) {
                     this.m_fileHandler.loadModel(loadModel, this.m_activeModel, this.m_gui.importStage);
+                    var tmp = this.m_activeModel.getMainObjective();
+                    if (this.m_activeModel.getMainObjective() != undefined) {
+                        this.m_gui.setHasGoal(true);
+                    }
                     console.log("model loaded");
                     this.m_resetModel = JSON.stringify(this.m_activeModel);
                 }
@@ -67,7 +71,7 @@ var Mareframe;
             Handler.prototype.addNewModel = function () {
                 var bbnMode = (DST.Tools.getUrlParameter('bbn') == "true");
                 //bbnMode = true;
-                bbnMode = false;
+                //bbnMode = false;
                 var mdl = new DST.Model(bbnMode);
                 console.log("BBN mode is: " + mdl.m_bbnMode);
                 this.setActiveModel(mdl);
@@ -76,6 +80,7 @@ var Mareframe;
             Handler.prototype.setActiveModel = function (p_mdl) {
                 this.m_activeModel = p_mdl;
             };
+            //sdfghj
             Handler.prototype.getActiveModel = function () {
                 return this.m_activeModel;
             };

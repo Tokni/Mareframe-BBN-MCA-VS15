@@ -3,7 +3,7 @@ var Mareframe;
     var DST;
     (function (DST) {
         var Element = (function () {
-            function Element(p_id, p_model, p_type) {
+            function Element(p_id, p_model, p_type, p_dstType) {
                 this.m_data = [];
                 this.m_dateDim = [];
                 this.m_id = "elmtbroken";
@@ -17,6 +17,9 @@ var Mareframe;
                 this.m_updated = false;
                 this.m_easelElmt = new createjs.Container();
                 this.m_minitableEaselElmt = new createjs.Container();
+                //private m_swingWeightsArr: number[] = [];
+                this.m_swingWeightsArr = [];
+                this.m_dataArr = [];
                 if (p_id.substr(0, 4) == "elmt") {
                     this.m_id = p_id;
                 }
@@ -24,11 +27,82 @@ var Mareframe;
                     this.m_id = "elmt" + p_id;
                 }
                 if (p_type != undefined) {
-                    this.m_type = p_type;
+                    if (this.m_dstType === 1) {
+                        this.m_type = p_type;
+                    }
+                    else {
+                        this.m_type = p_type;
+                    }
+                }
+                else {
+                    //console.log("type not defined");
+                    if (p_dstType === 1) {
+                        this.m_type = 101;
+                    }
+                    else {
+                        this.m_type = 1;
+                    }
                 }
                 this.m_model = p_model;
+                if (p_dstType !== undefined)
+                    this.m_dstType = p_dstType;
+                else
+                    this.m_dstType = 0;
                 this.getChildrenElements = this.getChildrenElements.bind(this);
+                this.m_swingWeightsArr = [];
             }
+            Element.prototype.getDataBaseLine = function () {
+                return this.m_dataBaseLine;
+            };
+            Element.prototype.setDataBaseLine = function (p_baseLine) {
+                this.m_dataBaseLine = p_baseLine;
+            };
+            Element.prototype.getDataMax = function () {
+                return this.m_dataMax;
+            };
+            Element.prototype.setDataMax = function (p_max) {
+                this.m_dataMax = p_max;
+                for (var i in this.m_dataArr) {
+                    if (this.m_dataArr[i] > p_max)
+                        this.m_dataMax = this.m_dataArr[i];
+                }
+            };
+            Element.prototype.getDataMin = function () {
+                return this.m_dataMin;
+            };
+            Element.prototype.setDataMin = function (p_min) {
+                this.m_dataMin = p_min;
+                for (var i in this.m_dataArr) {
+                    if (this.m_dataArr[i] < p_min)
+                        this.m_dataMin = this.m_dataArr[i];
+                }
+            };
+            Element.prototype.getDataArrAtIndex = function (p_index) {
+                if (p_index >= 0 || p_index < this.m_dataArr.length)
+                    return this.m_dataArr[p_index];
+                else
+                    return undefined;
+            };
+            Element.prototype.getDataArrLength = function () {
+                return this.m_dataArr.length;
+            };
+            Element.prototype.changeDataArrAtIndex = function (p_index, p_value) {
+                if (p_index >= 0 || p_index < this.m_dataArr.length)
+                    this.m_dataArr[p_index] = p_value;
+                if (p_value < this.m_dataMin)
+                    this.m_dataMin = p_value;
+                if (p_value > this.m_dataMax)
+                    this.m_dataMax = p_value;
+            };
+            Element.prototype.pushValueToDataArr = function (p_value) {
+                this.m_dataArr.push(p_value);
+            };
+            Element.prototype.deleteValueAtIndex = function (p_index) {
+                this.m_dataArr.splice(p_index, 1);
+            };
+            Element.prototype.dataArrLength = function () {
+                return this.m_dataArr.length;
+            };
             Element.prototype.getValues = function () {
                 return this.m_values;
             };
@@ -230,7 +304,18 @@ var Mareframe;
                 return row;
             };
             //MCA TOOL
-            Element.prototype.getData = function (p_index, p_secondary) {
+            Element.prototype.getDataArr = function (p_index, p_secondary) {
+                if (p_index != undefined) {
+                    var data = this.m_dataArr[p_index];
+                    if (p_secondary != undefined && data instanceof Array)
+                        data = data[p_secondary];
+                    return data;
+                }
+                else {
+                    return this.m_dataArr;
+                }
+            };
+            Element.prototype.getDataOld = function (p_index, p_secondary) {
                 if (p_index != undefined) {
                     var data = this.m_data[p_index];
                     if (p_secondary != undefined && data instanceof Array)
@@ -289,11 +374,39 @@ var Mareframe;
             Element.prototype.getType = function () {
                 return this.m_type;
             };
+            Element.prototype.getTypeName = function () {
+                switch (this.getType()) {
+                    case 100:
+                        return "Attribute";
+                        break;
+                    case 101:
+                        return "Objective";
+                        break;
+                    case 102:
+                        return "Alternative";
+                        break;
+                    case 103: return "Goal";
+                    default: console.log("No such element type name: " + this.getType());
+                }
+            };
             Element.prototype.setType = function (p_type) {
                 this.m_type = p_type;
             };
             Element.prototype.getMethod = function () {
                 return this.m_weightingMethod;
+            };
+            Element.prototype.getMethodName = function () {
+                switch (this.getMethod()) {
+                    case 0:
+                        return "Direct";
+                        break;
+                    case 1:
+                        return "Swing / Direct";
+                        break;
+                    case 2:
+                        return "Value Function";
+                        break;
+                }
             };
             Element.prototype.setMethod = function (p_weightingMethod) {
                 this.m_weightingMethod = p_weightingMethod;
@@ -320,9 +433,9 @@ var Mareframe;
                     for (var index in this.m_connections) {
                         console.log(this.m_name + "  EAfter: " + this.m_connections[index].getID());
                     }
-                    console.log("Total conections: " + this.m_model.getConnectionArr().length);
-                    this.m_model.deleteConnection(p_connID);
-                    console.log("Total conections: " + this.m_model.getConnectionArr().length);
+                    //console.log("Total conections: " + this.m_model.getConnectionArr().length);
+                    //this.deleteConnection(p_connID);
+                    //console.log("Total conections: " + this.m_model.getConnectionArr().length);
                     return true;
                 }
             };
@@ -337,7 +450,41 @@ var Mareframe;
                 return this.m_connections;
             };
             Element.prototype.toJSON = function () {
-                return { posX: this.m_easelElmt.x, posY: this.m_easelElmt.y, elmtID: this.getID(), elmtName: this.getName(), elmtDesc: this.getDescription(), elmtType: this.getType(), elmtData: this.getData(), elmtWghtMthd: this.getMethod() };
+                var retJson = {
+                    posX: this.m_easelElmt.x,
+                    posY: this.m_easelElmt.y,
+                    elmtValueFnX: this.m_valueFunctionX,
+                    elmtValueFnY: this.m_valueFunctionY,
+                    elmtValueFnFlip: this.m_valueFunctionFlip,
+                    elmtID: this.getID(),
+                    elmtName: this.getName(),
+                    elmtDesc: this.getDescription(),
+                    elmtType: this.getType(),
+                    elmtWghtMthd: this.getMethod(),
+                    elmtDstType: this.m_dstType,
+                    elmtDataMin: this.m_dataMin,
+                    elmtDataMax: this.m_dataMax,
+                    elmtDataUnit: this.m_dataUnit,
+                    elmtDataBaseLine: this.m_dataBaseLine
+                };
+                if (this.getMethod() === 2)
+                    retJson["elmtDataArr"] = this.getDataArr();
+                if (this.getMethod() === 1)
+                    retJson["elmtData"] = this.m_swingWeightsArr;
+                return retJson;
+            };
+            Element.prototype.toJSONOld = function () {
+                return {
+                    posX: this.m_easelElmt.x,
+                    posY: this.m_easelElmt.y,
+                    elmtID: this.getID(),
+                    elmtName: this.getName(),
+                    elmtDesc: this.getDescription(),
+                    elmtType: this.getType(),
+                    elmtData: this.getDataArr(),
+                    elmtWghtMthd: this.getMethod(),
+                    elmtDstType: this.m_dstType
+                };
             };
             Element.prototype.fromJSON = function (p_jsonElmt) {
                 // console.log("element.fromJSON()");
@@ -349,7 +496,43 @@ var Mareframe;
                 //console.log("FromJSONname: " + this.m_name);
                 this.m_description = p_jsonElmt.elmtDesc;
                 this.m_type = p_jsonElmt.elmtType;
-                this.m_data = p_jsonElmt.elmtData;
+                //this.m_data = p_jsonElmt.elmtData;
+                //console.log("FromJSONdata: " + this.m_data);
+                this.m_weightingMethod = p_jsonElmt.elmtWghtMthd;
+                switch (this.m_weightingMethod) {
+                    case 0: break;
+                    case 1:
+                        if (p_jsonElmt.elmtData) {
+                            for (var i = 0; i < p_jsonElmt.elmtData.length; i++) {
+                                this.m_swingWeightsArr[i] = p_jsonElmt.elmtData[i];
+                            }
+                        }
+                        break;
+                    case 2:
+                        this.m_dataBaseLine = p_jsonElmt.elmtDataBaseLine;
+                        this.m_dataMin = p_jsonElmt.elmtDataMin;
+                        this.m_dataMax = p_jsonElmt.elmtDataMax;
+                        this.m_dataArr = p_jsonElmt.elmtDataArr;
+                        this.m_dataUnit = p_jsonElmt.elmtDataUnit;
+                        this.m_valueFunctionX = p_jsonElmt.elmtValueFnX;
+                        this.m_valueFunctionY = p_jsonElmt.elmtValueFnY;
+                        this.m_valueFunctionFlip = p_jsonElmt.elmtValueFnFlip;
+                        break;
+                    default: console.log("Json Goof");
+                }
+                console.log("element " + p_jsonElmt.elmtName + " imported from JSON.");
+            };
+            Element.prototype.fromJSONOld = function (p_jsonElmt) {
+                // console.log("element.fromJSON()");
+                //console.log(p_jsonElmt);
+                this.m_easelElmt.x = p_jsonElmt.posX;
+                this.m_easelElmt.y = p_jsonElmt.posY;
+                this.m_id = p_jsonElmt.elmtID;
+                this.m_name = p_jsonElmt.elmtName;
+                //console.log("FromJSONname: " + this.m_name);
+                this.m_description = p_jsonElmt.elmtDesc;
+                this.m_type = p_jsonElmt.elmtType;
+                //this.m_data = p_jsonElmt.elmtData;
                 //console.log("FromJSONdata: " + this.m_data);
                 this.m_weightingMethod = p_jsonElmt.elmtWghtMthd;
             };

@@ -42,6 +42,10 @@ var Mareframe;
                 };
                 this.m_elementColors = [["#efefff", "#15729b", "#dfdfff"], ["#ffefef", "#c42f33", "#ffdfdf"], ["#fff6e0", "#f6a604", "#fef4c6"], ["#efffef", "#2fc433", "#dfffdf"]];
                 this.m_trashBin = [];
+                this.m_hasGoal = false;
+                this.m_attributeCount = 0;
+                this.m_alternativCount = 0;
+                this.m_attributeIndex = [];
                 this.setShowDescription = function (cb) {
                     this.m_showDescription = cb.currentTarget.checked;
                     if (this.m_showDescription) {
@@ -68,7 +72,7 @@ var Mareframe;
                         $("#modeStatus").html("");
                     }
                     this.updateEditorMode();
-                    console.log("editormode: " + this.m_editorMode);
+                    //console.log("editormode: " + this.m_editorMode);
                 };
                 this.setAutoUpdate = function (cb) {
                     //console.log(cb);
@@ -85,19 +89,29 @@ var Mareframe;
                 this.saveChanges = this.saveChanges.bind(this);
                 var mareframeGUI = this;
                 if (p_model.m_bbnMode) {
-                    $("#detailsDialog").dialog({
-                        beforeClose: function (event, ui) {
-                            if (mareframeGUI.m_unsavedChanges) {
-                                console.log("unsaved changes");
-                                if (!confirm("You have unsaved changes. Pressing OK will close the window and discard all changes.")) {
-                                    return false;
-                                }
-                                $("#valuesTable_div").show();
+                    $("#detailsDialog").on("closedialog", function (event, ui) {
+                        console.log("MFGUI colsing dialog BBN");
+                        if (mareframeGUI.m_unsavedChanges) {
+                            console.log("unsaved changes");
+                            if (!confirm("You have unsaved changes. Pressing OK will close the window and discard all changes.")) {
+                                return false;
                             }
+                            $("#valuesTable_div").show();
                         }
                     });
+                    //$("#detailsDialog").dialog({
+                    //    beforeClose: function (event, ui) {
+                    //        if (mareframeGUI.m_unsavedChanges) {
+                    //            console.log("unsaved changes");
+                    //            if (!confirm("You have unsaved changes. Pressing OK will close the window and discard all changes.")) {
+                    //                return false;
+                    //            }
+                    //            $("#valuesTable_div").show();
+                    //        }
+                    //    }
+                    //});
                     $("#detailsDialog").on('dialogclose', function (event) {
-                        console.log("closing window");
+                        console.log("closing window GUI");
                         $("#valuesTable_div").hide();
                     });
                     $("#submit").on("click", this.saveChanges);
@@ -113,7 +127,11 @@ var Mareframe;
                     $("#model_description").text("This is the Mareframe MCA tool. Data has been loaded into the table on the right. You may doubleclick on each element below, to access the properties panel for that element. If you doubleclick on one of the red or green elements, you may adjust the weights of it's child elements, and thus the data it points to. In the chart at the bottom, you will see the result of the analysis, with the tallest column being the highest scoring one.");
                     this.setEditorMode = this.setEditorMode.bind(this);
                     this.m_editorMode = false;
+                    //$("#elementType").hide().selectmenu();
                     $("#elementType").hide();
+                    //$("#MCAelmtType").selectmenu();
+                    //$("#MCAWeightingMethod").selectmenu();
+                    $("#weightingMethodSelector").hide();
                 }
                 this.allModeltoConsole = this.allModeltoConsole.bind(this);
                 this.allConnectionstoConsole = this.allConnectionstoConsole.bind(this);
@@ -149,6 +167,7 @@ var Mareframe;
                 this.cnctStatus = this.cnctStatus.bind(this);
                 this.optionTypeChange = this.optionTypeChange.bind(this);
                 this.optionMethodChange = this.optionMethodChange.bind(this);
+                this.editTableData = this.editTableData.bind(this);
                 this.m_model = p_model;
                 this.m_mcaBackground.name = "hitarea";
                 this.updateEditorMode = this.updateEditorMode.bind(this);
@@ -183,6 +202,8 @@ var Mareframe;
                 $("#fullscreen").on("click", this.fullscreen);
                 $("#cnctTool").on("click", this.cnctStatus);
                 $("#addDataRow").on("click", this.addDataRowClick);
+                //$(".tableEdit").on("click", this.editTableData);
+                //$("td").on("dblclick", this.editTableData);
                 this.m_mcaBackground.addEventListener("pressup", this.mouseUp);
                 $("#lodDcmt").on("change", this.loadModel);
                 $("#lodDcmt").on("click", function () {
@@ -197,16 +218,245 @@ var Mareframe;
                 createjs.Ticker.addEventListener("tick", this.tick);
                 createjs.Ticker.setFPS(60);
                 $("#debug").hide();
+                //this.setEditorMode(true);
                 this.updateEditorMode();
             }
+            GUIHandler.prototype.setHasGoal = function (p_goal) {
+                this.m_hasGoal = true;
+            };
+            GUIHandler.prototype.updateAlternativeCount = function () {
+                this.m_alternativCount = 0;
+                for (var i in this.m_model.getElementArr()) {
+                    if (this.m_model.getElementArr()[i].getType() === 102)
+                        this.m_alternativCount++;
+                }
+            };
+            GUIHandler.prototype.updateAtributeIndex = function () {
+                this.m_attributeIndex.splice(0, this.m_attributeIndex.length);
+                for (var i in this.m_model.getElementArr()) {
+                    if (this.m_model.getElementArr()[i].getType() === 100)
+                        this.m_attributeIndex.push(i);
+                }
+                console.log("AttrIndex: " + this.m_attributeIndex);
+            };
+            GUIHandler.prototype.editTableData = function (p_evt) {
+                //document.attributes(
+                this.updateAtributeIndex();
+                var gui = this;
+                console.log("id: " + '"#' + p_evt.target.id + '"');
+                var id = "#" + p_evt.target.id;
+                //var originalName: any = $('"#' + p_evt.target.id + '"')[0];
+                var originalName = $("#" + p_evt.target.id)[0].textContent;
+                console.log("id: " + originalName);
+                $(id).addClass("editable");
+                $(id).html("<input type='text' value='" + originalName + "' />");
+                $(id).children().first().focus();
+                $(id).children().first().keypress(function (e) {
+                    if (e.which == 13) {
+                        var newText = $(this).val();
+                        console.log("new text1: " + newText);
+                        if (newText.length < 1) {
+                            $("#info_name").html(originalName);
+                            newText = originalName;
+                        }
+                        $(this).parent().text(newText);
+                        originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                        var tableX = id.slice(10).split("x")[0];
+                        var tableY = id.slice(10).split("x")[1];
+                        console.log("tableX: " + tableX + "  tableY: " + tableY);
+                        console.log("atrributeIndex: " + gui.m_attributeIndex);
+                        if (parseInt(tableX) !== 0) {
+                            var elmt = gui.m_model.getElementArr()[gui.m_attributeIndex[parseInt(tableX) - 1]];
+                            console.log("element: " + elmt.getName());
+                            if (parseInt(tableY) === 0) {
+                                elmt.setName(originalName);
+                            }
+                            if (parseInt(tableY) === 1) {
+                                elmt.setDataMin(parseFloat(originalName));
+                            }
+                            if (parseInt(tableY) > 1 && parseInt(tableY) < gui.m_alternativCount + 2) {
+                                elmt.changeDataArrAtIndex(parseInt(tableY) - 2, parseFloat(originalName));
+                            }
+                            if (parseInt(tableY) === gui.m_alternativCount + 2) {
+                                elmt.m_dataUnit = originalName;
+                            }
+                            if (parseInt(tableY) === gui.m_alternativCount + 3) {
+                                elmt.setDataMax(parseFloat(originalName));
+                            }
+                        }
+                        gui.updateTable(gui.m_model.getDataMatrix(true));
+                        gui.updateFinalScores();
+                    }
+                    $(this).parent().removeClass("editable");
+                });
+                $(id).children().first().blur(function () {
+                    var newText = $(this).val();
+                    console.log("new text2: " + newText);
+                    if (newText.length < 1) {
+                        $("#info_name").html(originalName);
+                        newText = originalName;
+                    }
+                    $(this).parent().text(newText);
+                    originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                    $(this).parent().removeClass("editable");
+                });
+                //this.updateFinalScores();
+            };
             GUIHandler.prototype.optionTypeChange = function (p_evt) {
                 //console.log("Element name: " + p_evt.target.id);
+                //var elmt: Element = $("#detailsDialog").data("element");
+                console.log("optchg");
                 var elmt = $("#detailsDialog").data("element");
-                elmt.setType(p_evt.target.value);
+                console.log("******************numType: " + $("#MCAelmtType").val());
+                var oldType = elmt.getType();
+                console.log("oldtype: " + oldType);
+                switch (oldType) {
+                    case 100:
+                        elmt.m_dataMax = 0;
+                        elmt.m_dataMin = 0;
+                        elmt.m_dataUnit = 'x';
+                        //elmt.m_dataArr = 0;
+                        this.m_attributeCount--;
+                        //this.updateAtributeIndex();
+                        break;
+                    case 101:
+                        elmt.m_swingWeightsArr.slice(0, elmt.m_swingWeightsArr.length);
+                        break;
+                    case 102:
+                        //update attributes
+                        var altKeyes = [];
+                        var index = 0;
+                        for (var e in this.m_model.getElementArr()) {
+                            if (this.m_model.getElementArr()[e].getType() === 2) {
+                                altKeyes[index] = e;
+                            }
+                        }
+                        var deleteIndex;
+                        for (var k in altKeyes) {
+                            if (this.m_model.getElementArr()[altKeyes[k]].getID() === elmt.getID()) {
+                                deleteIndex = k;
+                            }
+                        }
+                        for (var e in this.m_model.getElementArr()) {
+                            if (this.m_model.getElementArr()[e].getType() === 0) {
+                                this.m_model.getElementArr()[e].deleteValueAtIndex(deleteIndex);
+                            }
+                        }
+                        this.m_alternativCount--;
+                        break;
+                    case 103:
+                        this.m_hasGoal = false;
+                        break;
+                    default:
+                        console.log("oldtypye goooof :  " + oldType);
+                }
+                var tm = $("#MCAelmtType").val();
+                switch ($("#MCAelmtType").val()) {
+                    case "100":
+                        //console.log("changed to type: " + $("#MCAelmtType").val());
+                        //preserve  output connections
+                        //dlete input connections
+                        for (var i = 0; i < elmt.getConnections().length; i++) {
+                            if (elmt.getConnections()[i].getOutputElement() === elmt) {
+                                var tmp = elmt.getConnections()[i].getOutputElement();
+                                var tmp2 = elmt.getConnections()[i];
+                                console.log("--delete connection: " + elmt.getConnections()[i].getID());
+                                this.m_model.deleteConnection(elmt.getConnections()[i].getOutputElement().getID());
+                            }
+                            else {
+                                var tmp3 = elmt.getConnections()[i];
+                                console.log("--preserve connection: " + elmt.getConnections()[i].getID());
+                            }
+                        }
+                        //define data based on alternative elements
+                        var altKeyes = [];
+                        var index = 0;
+                        for (var e in this.m_model.getElementArr()) {
+                            if (this.m_model.getElementArr()[e].getType() === 102) {
+                                altKeyes[index++] = e;
+                            }
+                        }
+                        elmt.setDataMin(0);
+                        elmt.setDataMax(100);
+                        elmt.setDataBaseLine(50);
+                        elmt.m_dataUnit = "Unit";
+                        for (var j in altKeyes) {
+                            elmt.pushValueToDataArr(50);
+                        }
+                        elmt.setType(100);
+                        elmt.setMethod(2);
+                        elmt.m_valueFunctionX = 50;
+                        elmt.m_valueFunctionY = 50;
+                        elmt.m_valueFunctionFlip = 0;
+                        this.m_attributeCount++;
+                        this.m_attributeIndex = [];
+                        this.updateAtributeIndex();
+                        break;
+                    case "101":
+                        //console.log("changed to type: " + $("#MCAelmtType").val());
+                        for (var i = 0; i < elmt.getConnections().length; i++) {
+                        }
+                        elmt.setType(101);
+                        elmt.setMethod(1);
+                        this.updateAtributeIndex();
+                        break;
+                    case "102":
+                        //console.log("changed to type: " + $("#MCAelmtType").val());
+                        this.deleteConnectionsFromElement(elmt);
+                        elmt.setType(102);
+                        elmt.setMethod(0);
+                        for (var j in this.m_model.getElementArr()) {
+                            if (this.m_model.getElementArr()[j].getType() === 100) {
+                                this.m_model.getElementArr()[j].pushValueToDataArr((this.m_model.getElementArr()[j].getDataMax() - this.m_model.getElementArr()[j].getDataMin()) / 2);
+                                this.m_model.getElementArr()[j].setDataBaseLine((this.m_model.getElementArr()[j].getDataMax() - this.m_model.getElementArr()[j].getDataMin()) / 2);
+                            }
+                        }
+                        this.m_alternativCount++;
+                        this.updateAtributeIndex();
+                        this.updateFinalScores();
+                        break;
+                    case "103":
+                        //console.log("changed to type: " + $("#MCAelmtType").val());
+                        //this.deleteConnectionsFromElement(elmt);
+                        if (!this.m_hasGoal) {
+                            elmt.setType(103);
+                            this.deleteConnectionsFromElement(elmt);
+                            this.m_hasGoal = true;
+                            this.m_model.setMainObj(elmt);
+                            elmt.setMethod(1);
+                        }
+                        //elmt.m_swingWeightsArr[0] = 1;
+                        //console.log(elmt.m_swingWeightsArr[0]);
+                        this.updateAtributeIndex();
+                        break;
+                    default: console.log("Element is suppoesd to  be deleted");
+                }
+                //elmt.setType($("#MCAelmtType").val());
+                this.populateElmtDetails(elmt);
+                this.updateElement(elmt);
+                this.updateModel();
+                this.updateTable(this.m_model.getDataMatrix(true));
+                this.m_updateMCAStage = true;
+                //this.clearSelection();         
             };
             GUIHandler.prototype.optionMethodChange = function (p_evt) {
+                //var elmt: Element = $("#detailsDialog").data("element");
                 var elmt = $("#detailsDialog").data("element");
-                elmt.setMethod(p_evt.target.value);
+                //var el: Element = document.getElementById("detailsDialog").data("element"); 
+                elmt.setMethod($("#MCAWeightingMethod").val());
+                switch ($("#MCAWeightingMethod").val()) {
+                    case "1":
+                        elmt.getConnectionArr();
+                        elmt.setData({});
+                        break;
+                    case "2":
+                        elmt.setData([Math.random() * 100, Math.random() * 100, 0, 0, 100]);
+                        break;
+                    default:
+                        console.log("You done goofed" + $("#MCAWeightingMethod").val());
+                }
+                this.populateElmtDetails(elmt);
+                this.m_updateMCAStage = true;
             };
             GUIHandler.prototype.allConnectionstoConsole = function (p_evt) {
                 for (var i = 0; i < this.m_model.getConnectionArr().length; i++) {
@@ -216,6 +466,7 @@ var Mareframe;
             GUIHandler.prototype.addDataRowClick = function (p_evt) {
                 console.log("doing tnifgs");
                 //$("#defTable_div").append("<p> hello </p>");
+                //var elmt: Element = $("#detailsDialog").data("element");
                 var elmt = $("#detailsDialog").data("element");
                 var oldData = [];
                 oldData = elmt.getData();
@@ -265,7 +516,7 @@ var Mareframe;
                 //    console.log("Id: " + this.m_model.getConnectionArr()[i].getID + "  InElmt: " + this.m_model.getConnectionArr()[i].getInputElement + "  OutElmt: " + this.m_model.getConnectionArr()[i].getOutputElement);
                 //}
             };
-            GUIHandler.prototype.cnctStatus = function (p_evt) {
+            GUIHandler.prototype.cnctStatus = function () {
                 if ($("#cnctTool").prop("checked")) {
                     $("#modeStatus").html("Connect Mode");
                 }
@@ -276,11 +527,45 @@ var Mareframe;
             GUIHandler.prototype.loadModel = function (p_evt) {
                 ////console.log(this);
                 ////console.log(this.m_handler);
-                this.m_handler.getFileIO().loadfromGenie(this.m_model, this.importStage);
+                if (this.m_model.m_bbnMode) {
+                    this.m_handler.getFileIO().loadfromGenie(this.m_model, this.importStage);
+                }
+                else {
+                    this.m_handler.getFileIO().loadMCAModelFromFile(this.m_model, this.importStage);
+                    if (this.m_model.getMainObjective() != undefined)
+                        this.m_hasGoal = true;
+                }
+                this.updateAtributeIndex();
             };
             GUIHandler.prototype.saveModel = function (p_evt) {
-                $("#saveFile_div").show();
-                this.m_handler.getFileIO().saveModel(this.m_model);
+                //var originalName: string = $("#saveFile_div").html();
+                var handler = this.m_handler;
+                var model = this.m_model;
+                $("#saveFile_div").show().dblclick(function () {
+                    //console.log("DC filname");
+                    var $filename = $("#filename");
+                    var oldText = $filename.html();
+                    $filename.html("<input type='text' value= '" + oldText + "'>");
+                    $filename.children().first().focus();
+                    $filename.children().first().keypress(function (e) {
+                        if (e.which == 13) {
+                            var newText = $(this).val();
+                            console.log("new text: " + newText);
+                            if (newText.length < 1) {
+                                $filename.html(oldText);
+                                newText = oldText;
+                            }
+                            $filename.text(newText);
+                            oldText = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                            var saveName = oldText + ".xdsl";
+                            console.log("saveName: " + saveName);
+                            handler.getFileIO().saveModel(model, saveName);
+                        }
+                    });
+                });
+                var saveName = $("#filename").html() + ".xdsl";
+                console.log("saveNmae: " + saveName);
+                this.m_handler.getFileIO().saveModel(this.m_model, saveName);
             };
             GUIHandler.prototype.selectAll = function (p_evt) {
                 this.clearSelection();
@@ -289,8 +574,12 @@ var Mareframe;
                 }
             };
             GUIHandler.prototype.updateModel = function () {
-                this.m_model.update();
-                this.updateMiniTable(this.m_model.getElementArr());
+                if (this.m_model.m_bbnMode == true) {
+                    this.m_model.update();
+                    this.updateMiniTable(this.m_model.getElementArr());
+                }
+                else {
+                }
             };
             GUIHandler.prototype.setSize = function (p_width, p_height) {
                 console.log("setting size");
@@ -342,7 +631,7 @@ var Mareframe;
                 }
                 if (!this.m_model.m_bbnMode) {
                     this.updateFinalScores();
-                    this.updateTable(this.m_model.getDataMatrix());
+                    this.updateTable(this.m_model.getDataMatrix(true));
                 }
                 else {
                     this.updateMiniTable(elmts);
@@ -368,7 +657,14 @@ var Mareframe;
             GUIHandler.prototype.updateElement = function (p_elmt) {
                 p_elmt.m_easelElmt.removeAllChildren();
                 var shape = new createjs.Shape();
-                shape.graphics.f(this.m_elementColors[p_elmt.getType()][0]).s(this.m_elementColors[p_elmt.getType()][1]);
+                console.log("element type: " + p_elmt.getType());
+                var tmp = p_elmt.getType();
+                if (p_elmt.m_dstType === 1) {
+                    shape.graphics.f(this.m_elementColors[p_elmt.getType() - 100][0]).s(this.m_elementColors[p_elmt.getType() - 100][1]);
+                }
+                else {
+                    shape.graphics.f(this.m_elementColors[p_elmt.getType()][0]).s(this.m_elementColors[p_elmt.getType()][1]);
+                }
                 var elmtShapeType = 2;
                 if (this.m_model.m_bbnMode) {
                     elmtShapeType = p_elmt.getType();
@@ -388,7 +684,13 @@ var Mareframe;
                     default:
                         break;
                 }
-                var label = new createjs.Text(p_elmt.getName().substr(0, 24), "1em trebuchet", this.m_elementColors[p_elmt.getType()][1]);
+                if (p_elmt.m_dstType === 1) {
+                    var label = new createjs.Text(p_elmt.getName().substr(0, 24), "1em trebuchet", this.m_elementColors[p_elmt.getType() - 100][1]);
+                }
+                else {
+                    var label = new createjs.Text(p_elmt.getName().substr(0, 24), "1em trebuchet", this.m_elementColors[p_elmt.getType()][1]);
+                }
+                //var label = new createjs.Text(p_elmt.getName().substr(0, 24), "1em trebuchet", this.m_elementColors[p_elmt.getType()][1]);
                 label.textAlign = "center";
                 label.textBaseline = "middle";
                 label.maxWidth = 145;
@@ -400,7 +702,7 @@ var Mareframe;
                 }
             };
             GUIHandler.prototype.updateMiniTable = function (p_elmtArr) {
-                //console.log("updating minitable");
+                console.log("updating minitable");
                 for (var j = 0; j < p_elmtArr.length; j++) {
                     var elmt = p_elmtArr[j];
                     //console.log(elmt.getName());
@@ -409,6 +711,7 @@ var Mareframe;
                     var backgroundColors = ["#c6c6c6", "#bfbfe0"];
                     var decisionCont = elmt.m_minitableEaselElmt;
                     decisionCont.removeAllChildren();
+                    console.log("elmt.getValues: " + elmt.getValues());
                     if (elmt.getValues()[0].length > 2) {
                         var decisTextBox = new createjs.Text("Values is multidimensional", "0.8em trebuchet", "#303030");
                         decisionCont.addChild(decisTextBox);
@@ -471,7 +774,7 @@ var Mareframe;
                 this.updateModel();
             };
             GUIHandler.prototype.updateEditorMode = function () {
-                console.log("updating editormode");
+                //console.log("updating editormode");
                 if (this.m_editorMode) {
                     $(".advButton").show();
                     $("#reset").show();
@@ -556,25 +859,29 @@ var Mareframe;
                 var elmt = this.m_model.createNewElement(0);
                 this.addElementToStage(elmt);
                 elmt.update();
+                console.log("creating new chance element");
                 this.updateMiniTable([elmt]);
             };
             GUIHandler.prototype.createNewDec = function (p_evt) {
                 var elmt = this.m_model.createNewElement(1);
                 this.addElementToStage(elmt);
                 elmt.update();
+                console.log("creating new decision element");
                 this.updateMiniTable([elmt]);
             };
             GUIHandler.prototype.createNewValue = function (p_evt) {
                 var elmt = this.m_model.createNewElement(2);
                 this.addElementToStage(elmt);
                 elmt.update();
+                console.log("creating new value element");
                 this.updateMiniTable([elmt]);
             };
             GUIHandler.prototype.createNewElement = function (p_evt) {
                 var elmt = this.m_model.createNewElement(undefined);
                 this.addElementToStage(elmt);
                 // elmt.update();
-                this.updateMiniTable([elmt]);
+                //this.updateMiniTable([elmt]);
+                console.log("creating new element");
             };
             GUIHandler.prototype.deleteSelected = function (p_evt) {
                 console.log("deleting");
@@ -588,14 +895,7 @@ var Mareframe;
                         ////console.log(this.m_trashBin);
                         //alert("begin delete connections from " + elmt.getName() );
                         for (var j = 0; j < elmt.getConnections().length; j++) {
-                            var conn = elmt.getConnections()[j];
-                            console.log("deleting connection " + conn.getID());
-                            if (conn.getOutputElement().getID() === elmt.getID()) {
-                                conn.getInputElement().deleteConnection(conn.getID());
-                            }
-                            else {
-                                conn.getOutputElement().deleteConnection(conn.getID());
-                            }
+                            this.m_model.deleteConnection(elmt.getConnections()[j].getID());
                         }
                     }
                 }
@@ -649,10 +949,20 @@ var Mareframe;
                     $("#detailsDialog").dialog("open");
                 }
             };
+            GUIHandler.prototype.eraseElmtDetails = function (p_elmt) {
+                $(".dialogDiv ").hide();
+            };
             GUIHandler.prototype.populateElmtDetails = function (p_elmt) {
                 this.m_unsavedChanges = false;
-                console.log("unsaved changes: " + this.m_unsavedChanges);
-                console.log(p_elmt.getName() + " is updated: " + p_elmt.isUpdated());
+                this.eraseElmtDetails(p_elmt);
+                var type = p_elmt.getType();
+                var method = p_elmt.getMethod();
+                //$("#MCAelmtType").prop( 
+                $('#MCAelmtType option:contains(' + p_elmt.getTypeName() + ')').prop({ selected: true });
+                $('#MCAWeightingMethod option:contains(' + p_elmt.getMethodName() + ')').prop({ selected: true });
+                //$('#sel option:contains(' + val + ')').prop({ selected: true });
+                //console.log("unsaved changes: " + this.m_unsavedChanges);
+                //console.log(p_elmt.getName() + " is updated: " + p_elmt.isUpdated());
                 //console.log(p_elmt)
                 //set dialog title
                 $("#detailsDialog").dialog({
@@ -666,8 +976,8 @@ var Mareframe;
                     console.log("hiding selector");
                     $("#detailsDialog").data("element", p_elmt);
                     $("#detailsDialog").data("model", this.m_model);
-                    var s = DST.Tools.htmlTableFromArray("Definition", p_elmt.getData(), this.m_model);
-                    console.log(p_elmt.getData());
+                    var s = DST.Tools.htmlTableFromArray("Definition", p_elmt.getDataOld(), this.m_model);
+                    console.log(p_elmt.getDataOld());
                     $("#defTable_div").html(s);
                     $("#defTable_div").show();
                     var typeText;
@@ -709,6 +1019,11 @@ var Mareframe;
                 }
                 else {
                     //MCA mode only
+                    if (this.m_editorMode) {
+                        $(".info_div").show();
+                        $("#weightingMethodSelector").show();
+                        $("#elementType").show();
+                    }
                     $("#info_type").hide();
                     $("#info_type_tag").hide();
                     $("#detailsDialog").data("element", p_elmt);
@@ -721,25 +1036,30 @@ var Mareframe;
                         bar: { groupWidth: '60%' }
                     };
                     switch (p_elmt.getType()) {
-                        case 2:
+                        case 102:
                             //show: tabledata,description
+                            $("#weightingMethodSelector").hide();
                             $("#description_div").show();
                             break;
-                        case 0:
+                        case 100:
                             //show: valueFn,direct(sliders),ahp
-                            $("#weightingMethodSelector").show();
+                            //$("#weightingMethodSelector").show();
                             $("#datatable_div").show();
                             $("#chart_div").show();
                             // Create the data table.
                             // Instantiate and draw our chart, passing in some options.
+                            //alert("1");
+                            console.log("WeightedData: " + this.m_model.getWeightedData(p_elmt, true));
                             var chartData = google.visualization.arrayToDataTable(this.m_model.getWeightedData(p_elmt, true));
+                            //alert("2");
                             var chart = new google.visualization.ColumnChart($("#chart_div").get(0));
+                            //alert("3");
                             chart.draw(chartData, chartOptions);
+                            //alert("4");
                             break;
-                        case 3: //objective
-                        case 1:
+                        case 103: //Goal
+                        case 101:
                             //show: swing(sliders),direct(sliders),ahp
-                            $("#weightingMethodSelector").show();
                             break;
                     }
                     switch (p_elmt.getMethod()) {
@@ -751,27 +1071,34 @@ var Mareframe;
                             console.log("WeigthMethodSwing");
                             var sliderHtml = "";
                             $("#sliders_div").empty();
-                            for (var i = 0; i < p_elmt.getData(0).length; i++) {
-                                var childEl = this.m_model.getConnection(p_elmt.getData(0, i)).getInputElement();
+                            // for (var i = 0; i < p_elmt.getDataArr.length; i++) {
+                            for (var i = 0; i < p_elmt.m_swingWeightsArr.length; i++) {
+                                //var childEl = this.m_model.getConnection(p_elmt.getDataArr(0, i)).getInputElement();
+                                //console.log("i: "+ i + "  connectio
+                                var childEl = this.m_model.getConnection(p_elmt.m_swingWeightsArr[i][0]).getInputElement();
                                 sliderHtml = "<div><p>" + childEl.getName() + ":<input id=\"inp_" + childEl.getID() + "\"type=\"number\" min=\"0\" max=\"100\"></p><div style=\"margin-top:5px ;margin-bottom:10px\"class =\"slider\"id=\"slid_" + childEl.getID() + "\"></div></div>";
                                 $("#sliders_div").append(sliderHtml);
                                 function makeSlider(count, id, _this) {
                                     $("#slid_" + id).slider({
                                         min: 0,
                                         max: 100,
-                                        value: p_elmt.getData(1, count),
+                                        //value: p_elmt.getDataArr(1, count),
+                                        value: p_elmt.m_swingWeightsArr[count][1],
                                         slide: function (event, ui) {
-                                            p_elmt.setData(ui.value, 1, count);
+                                            //p_elmt.setData(ui.value, 1, count);
+                                            p_elmt.m_swingWeightsArr[count][1] = ui.value;
                                             console.log("Slide: " + ui.value);
                                             $("#inp_" + id).val(ui.value);
                                             this.updateFinalScores();
                                         }.bind(_this)
                                     });
-                                    $("#inp_" + id).val(p_elmt.getData(1, count));
+                                    //$("#inp_" + id).val(p_elmt.getDataArr(1, count));
+                                    $("#inp_" + id).val(p_elmt.m_swingWeightsArr[count][1]);
                                     $("#inp_" + id).on("input", function () {
                                         var val = parseInt(this.value);
                                         if (val <= 100 && val >= 0) {
-                                            p_elmt.setData(val, 1, count);
+                                            //p_elmt.setData(val, 1, count);
+                                            p_elmt.m_swingWeightsArr[count][1] = val;
                                             $("#slid_" + id).slider("option", "value", val);
                                             _this.updateFinalScores();
                                         }
@@ -783,7 +1110,7 @@ var Mareframe;
                                         }
                                         ////console.log(p_elmt.getData(1));
                                     });
-                                }
+                                } // end makeSlider
                                 makeSlider(i, childEl.getID(), this);
                             }
                             $("#sliders_div").show();
@@ -792,8 +1119,10 @@ var Mareframe;
                             console.log("WeigthMethodValueFn");
                             var tableMat = this.m_model.getWeightedData(p_elmt, false);
                             console.log("getWeigthedData: " + tableMat);
-                            var cPX = p_elmt.getData(1);
-                            var cPY = p_elmt.getData(2);
+                            //var cPX: number = p_elmt.getData(1);
+                            var cPX = p_elmt.m_valueFunctionX;
+                            //var cPY: number = p_elmt.getData(2);
+                            var cPY = p_elmt.m_valueFunctionY;
                             ////console.log("draw line");
                             this.m_valueFnLineCont.removeAllChildren();
                             this.m_controlP.regX = 3;
@@ -809,8 +1138,10 @@ var Mareframe;
                                     maxVal = tableMat[i][1];
                             }
                             //set minimum and maximum values
-                            var maxVal = p_elmt.getData(5);
-                            var minVal = p_elmt.getData(4);
+                            //var maxVal: number = p_elmt.getData(5);
+                            //var minVal: number = p_elmt.getData(4);
+                            var maxVal = p_elmt.getDataMax();
+                            var minVal = p_elmt.getDataMin();
                             //check if data is within min-max values, and expand as necessary
                             for (var i = 1; i < tableMat.length - 1; i++) {
                                 if (tableMat[i][1] > maxVal) {
@@ -822,16 +1153,23 @@ var Mareframe;
                                     minVal = tableMat[i][1];
                                 }
                             }
-                            for (var i = 1; i < tableMat.length; i++) {
+                            for (var i = 0; i < p_elmt.getDataArrLength(); i++) {
+                                //for (var i = 1; i < tableMat.length; i++) {
                                 ////console.log(tableMat[i][1]);
-                                var vertLine = new createjs.Shape(this.getValueFnLine((tableMat[i][1] - minVal) / (maxVal - minVal) * this.m_valueFnSize, this.m_googleColors[i - 1]));
+                                //var vertLine = new createjs.Shape(this.getValueFnLine((tableMat[i][1] - minVal) / (maxVal - minVal) * this.m_valueFnSize, this.m_googleColors[i - 1]));
+                                var tmp = (p_elmt.getDataArrAtIndex(i) - minVal) / (maxVal - minVal) * this.m_valueFnSize;
+                                var tmp2 = this.m_valueFnSize;
+                                var vertLine = new createjs.Shape(this.getValueFnLine((p_elmt.getDataArrAtIndex(i) - minVal) / (maxVal - minVal) * this.m_valueFnSize, this.m_googleColors[i]));
+                                //var vertLine = new createjs.Shape(this.getValueFnLine(30, this.m_googleColors[i - 1]));
                                 this.m_valueFnLineCont.addChild(vertLine);
                             }
-                            this.updateValFnCP(cPX, cPY, p_elmt.getData(3));
+                            //this.updateValFnCP(cPX, cPY, p_elmt.getData(3));
+                            this.updateValFnCP(cPX, cPY, p_elmt.m_valueFunctionFlip);
                             this.updateDataTableDiv(p_elmt);
                             break;
                         case 3: //ahp
                     }
+                    this.m_updateMCAStage = true;
                     //set description
                     document.getElementById("description_div").innerHTML = p_elmt.getDescription();
                 }
@@ -1073,6 +1411,8 @@ var Mareframe;
                 }
                 else {
                     if (p_editorMode) {
+                        $("#saveFile_div").dblclick(function () {
+                        });
                         $("#info_name").dblclick(function () {
                             $("#submit").show();
                             $(this).addClass("editable");
@@ -1115,16 +1455,20 @@ var Mareframe;
                 }
             };
             GUIHandler.prototype.showValues = function () {
+                //var elmt: Element = $("#detailsDialog").data("element");
                 var elmt = $("#detailsDialog").data("element");
                 console.log("Data: " + elmt.getData());
                 console.log("Values: " + elmt.getValues());
                 console.log(elmt.getValues());
                 console.log("size of values: " + math.size(elmt.getValues()));
-                $("#valuesTable_div").html(DST.Tools.htmlTableFromArray("Values", elmt.getValues(), $("#detailsDialog").data("model")));
+                var mdl = $("#detailsDialog").data("model");
+                //$("#valuesTable_div").html(Tools.htmlTableFromArray("Values", elmt.getValues(), $("#detailsDialog").data("model")));
+                $("#valuesTable_div").html(DST.Tools.htmlTableFromArray("Values", elmt.getValues(), mdl));
                 $("#valuesTable_div").show();
                 $("#values").prop("disabled", true);
             };
             GUIHandler.prototype.saveChanges = function () {
+                //var elmt: Element = $("#detailsDialog").data("element");
                 var elmt = $("#detailsDialog").data("element");
                 var oldData = elmt.getData();
                 var model = this.m_model;
@@ -1224,21 +1568,24 @@ var Mareframe;
                 var elmt = this.m_model.getElement(p_evt.target.name);
                 this.m_controlP.x = p_evt.stageX;
                 this.m_controlP.y = p_evt.stageY;
-                elmt.getData()[1] = p_evt.stageX;
-                elmt.getData()[2] = p_evt.stageY;
-                this.updateValFnCP(p_evt.stageX, p_evt.stageY, elmt.getData()[3]);
+                //elmt.getData()[1] = p_evt.stageX;
+                //elmt.getData()[2] = p_evt.stageY;
+                elmt.m_valueFunctionX = p_evt.stageX;
+                elmt.m_valueFunctionY = p_evt.stageY;
+                this.updateValFnCP(p_evt.stageX, p_evt.stageY, elmt.m_valueFunctionFlip);
                 this.updateDataTableDiv(elmt);
                 //update = true;
                 this.updateFinalScores();
-                console.log("ElementData: " + elmt.getData());
             };
             GUIHandler.prototype.linearizeValFn = function () {
                 this.moveValFnCP({ stageX: 50, stageY: 50, target: { name: $("#valueFn_Linear").data("name") } });
             };
             GUIHandler.prototype.flipValFn = function () {
-                var elmt = this.m_model.getElement($("#valueFn_Flip").data("name")[0][0]);
-                elmt.getData()[3] = Math.abs(elmt.getData()[3] - 1);
-                this.updateValFnCP(elmt.getData()[1], elmt.getData()[2], elmt.getData()[3]);
+                var tm = $("#valueFn_Flip").data("name");
+                var tm2 = tm.toString();
+                var elmt = this.m_model.getElement(tm2);
+                elmt.m_valueFunctionFlip = Math.abs(elmt.m_valueFunctionFlip - 1);
+                this.updateValFnCP(elmt.m_valueFunctionX, elmt.m_valueFunctionY, elmt.m_valueFunctionFlip);
                 this.updateDataTableDiv(elmt);
                 //update = true;
                 this.updateFinalScores();
@@ -1247,33 +1594,81 @@ var Mareframe;
                 return new createjs.Graphics().beginStroke(p_color).mt(p_xValue, 0).lt(p_xValue, this.m_valueFnSize);
             };
             GUIHandler.prototype.updateFinalScores = function () {
+                // if (this.m_model.getFinalScore() 
+                //var data = google.visualization.arrayToDataTable([
+                //    [{ label: 'Country', type: 'string' },
+                //        { label: 'Population', type: 'number' },
+                //        { label: 'Area', type: 'number' },
+                //        {type: 'string', role: 'annotation' }],
+                //    ['CN', 1324, 9640821, 'Annotated'],
+                //    ['IN', 1133, 3287263, 'Annotated'],
+                //    ['US', 304, 9629091, 'Annotated'],
+                //    ['ID', 232, 1904569, 'Annotated'],
+                //    ['BR', 187, 8514877, 'Annotated']
+                //]);
                 var data = google.visualization.arrayToDataTable(this.m_model.getFinalScore());
                 data.removeRow(data.getNumberOfRows() - 1);
+                data.removeRow(data.getNumberOfRows() - 1);
+                data.removeRow(0);
+                data.removeRow(0);
+                //data.removeRow(4);
                 this.m_finalScoreChart.draw(data, this.m_finalScoreChartOptions);
             };
             GUIHandler.prototype.updateTable = function (p_matrix) {
+                this.updateAlternativeCount();
+                $(".tableEdit").off("dblclick", this.editTableData);
                 var tableHTML = "";
                 var topRow = true;
                 for (var j = 0; j < p_matrix.length; j++) {
                     var row = p_matrix[j];
-                    tableHTML = tableHTML + "<tr style=\"border:1px solid black;height:64px\">";
-                    for (var i = 1; i < row.length; i++) {
-                        if (topRow) {
-                            tableHTML = tableHTML + "<td contenteditable=true style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle\">" + this.m_model.getElement(row[i]).getName() + "</td>";
+                    tableHTML = tableHTML + "<tr style=\"border:1px solid black;height:32px\">";
+                    for (var i = 0; i < row.length; i++) {
+                        //if (topRow) {
+                        //    if (i!==0)
+                        //        tableHTML = tableHTML + "<td contenteditable=true style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle\">" + this.m_model.getElement(row[i]).getName() + "</td>";
+                        //}
+                        //else {
+                        //    tableHTML = tableHTML + "<td contenteditable=true style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle\">" + row[i] + "</td>";
+                        //}
+                        //tableHTML = tableHTML + "<td contenteditable=true style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle\" id='dataTable" + i + j + "' class='tableEdit' >" + row[i] + "</td>";
+                        if (i === 0 && j === 0) {
+                            tableHTML = tableHTML + "<td style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle\" id='dataTable" + i + "x" + j + "' class='tableEdit' ><b></b></td>";
                         }
-                        else {
-                            tableHTML = tableHTML + "<td contenteditable=true style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle\">" + row[i] + "</td>";
+                        if (j === 0 && i !== 0) {
+                            tableHTML = tableHTML + "<td style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle\" id='dataTable" + i + "x" + j + "' class='tableEdit' ><b>" + row[i] + "</b></td>";
+                        }
+                        if (i === 0 && j !== 0) {
+                            tableHTML = tableHTML + "<td style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle\" id='dataTable" + i + "x" + j + "' class='tableEdit' ><b>" + row[i] + "</b></td>";
+                        }
+                        if (i !== 0 && j !== 0) {
+                            var t = " ;color:black; ";
+                            if (j > 2 && j < p_matrix.length - 2) {
+                                if (row[i] / p_matrix[2][i] > 1.15) {
+                                    t = " ;color:red; ";
+                                }
+                                else if (row[i] / p_matrix[2][i] < 0.85) {
+                                    var t = " ;color:blue; ";
+                                }
+                                else {
+                                    var t = " ;color:yellow; ";
+                                }
+                            }
+                            tableHTML = tableHTML + "<td style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle" + t + "\" id='dataTable" + i + "x" + j + "' class='tableEdit' >" + row[i] + "</td>";
                         }
                     }
                     tableHTML = tableHTML + "</tr>";
                     topRow = false;
                 }
+                //console.log("tableHtML: " + tableHTML);
                 $("#editableDataTable").html(tableHTML);
+                $("#MCADataTable").on('dblclick', "td", this.editTableData);
+                //$(".tableEdit").on("click", this.editTableData);
                 //console.log("original datamatrix" + this.m_model.getDataMatrix());
                 ////console.log(this.m_model.getDataMatrix());
             };
             GUIHandler.prototype.mouseDown = function (p_evt) {
                 console.log("mouse down");
+                console.log("DataMatrix: " + this.m_model.getDataMatrix());
                 $("#mX").html("X: " + p_evt.stageX);
                 $("#mY").html("Y: " + p_evt.stageY);
                 $("#mAction").html("Action: mousedown");
@@ -1285,8 +1680,25 @@ var Mareframe;
                     for (var i in elmt.getConnections()) {
                         console.log(elmt.getID() + "  " + elmt.getConnections()[i].getID());
                     }
-                    console.log("Data: " + elmt.getData());
                     console.log("Values: " + elmt.getValues());
+                    console.log("Name: " + elmt.getName());
+                    console.log("ID: " + elmt.getID());
+                    console.log("Type: " + elmt.getTypeName());
+                    console.log("Method: " + elmt.getMethodName());
+                    //console.log("MainValues: " + elmt.getMainValues());
+                    if (elmt.getType() === 100) {
+                        console.log("minimum: " + elmt.getDataMin());
+                        console.log("maximum: " + elmt.getDataMax());
+                        console.log("unit: " + elmt.m_dataUnit);
+                        console.log("Data: " + elmt.getDataArr());
+                        console.log("BaseLine: " + elmt.getDataBaseLine());
+                    }
+                    if (elmt.getType() === 101 || elmt.getType() === 103) {
+                        for (var j = 0; j < elmt.m_swingWeightsArr.length; j++) {
+                            console.log("------Data: " + elmt.m_swingWeightsArr[j]);
+                        }
+                    }
+                    console.log("------------------");
                 }
                 //////console.log("mouse down at: ("+e.stageX+","+e.stageY+")");
                 this.m_oldX = p_evt.stageX;
@@ -1297,12 +1709,21 @@ var Mareframe;
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
                     var cnctChkbox = document.getElementById("cnctTool"); // What the hell no jQuery
                     if (cnctChkbox.checked) {
-                        ////console.log("cnctTool enabled");
-                        if (!this.connectionExist(p_evt)) {
-                            this.connectTo(p_evt);
+                        if (this.m_model.m_bbnMode) {
+                            ////console.log("cnctTool enabled");
+                            if (!this.connectionExist(p_evt)) {
+                                this.connectTo(p_evt);
+                            }
+                            else {
+                                this.disconnectFrom(p_evt);
+                            }
                         }
                         else {
-                            this.disconnectFrom(p_evt);
+                            console.log("connencting MCA");
+                            if (!this.connectionExist(p_evt))
+                                this.connctToMCAElement(p_evt);
+                            cnctChkbox.checked = false;
+                            this.cnctStatus();
                         }
                     }
                     else {
@@ -1446,6 +1867,7 @@ var Mareframe;
                 this.m_updateMCAStage = true;
             };
             GUIHandler.prototype.disconnectFrom = function (p_evt) {
+                //this.m_model.deleteConnection( );
             };
             GUIHandler.prototype.connectionExist = function (p_evt) {
                 console.log("selected: " + this.m_selectedItems);
@@ -1458,11 +1880,51 @@ var Mareframe;
                 }
                 return false;
             };
+            GUIHandler.prototype.connctToMCAElement = function (p_evt) {
+                var elmtIdent = p_evt.target.name;
+                var connected = false;
+                var newConnection;
+                console.log("selected length: " + this.m_selectedItems.length);
+                for (var i = 0; i < this.m_selectedItems.length; i++) {
+                    var e = this.m_selectedItems[i];
+                    if (e.name.substr(0, 4) === "elmt" && e.name !== elmtIdent) {
+                        var outputElmt = this.m_model.getElement(elmtIdent);
+                        var inputElmt = this.m_model.getElement(e.name);
+                    }
+                    var tmp = inputElmt.getParentElements();
+                    var tmp2 = outputElmt.getParentElements();
+                    if (inputElmt.isChildOf(outputElmt)) {
+                        var conn = outputElmt.getConnectionFrom(inputElmt);
+                        this.m_model.deleteConnection(conn.getID());
+                    }
+                    else {
+                        newConnection = this.m_model.createNewConnection(inputElmt, outputElmt);
+                        //console.log("connection: " + c);
+                        if (this.m_model.addConnection(newConnection)) {
+                            this.addConnectionToStage(newConnection);
+                            connected = true;
+                            switch (outputElmt.getType()) {
+                                case 101:
+                                    outputElmt.m_swingWeightsArr[outputElmt.m_swingWeightsArr.length] = [newConnection.getID(), 50];
+                                    break;
+                                case 103:
+                                    outputElmt.m_swingWeightsArr[outputElmt.m_swingWeightsArr.length] = [newConnection.getID(), 50];
+                                    break;
+                            }
+                        }
+                    }
+                }
+                if (!connected) {
+                    this.select(p_evt);
+                }
+                this.importStage();
+                this.m_mcaStage.update();
+            };
             GUIHandler.prototype.connectTo = function (p_evt) {
                 var elmtIdent = p_evt.target.name;
                 var connected = false;
                 //console.log("attempting connection "+elmtIdent);
-                //console.log("selected length: " + this.m_selectedItems.length);
+                console.log("selected length: " + this.m_selectedItems.length);
                 for (var i = 0; i < this.m_selectedItems.length; i += 2) {
                     var e = this.m_selectedItems[i];
                     if (e.name.substr(0, 4) === "elmt" && e.name !== elmtIdent) {
@@ -1562,6 +2024,7 @@ var Mareframe;
                 cont.name = p_connection.getID();
                 //conn.addEventListener("pressmove", pressMove);
                 //cont.addEventListener("mousedown", mouseDown);
+                //if (this.m_model.m_bbnMode)
                 cont.addChild(arrowCont);
                 cont.addChild(conn);
                 this.m_mcaContainer.addChildAt(cont, 0);
@@ -1570,8 +2033,10 @@ var Mareframe;
             };
             GUIHandler.prototype.updateConnection = function (p_connection) {
                 //stage.removeChild(c.easelElmt);
+                // if (this.m_model.m_bbnMode) {
                 var temp = p_connection.m_easelElmt.getChildAt(1);
                 temp.graphics.clear().beginStroke(p_connection.getColor()).mt(p_connection.getInputElement().m_easelElmt.x, p_connection.getInputElement().m_easelElmt.y).lt(p_connection.getOutputElement().m_easelElmt.x, p_connection.getOutputElement().m_easelElmt.y);
+                //}
                 p_connection.m_easelElmt.getChildAt(0).x = ((p_connection.getInputElement().m_easelElmt.x - p_connection.getOutputElement().m_easelElmt.x) / 2) + p_connection.getOutputElement().m_easelElmt.x;
                 p_connection.m_easelElmt.getChildAt(0).y = ((p_connection.getInputElement().m_easelElmt.y - p_connection.getOutputElement().m_easelElmt.y) / 2) + p_connection.getOutputElement().m_easelElmt.y;
                 p_connection.m_easelElmt.getChildAt(0).rotation = (180 / Math.PI) * Math.atan((p_connection.getInputElement().m_easelElmt.y - p_connection.getOutputElement().m_easelElmt.y) / (p_connection.getInputElement().m_easelElmt.x - p_connection.getOutputElement().m_easelElmt.x));
@@ -1596,7 +2061,12 @@ var Mareframe;
                     var elmtType = elmt.getType();
                     //////console.log(e);
                     var shape = p_easelElmt.getChildAt(0);
-                    shape.graphics.clear().f(this.m_elementColors[elmtType][2]).s(this.m_elementColors[elmtType][1]);
+                    if (elmt.m_dstType === 1) {
+                        shape.graphics.clear().f(this.m_elementColors[elmtType - 100][2]).s(this.m_elementColors[elmtType - 100][1]);
+                    }
+                    else {
+                        shape.graphics.clear().f(this.m_elementColors[elmtType][2]).s(this.m_elementColors[elmtType][1]);
+                    }
                     var elmtShapeType = 2;
                     if (this.m_model.m_bbnMode)
                         elmtShapeType = elmtType;
@@ -1681,7 +2151,12 @@ var Mareframe;
                     if (easelElmt.id != this.m_model.getElement(easelElmt.name).m_minitableEaselElmt.id) {
                         var elmtType = this.m_model.getElement(easelElmt.name).getType();
                         var shape = easelElmt.getChildAt(0);
-                        shape.graphics.clear().f(this.m_elementColors[elmtType][0]).s(this.m_elementColors[elmtType][1]);
+                        if (this.m_model.getElement(easelElmt.name).m_dstType === 1) {
+                            shape.graphics.clear().f(this.m_elementColors[elmtType - 100][0]).s(this.m_elementColors[elmtType - 100][1]);
+                        }
+                        else {
+                            shape.graphics.clear().f(this.m_elementColors[elmtType][0]).s(this.m_elementColors[elmtType][1]);
+                        }
                         var elmtShapeType = 2;
                         if (this.m_model.m_bbnMode)
                             elmtShapeType = elmtType;
@@ -1705,6 +2180,26 @@ var Mareframe;
                 }
                 this.m_selectedItems = [];
                 this.m_updateMCAStage = true;
+            };
+            GUIHandler.prototype.deleteConnectionsFromElement = function (p_elmt) {
+                for (var i = 0; i < p_elmt.getConnections().length; i++) {
+                    //var elmt = p_elmt.getConnections()[i].getOutputElement();
+                    //switch (elmt.getType()) {
+                    //    case 0:
+                    //        break;
+                    //    case 1:
+                    //        for (var j = 0; j < elmt.getConnections().length; j++) {
+                    //            if (elmt.getConnections()[j].getID() === 
+                    //        break;
+                    //    case 2:
+                    //        break;
+                    //    case 3:
+                    //        break;
+                    //}
+                    this.m_model.deleteConnection(p_elmt.getConnections()[i].getID());
+                    this.m_updateMCAStage = true;
+                    this.importStage();
+                }
             };
             return GUIHandler;
         })();

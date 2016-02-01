@@ -1,0 +1,55 @@
+{
+    "elements": [
+      {
+       
+        "posX": 650,
+        "posY": 200,
+        "elmtID": "elmtA1",
+        "elmtName": "Atr 1",
+        "elmtDesc": "",
+        "elmtType": 100,
+        "elmtWghtMthd": 2,
+        "elmtDataMin": 10,
+        "elmtDataMax": 100,
+        "elmtDataArr": [ 30 ],
+        "elmtDataUnit": "kg",
+        "elmtValueFnX": 60,
+        "elmtValueFnY": 60,
+        "elmtValueFnFlip": 0
+      },
+        { "posX": 650, "posY": 250, "elmtID": "elmtA2", "elmtName": "Atr 2",  "elmtDesc": "aa",   "elmtType": 100, "elmtWghtMthd": 2, "elmtDataMin": 20, "elmtDataMax": 200, "elmtDataArr": [ 60 ], "elmtDataUnit":  "m",  "elmtValueFnX": 30, "elmtValueFnY":  60, "elmtValueFnFlip":  0},
+        { "posX": 650, "posY": 350, "elmtID": "elmtA3", "elmtName": "Atr 3",  "elmtDesc": "",     "elmtType": 100, "elmtWghtMthd": 2, "elmtDataMin": 30,  "elmtDataMax": 300, "elmtDataArr": [ 150 ], "elmtDataUnit":  "km", "elmtValueFnX": 10, "elmtValueFnY":  60, "elmtValueFnFlip":  0},
+        { "posX": 650, "posY": 400, "elmtID": "elmtA4", "elmtName": "Atr 4",  "elmtDesc": "aa",   "elmtType": 100, "elmtWghtMthd": 2, "elmtDataMin": 40, "elmtDataMax": 400, "elmtDataArr": [ 390 ], "elmtDataUnit":  "AU",  "elmtValueFnX": 30, "elmtValueFnY":  90, "elmtValueFnFlip":  0},
+      {
+       
+        "posX": 230,
+        "posY": 180,
+        "elmtID": "elmt2020",
+        "elmtName": "2020",
+        "elmtDesc": "2020",
+        "elmtType": 101,
+        "elmtWghtMthd": 1,
+        "elmtData": [
+          [ "conn3", 80 ],
+          [ "conn4", 20 ]
+        ]
+      },
+        { "posX": 230, "posY": 250, "elmtID": "elmt2030", "elmtName": "2030", "elmtDesc": "2030", "elmtType": 101, "elmtWghtMthd": 1, "elmtData": [ [ "conn6", 60 ], [ "conn7", 40 ] ] },    
+        { "posX": 120, "posY": 250, "elmtID": "elmtGoal", "elmtName": "Goal", "elmtDesc": "Goal", "elmtType": 103, "elmtWghtMthd": 1, "elmtData": [ [ "conn2", 20 ], [ "conn5", 80 ] ] }, 
+    
+        { "posX": 850, "posY": 250, "elmtID": "elmtAlt1", "elmtName": "Alternative1", "elmtDesc": "Alternative One", "elmtType": 102, "elmtWghtMthd": 0 } 
+    ],
+    "connections": [
+        { "connInput": "elmt2020", "connOutput": "elmtGoal", "connID": "conn2" },
+        { "connInput": "elmtA1",   "connOutput": "elmt2020", "connID": "conn3" },
+        { "connInput": "elmtA2",   "connOutput": "elmt2020", "connID": "conn4" },
+        
+        { "connInput": "elmt2030", "connOutput": "elmtGoal", "connID": "conn5" },
+        { "connInput": "elmtA3",   "connOutput": "elmt2030", "connID": "conn6" },
+        { "connInput": "elmtA4",   "connOutput": "elmt2030", "connID": "conn7" }
+    ],
+  "mdlName":  "For Testing One",
+  "mdlIdent": "test1",
+  "mdlDesc":  "",
+  "mainObj":  "elmtGoal"
+}

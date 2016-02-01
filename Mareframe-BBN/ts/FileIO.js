@@ -8,24 +8,42 @@ var Mareframe;
                 this.m_handler = p_handler;
                 this.reset = this.reset.bind(this);
             }
-            FileIO.prototype.saveModel = function (p_model) {
+            FileIO.prototype.saveModel = function (p_model, p_filename) {
                 //console.log("generating download link");
                 // encode the data into base64
+                //var regDigit = /\d/;
+                //for (var e in p_model.getElementArr()) {
+                //    var tmp3 = p_model.getElementArr();
+                //    var tmp = p_model.getElementArr()[e].getID().substr(0, 4);
+                //    var tmp4 = p_model.getElementArr()[e].getID().substr(4, 1);
+                //    var tmp5 = regDigit.test(p_model.getElementArr()[e].getID().substr(4, 1));
+                //    if (p_model.getElementArr()[e].getID().substr(0, 4) === "elmt" && regDigit.test(p_model.getElementArr()[e].getID().substr(4, 1))) { 
+                //        var tmp2 = p_model.getElementArr()[e].getID().substring(0, 4) + 's' + p_model.getElementArr()[e].getID().substring(4);
+                //        p_model.getElementArr()[e].setID(p_model.getElementArr()[e].getID().substring(0, 4) + 's' + p_model.getElementArr()[e].getID().substring(4) );
+                //    }
+                //}
                 var datastream = p_model.saveModel();
                 var base64 = window.btoa(datastream);
                 // create an a tag
                 var a = $("#downloadLink").get(0);
                 a.href = 'data:application/octet-stream;base64,' + base64;
-                a.download = "test.xdsl";
+                if (p_filename == undefined) {
+                    a.download = "test.xdsl";
+                }
+                else {
+                    a.download = p_filename;
+                }
                 a.innerHTML = 'Download';
             };
             FileIO.prototype.loadfromGenie = function (p_activeModelInstance, p_updateGui) {
+                console.log("loadFromGenie");
                 var win = window;
                 // Check for the various File API support.
                 if (win.File && win.FileReader && win.FileList && win.Blob) {
                     // Great success! All the File APIs are supported.
                     var fileInputObj = $("#lodDcmt").get(0);
                     var loadedFile = fileInputObj.files[0];
+                    //loadedFile.path 
                     ////console.log(loadedFile);
                     var reader = new FileReader();
                     reader.onload = (function (theFile) {
@@ -189,17 +207,40 @@ var Mareframe;
                     case "test":
                         path += "test.json";
                         break;
+                    case "test1":
+                        path += "test1.json";
+                        break;
                     default:
-                        console.log("NO such file exists!!");
+                        console.log("NO such file exists!!   " + p_modelStringIdent);
                         break;
                 }
                 console.log("resulting path is: " + path);
                 //console.log("Data: " + JSON.stringify(data));
                 jQuery.getJSON(path, function (data) {
-                    //console.log(JSON.stringify(data));
+                    console.log("stringyfied Json: " + JSON.stringify(data));
+                    console.log("Pure json: " + data);
                     p_activeModelInstance.fromJSON(data);
                     p_updateGui();
                 });
+            };
+            FileIO.prototype.loadMCAModelFromFile = function (p_activeModelInstance, p_updateGui) {
+                console.log("Loading MCA model from file");
+                var fileInputElement = $("#lodDcmt").get(0);
+                fileInputElement.files[0];
+                var file = fileInputElement.files[0];
+                console.log("file: " + file);
+                console.log("filename: " + file.name);
+                var fileReader = new FileReader();
+                fileReader.onload = function (p_evt) {
+                    var text = fileReader.result;
+                    console.log("loaded file: " + text);
+                    var jsonObj = JSON.parse(text);
+                    console.log("jsonObj: " + jsonObj);
+                    p_activeModelInstance.fromJSON(jsonObj);
+                    p_updateGui();
+                };
+                fileReader.readAsText(file);
+                console.log("Result: " + fileReader.result);
             };
             return FileIO;
         })();

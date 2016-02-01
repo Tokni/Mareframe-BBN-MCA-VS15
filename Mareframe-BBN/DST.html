@@ -5,22 +5,26 @@
     <title>Mareframe Decision Support Tool</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
     <link href="css/lib/bootstrap.min.css" rel="stylesheet" />
     <link href="css/body.css" rel="stylesheet" />
     <link href="css/footer.css" rel="stylesheet" />
     <link href="css/dialog.css" rel="stylesheet" />
+    <link href="css/debug.css" rel="stylesheet" />
 
     <link href="jQueryUI/jquery-ui.css" rel="stylesheet" />
     <link href="css/DST.css" rel="stylesheet" />
+    
 </head>
 <body>
     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
     <script src="https://code.createjs.com/createjs-2015.05.21.min.js"></script>
+
     <script src="https://www.google.com/jsapi"></script>
-    <script>
-        google.load("visualization", "1.0", { "packages": ["corechart", "table"] });
-    </script>
+    <script>google.load("visualization", "1.0", { "packages": ["corechart", "table"] });</script>
+
     <script src="js/math.min.js" type="text/javascript"></script>
     <script src="ts/Model.js" type="text/javascript"></script>
     <script src="ts/MareframeGUI.js" type="text/javascript"></script>
@@ -66,23 +70,24 @@
 
 
         <div style="padding: 1em 1em 0.5em 1.4em; font-size: 0.7em">
-            <button class="advButton" id="newDcmt">New Document</button>
-            <div class="LoadFileBtn advButton" id="lodDcmtDiv">
-                <span class="advButton">Open Document</span>
-                <input class="advButton upload" type="file" id="lodDcmt" />
-            </div>
+            <div style="float:left">
+                <button class="advButton" id="newDcmt">New Document</button>
+                <div class="LoadFileBtn advButton" id="lodDcmtDiv">
+                    <span class="advButton">Open Document</span>
+                    <input class="advButton upload" type="file" id="lodDcmt" />
+                </div>
 
-            <button class="advButton" id="savDcmt">Save Document</button>
-            <button class="advButton" id="resetDcmt">Reset</button>
-            <button class="advButton" id="newElmt">New Element</button>
-            <button class="advButton" id="newChance">New Chance</button>
-            <button class="advButton" id="newDec">New Decision</button>
-            <button class="advButton" id="newValue">New Value</button>
-            <button class="advButton" id="deleteElmt">Delete Element</button>
-            <button class="advButton" id="selectAllElmt">Select All</button>
-            <input class="advButton" type="checkbox" id="cnctTool">
-            <label for="cnctTool" class="advButton">Connect Tool</label> 
-            
+                <button class="advButton" id="savDcmt">Save Document</button>
+                <button class="advButton" id="resetDcmt">Reset</button>
+                <button class="advButton" id="newElmt">New Element</button>
+                <button class="advButton" id="newChance">New Chance</button>
+                <button class="advButton" id="newDec">New Decision</button>
+                <button class="advButton" id="newValue">New Value</button>
+                <button class="advButton" id="deleteElmt">Delete Element</button>
+                <button class="advButton" id="selectAllElmt">Select All</button>
+                <input class="advButton" type="checkbox" id="cnctTool">
+                <label for="cnctTool" class="advButton">Connect Tool</label>
+            </div>
             <div style="float:right">
                 <button class="button" id="fullscreen"> Fullscreen</button>
                 <input class="button" type="checkbox" id="editorMode">
@@ -97,15 +102,22 @@
 
     <div id="autoUpdateStatus" class="modeStatus"></div>
     <div id="modeStatus" class="modeStatus"></div>
+    <div id="saveFile_div"> <span>Filename: </span> <span id="filename">test</span> <span>.xdsl</span>
+        <!--<form name="saveFileForm" action="" onsubmit="Mareframe.DST.Tools.saveFileFormSubmit()" >
+            <label for="saveFileName">Filename: </label>
+            <input id="saveFileName" name="saveFileName" type="text" />
+        </form>-->
+        <a id="downloadLink"></a>
+    </div>
     
     <div id="MCAContainer" style="text-align:center">
 
         <!--MCA Tool canvas-->
-        <canvas id="MCATool" width="1000" height="600" style="display:inline-block"></canvas>
+        <canvas id="MCATool" width="800" height="600" style="display:inline-block"></canvas>
 
 
         <!--Data Table-->
-        <div id="MCADataTable" class="table-editable" style="display:inline-block ; vertical-align:top">
+        <div id="MCADataTable" class="table-editable" style="display:inline-block ; vertical-align:central">
             <table id="editableDataTable" class="table" style="border: 2px solid #ffffff;border-collapse:collapse;">
                 <tr id="table_header">
                     <th style="border: 1px solid black">UnDef</th>
@@ -128,52 +140,61 @@
 
 
     <!--Popup Dialog-->
-    <div id="detailsDialog">
-        <div class="info_div" style="width: 30%; overflow: hidden;">
+    <div id="detailsDialog" >
+        <div  class="info_div dialogDiv" style="width: 30%; overflow: visible;">
             <div class="info_div" style="width: 80px; float: left;"> Name: </div>
             <div class="info_div" id="info_name" style="margin-left: 50px;">  </div>
             <div class="info_div" id="info_type_tag"style="width: 80px; float: left;"> Type: </div>
             <div class="info_div" id="info_type" style="margin-left: 50px;">  </div>
         </div>
-        <div id="elementType">
+    <!--<ul id="testList">
+        <li>opt1</li>
+        <li>opt2</li>
+    </ul>-->
+        <div id="elementType" class="dialogDiv">
             <form >
                 <fieldset>
-                    <label for = "MCAelmtType" >Type of Element</label>
+                    <label for = "MCAelmtType" >Type of Element:</label>
                     <select name="MCAelmtType" id="MCAelmtType">
-                        <option id="optionAttribute" value="0">Attribute</option>
-                        <option id="optionObjective" value="1">Objective</option>
-                        <option id="optionAlternative" value="2">Alternative</option>
+                        <option id="optionAttribute" value="100">Attribute</option>
+                        <option id="optionObjective" value="101">Objective</option>
+                        <option id="optionAlternative" value="102">Alternative</option>
+                        <option id="optionGoal" value="103">Goal</option>
                     </select>
-
-                    <label for="MCAWeightingMethod">Type of Weighting Method</label>
+                </fieldset>
+            </form>
+        </div> <!--end elementType-->
+        <div id="weightingMethodSelector" class="dialogDiv">
+            <form>
+                <fieldset>
+                    <label for="MCAWeightingMethod">Type of Weighting Method:</label>
                     <select name="MCAWeightingMethod" id="MCAWeightingMethod">
                         <option id="optionSwingDirect" value="1">Swing / Direct</option>
                         <option id="optionValueFunction" value="2">Value Function</option>
                     </select>
                 </fieldset>
             </form>
-        </div>
-        <div id="weightingMethodSelector"></div>
-        <div id="valueFn_div">
+        </div> <!--end weightingMethodSelector-->
+        <div id="valueFn_div" class="dialogDiv">
             <canvas id="valueFn_canvas" width="100" height="100"></canvas>
             <button class="button" id="valueFn_Linear">Linearize</button>
             <button class="button" id="valueFn_Flip">Flip Direction</button>
         </div>
-        <div id="sliders_div"></div>
-        <div id="datatable_div"></div>
-        <div id="description_div"></div>
-        <div id="chart_div"></div>
-        <input class="dialogButton" type="checkbox" id="showDescription" checked>
-        <label for="showDescription" class="button">Hide Description</label>
-        <div id="userDescription_div"> </div>
-        <div class="editable ">
+        <div id="sliders_div" class="dialogDiv"></div>
+        <div id="datatable_div" class="dialogDiv"></div>
+        <div id="description_div" class="dialogDiv" ></div>
+        <div id="chart_div" class="dialogDiv"></div>
+        <input class="dialogButton dialogDiv" type="checkbox" id="showDescription" checked>
+        <label for="showDescription dialogDiv" class="button">Hide Description</label>
+        <div id="userDescription_div dialogDiv"> </div>
+        <div class="editable dialogDiv">
             <div id="defTable_div"></div>
         </div>
-        <button class="dialogButton" id="addDataRow">Add Data Row</button>
-        <button class="dialogButton" id="submit">Submit changes</button>
-        <button class="dialogButton" id="values">Show values</button>
+        <button class="dialogButton dialogDiv" id="addDataRow">Add Data Row</button>
+        <button class="dialogButton dialogDiv" id="submit">Submit changes</button>
+        <button class="dialogButton dialogDiv" id="values">Show values</button>
         <div id="valuesTable_div"></div>
-    </div>
+    </div> <!--end detailsDialog-->
     
     <script>
         function cnctPress() {
@@ -211,24 +232,28 @@
                 duration: 400
             },
             hide: {
-                effect: "scale",
+                //effect: "scale",
+                effect: "explode",
                 duration: 400
             },
-            
+            modal: false,
+            close: function () {
+                console.log("closing dialog html");
+                $("#valuesTable_div").hide();
+                $("#weightingMethodSelector").hide();
+                $("#valueFn_div").hide();
+                $("#sliders_div").hide();
+                $("#datatable_div").hide();
+                $("#description_div").hide();
+                $("#chart_div").hide();
+            }, // end close
+            //beforeclose: function (){ console.log("beforeclosing dialog");},
             buttons: {
-                Close: function () {
-                    $("#valuesTable_div").hide();
+                Close: function () {                 
                     $(this).dialog("close");
-                    $("#weightingMethodSelector").hide();
-                    $("#valueFn_div").hide();
-                    $("#sliders_div").hide();
-                    $("#datatable_div").hide();
-                    $("#description_div").hide();
-                    $("#chart_div").hide();
                 },
-            }
-        });
-
+            } // end buttons
+        }); // end dialog
         $("#weightingMethodSelector").hide();
         $("#valueFn_div").hide();
         $("#sliders_div").hide();
@@ -237,11 +262,13 @@
         $("#chart_div").hide();
         $("#valuesTable_div").hide();
         $("#saveFile_div").hide();
+        $("#addDataRow").hide();
+        $("#values").hide();
         $(document).ready(function () {
             var MareFrame = MareFrame || {};
             MareFrame.DST = MareFrame.DST || {};
             new Mareframe.DST.Handler();
-        });
+        }); // end ready function
 
     </script>
     <footer class="footer">

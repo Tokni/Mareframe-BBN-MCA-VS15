@@ -611,6 +611,7 @@ declare module JQueryUI {
         step?: number;
         value?: number;
         values?: number[];
+        slide?: SliderEvent; //change*******************************************************************************
     }
 
     interface SliderUIParams {

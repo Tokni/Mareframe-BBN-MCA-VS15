@@ -10,9 +10,20 @@
 
                 this.reset = this.reset.bind(this);
             }
-            saveModel(p_model: Model): void {
+            saveModel(p_model: Model, p_filename?: string): void {
                 //console.log("generating download link");
                 // encode the data into base64
+                //var regDigit = /\d/;
+                //for (var e in p_model.getElementArr()) {
+                //    var tmp3 = p_model.getElementArr();
+                //    var tmp = p_model.getElementArr()[e].getID().substr(0, 4);
+                //    var tmp4 = p_model.getElementArr()[e].getID().substr(4, 1);
+                //    var tmp5 = regDigit.test(p_model.getElementArr()[e].getID().substr(4, 1));
+                //    if (p_model.getElementArr()[e].getID().substr(0, 4) === "elmt" && regDigit.test(p_model.getElementArr()[e].getID().substr(4, 1))) { 
+                //        var tmp2 = p_model.getElementArr()[e].getID().substring(0, 4) + 's' + p_model.getElementArr()[e].getID().substring(4);
+                //        p_model.getElementArr()[e].setID(p_model.getElementArr()[e].getID().substring(0, 4) + 's' + p_model.getElementArr()[e].getID().substring(4) );
+                //    }
+                //}
                 var datastream = p_model.saveModel();
                 var base64: string = window.btoa(datastream);
                 
@@ -21,24 +32,31 @@
                 var a: any = $("#downloadLink").get(0);
 
                 a.href = 'data:application/octet-stream;base64,' + base64;
-                a.download = "test.xdsl";
+                if (p_filename == undefined) {
+                    a.download = "test.xdsl";
+                } else {
+                    a.download = p_filename;
+                }
                 a.innerHTML = 'Download';
                 
 
             }
-
             loadfromGenie(p_activeModelInstance: Model, p_updateGui: Function): any {
+                console.log("loadFromGenie");
                 var win: any = window;
+                
                 // Check for the various File API support.
                 if (win.File && win.FileReader && win.FileList && win.Blob) {
                     // Great success! All the File APIs are supported.
+                    
                     var fileInputObj:any = $("#lodDcmt").get(0)
                     var loadedFile = fileInputObj.files[0];
+                    //loadedFile.path 
 
                     ////console.log(loadedFile);
-
+                    
                     var reader = new FileReader();
-
+                    
                     reader.onload = (function (theFile) {
                         return function (e) {
                             ////console.log(e.target.result);
@@ -185,13 +203,14 @@
 
                         };
                     })(loadedFile);
+                    
                     fileInputObj.val = '';
                     reader.readAsText(loadedFile);
+                    
                 } else {
                     alert('The File APIs are not fully supported in this browser.');
                 }
             }
-
             quickSave(p_model: Model): void {
                 var json: string = JSON.stringify(p_model);
                 localStorage.setItem(p_model.getIdent(), json);
@@ -206,8 +225,7 @@
                 else {
                     return null;
                 }
-            }
-            
+            }           
             loadModel(p_modelStringIdent: string, p_activeModelInstance: Model, p_updateGui: Function): any {
                 console.log("attempting to load " + p_modelStringIdent);
                 var path: string = "JSON/";
@@ -241,17 +259,44 @@
                     case "test":
                         path += "test.json";
                         break;
+                    case "test1":
+                        path += "test1.json";
+                        break;
                     default:
-                        console.log("NO such file exists!!");
+                        console.log("NO such file exists!!   " + p_modelStringIdent);
                         break;
                 }
                 console.log("resulting path is: " + path);
                 //console.log("Data: " + JSON.stringify(data));
                 jQuery.getJSON(path, function (data) {
-                    //console.log(JSON.stringify(data));
+                    console.log("stringyfied Json: " + JSON.stringify(data));
+                    console.log("Pure json: " + data);
                     p_activeModelInstance.fromJSON(data);
                     p_updateGui();
                 });
+
+            }
+            loadMCAModelFromFile(p_activeModelInstance: Model, p_updateGui: Function) {
+                console.log("Loading MCA model from file");
+                var fileInputElement: any = $("#lodDcmt").get(0);
+                fileInputElement.files[0];
+                var file = fileInputElement.files[0];
+                console.log("file: " + file);
+                console.log("filename: " + file.name);
+                var fileReader = new FileReader();
+
+                fileReader.onload = function (p_evt) {
+                    var text = fileReader.result;
+                    console.log("loaded file: " + text);
+                    var jsonObj = JSON.parse(text);
+                    console.log("jsonObj: " + jsonObj);
+                    p_activeModelInstance.fromJSON(jsonObj);
+
+                    p_updateGui();
+                }
+
+                fileReader.readAsText(file); 
+                console.log("Result: " + fileReader.result);
 
             }
         }

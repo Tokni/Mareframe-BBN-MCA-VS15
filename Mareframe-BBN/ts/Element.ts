@@ -16,18 +16,109 @@
             public m_minitableEaselElmt: createjs.Container = new createjs.Container();
             private m_model: Model;
             private m_decision: number;
+            public m_dstType: number;
 
-            constructor(p_id: string, p_model: Model, p_type: number) {
+            //private m_swingWeightsArr: number[] = [];
+            public m_swingWeightsArr: any[] = [];
+
+            //private m_valueFunctionX: number;
+            //private m_valueFunctionY: number;
+            //private m_valueFunctionFlip: number;
+
+            //private m_dataMax: number;
+            //private m_dataArr: number[] = [];
+            //private m_dataUnit: string;
+            //private m_dataMin: number;
+
+            public m_valueFunctionX: number;
+            public m_valueFunctionY: number;
+            public m_valueFunctionFlip: number;
+
+            private m_dataMax: number;
+            private m_dataArr: number[] = [];
+            public m_dataUnit: string;
+            private m_dataMin: number;
+            private m_dataBaseLine: number;
+
+            constructor(p_id: string, p_model: Model, p_type: number, p_dstType?: number) {
                 if (p_id.substr(0, 4) == "elmt")
                 { this.m_id = p_id; }
                 else { this.m_id = "elmt" + p_id; }
                 if (p_type != undefined) {
-                    this.m_type = p_type; 
+                    if (this.m_dstType === 1) {
+                        this.m_type = p_type;
+                    } else {
+                        this.m_type = p_type;
+                    }
+                }
+                else {
+                    //console.log("type not defined");
+                    if (p_dstType === 1) {
+                        this.m_type = 101;
+                    } else {
+                        this.m_type = 1;
+                    }
                 }
                 this.m_model = p_model;
+                if (p_dstType !== undefined)
+                    this.m_dstType = p_dstType;
+                else
+                    this.m_dstType = 0;
                 this.getChildrenElements = this.getChildrenElements.bind(this);
+                this.m_swingWeightsArr = [];
             }
-
+            getDataBaseLine(): number {
+                return this.m_dataBaseLine;
+            }
+            setDataBaseLine(p_baseLine: number) {
+                this.m_dataBaseLine = p_baseLine;
+            }
+            getDataMax(): number {
+                return this.m_dataMax;
+            }
+            setDataMax(p_max: number) {
+                this.m_dataMax = p_max;
+                for (var i in this.m_dataArr) {
+                    if (this.m_dataArr[i] > p_max)
+                        this.m_dataMax = this.m_dataArr[i];
+                }
+            }
+            getDataMin(): number {
+                return this.m_dataMin;
+            }
+            setDataMin(p_min: number) {
+                this.m_dataMin = p_min;
+                for (var i in this.m_dataArr) {
+                    if (this.m_dataArr[i] < p_min)
+                        this.m_dataMin = this.m_dataArr[i];
+                }
+            }
+            getDataArrAtIndex(p_index: number) {
+                if (p_index >= 0 || p_index < this.m_dataArr.length)
+                    return this.m_dataArr[p_index];
+                else 
+                    return undefined;       
+            }
+            getDataArrLength(): number {
+                return this.m_dataArr.length;
+            }
+            changeDataArrAtIndex(p_index: number, p_value:number) {
+                if (p_index >= 0 || p_index < this.m_dataArr.length)
+                    this.m_dataArr[p_index] = p_value;
+                if (p_value < this.m_dataMin)
+                    this.m_dataMin = p_value;
+                if (p_value > this.m_dataMax)
+                    this.m_dataMax = p_value;
+            }
+            pushValueToDataArr(p_value) {
+                this.m_dataArr.push(p_value);
+            }
+            deleteValueAtIndex(p_index: number) {
+                this.m_dataArr.splice(p_index, 1);
+            }
+            dataArrLength() {
+                return this.m_dataArr.length;
+            }
             getValues(): any[][] {
                 return this.m_values;
             }
@@ -57,7 +148,6 @@
                 //console.log("Updated element " + this.getName());
                 this.m_updated = true;
             }
-
             getParentElements(): Element[] {
                 var elmt = this;
                 var parents = [];
@@ -69,7 +159,6 @@
                 ////console.log(elmt.getName() + " parents: " + parents);
                 return parents;
             }
-
             isParentOf(p_elmt: Element): boolean {
                 var retBool: boolean = false;
                 
@@ -84,7 +173,6 @@
                 console.log(" Is Parent Of: " + retBool);
                 return retBool;
             }
-
             isChildOf(p_elmt: Element): boolean {
                 var retBool: boolean = false;
 
@@ -99,8 +187,6 @@
                 console.log(" Is Child Of: " + retBool );
                 return retBool;
             }
-
-
             getChildrenElements(): Element[] {
                 var children: Element[] = [];
                 var elmt = this;
@@ -134,7 +220,6 @@
                 }
                 return ancestors;
             }
-
             getAllDecisionAncestors(): Element[] {
                 var decisions: Element[] = [];
                 this.getAllAncestors().forEach(function (e) {
@@ -144,7 +229,6 @@
                 });
                     return decisions;
             }
-
             isAncestorOf(elmt): boolean {
               //  console.log("checking if " + this.getName() + " is an ancestor of " + elmt.getName() + ": " + (this.getAllAncestors().indexOf(elmt) > -1));
                 return (this.getAllAncestors().indexOf(elmt) > -1);
@@ -169,7 +253,6 @@
                 //console.log("returned: " + decendants);
                 return decendants;
             }
-
             copyDefArray(): any[] {
                 var valueArray = [];
                 //console.log(this);
@@ -182,7 +265,6 @@
                 return valueArray;
 
             }
-
             updateData() {
                // console.log("updateData " + this.m_name);
                // console.log("data: " + this.m_data);
@@ -207,7 +289,6 @@
                     this.m_data = Tools.fillDataTable(this.m_data);
                 }
             }
-
             updateHeaderRows(p_originalData: any[][]): any[][] {
                 //console.log("updating header rows in " + this.getName())
                // console.log("data: " + p_originalData);
@@ -233,7 +314,6 @@
                 return data;
 
             }
-
 	        //returns the different variables (conditions or choices) that belong to the element
             getMainValues(): any[]{
                 //console.log(this.m_data);
@@ -250,11 +330,19 @@
                 }
                 ////console.log("new row: " + row);
                 return row;
-            }
-
-            
+            }          
             //MCA TOOL
-            getData(p_index?: number, p_secondary?: number): any {
+            getDataArr(p_index?: number, p_secondary?: number): any {
+                if (p_index != undefined) {
+                    var data: any = this.m_dataArr[p_index];
+                    if (p_secondary != undefined && data instanceof Array)
+                        data = data[p_secondary];
+                    return data;
+                } else {
+                    return this.m_dataArr;
+                }
+            }
+            getDataOld(p_index?: number, p_secondary?: number): any {
                 if (p_index != undefined) {
                     var data = this.m_data[p_index];
                     if (p_secondary != undefined && data instanceof Array)
@@ -264,7 +352,6 @@
                     return this.m_data;
                 }
             }
-
             setData(p_data: any, p_index?: number, p_secondary?: number): any {
                 if (p_index != undefined) {
                     if (p_secondary != undefined && this.m_data[p_index] instanceof Array) {
@@ -309,16 +396,34 @@
             getType(): number {
                 return this.m_type;
             }
+            getTypeName(): string {
+                switch (this.getType()) {
+                    case 100: return "Attribute";
+                        break;
+                    case 101: return "Objective";
+                        break;
+                    case 102: return "Alternative";
+                        break;
+                    case 103: return "Goal";
+                    default: console.log("No such element type name: " + this.getType() );
+                }
+            }
             setType(p_type: number): void {
                 this.m_type = p_type;
             }
             getMethod(): number {
                 return this.m_weightingMethod
             }
+            getMethodName(): string {
+                switch (this.getMethod()) {
+                    case 0: return "Direct"; break;
+                    case 1: return "Swing / Direct"; break;
+                    case 2: return "Value Function"; break;
+                }
+            }
             setMethod(p_weightingMethod: number): void {
                 this.m_weightingMethod = p_weightingMethod;
             }
-
             deleteConnection(p_connID: string): boolean {
 
                 var key = 0;
@@ -344,14 +449,13 @@
                     for (var index in this.m_connections) {
                         console.log(this.m_name + "  EAfter: " + this.m_connections[index].getID());
                     }
-                    console.log("Total conections: " + this.m_model.getConnectionArr().length);
-                    this.m_model.deleteConnection(p_connID);
-                    console.log("Total conections: " + this.m_model.getConnectionArr().length);
+                    //console.log("Total conections: " + this.m_model.getConnectionArr().length);
+                    //this.deleteConnection(p_connID);
+                    //console.log("Total conections: " + this.m_model.getConnectionArr().length);
 
                     return true;
                 }
             }
-
             deleteAllConnections(): any {
                 this.m_connections.forEach(function (p_conn: Connection) {
 
@@ -363,12 +467,86 @@
             getConnections(): Connection[] {
                 return this.m_connections;
             }
-
             toJSON(): any {
-                return { posX: this.m_easelElmt.x, posY: this.m_easelElmt.y, elmtID: this.getID(), elmtName: this.getName(), elmtDesc: this.getDescription(), elmtType: this.getType(), elmtData: this.getData(), elmtWghtMthd: this.getMethod() };
+                var retJson = 
+                {
+                    posX: this.m_easelElmt.x,
+                    posY: this.m_easelElmt.y,
+                    elmtValueFnX: this.m_valueFunctionX,
+                    elmtValueFnY: this.m_valueFunctionY,
+                    elmtValueFnFlip: this.m_valueFunctionFlip,
+                    elmtID: this.getID(),
+                    elmtName: this.getName(),
+                    elmtDesc: this.getDescription(),
+                    elmtType: this.getType(),
+                    
+                    elmtWghtMthd: this.getMethod(),
+                    elmtDstType: this.m_dstType,
+                    elmtDataMin: this.m_dataMin,
+                    elmtDataMax: this.m_dataMax,
+                    elmtDataUnit: this.m_dataUnit,
+                    elmtDataBaseLine: this.m_dataBaseLine
+                    }
+                if (this.getMethod() === 2)
+                    retJson["elmtDataArr"] = this.getDataArr();
+                if (this.getMethod() === 1 )
+                    retJson["elmtData"] = this.m_swingWeightsArr;
+                return retJson;
+                }            
+            toJSONOld(): any {
+                return {
+                    posX: this.m_easelElmt.x,
+                    posY: this.m_easelElmt.y,
+                    elmtID: this.getID(),
+                    elmtName: this.getName(),
+                    elmtDesc: this.getDescription(),
+                    elmtType: this.getType(),
+                    elmtData: this.getDataArr(),
+                    elmtWghtMthd: this.getMethod(),
+                    elmtDstType: this.m_dstType
+                };
             }
-
             fromJSON(p_jsonElmt: any): void {
+                // console.log("element.fromJSON()");
+                //console.log(p_jsonElmt);
+                this.m_easelElmt.x = p_jsonElmt.posX;
+                this.m_easelElmt.y = p_jsonElmt.posY;
+                this.m_id = p_jsonElmt.elmtID;
+                this.m_name = p_jsonElmt.elmtName;
+                //console.log("FromJSONname: " + this.m_name);
+                this.m_description = p_jsonElmt.elmtDesc;
+                this.m_type = p_jsonElmt.elmtType;
+                //this.m_data = p_jsonElmt.elmtData;
+                //console.log("FromJSONdata: " + this.m_data);
+                this.m_weightingMethod = p_jsonElmt.elmtWghtMthd;
+
+                switch (this.m_weightingMethod) {
+                    case 0: break;
+                    case 1:
+                        if (p_jsonElmt.elmtData) {
+                            for (var i = 0; i < p_jsonElmt.elmtData.length; i++) {
+                                this.m_swingWeightsArr[i] = p_jsonElmt.elmtData[i];
+                            }
+                        }
+                        break;
+
+                    case 2:
+                        this.m_dataBaseLine = p_jsonElmt.elmtDataBaseLine;
+                        this.m_dataMin = p_jsonElmt.elmtDataMin;
+                        this.m_dataMax = p_jsonElmt.elmtDataMax;
+                        this.m_dataArr = p_jsonElmt.elmtDataArr;
+                        this.m_dataUnit = p_jsonElmt.elmtDataUnit;
+                        this.m_valueFunctionX = p_jsonElmt.elmtValueFnX;
+                        this.m_valueFunctionY = p_jsonElmt.elmtValueFnY;
+                        this.m_valueFunctionFlip = p_jsonElmt.elmtValueFnFlip;
+                       
+                        break;
+                    default: console.log("Json Goof");
+                }
+                console.log("element " + p_jsonElmt.elmtName + " imported from JSON.");
+
+            }
+            fromJSONOld(p_jsonElmt: any): void {
                // console.log("element.fromJSON()");
                 //console.log(p_jsonElmt);
                 this.m_easelElmt.x = p_jsonElmt.posX;
@@ -378,12 +556,11 @@
                 //console.log("FromJSONname: " + this.m_name);
                 this.m_description = p_jsonElmt.elmtDesc;
                 this.m_type = p_jsonElmt.elmtType;
-                this.m_data = p_jsonElmt.elmtData;
+                //this.m_data = p_jsonElmt.elmtData;
                 //console.log("FromJSONdata: " + this.m_data);
                 this.m_weightingMethod = p_jsonElmt.elmtWghtMthd;
                 
             }
-
             getConnectionFrom(p_elmt: Element): Connection {
                 var retConnection: Connection = null;
 

@@ -40,7 +40,7 @@ module Mareframe {
 
                 
                 var loadModel: string = Tools.getUrlParameter('model');
-                loadModel = "scotland";
+                //loadModel = "scotland";
                 //loadModel = "sicily";
                 //loadModel = "baltic";
                 //loadModel = "northSea";
@@ -51,6 +51,10 @@ module Mareframe {
                 console.log("using model: " + loadModel);
                 if (loadModel !== null) {
                     this.m_fileHandler.loadModel(loadModel, this.m_activeModel, this.m_gui.importStage);
+                    var tmp = this.m_activeModel.getMainObjective();
+                    if (this.m_activeModel.getMainObjective() != undefined) {
+                        this.m_gui.setHasGoal(true);
+                    }
                     console.log("model loaded")
                     this.m_resetModel = JSON.stringify(this.m_activeModel);
                     //console.log("reset model: " + this.m_resetModel);
@@ -76,7 +80,7 @@ module Mareframe {
             addNewModel(): Model {
                 var bbnMode = (Tools.getUrlParameter('bbn') == "true");
                 //bbnMode = true;
-                bbnMode = false;
+                //bbnMode = false;
                 var mdl = new Model(bbnMode);
                 console.log("BBN mode is: " + mdl.m_bbnMode);
                 this.setActiveModel(mdl);
@@ -85,6 +89,7 @@ module Mareframe {
             setActiveModel(p_mdl: Model): void {
                 this.m_activeModel = p_mdl;
             }
+            //sdfghj
             getActiveModel(): Model {
                 return this.m_activeModel;
             }
