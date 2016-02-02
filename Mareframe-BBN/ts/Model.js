@@ -273,14 +273,14 @@ var Mareframe;
                         //calculate weights according to valueFn or sliders
                         console.log("Method num: " + p_elmt.getMethod());
                         if (p_elmt.getMethod() == 2) {
-                            for (var i = 2; i < this.getDataMatrix().length - 2; i++) {
-                                var toAdd = [this.m_elementArr[this.m_altIndex[i - 2]].getName(), p_elmt.getDataArrAtIndex(i - 2)];
+                            for (var i = 3; i < this.getDataMatrix().length - 2; i++) {
+                                var toAdd = [this.m_elementArr[this.m_altIndex[i - 3]].getName(), p_elmt.getDataArrAtIndex(i - 3)];
                                 if (!p_addHeader) {
-                                    var tmp = p_elmt.getDataArrAtIndex(i - 2);
-                                    var nom = p_elmt.getDataArrAtIndex(i - 2) - minVal;
+                                    var tmp = p_elmt.getDataArrAtIndex(i - 3);
+                                    var nom = p_elmt.getDataArrAtIndex(i - 3) - minVal;
                                     var denom = (maxVal - minVal);
                                     var frac = nom / denom;
-                                    toAdd.push(Mareframe.DST.Tools.getValueFn(Math.abs(p_elmt.m_valueFunctionFlip - (p_elmt.getDataArrAtIndex(i - 2) - minVal) / (maxVal - minVal)), Math.abs(p_elmt.m_valueFunctionFlip - p_elmt.m_valueFunctionX / 100), 1 - p_elmt.m_valueFunctionY / 100));
+                                    toAdd.push(Mareframe.DST.Tools.getValueFn(Math.abs(p_elmt.m_valueFunctionFlip - (p_elmt.getDataArrAtIndex(i - 3) - minVal) / (maxVal - minVal)), Math.abs(p_elmt.m_valueFunctionFlip - p_elmt.m_valueFunctionX / 100), 1 - p_elmt.m_valueFunctionY / 100));
                                 }
                                 console.log("toAdd: " + toAdd);
                                 tempMatrix.push(toAdd);
