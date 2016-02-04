@@ -162,7 +162,6 @@
                         }
                     }
                     console.log("best decision: " + bestDecRow + " , " + bestDecCol);
-
                 }
                 //console.log("p_header: " + p_header);
                 //console.log("data: " + data);

@@ -54,6 +54,10 @@
     <Content Include="JSON\MCA\scotland.json" />
     <Content Include="JSON\MCA\sicily.json" />
     <Content Include="JSON\MCA\test.json" />
+    <Content Include="ClassDiagram1.cd" />
+    <Content Include="JSON\BBN\HappinessExample.json" />
+    <Content Include="JSON\BBN\InvestmentExample.json" />
+    <Content Include="JSON\BBN\ResturantExample.json" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
