@@ -1148,7 +1148,6 @@ var Mareframe;
                 for (var i = 0; i < p_oldData.length; i++) {
                 }
                 if (!found) {
-                    console.log("HAAALOOOO");
                     newData = p_oldData;
                 }
                 //console.log("NewData: length: "  + newData.length);

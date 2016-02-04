@@ -1208,7 +1208,6 @@
                 }
 
                 if (!found) {
-                    console.log("HAAALOOOO");
                     newData = p_oldData;
                 }
 

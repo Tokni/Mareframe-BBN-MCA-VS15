@@ -469,6 +469,7 @@ module Mareframe {
                     $(".advButton").show();
                     $("#reset").show();
                     if (this.m_model.m_bbnMode) {
+                        $("#lodDcmtDiv").css("display", "inline-block"); //cannot use show here, because in firefox it adds the attribute "block" and the button is not inline
                         $("#newElmt").hide();
                         $("#newDcmt").hide();
                         /*$("#newChance").hide();
@@ -484,7 +485,7 @@ module Mareframe {
                     }
                 } else {
                     $(".advButton").hide();
-                    $("#lodDcmtDiv").hide();
+                   $("#lodDcmtDiv").hide();
                     $("#cnctTool").prop("checked", false);
                 }
                 var elementArr = this.m_model.getElementArr();
