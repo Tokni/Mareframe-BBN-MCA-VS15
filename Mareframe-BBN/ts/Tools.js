@@ -127,14 +127,30 @@ var Mareframe;
                     data = p_elmt.getValues();
                 }
                 var numOfHeaderRows = Tools.numOfHeaderRows(data);
-                if (p_elmt.getType() === 2 && p_header === "Values") {
-                    var highest = 1;
+                if (p_elmt.getType() == 2 && p_header === "Values") {
+                    var highestValue = 1;
                     for (var i = 2; i < data.length; i++) {
-                        if (data[numOfHeaderRows][i] > data[numOfHeaderRows][highest]) {
-                            highest = i;
+                        if (data[numOfHeaderRows][i] > data[numOfHeaderRows][highestValue]) {
+                            highestValue = i;
                         }
                     }
-                    console.log("highest is : " + highest);
+                    console.log("highest is : " + highestValue);
+                }
+                if (p_elmt.getType() == 1 && p_header === "Values") {
+                    var bestDecRow = numOfHeaderRows;
+                    var bestDecCol = 1;
+                    console.log("data length: " + data.length);
+                    console.log("data [0] length: " + data[0].length);
+                    for (var i = numOfHeaderRows + 1; i < data.length; i++) {
+                        for (var j = 1; j < data[0].length; j++) {
+                            console.log("i: " + i + " j: " + j);
+                            if (data[i][j] > data[bestDecRow][bestDecCol]) {
+                                bestDecRow = i;
+                                bestDecCol = j;
+                            }
+                        }
+                    }
+                    console.log("best decision: " + bestDecRow + " , " + bestDecCol);
                 }
                 //console.log("p_header: " + p_header);
                 //console.log("data: " + data);
@@ -172,7 +188,7 @@ var Mareframe;
                             htmlString += "<th><div class='editable_cell'> " + data[i][j] + "</div></th>";
                         }
                         else {
-                            if (j === highest) {
+                            if (j === highestValue || (i == bestDecRow && j == bestDecCol)) {
                                 htmlString += "<td> <b>" + Tools.round((data[i][j])) + "</b></td>";
                             }
                             else {

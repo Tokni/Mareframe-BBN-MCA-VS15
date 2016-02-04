@@ -1,0 +1,157 @@
+{
+  "elements": [
+    {
+      "posX": 973,
+      "posY": 136,
+      "elmtID": "elmtExercise",
+      "elmtName": "Exercise",
+      "elmtDesc": "This represent how much the user exercises. More exercise will result in better health but also in higher stress level.",
+      "elmtType": 1,
+      "elmtData": [
+        [ " None" ],
+        [ " Moderate" ],
+        [ "High" ]
+      ]
+    },
+    {
+      "posX": 676,
+      "posY": 71,
+      "elmtID": "elmtWork",
+      "elmtName": "Work",
+      "elmtDesc": "The represents how much the user works. More work will result in lower loneliness but also in higher stress level",
+      "elmtType": 1,
+      "elmtData": [
+        [ "None" ],
+        [ "Part time" ],
+        [ "Full time" ]
+      ]
+    },
+    {
+      "posX": 676,
+      "posY": 292,
+      "elmtID": "elmtStress",
+      "elmtName": "Stress Level",
+      "elmtDesc": "This represents the users stress level. The stress level is influenced by how busy the user is. A higher stress level will result in lower happiness.",
+      "elmtType": 0,
+      "elmtData": [
+        [ "    Low", 0.95, 0.89, 0.8, 0.75, 0.65, 0.7, 0.5, 0.3, 0.08, 0.9, 0.85, 0.75, 0.75, 0.5, 0.3, 0.5, 0.4, 0.1, 0.9, 0.85, 0.75, 0.78, 0.4, 0.2, 0.2, 0.1, 0.05 ],
+        [ "Medium", 0.04, 0.06, 0.14, 0.2, 0.28, 0.2, 0.4, 0.55, 0.27, 0.09, 0.1, 0.175, 0.2, 0.43, 0.55, 0.45, 0.5, 0.6, 0.09, 0.1, 0.15, 0.2, 0.5, 0.65, 0.55, 0.4, 0.1 ],
+        [ "High", 0.01, 0.05, 0.06, 0.05, 0.07, 0.1, 0.1, 0.15, 0.65, 0.01, 0.05, 0.075, 0.05, 0.07, 0.15, 0.05, 0.1, 0.3, 0.01, 0.05, 0.1, 0.02, 0.1, 0.15, 0.25, 0.5, 0.85 ]
+      ]
+    },
+    {
+      "posX": 676,
+      "posY": 501,
+      "elmtID": "elmtHappiness",
+      "elmtName": "Overall happiness",
+      "elmtDesc": "The represents the users overall happiness. The happiness is influenced by the users stress level, loneliness and health. Maximum happiness is 100 and mininum is 0.",
+      "elmtType": 2,
+      "elmtData": [ [ "Value", 75, 15, 70, 10, 45, 1, 100, 30, 90, 20, 55, 5 ] ]
+    },
+    {
+      "posX": 352,
+      "posY": 292,
+      "elmtID": "elmtLoneliness",
+      "elmtName": "Loneliness",
+      "elmtDesc": "This represents the users loneliness. The loneliness is influenced by how much the user works and how busy the users social life is. Higher loneliness wih result in lower happiness.",
+      "elmtType": 0,
+      "elmtData": [
+        [ "   Low", 0.1, 0.5, 0.65, 0.4, 0.8, 0.9, 0.55, 0.91, 0.95 ],
+        [ "   High", 0.9, 0.5, 0.35, 0.6, 0.2, 0.1, 0.45, 0.09, 0.05 ]
+      ]
+    },
+    {
+      "posX": 1132,
+      "posY": 292,
+      "elmtID": "elmtDiet",
+      "elmtName": "Diet",
+      "elmtDesc": "This represents the healthiness of the users diet. A healthy diet will result in better health.",
+      "elmtType": 1,
+      "elmtData": [
+        [ "Healthy" ],
+        [ "Unhealthy" ]
+      ]
+    },
+    {
+      "posX": 973,
+      "posY": 384,
+      "elmtID": "elmtHealth",
+      "elmtName": "Health",
+      "elmtDesc": "This represents the users health. The health is influenced by how much the users exercises and whether the user has a healthy diet. Better health will result in higher happiness.",
+      "elmtType": 0,
+      "elmtData": [
+        [ "Poor", 0.6, 0.95, 0.2, 0.65, 0.05, 0.6 ],
+        [ "Good", 0.4, 0.05, 0.8, 0.35, 0.95, 0.4 ]
+      ]
+    },
+    {
+      "posX": 255,
+      "posY": 70,
+      "elmtID": "elmtSocial",
+      "elmtName": "Social Life",
+      "elmtDesc": "This represents how busy the users social life is. A busier social life will result in lower loneliness but also in a higher stress level",
+      "elmtType": 1,
+      "elmtData": [
+        [ "Next to none" ],
+        [ "Moderate" ],
+        [ "Busy" ]
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "connInput": "elmtExercise",
+      "connOutput": "elmtHealth",
+      "connID": "conn10"
+    },
+    {
+      "connInput": "elmtDiet",
+      "connOutput": "elmtHealth",
+      "connID": "conn9"
+    },
+    {
+      "connInput": "elmtHealth",
+      "connOutput": "elmtHappiness",
+      "connID": "conn8"
+    },
+    {
+      "connInput": "elmtExercise",
+      "connOutput": "elmtStress",
+      "connID": "conn7"
+    },
+    {
+      "connInput": "elmtSocial",
+      "connOutput": "elmtStress",
+      "connID": "conn6"
+    },
+    {
+      "connInput": "elmtStress",
+      "connOutput": "elmtHappiness",
+      "connID": "conn5"
+    },
+    {
+      "connInput": "elmtSocial",
+      "connOutput": "elmtLoneliness",
+      "connID": "conn4"
+    },
+    {
+      "connInput": "elmtLoneliness",
+      "connOutput": "elmtHappiness",
+      "connID": "conn3"
+    },
+    {
+      "connInput": "elmtWork",
+      "connOutput": "elmtStress",
+      "connID": "conn2"
+    },
+    {
+      "connInput": "elmtWork",
+      "connOutput": "elmtLoneliness",
+      "connID": "conn1"
+    }
+  ],
+  "mdlName": "Happiness",
+  "dataMat": [ ],
+  "mdlIdent": "happiness",
+  "mdlDesc": ""
+}

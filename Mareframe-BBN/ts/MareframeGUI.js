@@ -132,7 +132,6 @@ var Mareframe;
                 this.allModeltoConsole = this.allModeltoConsole.bind(this);
                 this.allConnectionstoConsole = this.allConnectionstoConsole.bind(this);
                 this.addDataRowClick = this.addDataRowClick.bind(this);
-                //this.click = this.click.bind(this);
                 this.pressMove = this.pressMove.bind(this);
                 this.mouseDown = this.mouseDown.bind(this);
                 this.dblClick = this.dblClick.bind(this);
@@ -473,7 +472,7 @@ var Mareframe;
                 }
                 else {
                     $(".advButton").hide();
-                    $("#reset").hide();
+                    $("#lodDcmtDiv").hide();
                     $("#cnctTool").prop("checked", false);
                 }
                 var elementArr = this.m_model.getElementArr();

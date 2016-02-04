@@ -138,14 +138,31 @@
                     data = p_elmt.getValues();
                 }
                 var numOfHeaderRows = Tools.numOfHeaderRows(data);
-                if (p_elmt.getType() === 2 && p_header === "Values") {//Find best decision by finding the highest value
-                    var highest: number = 1;
+                if (p_elmt.getType() == 2 && p_header === "Values") {//Find best decision by finding the highest value in value value table
+                    var highestValue: number = 1;
                     for (var i = 2; i < data.length; i++) {
-                        if (data[numOfHeaderRows][i] > data[numOfHeaderRows][highest]) {
-                            highest = i;
+                        if (data[numOfHeaderRows][i] > data[numOfHeaderRows][highestValue]) {
+                            highestValue = i;
                         }
                     }
-                    console.log("highest is : " + highest);
+                    console.log("highest is : " + highestValue);
+                }
+                if (p_elmt.getType() == 1 && p_header === "Values") {//Find best decision by finding the highest value in dec value table
+                    var bestDecRow: number = numOfHeaderRows;
+                    var bestDecCol: number = 1;
+                    console.log("data length: " + data.length);
+                    console.log("data [0] length: " + data[0].length);
+                    for (var i = numOfHeaderRows + 1; i < data.length; i++) {
+                        for (var j = 1; j < data[0].length; j++) {
+                            console.log("i: " + i + " j: " + j);
+                            if (data[i][j] > data[bestDecRow][bestDecCol]) {
+                                bestDecRow = i;
+                                bestDecCol = j;
+                            }
+                        }
+                    }
+                    console.log("best decision: " + bestDecRow + " , " + bestDecCol);
+
                 }
                 //console.log("p_header: " + p_header);
                 //console.log("data: " + data);
@@ -178,7 +195,7 @@
                         if (j === 0) {
                             htmlString += "<th><div class='editable_cell'> " + data[i][j] + "</div></th>";
                         } else {
-                            if ( j === highest) {//mark highest if it is the value table of a value node
+                            if ( j === highestValue || (i == bestDecRow && j == bestDecCol)) {//mark highest if it is the value table of a value node
                                 htmlString += "<td> <b>" + Tools.round((data[i][j])) + "</b></td>";
                             }
                             else {
