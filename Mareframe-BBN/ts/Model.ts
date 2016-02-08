@@ -496,7 +496,8 @@
                     //if (JsonElmt.posY > maxY)
                     //    maxY = JsonElmt.posY;
                     elmt.fromJSON(JsonElmt);
-                   // console.log("created from json: " + elmt.getName());
+                    console.log("created from json: " + elmt.getName());
+                    console.log("position " + elmt.m_easelElmt.y);
                 }
 
                 for (var i = 0; i < p_jsonObject.connections.length; i++)

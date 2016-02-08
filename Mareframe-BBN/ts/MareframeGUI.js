@@ -17,10 +17,10 @@ var Mareframe;
                 this.m_mcaStageCanvas = this.m_mcaStage.canvas;
                 this.m_selectionBox = new createjs.Shape();
                 this.m_mcaSizeX = $(window).width();
-                this.m_mcaSizeY = 480;
+                this.m_mcaSizeY = $(window).height();
                 this.m_mcaContainer = new createjs.Container();
                 this.m_googleColors = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac", "#b77322", "#16d620", "#b91383", "#f4359e", "#9c5935", "#a9c413", "#2a778d", "#668d1c", "#bea413", "#0c5922", "#743411"];
-                this.m_mcaBackground = new createjs.Shape(new createjs.Graphics().beginFill("#ffffff").drawRect(0, 0, this.m_mcaSizeX, this.m_mcaSizeY));
+                this.m_mcaBackground = new createjs.Shape(new createjs.Graphics().beginFill("white").drawRect(0, 0, this.m_mcaSizeX, this.m_mcaSizeY));
                 this.m_valFnBackground = new createjs.Shape(new createjs.Graphics().beginFill("#ffffff").drawRect(0, 0, this.m_valueFnSize, this.m_valueFnSize));
                 this.m_updateMCAStage = true;
                 this.m_chartsLoaded = false;
@@ -133,6 +133,7 @@ var Mareframe;
                 this.allConnectionstoConsole = this.allConnectionstoConsole.bind(this);
                 this.addDataRowClick = this.addDataRowClick.bind(this);
                 this.pressMove = this.pressMove.bind(this);
+                this.pressUp = this.pressUp.bind(this);
                 this.mouseDown = this.mouseDown.bind(this);
                 this.dblClick = this.dblClick.bind(this);
                 this.clearSelection = this.clearSelection.bind(this);
@@ -151,7 +152,7 @@ var Mareframe;
                 this.createNewValue = this.createNewValue.bind(this);
                 this.createNewElement = this.createNewElement.bind(this);
                 this.deleteSelected = this.deleteSelected.bind(this);
-                this.quickLoad = this.quickLoad.bind(this);
+                this.resetDcmt = this.resetDcmt.bind(this);
                 this.updateModel = this.updateModel.bind(this);
                 this.mouseUp = this.mouseUp.bind(this);
                 this.selectAll = this.selectAll.bind(this);
@@ -172,6 +173,7 @@ var Mareframe;
                 this.m_valFnBackground.addEventListener("pressmove", this.moveValFnCP);
                 this.m_valFnBackground.addEventListener("mousedown", this.downValFnCP);
                 this.m_mcaBackground.addEventListener("pressmove", this.pressMove);
+                this.m_mcaBackground.addEventListener("pressup", this.pressUp);
                 this.m_controlP.mouseChildren = false;
                 $("#selectModel").on("change", this.selectModel);
                 $("#MCAelmtType").on("change", this.optionTypeChange);
@@ -188,7 +190,7 @@ var Mareframe;
                 $("#editorMode").on("click", this.setEditorMode);
                 $("#showDescription").on("click", this.setShowDescription);
                 $("#autoUpdate").on("click", this.setAutoUpdate);
-                $("#resetDcmt").on("click", this.quickLoad);
+                $("#resetDcmt").on("click", this.resetDcmt);
                 $("#updateMdl").on("click", this.updateModel);
                 $("#selectAllElmt").on("click", this.selectAll);
                 $("#savDcmt").on("click", this.saveModel);
@@ -272,10 +274,10 @@ var Mareframe;
             };
             GUIHandler.prototype.updateModel = function () {
                 this.m_model.update();
-                this.updateMiniTable(this.m_model.getElementArr());
+                this.updateMiniTables(this.m_model.getElementArr());
             };
             GUIHandler.prototype.setSize = function (p_width, p_height) {
-                console.log("setting size");
+                console.log("setting size to " + p_width + " , " + p_height);
                 this.m_mcaStageCanvas.height = p_height;
                 this.m_mcaStageCanvas.width = p_width;
                 this.m_mcaBackground.scaleY = p_height / this.m_mcaSizeY;
@@ -287,9 +289,8 @@ var Mareframe;
                 this.m_mcaStageCanvas.height += p_y;
                 this.m_mcaStageCanvas.width += p_x;
             };
-            GUIHandler.prototype.quickLoad = function () {
+            GUIHandler.prototype.resetDcmt = function () {
                 console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
-                console.log("quickLoad");
                 this.clearSelection();
                 if (this.m_handler.getFileIO().reset() === null) {
                     var loadModel = DST.Tools.getUrlParameter('model');
@@ -327,7 +328,7 @@ var Mareframe;
                     this.updateTable(this.m_model.getDataMatrix());
                 }
                 else {
-                    this.updateMiniTable(elmts);
+                    this.updateMiniTables(elmts);
                 }
                 this.m_updateMCAStage = true;
                 //this.m_handler.getFileIO().quickSave(this.m_model); //This is commented out the because it was preventing reset from working properly
@@ -343,18 +344,22 @@ var Mareframe;
                 //$("#mTarget").html("Target: " + tmp );
                 this.m_updateMCAStage = true;
             };
+            GUIHandler.prototype.pressUp = function (p_evt) {
+                console.log("pressup");
+                this.updateSize();
+            };
             GUIHandler.prototype.mouseMove = function (p_evt) {
                 if ($("cnctTool").prop("checked")) {
                 }
             };
             GUIHandler.prototype.updateElement = function (p_elmt) {
                 p_elmt.m_easelElmt.removeAllChildren();
-                var shape = new createjs.Shape();
-                shape.graphics.f(this.m_elementColors[p_elmt.getType()][0]).s(this.m_elementColors[p_elmt.getType()][1]);
                 var elmtShapeType = 2;
                 if (this.m_model.m_bbnMode) {
                     elmtShapeType = p_elmt.getType();
                 }
+                var shape = new createjs.Shape();
+                shape.graphics.f(this.m_elementColors[elmtShapeType][0]).s(this.m_elementColors[elmtShapeType][1]);
                 switch (elmtShapeType) {
                     case 0:
                         //chance
@@ -367,6 +372,7 @@ var Mareframe;
                     case 2:
                         //Value
                         shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
+                        break;
                     default:
                         break;
                 }
@@ -381,12 +387,10 @@ var Mareframe;
                 if (this.m_model.m_bbnMode) {
                 }
             };
-            GUIHandler.prototype.updateMiniTable = function (p_elmtArr) {
+            GUIHandler.prototype.updateMiniTables = function (p_elmtArr) {
                 //console.log("updating minitable");
                 for (var j = 0; j < p_elmtArr.length; j++) {
                     var elmt = p_elmtArr[j];
-                    //console.log(elmt.getName());
-                    // if (elmt.getType() !== 2) {
                     //  console.log(elmt.getName() + " minitable is being updated");
                     var backgroundColors = ["#c6c6c6", "#bfbfe0"];
                     var decisionCont = elmt.m_minitableEaselElmt;
@@ -415,6 +419,9 @@ var Mareframe;
                             decisionCont.addChild(decisRect);
                             decisionCont.addChild(decisName);
                             var valueData = elmt.getValues()[i][1];
+                            if (valueData == -Infinity) {
+                                valueData = 0;
+                            }
                             var decisBarBackgr = new createjs.Shape(new createjs.Graphics().f(backgroundColor).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
                             var decisBar = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
                             if (elmt.getType() === 0) {
@@ -481,10 +488,12 @@ var Mareframe;
                     for (var i = 0; i < elementArr.length; i++) {
                         if (this.m_editorMode) {
                             elementArr[i].m_easelElmt.addEventListener("pressmove", this.pressMove);
+                            elementArr[i].m_easelElmt.addEventListener("pressup", this.pressUp);
                             this.m_model.setDecision(elementArr[i].getID(), elementArr[i].getDecision()); //Unsets all decisions
                         }
                         else {
                             elementArr[i].m_easelElmt.removeEventListener("pressmove", this.pressMove);
+                            elementArr[i].m_easelElmt.removeEventListener("pressup", this.pressUp);
                         }
                     }
                     this.updateModel();
@@ -495,32 +504,81 @@ var Mareframe;
                 var model = this.m_model;
                 // this.m_handler.getFileIO().quickSave(model);
                 //var modelIdent = model.getIdent();
-                var json = JSON.stringify(model);
-                sessionStorage.setItem(model.getIdent(), json);
+                //var json: string = JSON.stringify(model);
+                //sessionStorage.setItem(model.getIdent(), json);
                 console.log("fullscreen pressed");
                 if (!this.m_fullscreen) {
-                    console.log("was not in fullscreen");
+                    //console.log("was not in fullscreen");
                     $(".row").hide();
-                    this.setSize($(window).width(), $(window).height());
+                    $(".footer").hide();
+                    var modelPos = this.getModelPos();
+                    this.setSize(Math.max(modelPos[3], $(window).width()), Math.max(modelPos[1], $(window).height()));
                     this.m_fullscreen = true;
                 }
                 else {
-                    console.log("was in fullscreen");
+                    //console.log("was in fullscreen");
                     $(".row").show();
+                    $(".footer").show();
+                    this.repositionModel();
                     this.updateSize();
                     this.m_fullscreen = false;
                 }
-                json = JSON.parse(sessionStorage.getItem(this.m_handler.getActiveModel().getIdent()));
+                //json = JSON.parse(sessionStorage.getItem(this.m_handler.getActiveModel().getIdent()));
                 //json = JSON.parse(sessionStorage.getItem(modelIdent));
-                model.fromJSON(json);
-                this.importStage();
-                console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
+                //model.fromJSON(json);
+                // this.importStage(); 
+                this.m_updateMCAStage = true;
+            };
+            //Moves all elements to a reasonable position
+            GUIHandler.prototype.repositionModel = function () {
+                var modelPos = this.getModelPos();
+                var lowestElement = modelPos[0];
+                var highestElement = modelPos[1];
+                var leftmostElement = modelPos[2];
+                var rightmostElement = modelPos[3];
+                var moveDistanceX = 0;
+                var moveDistanceY = 0;
+                if (highestElement > 50) {
+                    moveDistanceY = -highestElement + 50;
+                }
+                if (this.getModelSize()[0] > $(window).width()) {
+                    if (leftmostElement > 100) {
+                        moveDistanceX = -leftmostElement + 100;
+                    }
+                }
+                else {
+                    moveDistanceX = $(window).width() / 2 - (leftmostElement + (rightmostElement - leftmostElement) / 2);
+                }
+                this.moveAllElements(moveDistanceX, moveDistanceY);
             };
             GUIHandler.prototype.updateSize = function () {
+                console.log("updating size");
                 var gui = this;
-                var lowestElement = this.m_mcaSizeY;
+                var modelPos = this.getModelPos();
+                var lowestElement = modelPos[0];
+                var highestElement = modelPos[1];
+                var leftmostElement = modelPos[2];
+                var rightmostElement = modelPos[3];
+                var moveDistanceX = 0;
+                var moveDistanceY = 0;
+                console.log("highest element: " + highestElement);
+                console.log("lowest element: " + lowestElement);
+                console.log("rightmost element: " + rightmostElement);
+                console.log("leftmost element: " + leftmostElement);
+                this.m_updateMCAStage = true;
+                this.setSize(Math.max($(window).width(), rightmostElement), lowestElement); //Sets size 
+            };
+            GUIHandler.prototype.getModelSize = function () {
+                var modelPos = this.getModelPos();
+                return [modelPos[3] - modelPos[2], modelPos[1] - modelPos[0]];
+            };
+            //Returns a list containing lowest, highest, leftmost and rightmost element in that order
+            GUIHandler.prototype.getModelPos = function () {
+                var gui = this;
+                var lowestElement = 0;
                 var highestElement = $(window).height();
-                console.log("hitarea position: " + this.m_mcaContainer.y);
+                var leftmostElement = $(window).width();
+                var rightmostElement = 0;
                 this.m_model.getElementArr().forEach(function (e) {
                     //console.log("e y = " + (e.m_easelElmt.y + gui.m_mcaContainer.y) + " and lowestElement: " + lowestElement);
                     if (e.m_easelElmt.y + gui.m_mcaContainer.y > lowestElement) {
@@ -529,39 +587,38 @@ var Mareframe;
                     if (e.m_easelElmt.y + gui.m_mcaContainer.y < highestElement) {
                         highestElement = e.m_easelElmt.y + gui.m_mcaContainer.y;
                     }
+                    if (e.m_easelElmt.x + gui.m_mcaContainer.x < leftmostElement) {
+                        leftmostElement = e.m_easelElmt.x + gui.m_mcaContainer.x;
+                    }
+                    if (e.m_easelElmt.x + gui.m_mcaContainer.x > rightmostElement) {
+                        rightmostElement = e.m_easelElmt.x + gui.m_mcaContainer.x + 250;
+                    }
                 });
-                console.log("highest element: " + highestElement);
-                if (highestElement > 50) {
-                    var moveDistance = highestElement - 50;
-                    this.m_mcaContainer.y -= moveDistance;
-                    this.m_updateMCAStage = true;
-                    lowestElement -= moveDistance;
-                }
-                this.setSize(this.m_mcaSizeX, lowestElement); //Sets the height to be where the lowest element is
+                return [lowestElement, highestElement, leftmostElement, rightmostElement];
             };
             GUIHandler.prototype.createNewChance = function (p_evt) {
                 var elmt = this.m_model.createNewElement(0);
                 this.addElementToStage(elmt);
                 elmt.update();
-                this.updateMiniTable([elmt]);
+                this.updateMiniTables([elmt]);
             };
             GUIHandler.prototype.createNewDec = function (p_evt) {
                 var elmt = this.m_model.createNewElement(1);
                 this.addElementToStage(elmt);
                 elmt.update();
-                this.updateMiniTable([elmt]);
+                this.updateMiniTables([elmt]);
             };
             GUIHandler.prototype.createNewValue = function (p_evt) {
                 var elmt = this.m_model.createNewElement(2);
                 this.addElementToStage(elmt);
                 elmt.update();
-                this.updateMiniTable([elmt]);
+                this.updateMiniTables([elmt]);
             };
             GUIHandler.prototype.createNewElement = function (p_evt) {
                 var elmt = this.m_model.createNewElement(undefined);
                 this.addElementToStage(elmt);
                 // elmt.update();
-                this.updateMiniTable([elmt]);
+                this.updateMiniTables([elmt]);
             };
             GUIHandler.prototype.deleteSelected = function (p_evt) {
                 console.log("deleting");
@@ -620,6 +677,7 @@ var Mareframe;
                 }
                 if (this.m_editorMode) {
                     p_elmt.m_easelElmt.addEventListener("pressmove", this.pressMove);
+                    p_elmt.m_easelElmt.addEventListener("pressup", this.pressUp);
                 }
                 p_elmt.m_easelElmt.addEventListener("mousedown", this.mouseDown);
                 p_elmt.m_easelElmt.on("dblclick", this.dblClick);
@@ -1325,7 +1383,7 @@ var Mareframe;
             };
             GUIHandler.prototype.pressMove = function (p_evt) {
                 var gui = this;
-                console.log("press move on target " + p_evt.target.name);
+                //console.log("press move on target " + p_evt.target.name);
                 $("#mX").html("X: " + p_evt.stageX);
                 $("#mY").html("Y: " + p_evt.stageY);
                 $("#mAction").html("Action: PressMove");
@@ -1339,23 +1397,12 @@ var Mareframe;
                         this.m_mcaContainer.addChild(this.m_selectionBox);
                     }
                     else if (this.m_editorMode) {
-                        //console.log("elements off screen: "); // + this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
-                        if (!this.elementOffScreen(undefined, p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
+                        //console.log("elements off screen: "+ this.elementOffScreen( p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
+                        if (!this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
                             //console.log("panning");
                             $("#mAction").html("Action: Panning");
                             //This moves all elements instead of the background
-                            this.m_model.getElementArr().forEach(function (e) {
-                                e.m_easelElmt.x += p_evt.stageX - gui.m_oldX;
-                                e.m_easelElmt.y += p_evt.stageY - gui.m_oldY;
-                                e.m_minitableEaselElmt.x += p_evt.stageX - gui.m_oldX;
-                                e.m_minitableEaselElmt.y += p_evt.stageY - gui.m_oldY;
-                                //console.log("selected elements: " + this.m_selectedItems);
-                                //        console.log("element: " + elmt.name);
-                                for (var j = 0; j < e.getConnections().length; j++) {
-                                    var c = e.getConnections()[j];
-                                    gui.updateConnection(c);
-                                }
-                            });
+                            this.moveAllElements(p_evt.stageX - gui.m_oldX, p_evt.stageY - gui.m_oldY);
                             /*this.m_mcaContainer.x += p_evt.stageX - this.m_oldX;
                             this.m_mcaContainer.y += p_evt.stageY - this.m_oldY;
                                 */
@@ -1370,7 +1417,8 @@ var Mareframe;
                         $("#mAction").html("connecting");
                     }
                     else {
-                        if (!this.elementOffScreen(this.m_selectedItems, p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
+                        //console.log("elements off screen: " + this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
+                        if (!this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
                             for (var i = 0; i < this.m_selectedItems.length; i++) {
                                 var elmt = this.m_selectedItems[i];
                                 elmt.x += p_evt.stageX - this.m_oldX;
@@ -1388,7 +1436,22 @@ var Mareframe;
                 }
                 this.m_oldX = p_evt.stageX;
                 this.m_oldY = p_evt.stageY;
+                // console.log("this.m_mcaSizeX " + this.m_mcaSizeX);
                 this.m_updateMCAStage = true;
+            };
+            GUIHandler.prototype.moveAllElements = function (xDistance, yDistance) {
+                var gui = this;
+                this.m_model.getElementArr().forEach(function (e) {
+                    //console.log("moving element from " + e.m_easelElmt.y + " to " + (e.m_easelElmt.y + yDistance));
+                    e.m_easelElmt.x += xDistance;
+                    e.m_easelElmt.y += yDistance;
+                    e.m_minitableEaselElmt.x += xDistance;
+                    e.m_minitableEaselElmt.y += yDistance;
+                    for (var j = 0; j < e.getConnections().length; j++) {
+                        var c = e.getConnections()[j];
+                        gui.updateConnection(c);
+                    }
+                });
             };
             GUIHandler.prototype.resizeWindow = function () {
                 var maxX = 0; // Right edge
@@ -1414,7 +1477,7 @@ var Mareframe;
                     this.increaseSize(moveDistance, 0);
                     window.scrollBy(moveDistance, 0);
                 }
-                /*else if (maxX < this.m_mcaStageCanvas.width - 100 && this.m_mcaStageCanvas.width > this.m_mcaSizeX) {
+                /*else if (maxX < this.m_mcaStageCanvas.width - 100) {
                     this.increaseSize(-moveDistance, 0);
                 }*/
                 //console.log("max y: " + maxY + " canvas heigth: " + this.m_mcaStageCanvas.height);
@@ -1423,32 +1486,17 @@ var Mareframe;
                     window.scrollBy(0, moveDistance);
                 }
             };
-            GUIHandler.prototype.elementOffScreen = function (array, xMovement, yMovement) {
-                //console.log("checking if elements are off screen");
-                var gui = this;
-                var elementOffScreen = false;
-                if (array === undefined) {
-                    array = [];
-                    this.m_model.getElementArr().forEach(function (e) {
-                        array.push(e.m_easelElmt);
-                        array.push(undefined); //This is needed because this is placeholder for minitables
-                    });
-                }
-                var miniTable = false;
-                array.forEach(function (e) {
-                    if (!miniTable) {
-                        // console.log("element x: " + (e.x + gui.m_mcaContainer.x));
-                        if (e.x + gui.m_mcaContainer.x - 80 + xMovement < 0) {
-                            //console.log("off screeen");
-                            elementOffScreen = true;
-                        } //console.log("element y: " + (e.y + gui.m_mcaContainer.y - 30 + yMovement));
-                        if (e.y + gui.m_mcaContainer.y - 30 + yMovement < 0) {
-                            elementOffScreen = true;
-                        }
-                    }
-                    miniTable = !miniTable; //every second element is a minitable
-                });
-                return elementOffScreen;
+            GUIHandler.prototype.elementOffScreen = function (xMovement, yMovement) {
+                var modelPos = this.getModelPos();
+                var lowestElement = modelPos[0];
+                var highestElement = modelPos[1];
+                var leftmostElement = modelPos[2];
+                var rightmostElement = modelPos[3];
+                //console.log("highest element: " + highestElement);
+                //console.log("lowest element: " + lowestElement);
+                //console.log("rightmost element: " + rightmostElement);
+                //console.log("leftmost element: " + leftmostElement);
+                return highestElement - 30 + yMovement < 0 || leftmostElement - 80 + xMovement < 0 || lowestElement + yMovement - 30 > this.m_mcaStageCanvas.height || rightmostElement - 80 + xMovement > this.m_mcaStageCanvas.width;
             };
             GUIHandler.prototype.tick = function () {
                 if (this.m_updateMCAStage) {
