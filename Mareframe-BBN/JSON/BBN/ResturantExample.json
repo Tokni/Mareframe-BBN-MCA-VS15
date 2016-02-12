@@ -1,0 +1,159 @@
+{
+  "elements": [
+    {
+      "posX": 730,
+      "posY": 557,
+      "elmtID": "elmtFinancialGain",
+      "elmtName": "Financial Gain",
+      "elmtDesc": "This represents the financial gian from the resturant. This depends on expences, food budget and popularity.",
+      "elmtType": 2,
+      "elmtData": [ [ "Value", -1000, 0, 500, -1500, -500, 250, -2000, -1000, 500, 250, 1000, 2000, 0, 500, 1000, -500, 0, 1000 ] ]
+    },
+    {
+      "posX": 1027,
+      "posY": 448,
+      "elmtID": "elmtBugdet",
+      "elmtName": "Food Bugdet",
+      "elmtDesc": "This represents how large the food budget is. A higher food bugdet will result in higher quality food.",
+      "elmtType": 1,
+      "elmtData": [
+        [ " Low" ],
+        [ " Medium" ],
+        [ " High" ]
+      ]
+    },
+    {
+      "posX": 360,
+      "posY": 52,
+      "elmtID": "elmtWaiters",
+      "elmtName": "No. of Waiters ",
+      "elmtDesc": "This represents the number of waiters and waitresses working in the resturant. A higher number of waiters and waitresses will result in higher quality of service but also in higher expences.",
+      "elmtType": 1,
+      "elmtData": [
+        [ "Low" ],
+        [ " Medium" ],
+        [ " High" ]
+      ]
+    },
+    {
+      "posX": 1023,
+      "posY": 52,
+      "elmtID": "elmtChefs",
+      "elmtName": "No. of Chefs",
+      "elmtDesc": "This represents the number of chefs working in the resturant. A higher number of chefs will result in higher quality food but also in higher expences.",
+      "elmtType": 1,
+      "elmtData": [
+        [ "Low" ],
+        [ " Medium" ],
+        [ " High" ]
+      ]
+    },
+    {
+      "posX": 1025,
+      "posY": 268,
+      "elmtID": "elmtFood",
+      "elmtName": "Quality of Food",
+      "elmtDesc": "This represents the quality of the food in the resturant. The quality of the food depends on number of chefs working in the resturant and how generous the food bugdet is. A higher quality of food will result in higher popularity.",
+      "elmtType": 0,
+      "elmtData": [
+        [ "    Low", 0.8, 0.7, 0.5, 0.4, 0.25, 0.2, 0.2, 0.1, 0.01 ],
+        [ "    Medium", 0.19, 0.2, 0.3, 0.5, 0.5, 0.4, 0.6, 0.2, 0.09 ],
+        [ "   High", 0.01, 0.1, 0.2, 0.1, 0.25, 0.4, 0.2, 0.7, 0.9 ]
+      ]
+    },
+    {
+      "posX": 362,
+      "posY": 235,
+      "elmtID": "elmtService",
+      "elmtName": "Quality of Service",
+      "elmtDesc":  "This represents the quality of the service in the resturant. The quality of the service depends on number of waiters and waitresses working in the resturant. A higher quality of service will result in higher popularity.",
+      "elmtType": 0,
+      "elmtData": [
+        [ " Low", 0.8, 0.4, 0.1 ],
+        [ " Medium", 0.19, 0.3, 0.3 ],
+        [ "  High", 0.01, 0.3, 0.6 ]
+      ]
+    },
+    {
+      "posX": 363,
+      "posY": 373,
+      "elmtID": "elmtPopularity",
+      "elmtName": "Popularity",
+      "elmtDesc": "This represents the popularity of the resturant. The popularity depends on the quality of food and service in the resturant. A higher popularity will result in higher financial gain.",
+      "elmtType": 0,
+      "elmtData": [
+        [ "  Low", 0.9, 0.85, 0.7, 0.7, 0.2, 0.2, 0.2, 0.05, 0.05 ],
+        [ "  Medium", 0.09, 0.14, 0.25, 0.25, 0.5, 0.4, 0.7, 0.3, 0.15 ],
+        [ "  High", 0.01, 0.01, 0.05, 0.05, 0.3, 0.4, 0.1, 0.65, 0.8 ]
+      ]
+    },
+    {
+      "posX": 730,
+      "posY": 177,
+      "elmtID": "elmtExpences",
+      "elmtName": "Expences",
+      "elmtDesc": "This represents the wage expences in the resturant. The expences depend on the number of staff working in the resturan. Higher expences will result in lower financial gain.",
+      "elmtType": 0,
+      "elmtData": [
+        [ "  High", 0.1, 0.2, 0.4, 0.25, 0.5, 0.7, 0.65, 0.85, 0.95 ],
+        [ "  Low", 0.9, 0.8, 0.6, 0.75, 0.5, 0.3, 0.35, 0.15, 0.05 ]
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "connInput": "elmtChefs",
+      "connOutput": "elmtExpences",
+      "connID": "conn10"
+    },
+    {
+      "connInput": "elmtWaiters",
+      "connOutput": "elmtExpences",
+      "connID": "conn9"
+    },
+    {
+      "connInput": "elmtFood",
+      "connOutput": "elmtPopularity",
+      "connID": "conn8"
+    },
+    {
+      "connInput": "elmtService",
+      "connOutput": "elmtPopularity",
+      "connID": "conn7"
+    },
+    {
+      "connInput": "elmtWaiters",
+      "connOutput": "elmtService",
+      "connID": "conn6"
+    },
+    {
+      "connInput": "elmtBugdet",
+      "connOutput": "elmtFood",
+      "connID": "conn5"
+    },
+    {
+      "connInput": "elmtChefs",
+      "connOutput": "elmtFood",
+      "connID": "conn4"
+    },
+    {
+      "connInput": "elmtPopularity",
+      "connOutput": "elmtFinancialGain",
+      "connID": "conn3"
+    },
+    {
+      "connInput": "elmtBugdet",
+      "connOutput": "elmtFinancialGain",
+      "connID": "conn2"
+    },
+    {
+      "connInput": "elmtExpences",
+      "connOutput": "elmtFinancialGain",
+      "connID": "conn1"
+    }
+  ],
+  "mdlName": "Opening a resurant",
+  "dataMat": [ ],
+  "mdlIdent": "resturant",
+  "mdlDesc": ""
+}

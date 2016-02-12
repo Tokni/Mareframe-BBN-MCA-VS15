@@ -24,7 +24,6 @@
   <ItemGroup>
     <Content Include="BBN.html" />
     <Content Include="css\body.css" />
-    <Content Include="css\debug.css" />
     <Content Include="css\dialog.css" />
     <Content Include="css\DST.css" />
     <Content Include="css\footer.css" />
@@ -36,7 +35,6 @@
     <Content Include="js\math.min.js" />
     <Content Include="MCA.html" />
     <Content Include="saveFile.php" />
-    <Content Include="testPage.html" />
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -56,9 +54,10 @@
     <Content Include="JSON\MCA\scotland.json" />
     <Content Include="JSON\MCA\sicily.json" />
     <Content Include="JSON\MCA\test.json" />
-    <Content Include="JSON\MCA\test1.json" />
-    <Content Include="JSON\MCA\scotlandForParis.json" />
-    <Content Include="JSON\MCA\test3.json" />
+    <Content Include="ClassDiagram1.cd" />
+    <Content Include="JSON\BBN\HappinessExample.json" />
+    <Content Include="JSON\BBN\InvestmentExample.json" />
+    <Content Include="JSON\BBN\ResturantExample.json" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -80,10 +79,7 @@
     <TypeScriptCompile Include="ts\Handler.ts" />
     <TypeScriptCompile Include="ts\MareframeGUI.ts" />
     <TypeScriptCompile Include="ts\Model.ts" />
-    <TypeScriptCompile Include="ts\TKN_Dialog.ts" />
-    <TypeScriptCompile Include="ts\TKN_Widget.ts" />
     <TypeScriptCompile Include="ts\Tools.ts" />
-    <TypeScriptCompile Include="ts\ValueFunction.ts" />
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup>
@@ -102,7 +98,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>57950</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:57957/</IISUrl>
+          <IISUrl>http://localhost:57670/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>http://localhost:57951/</CustomServerUrl>
