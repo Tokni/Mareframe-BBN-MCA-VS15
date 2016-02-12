@@ -36,6 +36,7 @@
     <Content Include="js\math.min.js" />
     <Content Include="MCA.html" />
     <Content Include="saveFile.php" />
+    <Content Include="testPage.html" />
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -79,7 +80,10 @@
     <TypeScriptCompile Include="ts\Handler.ts" />
     <TypeScriptCompile Include="ts\MareframeGUI.ts" />
     <TypeScriptCompile Include="ts\Model.ts" />
+    <TypeScriptCompile Include="ts\TKN_Dialog.ts" />
+    <TypeScriptCompile Include="ts\TKN_Widget.ts" />
     <TypeScriptCompile Include="ts\Tools.ts" />
+    <TypeScriptCompile Include="ts\ValueFunction.ts" />
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup>

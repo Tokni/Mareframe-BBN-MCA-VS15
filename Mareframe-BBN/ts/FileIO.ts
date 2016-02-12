@@ -5,8 +5,9 @@
             private m_handler: Handler;
             private m_lastPath: string = "";
 
-            constructor(p_handler: Handler) {
-                this.m_handler = p_handler;
+            //constructor(p_handler: Handler) {
+            constructor() {
+                //this.m_handler = p_handler;
 
                 this.reset = this.reset.bind(this);
             }
@@ -39,6 +40,22 @@
                 a.innerHTML = 'Download';
                 
 
+            }
+            savePiecewiseLinearFunction(p_pwl: PiecewiseLinear, p_filename?: string) {
+                var datastream = p_pwl.savePWL();
+                
+                var base64: string = window.btoa(datastream);
+                
+                // create an a tag
+                var a: any = $("#downloadLinkValueFunction").get(0);
+
+                a.href = 'data:application/octet-stream;base64,' + base64;
+                if (p_filename == undefined) {
+                    a.download = "valueFn.xdsl";
+                } else {
+                    a.download = p_filename;
+                }
+                a.innerHTML = 'Download';
             }
             loadfromGenie(p_activeModelInstance: Model, p_updateGui: Function): any {
                 console.log("loadFromGenie");
@@ -215,10 +232,13 @@
                 var json: string = JSON.stringify(p_model);
                 localStorage.setItem(p_model.getIdent(), json);
             }
-            reset(): any {
-                var modelIdent: string = this.m_handler.getActiveModel().getIdent();
-                console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
-                var jsonMdl: any = JSON.parse(localStorage.getItem(modelIdent));
+            reset(p_resetModel: Model): any {
+                //var modelIdent: string = this.m_handler.getActiveModel().getIdent();
+                if (p_resetModel) {
+                    var modelIdent: string = p_resetModel.getIdent();
+                    //console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
+                    var jsonMdl: any = JSON.parse(localStorage.getItem(modelIdent));
+                }
                 if (jsonMdl) {
                     return jsonMdl;
                 }
@@ -306,6 +326,41 @@
                 fileReader.readAsText(file); 
                 console.log("Result: " + fileReader.result);
 
+            }
+            loadValueFunctionFromFile(): ValueFunction {
+                var ret: ValueFunction;
+
+                return ret;
+            }
+            loadPWLFromFile(p_pwl: PiecewiseLinear, p_updateGui: Function, p_path?: string) {
+                //var ret: PiecewiseLinear = new PiecewiseLinear(0,0,0,0,0,0);
+                console.log("Loading MCA model from file");
+                var fileInputElement: any = $("#loadFromFile").get(0);
+                fileInputElement.files[0];
+                var file = fileInputElement.files[0];
+                console.log("file: " + file);
+                console.log("filename: " + file.name);
+                var fileReader = new FileReader();
+                
+
+                fileReader.onload = function (p_evt) {
+                    var text = fileReader.result;
+                    console.log("loaded file: " + text);
+                    var jsonObj = JSON.parse(text);
+                    console.log("jsonObj: " + jsonObj);
+                    //ret.fromJSON(jsonObj);
+                    p_pwl.fromJSON(jsonObj);
+                    p_updateGui();
+         
+                }
+
+                fileReader.readAsText(file);
+                console.log("Result: " + fileReader.result);
+                //return ret;
+            }
+            
+            saveValueFunctionToFile(p_vfn: ValueFunction) {
+                
             }
         }
     }

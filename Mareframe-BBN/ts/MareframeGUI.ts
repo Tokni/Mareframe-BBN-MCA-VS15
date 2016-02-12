@@ -559,7 +559,7 @@ module Mareframe {
                             if (newText.length < 1) { //Must not update the text if the new text string is empty
                                 $filename.html(oldText);
                                 newText = oldText;
-            }
+                            }
                             $filename.text(newText);
                             
                             oldText = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
@@ -609,7 +609,7 @@ module Mareframe {
                 console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
                 console.log("quickLoad");
                 this.clearSelection();
-                if (this.m_handler.getFileIO().reset() === null ) {
+                if (this.m_handler.getFileIO().reset(this.m_model) === null ) {
                     var loadModel: string = Tools.getUrlParameter('model');
                     loadModel = this.m_model.getIdent();
                     console.log("using model: " + loadModel);
@@ -617,7 +617,7 @@ module Mareframe {
                 }
                 else {
 
-                    this.m_model.fromJSON(this.m_handler.getFileIO().reset());
+                    this.m_model.fromJSON(this.m_handler.getFileIO().reset(this.m_model));
                     this.importStage();
                     if (!this.m_model.getElementArr().length) {
                         var loadModel: string = Tools.getUrlParameter('model');
@@ -1811,7 +1811,7 @@ module Mareframe {
                                     var t = " ;color:blue; ";
                         }
                         else {
-                                    var t = " ;color:yellow; ";
+                                    var t = " ;color:lightgrey; ";
                                 }
                             }
                             tableHTML = tableHTML + "<td style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle" + t + "\" id='dataTable" + i + "x" + j + "' class='tableEdit' >" + row[i] + "</td>";

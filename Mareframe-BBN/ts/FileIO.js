@@ -3,9 +3,10 @@ var Mareframe;
     var DST;
     (function (DST) {
         var FileIO = (function () {
-            function FileIO(p_handler) {
+            //constructor(p_handler: Handler) {
+            function FileIO() {
+                //this.m_handler = p_handler;
                 this.m_lastPath = "";
-                this.m_handler = p_handler;
                 this.reset = this.reset.bind(this);
             }
             FileIO.prototype.saveModel = function (p_model, p_filename) {
@@ -29,6 +30,20 @@ var Mareframe;
                 a.href = 'data:application/octet-stream;base64,' + base64;
                 if (p_filename == undefined) {
                     a.download = "test.xdsl";
+                }
+                else {
+                    a.download = p_filename;
+                }
+                a.innerHTML = 'Download';
+            };
+            FileIO.prototype.savePiecewiseLinearFunction = function (p_pwl, p_filename) {
+                var datastream = p_pwl.savePWL();
+                var base64 = window.btoa(datastream);
+                // create an a tag
+                var a = $("#downloadLinkValueFunction").get(0);
+                a.href = 'data:application/octet-stream;base64,' + base64;
+                if (p_filename == undefined) {
+                    a.download = "valueFn.xdsl";
                 }
                 else {
                     a.download = p_filename;
@@ -163,10 +178,13 @@ var Mareframe;
                 var json = JSON.stringify(p_model);
                 localStorage.setItem(p_model.getIdent(), json);
             };
-            FileIO.prototype.reset = function () {
-                var modelIdent = this.m_handler.getActiveModel().getIdent();
-                console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
-                var jsonMdl = JSON.parse(localStorage.getItem(modelIdent));
+            FileIO.prototype.reset = function (p_resetModel) {
+                //var modelIdent: string = this.m_handler.getActiveModel().getIdent();
+                if (p_resetModel) {
+                    var modelIdent = p_resetModel.getIdent();
+                    //console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
+                    var jsonMdl = JSON.parse(localStorage.getItem(modelIdent));
+                }
                 if (jsonMdl) {
                     return jsonMdl;
                 }
@@ -250,6 +268,34 @@ var Mareframe;
                 };
                 fileReader.readAsText(file);
                 console.log("Result: " + fileReader.result);
+            };
+            FileIO.prototype.loadValueFunctionFromFile = function () {
+                var ret;
+                return ret;
+            };
+            FileIO.prototype.loadPWLFromFile = function (p_pwl, p_updateGui, p_path) {
+                //var ret: PiecewiseLinear = new PiecewiseLinear(0,0,0,0,0,0);
+                console.log("Loading MCA model from file");
+                var fileInputElement = $("#loadFromFile").get(0);
+                fileInputElement.files[0];
+                var file = fileInputElement.files[0];
+                console.log("file: " + file);
+                console.log("filename: " + file.name);
+                var fileReader = new FileReader();
+                fileReader.onload = function (p_evt) {
+                    var text = fileReader.result;
+                    console.log("loaded file: " + text);
+                    var jsonObj = JSON.parse(text);
+                    console.log("jsonObj: " + jsonObj);
+                    //ret.fromJSON(jsonObj);
+                    p_pwl.fromJSON(jsonObj);
+                    p_updateGui();
+                };
+                fileReader.readAsText(file);
+                console.log("Result: " + fileReader.result);
+                //return ret;
+            };
+            FileIO.prototype.saveValueFunctionToFile = function (p_vfn) {
             };
             return FileIO;
         })();

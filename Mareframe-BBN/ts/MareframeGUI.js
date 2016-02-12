@@ -594,14 +594,14 @@ var Mareframe;
                 console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
                 console.log("quickLoad");
                 this.clearSelection();
-                if (this.m_handler.getFileIO().reset() === null) {
+                if (this.m_handler.getFileIO().reset(this.m_model) === null) {
                     var loadModel = DST.Tools.getUrlParameter('model');
                     loadModel = this.m_model.getIdent();
                     console.log("using model: " + loadModel);
                     this.m_handler.getFileIO().loadModel(loadModel, this.m_handler.getActiveModel(), this.importStage);
                 }
                 else {
-                    this.m_model.fromJSON(this.m_handler.getFileIO().reset());
+                    this.m_model.fromJSON(this.m_handler.getFileIO().reset(this.m_model));
                     this.importStage();
                     if (!this.m_model.getElementArr().length) {
                         var loadModel = DST.Tools.getUrlParameter('model');
@@ -1667,7 +1667,7 @@ var Mareframe;
                                     var t = " ;color:blue; ";
                                 }
                                 else {
-                                    var t = " ;color:yellow; ";
+                                    var t = " ;color:lightgrey; ";
                                 }
                             }
                             tableHTML = tableHTML + "<td style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle" + t + "\" id='dataTable" + i + "x" + j + "' class='tableEdit' >" + row[i] + "</td>";
