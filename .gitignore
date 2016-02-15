@@ -8,6 +8,9 @@
 *.sln.docstates
 *.js
 *.map
+Mareframe-BBN/ts/*.js
+Mareframe-BBN/ts/*.map
+!Mareframe-BBN/js/*
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

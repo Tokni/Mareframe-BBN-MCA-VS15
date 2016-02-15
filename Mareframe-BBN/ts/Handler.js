@@ -9,25 +9,6 @@ var Mareframe;
         var Handler = (function () {
             function Handler() {
                 this.m_modelArr = [];
-                /*
-                      //var m = new Model(true);
-                      this.m_fileHandler = new FileIO();
-                      var w = new TKN_Widget("testCanvas", this.m_fileHandler);
-      
-                      w.setSize(700, 700);
-                      var pw = new Mareframe.DST.PiecewiseLinear(1, 1, 6, 7, 0, 10);
-                      //var pw = new PiecewiseLinear(10, 10, 60, 70);
-                      pw.addPoint(2, 3);
-                      pw.addPoint(4, 7);
-                      pw.addPoint(2, 5);
-                      pw.addPoint(3, 9);
-                      pw.sortPointsByX();
-      
-                      w.setPwl(pw);
-                      w.addPWLToStage();
-                      pw.savePWL();
-                      //this.m_fileHandler.savePiecewiseLinearFunction( pw );
-                 */
                 console.log("handler started");
                 this.m_mareframeMode = false; //This sets the layout to Tokni mode
                 this.m_fileHandler = new DST.FileIO();
@@ -35,21 +16,17 @@ var Mareframe;
                 this.m_gui = new DST.GUIHandler(this.m_activeModel, this);
                 var loadModel = DST.Tools.getUrlParameter('model');
                 if (this.m_mareframeMode) {
-                    //loadModel = "scotland";
-                    //loadModel = "sicily";
-                    loadModel = "baltic";
                 }
                 else {
-                    loadModel = "resturant";
                 }
-                console.log("using model: " + loadModel);
-                if (loadModel !== null) {
+                //console.log("using model: " + loadModel);
+                if (loadModel != null) {
                     this.m_fileHandler.loadModel(loadModel, this.m_activeModel, this.m_gui.importStage);
                     var tmp = this.m_activeModel.getMainObjective();
                     if (this.m_activeModel.getMainObjective() != undefined) {
                         this.m_gui.setHasGoal(true);
                     }
-                    console.log("model loaded");
+                    //console.log("model loaded")
                     this.m_resetModel = JSON.stringify(this.m_activeModel);
                 }
                 else {

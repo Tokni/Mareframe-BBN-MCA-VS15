@@ -80,7 +80,7 @@
                     this.m_unitY = this.m_height / (this.m_pwl.m_maxValue - this.m_pwl.m_minValue);
                 }
                 //EventListeners for the background
-                this.m_backGround.addEventListener("mousedown", this.handleMouseDown);
+                //this.m_backGround.addEventListener("mousedown", this.handleMouseDown); //******************************************
                 //this.m_backGround.addEventListener("pressmove", this.handlePressMove);
                 this.m_backGround.addEventListener("dblclick", this.handleDoubleClick);
                 
@@ -287,7 +287,7 @@
                             var point = new createjs.Shape(new createjs.Graphics().beginFill("red").drawCircle(this.getStageX(i), this.getStageY(i), 6));
                         }
                     }
-                    point.on("click", this.handleMouseDown, null, false, { clickedPointIndex: i, selectIndex: this.m_selectedPointIndex, select: this.m_selectedPoint });
+                    //point.on("click", this.handleMouseDown, null, false, { clickedPointIndex: i, selectIndex: this.m_selectedPointIndex, select: this.m_selectedPoint }); //***************************************
                     
                     //point.addEventListener("mousedown", this.hd);
                     //point.addEventListener("mousedown", this.m_eventHandleAndData);

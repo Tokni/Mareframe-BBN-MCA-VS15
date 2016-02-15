@@ -79,7 +79,10 @@
     <TypeScriptCompile Include="ts\Handler.ts" />
     <TypeScriptCompile Include="ts\MareframeGUI.ts" />
     <TypeScriptCompile Include="ts\Model.ts" />
+    <TypeScriptCompile Include="ts\TKN_Dialog.ts" />
+    <TypeScriptCompile Include="ts\TKN_Widget.ts" />
     <TypeScriptCompile Include="ts\Tools.ts" />
+    <TypeScriptCompile Include="ts\ValueFunction.ts" />
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup>
@@ -98,7 +101,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>57950</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:57670/</IISUrl>
+          <IISUrl>http://localhost:57672/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>http://localhost:57951/</CustomServerUrl>

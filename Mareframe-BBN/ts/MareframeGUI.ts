@@ -864,20 +864,26 @@ module Mareframe {
             }
             public setEditorMode = function (cb) {
                 //console.log(cb);
-                
-                this.m_editorMode = cb.currentTarget.checked;
-                if (this.m_editorMode) {
-                    if ($("#cnctTool").prop("checked")) {
-                        $("#modeStatus").html("Connect Mode");
+                if (cb === true) {
+                    this.m_editorMode = true;
+                }
+                else if (cb === false) {
+                    this.m_editorMode = false;
+                }                
+                else {
+                    this.m_editorMode = cb.currentTarget.checked;
+                    if (this.m_editorMode) {
+                        if ($("#cnctTool").prop("checked")) {
+                            $("#modeStatus").html("Connect Mode");
+                        }
+                        else {
+                            $("#modeStatus").html("Editor Mode");
+                        }
                     }
                     else {
-                        $("#modeStatus").html("Editor Mode");
+                        $("#modeStatus").html("");
                     }
                 }
-                else {
-                    $("#modeStatus").html("");
-                }
-                
 
                 this.updateEditorMode();
                 

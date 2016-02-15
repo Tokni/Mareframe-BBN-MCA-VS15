@@ -20,7 +20,7 @@
                 //this.m_bbnMode = true;
                 this.createNewElement = this.createNewElement.bind(this);
                 this.deleteElement = this.deleteElement.bind(this);
-                console.log("model loaded")
+                console.log("model loaded, MCA is: " + !this.m_bbnMode);
                 ////console.log(this);
 
             };
