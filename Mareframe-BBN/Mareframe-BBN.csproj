@@ -35,6 +35,7 @@
     <Content Include="js\math.min.js" />
     <Content Include="MCA.html" />
     <Content Include="saveFile.php" />
+    <Content Include="testPage.html" />
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
