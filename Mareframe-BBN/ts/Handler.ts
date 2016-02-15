@@ -16,8 +16,8 @@ module Mareframe {
             private m_mareframeMode: Boolean;
             constructor() {
                 console.log("handler started");
-                this.m_mareframeMode = false;  //This sets the layout to Tokni mode
-                
+                this.m_mareframeMode = true;  
+                //this.m_mareframeMode = false;//This sets the layout to Tokni mode
 
                 
 

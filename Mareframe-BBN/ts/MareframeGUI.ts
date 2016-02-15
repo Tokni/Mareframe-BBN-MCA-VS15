@@ -114,6 +114,8 @@ module Mareframe {
                     this.setEditorMode = this.setEditorMode.bind(this);
                     this.m_editorMode = false;
                     //$("#elementType").hide().selectmenu();
+                    $("#newDcmt").hide();
+                    $("#lodDcmtDiv").show();
                     $("#elementType").hide();
                     //$("#MCAelmtType").selectmenu();
                     //$("#MCAWeightingMethod").selectmenu();
@@ -680,6 +682,7 @@ module Mareframe {
                 console.log("element type: " + p_elmt.getType());
                 var tmp = p_elmt.getType();
                 if (p_elmt.m_dstType === 1) {
+                    var t = p_elmt.getType() - 100;
                     shape.graphics.f(this.m_elementColors[p_elmt.getType()-100][0]).s(this.m_elementColors[p_elmt.getType()-100][1]);
                 } else {
                 shape.graphics.f(this.m_elementColors[p_elmt.getType()][0]).s(this.m_elementColors[p_elmt.getType()][1]);
@@ -689,8 +692,8 @@ module Mareframe {
                     elmtShapeType = p_elmt.getType();
                 }
 
-                var shape = new createjs.Shape();
-                shape.graphics.f(this.m_elementColors[elmtShapeType][0]).s(this.m_elementColors[elmtShapeType][1]);
+                //var shape = new createjs.Shape();
+                //shape.graphics.f(this.m_elementColors[elmtShapeType][0]).s(this.m_elementColors[elmtShapeType][1]);
 
                 switch (elmtShapeType) {
                     case 0:
@@ -829,6 +832,8 @@ module Mareframe {
                         $("#newChance").hide();
                         $("#newDec").hide();
                         $("#newValue").hide();
+                        $("#newDcmt").hide();
+                        $("#lodDcmtDiv").show();
                         $("#elementType").show();
                     }
                 } else {
@@ -1995,7 +2000,7 @@ module Mareframe {
                         /*this.m_mcaContainer.x += p_evt.stageX - this.m_oldX;
                         this.m_mcaContainer.y += p_evt.stageY - this.m_oldY;
                             */
-                        this.resizeWindow();
+                        //this.resizeWindow();
                         }
                     }
                 } else if (p_evt.target.name.substr(0, 4) === "elmt") {
@@ -2019,7 +2024,7 @@ module Mareframe {
                                 var c = this.m_model.getElement(elmt.name).getConnections()[j];
                                 this.updateConnection(c);
                             }
-                                this.resizeWindow();
+                                //this.resizeWindow();
                             }
                         }
                     }
