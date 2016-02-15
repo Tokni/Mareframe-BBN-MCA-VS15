@@ -171,44 +171,51 @@ var Mareframe;
                 return valueArray;
             };
             Element.prototype.updateData = function () {
-                // console.log("updateData " + this.m_name);
+                console.log("updateData " + this.m_name);
+                console.log("original data:");
+                console.log(this.m_data);
+                this.m_data = DST.Tools.makeSureItsTwoDimensional(this.updateHeaderRows(this.m_data));
                 // console.log("data: " + this.m_data);
-                this.m_data = this.updateHeaderRows(this.m_data);
-                // console.log("data: " + this.m_data);
-                var rows;
-                var columns;
-                // console.log("checking: " + this.m_data[this.m_data.length - 1][1]);
-                //console.log("data length: " + this.m_data.length);
-                if (this.m_data[this.m_data.length - 1][1] === undefined) {
-                    rows = 1;
-                    columns = this.m_data.length;
-                }
-                else {
-                    rows = this.m_data.length;
-                    columns = this.m_data[0].length;
+                var size = math.size(this.m_data);
+                var rows = size[0];
+                var columns = size[1];
+                if (this.getType() === 3 && columns === 0) {
+                    columns = 1;
                 }
                 //console.log("rows " + rows + " columns " + columns);
-                // console.log("in filling " + this.m_name + " last cell is " + this.m_data[rows - 1][columns - 1]);
+                console.log("in filling " + this.m_name + " last cell is " + this.m_data[rows - 1][columns - 1]);
                 if (this.m_data[rows - 1][columns - 1] === undefined) {
-                    this.m_data = DST.Tools.fillDataTable(this.m_data);
+                    this.m_data = DST.Tools.fillDataTable(this, this.m_data);
                 }
+                console.log("new data:");
+                console.log(this.m_data);
             };
             Element.prototype.updateHeaderRows = function (p_originalData) {
-                //console.log("updating header rows in " + this.getName())
-                // console.log("data: " + p_originalData);
+                console.log("updating header rows in " + this.getName());
+                console.log("data: " + p_originalData);
                 var data = [];
                 var parents = this.getParentElements();
-                for (var i = 0; i < parents.length; i++) {
-                    var elmt = parents[i];
-                    // console.log("Parent: " + elmt.getName());
-                    data = DST.Tools.addNewHeaderRow(elmt.getMainValues(), data);
+                if (this.m_type === 3) {
+                    for (var i = 0; i < parents.length; i++) {
+                        data.push([parents[i].m_id]);
+                    }
+                    for (var i = 0; i < p_originalData.length; i++) {
+                        data[i].push(p_originalData[i][1]);
+                    }
                 }
-                //console.log("number of header rows : " + Tools.numOfHeaderRows(this.m_data));
-                //Add original values to the table
-                for (var i = DST.Tools.numOfHeaderRows(this.m_data); i < p_originalData.length; i++) {
-                    //console.log("i: " + i);
-                    // console.log("new data: " + p_originalData[i]);
-                    data.push(p_originalData[i]);
+                else {
+                    for (var i = 0; i < parents.length; i++) {
+                        var elmt = parents[i];
+                        // console.log("Parent: " + elmt.getName());
+                        data = DST.Tools.addNewHeaderRow(elmt.getMainValues(), data);
+                    }
+                    //console.log("number of header rows : " + Tools.numOfHeaderRows(this.m_data));
+                    //Add original values to the table
+                    for (var i = DST.Tools.numOfHeaderRows(this.m_data); i < p_originalData.length; i++) {
+                        //console.log("i: " + i);
+                        // console.log("new data: " + p_originalData[i]);
+                        data.push(p_originalData[i]);
+                    }
                 }
                 // console.log(data);
                 return data;
@@ -216,7 +223,6 @@ var Mareframe;
             Element.prototype.addDefaultDataInEmptyCells = function (p_originalData, p_editedElmt, p_addedState) {
                 console.log("adding default values in " + this.getName());
                 var data = DST.Tools.makeSureItsTwoDimensional(p_originalData);
-                var elmtType = this.getType();
                 var rows = data.length;
                 var columns = data[0].length;
                 for (var i = 0; i < rows; i++) {
@@ -384,6 +390,11 @@ var Mareframe;
                     }
                 }
                 return retConnection;
+            };
+            Element.prototype.convertToSuperValue = function () {
+                this.setType(3);
+                this.setData([[]]);
+                this.setValues([[]]);
             };
             return Element;
         })();

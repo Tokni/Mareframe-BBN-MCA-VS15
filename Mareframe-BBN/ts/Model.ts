@@ -311,6 +311,10 @@
                     case 2:
                         e.setData([["Value", 0]]);
                         e.setValues([["Value", 0]]);
+                        break;
+                    case 3:
+                        e.setData([]);
+                        e.setValues([]);
                     default:
                         break;
                 }

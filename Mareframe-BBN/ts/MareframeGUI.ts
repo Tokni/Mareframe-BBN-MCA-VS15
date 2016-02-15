@@ -41,7 +41,7 @@ module Mareframe {
                 focusTarget: 'category'
 
             };
-            private m_elementColors: string[][] = [["#efefff", "#15729b", "#dfdfff"], ["#ffefef", "#c42f33", "#ffdfdf"], ["#fff6e0", "#f6a604", "#fef4c6"], ["#efffef", "#2fc433", "#dfffdf"]];
+            private m_elementColors: string[][] = [["#efefff", "#15729b", "#dfdfff", ], ["#ffefef", "#c42f33", "#ffdfdf"], ["#fff6e0", "#f6a604", "#fef4c6"], ["#fff6e0", "#f6a604", "#fef4c6"], ["#efffef", "#2fc433", "#dfffdf"]];
             private m_model: Model;
             private m_trashBin: Element[] = [];
 
@@ -122,6 +122,7 @@ module Mareframe {
                 this.createNewChance = this.createNewChance.bind(this);
                 this.createNewDec = this.createNewDec.bind(this);
                 this.createNewValue = this.createNewValue.bind(this);
+                this.createNewSuperValue = this.createNewSuperValue.bind(this);
                 this.createNewElement = this.createNewElement.bind(this);
                 this.deleteSelected = this.deleteSelected.bind(this);
                 this.resetDcmt = this.resetDcmt.bind(this);
@@ -148,7 +149,6 @@ module Mareframe {
                 this.m_valFnBackground.addEventListener("pressmove", this.moveValFnCP);
                 this.m_valFnBackground.addEventListener("mousedown", this.downValFnCP);
                 this.m_mcaBackground.addEventListener("pressmove", this.pressMove);
-                this.m_mcaBackground.addEventListener("pressup", this.pressUp);
                 this.m_controlP.mouseChildren = false;
 
                 $("#selectModel").on("change", this.selectModel);
@@ -162,6 +162,7 @@ module Mareframe {
                 $("#newChance").on("click", this.createNewChance);
                 $("#newDec").on("click", this.createNewDec);
                 $("#newValue").on("click", this.createNewValue);
+                $("#newSuperValue").on("click", this.createNewSuperValue);
                 $("#deleteElmt").on("click", this.deleteSelected);
                 $("#editorMode").on("click", this.setEditorMode);
                 $("#showDescription").on("click", this.setShowDescription);
@@ -334,7 +335,7 @@ module Mareframe {
 
             }
             private pressUp(p_evt: createjs.MouseEvent) {
-                console.log("pressup");
+               // console.log("pressup");
                this.updateSize();
             }
             private mouseMove(p_evt: createjs.MouseEvent) {
@@ -363,6 +364,10 @@ module Mareframe {
                         break;
                     case 2:
                         //Value
+                        shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
+                        break;
+                    case 3:
+                        //Super Value
                         shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
                         break;
                     default:
@@ -485,12 +490,19 @@ module Mareframe {
                         $("#newChance").hide();
                         $("#newDec").hide();
                         $("#newValue").hide();
+                        $("#newSuperValue").hide();
                         $("#elementType").show();
                     }
                 } else {
                     $(".advButton").hide();
                     $("#lodDcmtDiv").hide();
                     $("#cnctTool").prop("checked", false);
+                }
+                if (this.m_editorMode) {
+                    this.m_mcaBackground.removeEventListener("pressup", this.pressUp);
+                }
+                else {
+                    this.m_mcaBackground.addEventListener("pressup", this.pressUp);
                 }
                 var elementArr = this.m_model.getElementArr();
                 if (elementArr) {
@@ -607,7 +619,7 @@ module Mareframe {
                 this.moveAllElements(moveDistanceX, moveDistanceY);
             }
             private updateSize(): void {
-                console.log("updating size");
+              //  console.log("updating size");
                 var gui = this;
                 var modelPos: number[] = this.getModelPos();
                 var lowestElement: number = modelPos[0];
@@ -616,10 +628,10 @@ module Mareframe {
                 var rightmostElement: number = modelPos[3];
                 var moveDistanceX: number = 0;
                 var moveDistanceY: number = 0;
-                console.log("highest element: " + highestElement);
-                console.log("lowest element: " + lowestElement);
-                console.log("rightmost element: " + rightmostElement);
-                console.log("leftmost element: " + leftmostElement);
+             //   console.log("highest element: " + highestElement);
+               // console.log("lowest element: " + lowestElement);
+               // console.log("rightmost element: " + rightmostElement);
+                //console.log("leftmost element: " + leftmostElement);
                
                 this.m_updateMCAStage = true;
                 this.setSize(Math.max($(window).width(), rightmostElement), lowestElement); //Sets size 
@@ -669,6 +681,13 @@ module Mareframe {
             private createNewValue(p_evt: Event) {
 
                 var elmt = this.m_model.createNewElement(2)
+                this.addElementToStage(elmt);
+                elmt.update();
+                this.updateMiniTables([elmt]);
+            }
+            private createNewSuperValue(p_evt: Event) {
+
+                var elmt = this.m_model.createNewElement(3)
                 this.addElementToStage(elmt);
                 elmt.update();
                 this.updateMiniTables([elmt]);
@@ -781,14 +800,21 @@ module Mareframe {
                     $("#defTable_div").html(s);
                     $("#defTable_div").show();
                     var typeText: string;
-                    if (p_elmt.getType() === 0) {
-                        typeText = "Chance";
-                    }
-                    else if (p_elmt.getType() === 1) {
-                        typeText = "Decision";
-                    }
-                    else if (p_elmt.getType() === 2) {
-                        typeText = "Value";
+                    switch (p_elmt.getType()) {
+                        case 0:
+                            typeText = "Chance";
+                            break;
+                        case 1:
+                            typeText = "Decision";
+                            break;
+                        case 2:
+                            typeText = "Value";
+                            break;
+                        case 3:
+                            typeText = "Super Value";
+                            break;
+                        default:
+                            break;
                     }
                     document.getElementById("info_name").innerHTML = p_elmt.getName();
                     document.getElementById("info_type").innerHTML = typeText;
@@ -1012,7 +1038,7 @@ module Mareframe {
                         });
                         // });
                         if (p_editorMode) {
-                            if (p_elmt.getType() !== 2) {//If it is a chance or a decision node
+                            if (p_elmt.getType() === 0 || p_elmt.getType() === 1) {//If it is a chance or a decision node
                                 $("#addDataRow").show();
                                 $(".minus").button({
                                     icons: { primary: "ui-icon-minus" }
@@ -1683,13 +1709,17 @@ module Mareframe {
                                 alert("cannot create a cycle");
                             }
                         }
-                        else if (inputElmt.getType() === 2 && outputElmt.getType() !== 3 ) {//type 3 is reserved for super value nodes (not implemented yet)
+
+                        else if (inputElmt.getType() === 2 && (outputElmt.getType() === 1 || outputElmt.getType() === 0 || (outputElmt.getType() === 2 && outputElmt.getParentElements().length > 0))) {//Value cannot connect to value if output cannot be converted to super value
                             alert("Value nodes cannot have children");
                         }
                         else if (inputElmt.getType() === 0 && outputElmt.getType() === 1) {
                             alert("Chance nodes can not have decsion node children");
                         }
                         else {
+                            if (inputElmt.getType() === 2 && outputElmt.getType() === 2) {//Output element should be converted to a super value node
+                                outputElmt.convertToSuperValue();
+                            }
                             var c = this.m_model.createNewConnection(inputElmt, outputElmt);
                             //console.log("connection: " + c);
                             if (this.m_model.addConnection(c)) {
@@ -1788,6 +1818,11 @@ module Mareframe {
                         case 2:
                             //Value
                             shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
+                            break;
+                        case 3:
+                            //Super value
+                            shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
+                            break;
                         default:
                             break;
                     }
@@ -1831,6 +1866,10 @@ module Mareframe {
                             break;
                         case 2:
                             //Value
+                            shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
+                            break;
+                        case 3:
+                            //Super Value
                             shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
                             break;
                         default:
@@ -1878,6 +1917,10 @@ module Mareframe {
                                 break;
                             case 2:
                                 //Value
+                                shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
+                                break;
+                            case 3:
+                                //Super Value
                                 shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
                                 break;
                             default:
