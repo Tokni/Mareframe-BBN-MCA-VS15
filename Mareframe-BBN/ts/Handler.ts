@@ -16,45 +16,68 @@ module Mareframe {
             private m_mareframeMode: Boolean;
             constructor() {
                 console.log("handler started");
-                this.m_mareframeMode = true;  
-                //this.m_mareframeMode = false;//This sets the layout to Tokni mode
+                this.m_mareframeMode = true; 
+                var testPage = true; 
+                if (testPage === true) {
 
-                
+                    //var m = new Model(true);
+                    this.m_fileHandler = new FileIO();
+                    var w = new TKN_Widget("testCanvas", this.m_fileHandler);
 
-                this.m_fileHandler = new FileIO();
-                this.m_activeModel = this.addNewModel();
-                this.m_gui = new GUIHandler(this.m_activeModel,this);
+                    w.setSize(700, 700);
+                    var pw = new Mareframe.DST.PiecewiseLinear(1, 1, 6, 7, 0, 10);
+                    //var pw = new PiecewiseLinear(10, 10, 60, 70);
+                    pw.addPoint(2, 3);
+                    pw.addPoint(4, 7);
+                    pw.addPoint(2, 5);
+                    pw.addPoint(3, 9);
+                    pw.sortPointsByX();
 
-                
-                var loadModel: string = Tools.getUrlParameter('model');
-                if (this.m_mareframeMode) {
-                    //loadModel = "scotland";
-                //loadModel = "sicily";
-                    //loadModel = "baltic";
-                //loadModel = "northSea";
-                //loadModel = "blackSea";
-                //loadModel = "iceland";
-                //loadModel = "cadiz";
-                //loadModel = "test";
-                }
-                else {//Tokni mode
-                    //loadModel = "resturant";
-                    //loadModel = "happiness";
-                    //loadModel = "investment";
-                }
-
-                //console.log("using model: " + loadModel);
-                if (loadModel != null) {
-                    this.m_fileHandler.loadModel(loadModel, this.m_activeModel, this.m_gui.importStage);
-                    var tmp = this.m_activeModel.getMainObjective();
-                    if (this.m_activeModel.getMainObjective() != undefined) {
-                        this.m_gui.setHasGoal(true);
-                    }
-                    //console.log("model loaded")
-                    this.m_resetModel = JSON.stringify(this.m_activeModel);
-                    //console.log("reset model: " + this.m_resetModel);
+                    w.setPwl(pw);
+                    w.addPWLToStage();
+                    pw.savePWL();
+                    this.m_fileHandler.savePiecewiseLinearFunction(pw);
                 } else {
-                    this.m_gui.setEditorMode(true);
+
+                    this.m_mareframeMode = true;//This sets the layout to Tokni mode
+
+                
+
+                    this.m_fileHandler = new FileIO();
+                    this.m_activeModel = this.addNewModel();
+                    this.m_gui = new GUIHandler(this.m_activeModel,this);
+
+                
+                    var loadModel: string = Tools.getUrlParameter('model');
+                    if (this.m_mareframeMode) {
+                        //loadModel = "scotland";
+                    //loadModel = "sicily";
+                        //loadModel = "baltic";
+                    //loadModel = "northSea";
+                    //loadModel = "blackSea";
+                    //loadModel = "iceland";
+                    //loadModel = "cadiz";
+                    //loadModel = "test";
+                    }
+                    else {//Tokni mode
+                        //loadModel = "resturant";
+                        //loadModel = "happiness";
+                        //loadModel = "investment";
+                    }
+
+                    //console.log("using model: " + loadModel);
+                    if (loadModel != null) {
+                        this.m_fileHandler.loadModel(loadModel, this.m_activeModel, this.m_gui.importStage);
+                        var tmp = this.m_activeModel.getMainObjective();
+                        if (this.m_activeModel.getMainObjective() != undefined) {
+                            this.m_gui.setHasGoal(true);
+                        }
+                        //console.log("model loaded")
+                        this.m_resetModel = JSON.stringify(this.m_activeModel);
+                        //console.log("reset model: " + this.m_resetModel);
+                    } else {
+                        this.m_gui.setEditorMode(true);
+                    }
                 }
             }
             getResetModel(): String {

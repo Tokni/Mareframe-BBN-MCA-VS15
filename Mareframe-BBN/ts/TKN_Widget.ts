@@ -80,7 +80,7 @@
                     this.m_unitY = this.m_height / (this.m_pwl.m_maxValue - this.m_pwl.m_minValue);
                 }
                 //EventListeners for the background
-                //this.m_backGround.addEventListener("mousedown", this.handleMouseDown); //******************************************
+                this.m_backGround.addEventListener("mousedown", this.handleMouseDown); //******************************************
                 //this.m_backGround.addEventListener("pressmove", this.handlePressMove);
                 this.m_backGround.addEventListener("dblclick", this.handleDoubleClick);
                 
@@ -105,7 +105,8 @@
             handlePressMove() {
                 alert("PressMove");
             }
-            handleMouseDown(e: createjs.MouseEvent, data:any) {
+            handleMouseDown(e: createjs.MouseEvent, data: any) {
+              //handleMouseDown(e: createjs.MouseEvent) {
                 //alert("mouseDown");
                 console.log("mousedown on " + e.target.id);
                 //var tt = e.target;
@@ -118,8 +119,8 @@
                     //this.m_selectedPoint.graphics.clear().beginFill("green").drawCircle((this.m_pwl.getPoints()[this.m_selectedPointIndex].x - this.m_pwl.getPoints()[0].x) * this.m_unitX, (this.m_pwl.m_maxValue - this.m_pwl.getPoints()[this.m_selectedPointIndex].y) * this.m_unitY, 8);
                     //this.m_selectedPoint.graphics.clear().beginFill("green").drawCircle(data.PosX - this.m_pwl.getPoints()[0].x * this.m_unitX, this.m_pwl.m_maxValue * this.m_unitY - data.PosY, 8);
                 }
-                if (data !== undefined) {
-                    
+                //if (data !== undefined) {
+                if (data !== undefined) {   
 
                     $("#selectedPointInfo").show();
                     
@@ -287,7 +288,7 @@
                             var point = new createjs.Shape(new createjs.Graphics().beginFill("red").drawCircle(this.getStageX(i), this.getStageY(i), 6));
                         }
                     }
-                    //point.on("click", this.handleMouseDown, null, false, { clickedPointIndex: i, selectIndex: this.m_selectedPointIndex, select: this.m_selectedPoint }); //***************************************
+                    point.on("click", this.handleMouseDown, null, false, { clickedPointIndex: i, selectIndex: this.m_selectedPointIndex, select: this.m_selectedPoint }); //***************************************
                     
                     //point.addEventListener("mousedown", this.hd);
                     //point.addEventListener("mousedown", this.m_eventHandleAndData);
