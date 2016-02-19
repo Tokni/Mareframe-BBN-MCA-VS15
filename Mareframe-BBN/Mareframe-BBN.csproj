@@ -76,6 +76,7 @@
     <TypeScriptCompile Include="ts\Declarations\math.min.d.ts" />
     <TypeScriptCompile Include="ts\Declarations\tweenjs.d.ts" />
     <TypeScriptCompile Include="ts\Element.ts" />
+    <TypeScriptCompile Include="ts\ElementOO.ts" />
     <TypeScriptCompile Include="ts\FileIO.ts" />
     <TypeScriptCompile Include="ts\Handler.ts" />
     <TypeScriptCompile Include="ts\MareframeGUI.ts" />

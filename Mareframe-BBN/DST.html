@@ -62,6 +62,8 @@
     <div id="debug">
         <p id="mX"></p>
         <p id="mY"></p>
+        <p id="elmtX"></p>
+        <p id="elmtY"></p>
         <p id="mAction"></p>
         <p id="mTarget"></p>
         <p id="mConnect"></p>
@@ -73,13 +75,14 @@
 
 
         <div style="padding: 1em 1em 0.5em 1.4em; font-size: 0.7em">
-            <label for="selctModel">Select a model</label>
-            <select id="selectModel">
-                <option value="resturant"selected="selected">Opening a Resturant</option>
-                <option value="happiness" >Happiness</option>
-                <option value="investment"> Investment Decision</option>
-            </select>
-
+            <div id="selectModelDiv">
+                <label for="selectModel">Select a model</label>
+                <select id="selectModel">
+                    <option value="resturant" selected="selected">Opening a Resturant</option>
+                    <option value="happiness">Happiness</option>
+                    <option value="investment"> Investment Decision</option>
+                </select>
+            </div>
             <button class="advButton" id="newDcmt">New Document</button>
 
             <div class="LoadFileBtn" id="lodDcmtDiv">
@@ -124,7 +127,7 @@
     <div id="MCAContainer" style="text-align:center">
 
         <!--MCA Tool canvas-->
-        <canvas id="MCATool" width="800" height="600" style="display:inline-block"></canvas>
+        <canvas id="MCATool" width="800" height="600" style="display:inline-block; min-height: 400px; min-width: 600px" ></canvas>
 
 
         <!--Data Table-->
@@ -192,6 +195,28 @@
             <button class="button" id="valueFn_Linear">Linearize</button>
             <button class="button" id="valueFn_Flip">Flip Direction</button>
         </div>
+        <div id="pwl_div" class="dialogDiv">
+            <canvas id="pwl" width="200" height="200" style="border: solid black; float: left"></canvas>
+            <div style="margin: 30px">
+                <button id="flipHorizontal">Flip Horizontal</button>
+                <button id="flipVertical">Flip Vertical</button>
+            </div>
+            <div style="margin: 30px">
+                <button id="linearize">Linearize</button>
+                <!--<button id="loadFromFile">Load from file</button>-->
+                <div class="LoadFileBtn advButton" id="loadFromFileDiv">
+                    <input class="advButton upload" type="file" id="loadFromFile" />
+                    <span class="advButton">Load from file</span>
+                </div>
+                <button id="saveToFile">Save to file</button>
+                <button id="deleteAllPoints">Delete all points</button>
+            </div>
+            <div style="margin: 30px">
+                <button class="not_done" id="showAlternatives">Show Alternatives</button>
+
+            </div>
+        </div>
+
         <div id="sliders_div" class="dialogDiv"></div>
         <div id="datatable_div" class="dialogDiv"></div>
         <div id="description_div" class="dialogDiv" ></div>
