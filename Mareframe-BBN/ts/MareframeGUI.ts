@@ -47,7 +47,8 @@ module Mareframe {
             private m_hasGoal: boolean = false;
             private m_attributeCount = 0;
             private m_alternativCount = 0;
-            private m_attributeIndex : number[] = []
+            private m_attributeIndex: number[] = [];
+            private m_pwWidget;
 
             constructor(p_model: Model, p_handler: Handler) {
                 this.m_handler = p_handler;
@@ -100,7 +101,8 @@ module Mareframe {
                     
                     $("#submit").on("click", this.saveChanges);
                     $("#values").on("click", this.showValues);
-                   
+                    
+                    
                     this.setEditorMode = this.setEditorMode.bind(this);
                     this.setAutoUpdate = this.setAutoUpdate.bind(this);
                     $("#MCADataTable").hide();
@@ -117,9 +119,13 @@ module Mareframe {
                     $("#newDcmt").hide();
                     $("#lodDcmtDiv").show();
                     $("#elementType").hide();
+                    $("#selectModelDiv").hide();
                     //$("#MCAelmtType").selectmenu();
                     //$("#MCAWeightingMethod").selectmenu();
                     $("#weightingMethodSelector").hide();
+                    this.m_pwWidget = new TKN_Widget("pwl", this.m_handler.getFileIO());
+                    var pw: PiecewiseLinear = new PiecewiseLinear(1, 1, 5, 5, 0, 10);
+                    this.m_pwWidget.setPwl(pw);
                    // $("#MCAelmtType").on("fff", function () { });
                     //$("#detailsDialog").on("fff", function() { });
                     //$("#MCAweightingMethod").hide();
@@ -222,7 +228,7 @@ module Mareframe {
                 this.m_valueFnStage.addChild(this.m_controlP);
                 createjs.Ticker.addEventListener("tick", this.tick);
                 createjs.Ticker.setFPS(60);
-                $("#debug").hide();
+                //$("#debug").hide();
                 //this.setEditorMode(true);
                 this.updateEditorMode();
                 }
@@ -244,75 +250,76 @@ module Mareframe {
                 }
                 console.log("AttrIndex: " + this.m_attributeIndex);
             }
-            private editTableData(p_evt: Event) {
-            //    //document.attributes(
-            //    this.updateAtributeIndex();
-            //    var gui = this;
-            //    console.log("id: " + '"#' + p_evt.target.id + '"');
-            //    var id: string = "#" + p_evt.target.id;
-            //    //var originalName: any = $('"#' + p_evt.target.id + '"')[0];
-            //    var originalName: any = $("#" + p_evt.target.id)[0].textContent;
-            //    console.log("id: " + originalName );
-            //    if (this.m_model.getAutoUpdate()) {
-            //        $("#updateMdl").hide();
-            //    }
+            //private editTableData(p_evt: Event) {
+            private editTableData(p_evt: createjs.MouseEvent) {
+                //document.attributes(
+                this.updateAtributeIndex();
+                var gui = this;
+                console.log("id: " + '"#' + p_evt.target.id + '"');
+                var id: string = "#" + p_evt.target.id;
+                //var originalName: any = $('"#' + p_evt.target.id + '"')[0];
+                var originalName: any = $("#" + p_evt.target.id)[0].textContent;
+                console.log("id: " + originalName );
+                if (this.m_model.getAutoUpdate()) {
+                    $("#updateMdl").hide();
+                }
 
-            //    $(id).addClass("editable");
-            //    $(id).html("<input type='text' value='" + originalName + "' />");
-            //    $(id).children().first().focus();
-            //    $(id).children().first().keypress(function (e) {
-            //        if (e.which == 13) {
-            //            var newText = $(this).val();
-            //            console.log("new text1: " + newText);
-            //            if (newText.length < 1) { //Must not update the text if the new text string is empty
-            //                $("#info_name").html(originalName);
-            //                newText = originalName;
-            //}
-            //            $(this).parent().text(newText);
+                $(id).addClass("editable");
+                $(id).html("<input type='text' value='" + originalName + "' />");
+                $(id).children().first().focus();
+                $(id).children().first().keypress(function (e) {
+                    if (e.which == 13) {
+                        var newText = $(this).val();
+                        console.log("new text1: " + newText);
+                        if (newText.length < 1) { //Must not update the text if the new text string is empty
+                            $("#info_name").html(originalName);
+                            newText = originalName;
+            }
+                        $(this).parent().text(newText);
 
-            //            originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
-            //            var tableX = id.slice(10).split("x")[0];
-            //            var tableY = id.slice(10).split("x")[1];
-            //            console.log("tableX: " + tableX + "  tableY: " + tableY);
-            //            console.log("atrributeIndex: " + gui.m_attributeIndex);
-            //            if (parseInt(tableX) !== 0) {
-            //                var elmt: Element = gui.m_model.getElementArr()[gui.m_attributeIndex[parseInt(tableX) - 1]];
-            //                console.log("element: " + elmt.getName());
-            //                if (parseInt(tableY) === 0) {
-            //                    elmt.setName(originalName);
-            //                }
-            //                if (parseInt(tableY) === 1) {
-            //                    elmt.setDataMin(parseFloat(originalName));
-            //                }
-            //                if (parseInt(tableY) > 1 && parseInt(tableY) < gui.m_alternativCount + 2) {
-            //                    elmt.changeDataArrAtIndex(parseInt(tableY) - 2 , parseFloat(originalName));
-            //                }
-            //                if (parseInt(tableY) === gui.m_alternativCount + 2) {
-            //                    elmt.m_dataUnit = originalName;
-            //                }
-            //                if (parseInt(tableY) === gui.m_alternativCount + 3) {
-            //                    elmt.setDataMax(parseFloat(originalName));
-            //                }
-            //            }
-            //            gui.updateTable(gui.m_model.getDataMatrix(true));
-            //            gui.updateFinalScores();
-            //        }
-            //        $(this).parent().removeClass("editable");
-            //    });
-            //    $(id).children().first().blur(function () {
-            //        var newText = $(this).val();
-            //        console.log("new text2: " + newText);
-            //        if (newText.length < 1) { //Must not update the text if the new text string is empty
-            //            $("#info_name").html(originalName);
-            //            newText = originalName;
-            //        }
-            //        $(this).parent().text(newText);
+                        originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                        var tableX = id.slice(10).split("x")[0];
+                        var tableY = id.slice(10).split("x")[1];
+                        console.log("tableX: " + tableX + "  tableY: " + tableY);
+                        console.log("atrributeIndex: " + gui.m_attributeIndex);
+                        if (parseInt(tableX) !== 0) {
+                            var elmt: Element = gui.m_model.getElementArr()[gui.m_attributeIndex[parseInt(tableX) - 1]];
+                            console.log("element: " + elmt.getName());
+                            if (parseInt(tableY) === 0) {
+                                elmt.setName(originalName);
+                            }
+                            if (parseInt(tableY) === 1) {
+                                elmt.setDataMin(parseFloat(originalName));
+                            }
+                            if (parseInt(tableY) > 1 && parseInt(tableY) < gui.m_alternativCount + 2) {
+                                elmt.changeDataArrAtIndex(parseInt(tableY) - 2 , parseFloat(originalName));
+                            }
+                            if (parseInt(tableY) === gui.m_alternativCount + 2) {
+                                elmt.m_dataUnit = originalName;
+                            }
+                            if (parseInt(tableY) === gui.m_alternativCount + 3) {
+                                elmt.setDataMax(parseFloat(originalName));
+                            }
+                        }
+                        gui.updateTable(gui.m_model.getDataMatrix(true));
+                        gui.updateFinalScores();
+                    }
+                    $(this).parent().removeClass("editable");
+                });
+                $(id).children().first().blur(function () {
+                    var newText = $(this).val();
+                    console.log("new text2: " + newText);
+                    if (newText.length < 1) { //Must not update the text if the new text string is empty
+                        $("#info_name").html(originalName);
+                        newText = originalName;
+                    }
+                    $(this).parent().text(newText);
                    
-            //        originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
-            //        $(this).parent().removeClass("editable");
-            //    });
+                    originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                    $(this).parent().removeClass("editable");
+                });
                 
-            //    //this.updateFinalScores();
+                //this.updateFinalScores();
 
             }
             private optionTypeChange(p_evt: Event) {
@@ -481,6 +488,10 @@ module Mareframe {
                     case "2":
                         elmt.setData([Math.random() * 100, Math.random() * 100, 0, 0, 100]);
                         break;
+                    case "4":
+                        {
+
+                        }
                     default:
                         console.log("You done goofed" + $("#MCAWeightingMethod").val() );
             }
@@ -656,8 +667,8 @@ module Mareframe {
             };
             private mouseUp(p_evt: createjs.MouseEvent) {
                 console.log("mouse up");
-                $("#mX").html("X: " + p_evt.stageX);
-                $("#mY").html("Y: " + p_evt.stageY);
+                $("#mX").html("stageX: " + p_evt.stageX + "  localX: " + p_evt.localX + "  rawX: " + p_evt.rawX);
+                $("#mY").html("stageY: " + p_evt.stageY + "  localY: " + p_evt.localY + "  rawY: " + p_evt.rawY);
                 $("#mAction").html("Action: mouseUp");
                 $("#mTarget").html("Target: " + p_evt.target.name);
                 //var tmp: any = this.m_mcaContainer.getObjectUnderPoint(p_evt.stageX, p_evt.stageY, 0).name;
@@ -732,79 +743,81 @@ module Mareframe {
             }                        
             updateMiniTables(p_elmtArr: Element[]) {
                 //console.log("updating minitable");
-                for (var j = 0; j < p_elmtArr.length; j++) {
-                    var elmt = p_elmtArr[j];
-                    //  console.log(elmt.getName() + " minitable is being updated");
-                    var backgroundColors = ["#c6c6c6", "#bfbfe0"]
-                    var decisionCont: createjs.Container = elmt.m_minitableEaselElmt;
+                if (this.m_model.m_bbnMode) {
+                    for (var j = 0; j < p_elmtArr.length; j++) {
+                        var elmt = p_elmtArr[j];
+                        //  console.log(elmt.getName() + " minitable is being updated");
+                        var backgroundColors = ["#c6c6c6", "#bfbfe0"]
+                        var decisionCont: createjs.Container = elmt.m_minitableEaselElmt;
 
-                    decisionCont.removeAllChildren();
-                    console.log("elmt.getValues: " + elmt.getValues());
-                    if (elmt.getValues()[0].length > 2) {
-                        var decisTextBox: createjs.Text = new createjs.Text("Values is multidimensional", "0.8em trebuchet", "#303030");
-                        decisionCont.addChild(decisTextBox);
-                    }
-                    else {
-                        for (var i = Tools.numOfHeaderRows(elmt.getValues()); i < elmt.getValues().length; i++) {
-
-                            var backgroundColor: string;
-                            if (elmt.getDecision() == i && elmt.getType() == 1) {
-                                backgroundColor = "#CCFFCC";
-                            }
-                            else {
-                                backgroundColor = backgroundColors[i % 2];
-                            }
-                            var decisRect: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColor).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
-
-                            //   console.log("" + elmt.getValues());
-                            //console.log("substring 0-12: " + elmt.getValues()[i][0]);
-                            var decisName: createjs.Text = new createjs.Text(elmt.getValues()[i][0].substr(0, 12), "0.8em trebuchet", "#303030");
-                            decisName.textBaseline = "middle";
-                            decisName.maxWidth = 68;
-                            decisName.x = 2;
-                            decisName.y = 6 + (i * 12);
-
-                            decisionCont.addChild(decisRect);
-                            decisionCont.addChild(decisName);
-
-                            var valueData: number = elmt.getValues()[i][1];
-                            if (valueData == -Infinity) {
-                                valueData = 0;
-                            }
-                            var decisBarBackgr: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColor).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
-                            var decisBar: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
-
-                            if (elmt.getType() === 0) {
-                                var decisPercVal: createjs.Text = new createjs.Text(Math.floor(valueData * 100) + "%", "0.8em trebuchet", "#303030");
-                            } else {
-                                decisBar.visible = false;
-                                var decisPercVal: createjs.Text = new createjs.Text("" + Tools.round(valueData), "0.8em trebuchet", "#303030");
-
-                            }
-                            decisPercVal.textBaseline = "middle";
-                            decisPercVal.maxWidth = 22;
-                            decisPercVal.x = 71;
-                            decisPercVal.y = 6 + (i * 12);
-
-                            decisionCont.addChild(decisBarBackgr);
-                            decisionCont.addChild(decisBar);
-                            decisionCont.addChild(decisPercVal);
+                        decisionCont.removeAllChildren();
+                        console.log("elmt.getValues: " + elmt.getValues());
+                        if (elmt.getValues()[0].length > 2) {
+                            var decisTextBox: createjs.Text = new createjs.Text("Values is multidimensional", "0.8em trebuchet", "#303030");
+                            decisionCont.addChild(decisTextBox);
                         }
-                    }
-                    decisionCont.addEventListener("click", this.clickedDecision);
-                    decisionCont.x = elmt.m_easelElmt.x + 75;
-                    decisionCont.y = elmt.m_easelElmt.y - 15;
-                    decisionCont.name = elmt.getID();
-                    elmt.m_minitableEaselElmt = decisionCont;
-                    this.m_mcaContainer.addChild(decisionCont);
+                        else {
+                            for (var i = Tools.numOfHeaderRows(elmt.getValues()); i < elmt.getValues().length; i++) {
 
-                    if (elmt.getType() == 2) {
-                        decisionCont.visible = false;
-                    }
+                                var backgroundColor: string;
+                                if (elmt.getDecision() == i && elmt.getType() == 1) {
+                                    backgroundColor = "#CCFFCC";
+                                }
+                                else {
+                                    backgroundColor = backgroundColors[i % 2];
+                                }
+                                var decisRect: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColor).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
 
-                    this.m_updateMCAStage = true;
+                                //   console.log("" + elmt.getValues());
+                                //console.log("substring 0-12: " + elmt.getValues()[i][0]);
+                                var decisName: createjs.Text = new createjs.Text(elmt.getValues()[i][0].substr(0, 12), "0.8em trebuchet", "#303030");
+                                decisName.textBaseline = "middle";
+                                decisName.maxWidth = 68;
+                                decisName.x = 2;
+                                decisName.y = 6 + (i * 12);
+
+                                decisionCont.addChild(decisRect);
+                                decisionCont.addChild(decisName);
+
+                                var valueData: number = elmt.getValues()[i][1];
+                                if (valueData == -Infinity) {
+                                    valueData = 0;
+                                }
+                                var decisBarBackgr: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColor).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
+                                var decisBar: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
+
+                                if (elmt.getType() === 0) {
+                                    var decisPercVal: createjs.Text = new createjs.Text(Math.floor(valueData * 100) + "%", "0.8em trebuchet", "#303030");
+                                } else {
+                                    decisBar.visible = false;
+                                    var decisPercVal: createjs.Text = new createjs.Text("" + Tools.round(valueData), "0.8em trebuchet", "#303030");
+
+                                }
+                                decisPercVal.textBaseline = "middle";
+                                decisPercVal.maxWidth = 22;
+                                decisPercVal.x = 71;
+                                decisPercVal.y = 6 + (i * 12);
+
+                                decisionCont.addChild(decisBarBackgr);
+                                decisionCont.addChild(decisBar);
+                                decisionCont.addChild(decisPercVal);
+                            }
+                        }
+                        decisionCont.addEventListener("click", this.clickedDecision);
+                        decisionCont.x = elmt.m_easelElmt.x + 75;
+                        decisionCont.y = elmt.m_easelElmt.y - 15;
+                        decisionCont.name = elmt.getID();
+                        elmt.m_minitableEaselElmt = decisionCont;
+                        this.m_mcaContainer.addChild(decisionCont);
+
+                        if (elmt.getType() == 2) {
+                            decisionCont.visible = false;
+                        }
+
+                        this.m_updateMCAStage = true;
+                    }
+                    //}
                 }
-                //}
             }
             private clickedDecision(p_evt: createjs.MouseEvent) {
                 if (!this.m_editorMode) {// Setting decision while in editor mode messes with the calculations
@@ -977,7 +990,7 @@ module Mareframe {
                 console.log("leftmost element: " + leftmostElement);
 
                 this.m_updateMCAStage = true;
-                this.setSize(Math.max($(window).width(), rightmostElement), lowestElement); //Sets size 
+                //this.setSize(Math.max($(window).width(), rightmostElement), lowestElement); //Sets size 
             }
             private getModelSize(): number[] {
                 var modelPos: number[] = this.getModelPos();
@@ -992,6 +1005,8 @@ module Mareframe {
                 var rightmostElement: number = 0;
                 this.m_model.getElementArr().forEach(function (e) {
                     //console.log("e y = " + (e.m_easelElmt.y + gui.m_mcaContainer.y) + " and lowestElement: " + lowestElement);
+                    var tmp1 = e.m_easelElmt.x;
+                    var tmp2 = e.m_easelElmt.y;
                     if (e.m_easelElmt.y + gui.m_mcaContainer.y > lowestElement) {
                         lowestElement = gui.m_mcaContainer.y + e.m_easelElmt.y + 30;
                     }
@@ -1002,7 +1017,7 @@ module Mareframe {
                         leftmostElement = e.m_easelElmt.x + gui.m_mcaContainer.x;
                     }
                     if (e.m_easelElmt.x + gui.m_mcaContainer.x > rightmostElement) {
-                        rightmostElement = e.m_easelElmt.x + gui.m_mcaContainer.x + 250;
+                        rightmostElement = e.m_easelElmt.x + gui.m_mcaContainer.x +150;
                     }
                 });
                 return [lowestElement, highestElement, leftmostElement, rightmostElement];
@@ -1224,7 +1239,8 @@ module Mareframe {
                             // Create the data table.
                             // Instantiate and draw our chart, passing in some options.
                             //alert("1");
-                            console.log("WeightedData: " + this.m_model.getWeightedData(p_elmt, true));
+                            //console.log("WeightedDataT: " + this.m_model.getWeightedData(p_elmt, true));
+                            //console.log("WeightedDataF: " + this.m_model.getWeightedData(p_elmt, false));
                             var chartData = google.visualization.arrayToDataTable(this.m_model.getWeightedData(p_elmt, true));
                             //alert("2");
                             var chart = new google.visualization.ColumnChart($("#chart_div").get(0));
@@ -1243,7 +1259,7 @@ module Mareframe {
                     switch (p_elmt.getMethod()) {
                         case 0://direct or undefined
                             console.log("WeigthMethodDirect");
-                            console.log("Weigthed data: " + this.m_model.getWeightedData(p_elmt, false));
+                            //console.log("Weigthed data: " + this.m_model.getWeightedData(p_elmt, false));
                             break;
                         case 1://swing
                             console.log("WeigthMethodSwing");
@@ -1297,9 +1313,11 @@ module Mareframe {
 
                             break;
                         case 2://valueFn
+                            $("#valueFn_div").show();
+                            //$("#pwl_div").show();
                             console.log("WeigthMethodValueFn");
                             var tableMat = this.m_model.getWeightedData(p_elmt, false);
-                            console.log("getWeigthedData: " + tableMat);
+                            //console.log("getWeigthedData: " + tableMat);
                             //var cPX: number = p_elmt.getData(1);
                             var cPX: number = p_elmt.m_valueFunctionX;
                             //var cPY: number = p_elmt.getData(2);
@@ -1356,12 +1374,23 @@ module Mareframe {
 
                             //this.updateValFnCP(cPX, cPY, p_elmt.getData(3));
                             this.updateValFnCP(cPX, cPY, p_elmt.m_valueFunctionFlip);
+                            //this.m_pwWidget.addPWLToStage();
+                            //this.m_pwWidget.update();
                             this.updateDataTableDiv(p_elmt);
+                            
                             break;
                         case 3://ahp
+                        case 4: {
+                            $("#pwl_div").show();
+                            this.m_pwWidget.addPWLToStage();
+                            this.m_pwWidget.update();
+                            this.updateDataTableDiv(p_elmt);
+                            break;
+                        }
                     }
                     this.m_updateMCAStage = true;
-                    //set description
+
+                    //set editor description
                     document.getElementById("description_div").innerHTML = p_elmt.getDescription();
                 }
             };
@@ -1760,7 +1789,8 @@ module Mareframe {
                 this.m_valueFnContainer.addChild(plot);
                 this.m_valueFnStage.update();
                 //update = true;
-                $("#valueFn_div").show();
+                ///if(  ) 
+                //$("#valueFn_div").show();
             }
             private updateDataTableDiv(p_elmt: Element): void {
                 console.log("tableMat: " + tableMat);
@@ -1836,7 +1866,7 @@ module Mareframe {
             }
             private updateTable(p_matrix: any[][]): void {
                 this.updateAlternativeCount();
-                $(".tableEdit").off("dblclick", this.editTableData);
+                //$(".tableEdit").off("dblclick", this.editTableData);
                 var tableHTML = "";
 
                 var topRow = true;
@@ -1898,7 +1928,7 @@ module Mareframe {
             private mouseDown(p_evt: createjs.MouseEvent): void {
                 console.log("mouse down");
                 console.log("DataMatrix: " + this.m_model.getDataMatrix());
-                $("#mX").html("X: " + p_evt.stageX);
+                $("#mX").html("stageX: " + p_evt.stageX + "  localX: " + p_evt.localX + "  rawX: " + p_evt.rawX);
                 $("#mY").html("Y: " + p_evt.stageY);
                 $("#mAction").html("Action: mousedown");
                 $("#mTarget").html("Target: " + p_evt.target.name);
@@ -1978,8 +2008,8 @@ module Mareframe {
             private pressMove(p_evt: createjs.MouseEvent): void {
                 var gui = this;
                 //console.log("press move on target " + p_evt.target.name);
-                $("#mX").html("X: " + p_evt.stageX);
-                $("#mY").html("Y: " + p_evt.stageY);
+                $("#mX").html("stageX: " + p_evt.stageX + "  localX: " + p_evt.localX + "  rawX: " + p_evt.rawX);
+                $("#mY").html("stageX: " + p_evt.stageY + "  localY: " + p_evt.localY + "  rawY: " + p_evt.rawY);
                 $("#mAction").html("Action: PressMove");
                 $("#mTarget").html("Target: " + p_evt.target.name);
                 if (p_evt.target.name === "hitarea") {
@@ -1991,6 +2021,8 @@ module Mareframe {
                         this.m_mcaContainer.addChild(this.m_selectionBox)
                     } else if (this.m_editorMode) {
                         //console.log("elements off screen: "+ this.elementOffScreen( p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
+                        var tmp1 = p_evt.stageX - this.m_oldX;
+                        var tmp2 = p_evt.stageY - this.m_oldY;
                         if (!this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
                         //console.log("panning");
                             $("#mAction").html("Action: Panning");
@@ -2011,13 +2043,16 @@ module Mareframe {
                     }
                     else {
                         //console.log("elements off screen: " + this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
+                        var tmp3 = p_evt.stageX - this.m_oldX;
+                        var tmp4 = p_evt.stageY - this.m_oldY;
                         if (!this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
                         for (var i = 0; i < this.m_selectedItems.length; i++) {
                             var elmt = this.m_selectedItems[i];
 
                             elmt.x += p_evt.stageX - this.m_oldX;
                             elmt.y += p_evt.stageY - this.m_oldY;
-
+                            $("#elmtX").html("elmentX: " + elmt.x);
+                            $("#elmtY").html("elmentY: " + elmt.y);
                             //console.log("selected elements: " + this.m_selectedItems);
                             //        console.log("element: " + elmt.name);
                             for (var j = 0; j < this.m_model.getElement(elmt.name).getConnections().length; j++) {
@@ -2092,8 +2127,9 @@ module Mareframe {
                 //console.log("lowest element: " + lowestElement);
                 //console.log("rightmost element: " + rightmostElement);
                 //console.log("leftmost element: " + leftmostElement);
-                return highestElement - 30 + yMovement < 0 || leftmostElement - 80 + xMovement < 0 || lowestElement + yMovement -30 > this.m_mcaStageCanvas.height || rightmostElement -80 + xMovement > this.m_mcaStageCanvas.width;
-            }
+                var tm = highestElement - 30 + yMovement < 0 || leftmostElement - 80 + xMovement < 0 || lowestElement + yMovement - 30 > this.m_mcaStageCanvas.height || rightmostElement - 80 + xMovement > this.m_mcaStageCanvas.width;
+        
+                return   tm  }
             private tick(): void {
                 if (this.m_updateMCAStage) {
                     this.m_updateMCAStage = false;
