@@ -542,6 +542,17 @@
                 //this.m_data = p_jsonElmt.elmtData;
                 //console.log("FromJSONdata: " + this.m_data);
                 this.m_weightingMethod = p_jsonElmt.elmtWghtMthd;
+                switch (this.m_type) {
+                    case 100: {
+                        this.m_dataBaseLine = p_jsonElmt.elmtDataBaseLine;
+                        this.m_dataMin = p_jsonElmt.elmtDataMin;
+                        this.m_dataMax = p_jsonElmt.elmtDataMax;
+                        this.m_dataArr = p_jsonElmt.elmtDataArr;
+                        this.m_dataUnit = p_jsonElmt.elmtDataUnit;
+                        break;
+                    }
+
+                }
                 
                 switch (this.m_weightingMethod) {
                     case 0: break;
@@ -554,11 +565,7 @@
                         break;
 
                     case 2:
-                        this.m_dataBaseLine = p_jsonElmt.elmtDataBaseLine;
-                        this.m_dataMin = p_jsonElmt.elmtDataMin;
-                        this.m_dataMax = p_jsonElmt.elmtDataMax;
-                        this.m_dataArr = p_jsonElmt.elmtDataArr;
-                        this.m_dataUnit = p_jsonElmt.elmtDataUnit;
+                        
                         this.m_valueFunctionX = p_jsonElmt.elmtValueFnX;
                         this.m_valueFunctionY = p_jsonElmt.elmtValueFnY;
                         this.m_valueFunctionFlip = p_jsonElmt.elmtValueFnFlip;

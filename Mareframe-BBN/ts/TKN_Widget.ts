@@ -10,22 +10,22 @@
                 //this.m_stage.addChild(this.m_backGround);
                 //this.m_stage.update();
                 
-                this.handleDoubleClick = this.handleDoubleClick.bind(this);
-                this.handleMouseDown = this.handleMouseDown.bind(this);
-                this.handlePressMove = this.handlePressMove.bind(this);
-                this.handleDeleteButton = this.handleDeleteButton.bind(this);
-                this.handleFlipHorizontal = this.handleFlipHorizontal.bind(this);
-                this.handleFlipVeritical = this.handleFlipVeritical.bind(this);
-                this.handleLinearize = this.handleLinearize.bind(this);
-                this.handleLoadFromFile = this.handleLoadFromFile.bind(this);
-                this.handleSaveToFile = this.handleSaveToFile.bind(this);
-                this.handleDeleteAllPoints = this.handleDeleteAllPoints.bind(this);
+                //this.handleDoubleClick = this.handleDoubleClick.bind(this);
+                //this.handleMouseDown = this.handleMouseDown.bind(this);
+                //this.handlePressMove = this.handlePressMove.bind(this);
+                //this.handleDeleteButton = this.handleDeleteButton.bind(this);
+                //this.handleFlipHorizontal = this.handleFlipHorizontal.bind(this);
+                //this.handleFlipVeritical = this.handleFlipVeritical.bind(this);
+                //this.handleLinearize = this.handleLinearize.bind(this);
+                //this.handleLoadFromFile = this.handleLoadFromFile.bind(this);
+                //this.handleSaveToFile = this.handleSaveToFile.bind(this);
+                //this.handleDeleteAllPoints = this.handleDeleteAllPoints.bind(this);
                 this.setSize(this.m_width, this.m_height);
-                this.addPWLToStage = this.addPWLToStage.bind(this);
+                //this.addPWLToStage = this.addPWLToStage.bind(this);
                 $("#selectedPointInfo").hide();
                 $("#deleteButton").button().click( this.handleDeleteButton );
                 $("#flipHorizontal").button().click( this.handleFlipHorizontal );
-                $("#flipVertical").button().click( this.handleFlipVeritical );
+                $("#flipVertical").button().click( this.handleFlipVertical );
                 $("#linearize").button().click( this.handleLinearize );
                 $("#loadFromFileDiv").button().change( this.handleLoadFromFile );
                 $("#saveToFile").button().click( this.handleSaveToFile );
@@ -33,7 +33,8 @@
                 $("#showAlternatives").button().click(this.handleShowAlternatives);
                 $("#saveFile_div").hide();
                 //$(".not_done").prop("disable", true);
-                $(".not_done").button("disable");
+                //$(".not_done").button("disable");
+                $(".not_done").hide();
             };
 
             private m_stage: createjs.Stage;
@@ -105,7 +106,7 @@
             handlePressMove() {
                 alert("PressMove");
             }
-            handleMouseDown(e: createjs.MouseEvent, data: any) {
+            handleMouseDown = (e: createjs.MouseEvent, data: any) => {
               //handleMouseDown(e: createjs.MouseEvent) {
                 //alert("mouseDown");
                 console.log("mousedown on " + e.target.id);
@@ -150,7 +151,7 @@
                 this.update();
             }
             hd(e: createjs.MouseEvent, data: any) { }
-            handleDoubleClick(e: createjs.MouseEvent) {
+            handleDoubleClick = (e: createjs.MouseEvent) => {
                 var tmpx = this.m_pwl.getPoints()[0].x * this.m_unitX;
                 if (this.m_flipHorizontal) {
                     if (this.m_flipVertical) {
@@ -175,7 +176,7 @@
                 this.addPWLToStage();
                 this.update();
             }
-            handleDeleteButton(e: createjs.MouseEvent) {
+            handleDeleteButton = (e: createjs.MouseEvent) => {
                 console.log("houh");
                 this.m_pwl.removePointAtIndex(this.m_selectedPointIndex);
                 this.m_selectedPointIndex = null;
@@ -183,21 +184,21 @@
                 this.addPWLToStage();
                 this.m_stage.update();
             }
-            handleFlipHorizontal(e: createjs.MouseEvent) {
+            handleFlipHorizontal = (e: createjs.MouseEvent) => {
                 if (this.m_flipHorizontal)
                     this.m_flipHorizontal = false;
                 else
                     this.m_flipHorizontal = true;
                 this.addPWLToStage();
             }
-            handleFlipVeritical(e: createjs.MouseEvent) {
+            handleFlipVertical = (e: createjs.MouseEvent) => {
                 if (this.m_flipVertical)
                     this.m_flipVertical = false;
                 else
                     this.m_flipVertical = true;
                 this.addPWLToStage();
             }
-            handleLinearize(e: createjs.MouseEvent) {
+            handleLinearize = (e: createjs.MouseEvent) => {
                 var a = (this.m_pwl.getPoints()[this.m_pwl.getPoints().length-1].y - this.m_pwl.getPoints()[0].y) / (this.m_pwl.getPoints()[this.m_pwl.getPoints().length-1].x - this.m_pwl.getPoints()[0].x);
                 var b = this.m_pwl.getPoints()[0].y - a * this.m_pwl.getPoints()[0].y;
                 for (var i = 1; i < this.m_pwl.getPoints().length - 1; i++) {
@@ -206,12 +207,12 @@
             
                 this.addPWLToStage();
             }
-            handleLoadFromFile(e: createjs.MouseEvent) {
+            handleLoadFromFile = (e: createjs.MouseEvent) => {
                 console.log("not done yet, no not yet");
                 this.m_fileIO.loadPWLFromFile(this.m_pwl, this.addPWLToStage);
                 
             }
-            handleSaveToFile(e: createjs.MouseEvent) {
+            handleSaveToFile = (e: createjs.MouseEvent) => {
                 console.log("not done yet");
                 var fileIO = this.m_fileIO;
                 var widget = this;
@@ -245,12 +246,12 @@
                 });
                               
             }
-            handleDeleteAllPoints(e: createjs.MouseEvent) {
+            handleDeleteAllPoints = (e: createjs.MouseEvent) => {
                 console.log("not done yet");
                 this.m_pwl.getPoints().splice(1, this.m_pwl.getPoints().length - 2);
                 this.addPWLToStage();
             }
-            handleShowAlternatives(e: createjs.MouseEvent) {
+            handleShowAlternatives = (e: createjs.MouseEvent) => {
                 console.log("not done yet");
             }
             update() {
@@ -260,7 +261,7 @@
                 //for (var i = 1; i < this.m_valueFunction.
                 alert("not imp yet");
             }
-            addPWLToStage() {
+            addPWLToStage = () => {
                 this.m_stage.removeAllChildren();
                 this.setSize(this.m_width, this.m_height);
                 var points: createjs.Point[] = this.m_pwl.getPoints();
@@ -294,7 +295,8 @@
                     //point.addEventListener("mousedown", this.m_eventHandleAndData);
                     //point.on("mousedown", (e: createjs.MouseEvent) => this.handleMouseDown(e), this, false, { PosX: points[i].x, posY: points[i].y });
                     //point.on("click", this.hd; 
-                    this.m_stage.addChild(point);               
+                    this.m_stage.addChild(point);
+                    //this.m_stage.update();             
                 }
                 this.m_stage.addChild(new createjs.Shape(linePieceWise));
                 this.m_stage.update();

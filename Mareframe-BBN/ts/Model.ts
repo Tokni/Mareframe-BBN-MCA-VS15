@@ -283,7 +283,7 @@
                 var tempMatrix = [];
                 var dm = this.getDataMatrix();
                 if (p_addHeader) {
-                    tempMatrix.push(['string', 'number']);
+                    tempMatrix.push(['string', 'number' ]);
                 }
                 console.log("DataMatrixx  --------  -------- : " + dm);
                 switch (p_elmt.getType()) {
@@ -302,15 +302,25 @@
                             for (var i = 3; i < this.getDataMatrix().length - 2; i++) {
                                 var toAdd = [this.m_elementArr[this.m_altIndex[i - 3]].getName(), p_elmt.getDataArrAtIndex(i - 3)];
                                 if (!p_addHeader) {
-                                    var tmp = p_elmt.getDataArrAtIndex(i - 3);
-                                    var nom = p_elmt.getDataArrAtIndex(i - 3) - minVal;
-                                    var denom = (maxVal - minVal);
-                                    var frac = nom/denom;
-                                   toAdd.push(Mareframe.DST.Tools.getValueFn(Math.abs(p_elmt.m_valueFunctionFlip - (p_elmt.getDataArrAtIndex(i - 3) - minVal) / (maxVal - minVal)), Math.abs(p_elmt.m_valueFunctionFlip - p_elmt.m_valueFunctionX / 100), 1 - p_elmt.m_valueFunctionY / 100));                          
-                            }
-                                console.log("toAdd: " + toAdd);
+                                    //var tmp = p_elmt.getDataArrAtIndex(i - 3);
+                                    //var nom = p_elmt.getDataArrAtIndex(i - 3) - minVal;
+                                    //var denom = (maxVal - minVal);
+                                    //var frac = nom / denom;
+                                    toAdd.push(Mareframe.DST.Tools.getValueFn(Math.abs(p_elmt.m_valueFunctionFlip - (p_elmt.getDataArrAtIndex(i - 3) - minVal) / (maxVal - minVal)), Math.abs(p_elmt.m_valueFunctionFlip - p_elmt.m_valueFunctionX / 100), 1 - p_elmt.m_valueFunctionY / 100));
+                                }
+                                console.log("toAdd2: " + toAdd);
                                 tempMatrix.push(toAdd);
-                        }
+                            }
+                        } else if (p_elmt.getMethod() === 4) {
+                            for (var i = 3; i < this.getDataMatrix().length - 2; i++) {
+                                var toAdd = [this.m_elementArr[this.m_altIndex[i - 3]].getName(), p_elmt.getDataArrAtIndex(i - 3)];
+                                if (!p_addHeader) {
+                                    
+                                    toAdd.push("ss");
+                                }
+                                console.log("toAdd4: " + toAdd);
+                                tempMatrix.push(toAdd);
+                            }
                         } else {
 
                         }

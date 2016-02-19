@@ -54,9 +54,17 @@
             linearize() {
                 alert("Not Implemenrted");
             }
+            //member variables
+            m_maxValue: number = 100;
+            m_minValue: number = 100;
+            m_middlepoints: createjs.Point[] = [];
+            m_startPoint: createjs.Point = new createjs.Point(0, 0);
+            m_endPoint: createjs.Point = new createjs.Point(0, 0);
 
             constructor(p_startX: number, p_startY: number, p_endX: number, p_endY: number, p_minValue: number, p_maxValue: number) {
                 super();
+                this.setStartPoint(p_startX, p_startY);
+                this.setEndPoint(p_endX, p_endY);
                 this.addPoint(p_startX, p_startY);
                 this.addPoint(p_endX, p_endY);
                 if (p_minValue !== undefined) {
@@ -67,15 +75,13 @@
                 }
             }
 
-            //member variables
-            m_maxValue: number = 100;
-            m_minValue: number = 100;
-            m_middlepoints: createjs.Point[] = [];
-            m_startPoint: createjs.Point;
-            m_endPoint: createjs.Point;
+            
 
             //methods
             setStartPoint(p_x, p_y) {
+                var hello = 100;
+                this.m_startPoint.setValues(10, 20);
+                
                 this.m_startPoint.setValues(p_x, p_y);
             }
             getStartPoint() {

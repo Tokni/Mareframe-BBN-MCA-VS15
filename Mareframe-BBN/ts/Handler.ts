@@ -17,7 +17,7 @@ module Mareframe {
             constructor() {
                 console.log("handler started");
                 this.m_mareframeMode = true; 
-                var testPage = true; 
+                var testPage = false; 
                 if (testPage === true) {
 
                     //var m = new Model(true);
@@ -39,7 +39,7 @@ module Mareframe {
                     this.m_fileHandler.savePiecewiseLinearFunction(pw);
                 } else {
 
-                    this.m_mareframeMode = true;//This sets the layout to Tokni mode
+                    this.m_mareframeMode = true; //This sets the layout to Tokni mode
 
                 
 
@@ -57,7 +57,7 @@ module Mareframe {
                     //loadModel = "blackSea";
                     //loadModel = "iceland";
                     //loadModel = "cadiz";
-                    //loadModel = "test";
+                    loadModel = "test";
                     }
                     else {//Tokni mode
                         //loadModel = "resturant";
