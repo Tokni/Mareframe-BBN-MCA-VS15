@@ -4,6 +4,7 @@ var Mareframe;
     (function (DST) {
         var GUIHandler = (function () {
             function GUIHandler(p_model, p_handler) {
+                this.m_windowResizable = false;
                 this.m_editorMode = false;
                 this.m_showDescription = true;
                 this.m_unsavedChanges = false;
@@ -173,6 +174,7 @@ var Mareframe;
                 this.m_valFnBackground.addEventListener("pressmove", this.moveValFnCP);
                 this.m_valFnBackground.addEventListener("mousedown", this.downValFnCP);
                 this.m_mcaBackground.addEventListener("pressmove", this.pressMove);
+                this.m_mcaBackground.addEventListener("pressup", this.pressUp);
                 this.m_controlP.mouseChildren = false;
                 $("#selectModel").on("change", this.selectModel);
                 $("#MCAelmtType").on("change", this.optionTypeChange);
@@ -199,7 +201,6 @@ var Mareframe;
                 $("#fullscreen").on("click", this.fullscreen);
                 $("#cnctTool").on("click", this.cnctStatus);
                 $("#addDataRow").on("click", this.addDataRowClick);
-                this.m_mcaBackground.addEventListener("pressup", this.mouseUp);
                 $("#lodDcmt").on("change", this.loadModel);
                 $("#lodDcmt").on("click", function () {
                     console.log("click");
@@ -260,6 +261,7 @@ var Mareframe;
             GUIHandler.prototype.loadModel = function (p_evt) {
                 console.log("load model");
                 this.m_handler.getFileIO().loadfromGenie(this.m_model, this.importStage);
+                this.updateSize();
             };
             GUIHandler.prototype.saveModel = function (p_evt) {
                 $("#saveFile_div").show();
@@ -344,8 +346,33 @@ var Mareframe;
                 this.m_updateMCAStage = true;
             };
             GUIHandler.prototype.pressUp = function (p_evt) {
-                // console.log("pressup");
-                this.updateSize();
+                console.log("pressup");
+                console.log("canvas width: " + this.m_mcaStageCanvas.width + " window width: " + $(window).width());
+                console.log("canvas height: " + this.m_mcaStageCanvas.height + " window height: " + $(window).height());
+                if (this.m_mcaStageCanvas.width > $(window).width() || this.m_mcaStageCanvas.height > 650) {
+                    this.updateSize();
+                }
+                /*
+                var modelPos: number[] = this.getModelPos();
+                var lowestElement: number = modelPos[0];
+                var highestElement: number = modelPos[1];
+                var leftmostElement: number = modelPos[2];
+                var rightmostElement: number = modelPos[3];
+                console.log("lowest: " + lowestElement + " cancas height: " + this.m_mcaStageCanvas.height);
+                console.log("rigthmost: " + rightmostElement + "canvas width: " + this.m_mcaStageCanvas.width);
+                if (lowestElement > this.m_mcaStageCanvas.height + 10 && rightmostElement > this.m_mcaStageCanvas.width) {
+                    this.updateSize();
+                }*/
+                /*
+                console.log("resizable: " + this.m_windowResizable);
+                if (this.m_windowResizable) {
+                    this.updateSize();
+                    console.log("canvas width: " + this.m_mcaStageCanvas.width + " window width: " + $(window).width());
+                    console.log("canvas height: " + this.m_mcaStageCanvas.height + " window height: " + $(window).height());
+                    if (this.m_mcaStageCanvas.width <= $(window).width() && this.m_mcaStageCanvas.height <= $(window).height()) {
+                        this.m_windowResizable = false;
+                    }
+                }*/
             };
             GUIHandler.prototype.mouseMove = function (p_evt) {
                 if ($("cnctTool").prop("checked")) {
@@ -487,10 +514,10 @@ var Mareframe;
                     $("#cnctTool").prop("checked", false);
                 }
                 if (this.m_editorMode) {
-                    this.m_mcaBackground.removeEventListener("pressup", this.pressUp);
+                    this.m_mcaBackground.addEventListener("pressup", this.pressUp);
                 }
                 else {
-                    this.m_mcaBackground.addEventListener("pressup", this.pressUp);
+                    this.m_mcaBackground.removeEventListener("pressup", this.pressUp);
                 }
                 var elementArr = this.m_model.getElementArr();
                 if (elementArr) {
@@ -562,7 +589,6 @@ var Mareframe;
             };
             GUIHandler.prototype.updateSize = function () {
                 //  console.log("updating size");
-                var gui = this;
                 var modelPos = this.getModelPos();
                 var lowestElement = modelPos[0];
                 var highestElement = modelPos[1];
@@ -591,7 +617,7 @@ var Mareframe;
                 this.m_model.getElementArr().forEach(function (e) {
                     //console.log("e y = " + (e.m_easelElmt.y + gui.m_mcaContainer.y) + " and lowestElement: " + lowestElement);
                     if (e.m_easelElmt.y + gui.m_mcaContainer.y > lowestElement) {
-                        lowestElement = gui.m_mcaContainer.y + e.m_easelElmt.y + 30;
+                        lowestElement = gui.m_mcaContainer.y + e.m_easelElmt.y + 40;
                     }
                     if (e.m_easelElmt.y + gui.m_mcaContainer.y < highestElement) {
                         highestElement = e.m_easelElmt.y + gui.m_mcaContainer.y;
