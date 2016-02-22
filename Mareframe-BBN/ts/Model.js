@@ -283,10 +283,13 @@ var Mareframe;
                 return e;
             };
             Model.prototype.getElement = function (p_elmtStringId) {
+                if (p_elmtStringId === undefined) {
+                    return undefined;
+                }
                 return this.m_elementArr[this.getObjectIndex(p_elmtStringId)];
             };
             Model.prototype.getObjectIndex = function (p_objectStringId) {
-                //console.log(" get object "  + p_objectStringId + " in list: "+ this.m_elementArr);
+                // console.log(" get object "  + p_objectStringId + " in list: "+ this.m_elementArr);
                 var key = 0;
                 if (p_objectStringId.substr(0, 4) === "elmt") {
                     this.m_elementArr.every(function (p_elmt) {
@@ -365,6 +368,8 @@ var Mareframe;
                     return false;
                 else {
                     console.log("Deleting connection: " + p_connID + "   ----------------");
+                    var inputElmt = this.m_connectionArr[key].getInputElement();
+                    var outputElmt = this.m_connectionArr[key].getOutputElement();
                     var states = this.m_connectionArr[key].getInputElement().getData().length;
                     var data = this.m_connectionArr[key].getOutputElement().getData();
                     var dataIn = this.m_connectionArr[key].getInputElement().getData();
@@ -373,7 +378,7 @@ var Mareframe;
                     console.log("Original Data Out: " + data);
                     console.log("Original Data In: " + dataIn);
                     var dims = [0, 0, 0];
-                    data = DST.Tools.removeHeaderRow(removeHeader, data);
+                    data = DST.Tools.removeHeaderRow(outputElmt, removeHeader, data);
                     //var splicePos = 1 + Math.floor((data[data.length - 1].length / states));
                     //console.log("states: " + states);
                     //console.log("splicepos: " + splicePos);
@@ -384,8 +389,15 @@ var Mareframe;
                     //console.log("New data: " + data);
                     //console.log("ConnectionArr: " + this.m_connectionArr[key]);
                     this.m_connectionArr[key].getOutputElement().setData(data);
+                    console.log("data : " + outputElmt.getData());
                     this.m_connectionArr.splice(key, 1);
                     //console.log(this.m_elementArr);
+                    if (inputElmt.getType() === 1) {
+                        outputElmt.getAllDescendants().forEach(function (e) {
+                            console.log("descendant: " + e.getName());
+                            e.setUpdated(false);
+                        });
+                    }
                     return true;
                 }
             };
@@ -419,7 +431,7 @@ var Mareframe;
                 return { elements: this.m_elementArr, connections: this.m_connectionArr, mdlName: this.m_modelName, mainObj: this.m_mainObjective, dataMat: this.m_dataMatrix, mdlIdent: this.m_modelIdent };
             };
             Model.prototype.fromJSON = function (p_jsonObject) {
-                console.log("from json: p_jsonObject = " + p_jsonObject);
+                // console.log("from json: p_jsonObject = " + p_jsonObject);
                 $("#modelHeader").html(p_jsonObject.mdlName);
                 var header = $("#model_header").html();
                 //Only append if model name has not been added
@@ -442,8 +454,6 @@ var Mareframe;
                     //if (JsonElmt.posY > maxY)
                     //    maxY = JsonElmt.posY;
                     elmt.fromJSON(JsonElmt);
-                    console.log("created from json: " + elmt.getName());
-                    console.log("position " + elmt.m_easelElmt.y);
                 }
                 for (var i = 0; i < p_jsonObject.connections.length; i++) {
                     var conn = p_jsonObject.connections[i];

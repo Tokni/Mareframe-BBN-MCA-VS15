@@ -323,10 +323,13 @@
 
             }
             getElement(p_elmtStringId: string): Element {
+                if (p_elmtStringId === undefined) {
+                    return undefined;
+                }
                 return this.m_elementArr[this.getObjectIndex(p_elmtStringId)];
             }
             private getObjectIndex(p_objectStringId: string): number {
-             //console.log(" get object "  + p_objectStringId + " in list: "+ this.m_elementArr);
+            // console.log(" get object "  + p_objectStringId + " in list: "+ this.m_elementArr);
                 var key = 0;
                 if (p_objectStringId.substr(0, 4) === "elmt") {
                     this.m_elementArr.every(function (p_elmt) {
@@ -410,17 +413,19 @@
                     return false;
                 else {
                     console.log("Deleting connection: " + p_connID + "   ----------------");
-                    
+                    var inputElmt: Element = this.m_connectionArr[key].getInputElement();
+                    var outputElmt: Element = this.m_connectionArr[key].getOutputElement();
                     var states:number = this.m_connectionArr[key].getInputElement().getData().length;
                     var data = this.m_connectionArr[key].getOutputElement().getData();
                     var dataIn = this.m_connectionArr[key].getInputElement().getData();
                     var removeHeader = this.m_connectionArr[key].getInputElement().getID();
+                    
                     console.log("Remove header: " + removeHeader);
                     console.log("Original Data Out: " + data);
                     console.log("Original Data In: " + dataIn);
                     
                     var dims: number[] = [0, 0, 0];
-                    data = Tools.removeHeaderRow(removeHeader, data);
+                    data = Tools.removeHeaderRow(outputElmt, removeHeader, data);
                     //var splicePos = 1 + Math.floor((data[data.length - 1].length / states));
                     //console.log("states: " + states);
                     //console.log("splicepos: " + splicePos);
@@ -431,10 +436,16 @@
                     //console.log("New data: " + data);
                     //console.log("ConnectionArr: " + this.m_connectionArr[key]);
                     this.m_connectionArr[key].getOutputElement().setData(data);
-
+                    console.log("data : " + outputElmt.getData());
                     this.m_connectionArr.splice(key, 1);
 
                     //console.log(this.m_elementArr);
+                    if (inputElmt.getType() === 1) {//If the input element is a dec all descendants of the output element need to be updated
+                        outputElmt.getAllDescendants().forEach(function (e) {
+                            console.log("descendant: " + e.getName());
+                            e.setUpdated(false);
+                        });
+                    }
                     return true;
                 }
             }
@@ -469,7 +480,7 @@
 
             }
             fromJSON(p_jsonObject: any): void {
-                console.log("from json: p_jsonObject = " + p_jsonObject);
+               // console.log("from json: p_jsonObject = " + p_jsonObject);
                 $("#modelHeader").html(p_jsonObject.mdlName);
                 var header = $("#model_header").html();
                 //Only append if model name has not been added
@@ -500,8 +511,8 @@
                     //if (JsonElmt.posY > maxY)
                     //    maxY = JsonElmt.posY;
                     elmt.fromJSON(JsonElmt);
-                    console.log("created from json: " + elmt.getName());
-                    console.log("position " + elmt.m_easelElmt.y);
+                  //  console.log("created from json: " + elmt.getName());
+                   // console.log("position " + elmt.m_easelElmt.y);
                 }
 
                 for (var i = 0; i < p_jsonObject.connections.length; i++)

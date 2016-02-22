@@ -114,24 +114,38 @@
                 return highest;
             }
 
-            static numOfHeaderRows(p_valuesArray): number {
-                //console.log(p_valuesArray);
+            static numOfHeaderRows(p_valuesArray, p_elmt?: Element): number {
+                //console.log("number of headerrows in " + p_valuesArray);
                 var counter = 0;
                 Tools.makeSureItsAnArray(p_valuesArray);
-                //console.log("p_valuesArray.length: " + p_valuesArray.length);
-                //console.log(p_valuesArray);
-                for (var i = 0; i < p_valuesArray.length; i++) {
-                    //if the cell in column 2 contains text it is a header row and must be a decision
-                    if (isNaN(p_valuesArray[i][1]) && p_valuesArray[i][1] !== undefined) {
-                        counter++;
+                if (p_elmt !== undefined && p_elmt.getType() === 3) {//In super value nodes headerrows are not defined the same way as in other nodes
+                  //  console.log("super value node");
+                    var rows: number = math.size(p_valuesArray)[0];
+                    if (p_valuesArray[rows-1][0] === "Value") {//If the value row is part of the table then number of header rows is no. of rows minus 1
+                        counter = rows - 1;
+                       // console.log("value row is present");
+                    }
+                    else {//Otherwise all rows are headerrows
+                        counter = rows;
                     }
                 }
+                else {
+                    //console.log("p_valuesArray.length: " + p_valuesArray.length);
+                    //console.log(p_valuesArray);
+                    for (var i = 0; i < p_valuesArray.length; i++) {
+                        //if the cell in column 2 contains text it is a header row and must be a decision
+                        if (isNaN(p_valuesArray[i][1]) && p_valuesArray[i][1] !== undefined) {
+                            counter++;
+                        }
+                    }
+                }
+                //console.log("returned : " + counter);
                 return counter
             }
 
             static htmlTableFromArray(p_header: string, p_elmt: Element, p_model: Model, p_editorMode: boolean) {
-                console.log("header: " + p_header);
-                console.log("type of elmt: " + p_elmt.getType());
+                // console.log("header: " + p_header);
+                //console.log("type of elmt: " + p_elmt.getType());
 
                 var data: any[][];
                 if (p_header === "Definition") {
@@ -154,8 +168,8 @@
                 if (p_elmt.getType() == 1 && p_header === "Values") {//Find best decision by finding the highest value in dec value table
                     var bestDecRow: number = numOfHeaderRows;
                     var bestDecCol: number = 1;
-                    console.log("data length: " + data.length);
-                    console.log("data [0] length: " + data[0].length);
+                    // console.log("data length: " + data.length);
+                    // console.log("data [0] length: " + data[0].length);
                     for (var i = numOfHeaderRows + 1; i < data.length; i++) {
                         for (var j = 1; j < data[0].length; j++) {
                             console.log("i: " + i + " j: " + j);
@@ -170,53 +184,61 @@
                 //console.log("p_header: " + p_header);
                 //console.log("data: " + data);
                 var htmlString = "";
+
                 if (data[0] !== undefined) {
                     htmlString += "<tr><th style='text-align:center' colspan=\"" + (data[0].length + 1) + "\" >" + p_header + " </th></tr>";
                 } else {
                     htmlString += "<tr><th style='text-align:center'>" + p_header + " </th></tr>";
                 }
-                for (var i = 0; i < numOfHeaderRows; i++) {
-                    htmlString += "<tr>";
-                    if (p_editorMode && p_header === "Definition" && (p_elmt.getType() === 0 || p_elmt.getType() === 1)) { htmlString += "<th></th>"; }//Create empty cell above minus cells
-                    for (var j = 0; j < (data[0].length); j++) {
-                        if (j === 0) {
-                            htmlString += "<th>" + p_model.getElement(data[i][j]).getName() + "</th>";
-                        }
-                        else {
-                            htmlString += "<th>" + data[i][j] + "</th>";
-                        }
-                    }
-                    htmlString += "</tr>";
+                if (p_elmt.getType() === 3 && math.size(data)[1] < 1) {//The data table is empty in the super value node
+                    //console.log("super value with empty def");
+                    htmlString += " <tr> <th> This super value node has no parents</th></tr>";
                 }
-                //console.log("numOfHeaderRows: " + numOfHeaderRows);
-                //console.log("data.length: " + data.length);
-                
-                for (var i = numOfHeaderRows; i < data.length; i++) {
-                    htmlString += "<tr>";
-                    if (p_editorMode && p_header === "Definition" && (p_elmt.getType() === 0 || p_elmt.getType() === 1)) { htmlString += "<th><button class='minus' id='" + i + "'></button></th>"; }//add minus button
-                    for (var j = 0; j < (data[0].length); j++) {
-                        var value: number = data[i][j];
-                        if (value === -Infinity) {//In decision nodes the default value is -infinity, but this should be 0 to the user
-                            value = 0;
-                        }
-                        if (j === 0) {
-                            if (p_elmt.getType() === 3) {
-                                htmlString += "<th> " + p_model.getElement(data[i][j]).getName() + "</th>";//This is because super value nodes have parents horizontial in def table
+                else {
+                    for (var i = 0; i < numOfHeaderRows; i++) {
+                        console.log("i: " + i);
+                        htmlString += "<tr>";
+                        if (p_editorMode && p_header === "Definition" && (p_elmt.getType() === 0 || p_elmt.getType() === 1)) { htmlString += "<th></th>"; }//Create empty cell above minus cells
+                        for (var j = 0; j < (data[0].length); j++) {
+                            if (j === 0) {
+                                htmlString += "<th>" + p_model.getElement(data[i][j]).getName() + "</th>";
                             }
                             else {
-                                htmlString += "<th><div class='editable_cell'> " + value + "</div></th>";
-                            }
-                        } else {
-                            if (j === highestValue || (i == bestDecRow && j == bestDecCol)) {//mark highest if it is the value table of a value node or a decision node
-                                htmlString += "<td> <b>" + Tools.round(value) + "</b></td>";
-                            }
-                            else {
-                                htmlString += "<td>" + Tools.round(value) + "</td>";
+                                htmlString += "<th>" + data[i][j] + "</th>";
                             }
                         }
-
+                        htmlString += "</tr>";
                     }
-                    htmlString += "</tr>";
+                    //console.log("numOfHeaderRows: " + numOfHeaderRows);
+                    //console.log("data.length: " + data.length);
+                
+                    for (var i = numOfHeaderRows; i < data.length; i++) {
+                        htmlString += "<tr>";
+                        if (p_editorMode && p_header === "Definition" && (p_elmt.getType() === 0 || p_elmt.getType() === 1)) { htmlString += "<th><button class='minus' id='" + i + "'></button></th>"; }//add minus button
+                        for (var j = 0; j < (data[0].length); j++) {
+                            var value: number = data[i][j];
+                            if (value === -Infinity) {//In decision nodes the default value is -infinity, but this should be 0 to the user
+                                value = 0;
+                            }
+                            if (j === 0) {
+                                if (p_elmt.getType() === 3 && p_header === "Definition") {
+                                    htmlString += "<th> " + p_model.getElement(data[i][j]).getName() + "</th>";//This is because super value nodes have parents horizontial in def table
+                                }
+                                else {
+                                    htmlString += "<th><div class='editable_cell'> " + value + "</div></th>";
+                                }
+                            } else {
+                                if (j === highestValue || (i == bestDecRow && j == bestDecCol)) {//mark highest if it is the value table of a value node or a decision node
+                                    htmlString += "<td> <b>" + Tools.round(value) + "</b></td>";
+                                }
+                                else {
+                                    htmlString += "<td>" + Tools.round(value) + "</td>";
+                                }
+                            }
+
+                        }
+                        htmlString += "</tr>";
+                    }
                 }
                 //console.log("html table: " + htmlString);
                 return htmlString;
@@ -306,7 +328,7 @@
             }
             //This method converts an element, which is not an array, to a singleton list
             static makeSureItsAnArray(p_value: any[]): any[] {
-                if (math.size(p_value).valueOf()[1] === undefined) {
+                if (p_value === undefined || math.size(p_value).valueOf()[1] === undefined) {
                     p_value = [p_value];
                 }
                 return p_value;
@@ -320,7 +342,7 @@
             }
             //This returns a table withot its headerrows
             static getMatrixWithoutHeader(p_matrix: any[][]): any[][] {
-                console.log("get matrix without header from " + p_matrix)
+               // console.log("get matrix without header from " + p_matrix)
                 p_matrix = Tools.makeSureItsTwoDimensional(p_matrix);
                 var numOfColumns: number;
                 var numOfRows: number;
@@ -346,12 +368,12 @@
                         //  console.log("newMatrix: " + newMatrix)
                     }
                 }
-                console.log("returned: " + newMatrix);
-                console.log(newMatrix);
+                //console.log("returned: " + newMatrix);
+               // console.log(newMatrix);
                 return newMatrix;
             }
 
-            static getValueWithCondition(p_values: any[][], p_elmt: Element, p_condition): number[] {
+            static getValueWithCondition(p_values: any[][], p_elmt: Element, p_conditions: String[]): number[] {
                 //console.log("getting value with condition " + p_condition + " from " + p_values);
                 var values: any[][] = Tools.makeSureItsTwoDimensional(p_values);
                 // //console.log("values table : \n " + values);
@@ -364,7 +386,7 @@
                     if (values[i][0] === p_elmt.getID()) {
                         //Find the correct column
                         for (var j = 1; j < columns; j++) {
-                            if (values[i][j] === p_condition) {
+                            if (values[i][j] === p_conditions) {
                                 valuesFound.push(values[rows - 1][j]);
                             }
                         }
@@ -373,15 +395,36 @@
                 //console.log("returned " + valuesFound);
                 return valuesFound;
             }
+            static getValueWithConditions(p_values: any[][], p_elmts: string[], p_conditions: string[]): number {
+                //console.log("get value with condtions: " + p_conditions + " in: " + p_values + " for elements: " + p_elmts);
+                var values = Tools.makeSureItsTwoDimensional(p_values);
+                var rows: number = math.size(values)[0];
+                var columns: number = math.size(values)[1];
+                for (var i = 1; i < columns; i++) {
+                    var matchingColumn: boolean = true;
+                    for (var j = 0; j < Tools.numOfHeaderRows(values); j++) {
+                        for (var n = 0; n < p_elmts.length; n++) {
+                            if (values[j][0] === p_elmts[n] && values[j][i] !== p_conditions[n]) {
+                                matchingColumn = false;
+                                break;
+                            }
+                        }
+                    }
+                    if (matchingColumn) {
+                       // console.log("returned " + values[Tools.numOfHeaderRows(values)][i]);
+                        return values[Tools.numOfHeaderRows(values)][i];
+                    }
+                }
+            }
 
             static createSubMatrices(p_currentElement: Element, p_matrix: any[][], p_makeSubmatrixElmt: Element, p_dataHeaders: any[][]) {
                 if (p_makeSubmatrixElmt !== undefined) {
-                    console.log("create sub matrix from " + p_matrix + " size " + math.size(p_matrix) + " for values " + p_makeSubmatrixElmt.getName() + " current elmt type: " + p_currentElement.getType());
+                   // console.log("create sub matrix from " + p_matrix + " size " + math.size(p_matrix) + " for values " + p_makeSubmatrixElmt.getName() + " current elmt type: " + p_currentElement.getType());
                 }
                 var data = Tools.makeSureItsTwoDimensional(p_dataHeaders);
                 p_matrix = Tools.makeSureItsTwoDimensional(p_matrix);
-                console.log("data: " + (data) + " size " + math.size(data));
-                console.log(data);
+                //console.log("data: " + (data) + " size " + math.size(data));
+               // console.log(data);
                 var subMatrices = [];
                 var columns = math.size(p_matrix).valueOf()[1];
                 var newDataHeaders: any[][] = [];
@@ -464,14 +507,15 @@
                     }
                 }
                 else {//In super value nodes each value should be its own submatrix
-                    console.log("super value node");
+                    //console.log("super value node");
                     for (var i = 0; i < p_matrix.length; i++) {
                         subMatrices.push(Tools.makeSureItsTwoDimensional([p_matrix[i][0]]));
-                        console.log(subMatrices);
+                        //console.log(subMatrices);
                     }
+                    newDataHeaders = p_dataHeaders;//Because data headers do not get updated in super value nodes
                 }
                 // console.log("new data headers: " + newDataHeaders);
-                console.log("returned " + subMatrices + " size of submatrix " + math.size(subMatrices[0]) + " number of submatrices " + subMatrices.length);
+               // console.log("returned " + subMatrices + " size of submatrix " + math.size(subMatrices[0]) + " number of submatrices " + subMatrices.length);
                 return [subMatrices, Tools.makeSureItsTwoDimensional( newDataHeaders)];
             }
 
@@ -600,19 +644,21 @@
                 return p_dataHeader;
             }
             static insertNewHeaderRowAtBottom(p_newRow: any[], p_table: any[]): any[] {
-                // console.log("inserting " + p_newRow + " in to " + p_table + " size " + math.size(p_table));
-                var tempTable: any[] = p_newRow.slice();
-                //console.log("temp table: " + tempTable);
-                if (p_table.length !== 0) {//If table was not originally empty
-                    if (Tools.isOneDimensional(p_table)) {
+                 var tempTable: any[] = p_newRow.slice();
+                 var table: any[][] = Tools.makeSureItsTwoDimensional(p_table);
+                // console.log("inserting " + p_newRow + " into " + table + " size " + math.size(table));
+               // console.log("temp table: " + tempTable);
+               // console.log("p_table empty: " + !(math.size(table)[1] !== 0));
+                if (math.size(table)[1] !== 0) {//If table was not originally empty
+                    if (Tools.isOneDimensional(table)) {
                         //      console.log("one dimensional");
-                        tempTable = Tools.addNewHeaderRow(p_table, tempTable);
+                        tempTable = Tools.addNewHeaderRow(table, tempTable);
                     }
                     else {
                         //  console.log("length of p_table: " + p_table.length);
                         //Add each row from the bottom up
-                        for (var i = p_table.length - 1; i >= 0; i--) {
-                            tempTable = Tools.addNewHeaderRow(p_table[i], tempTable);
+                        for (var i = table.length - 1; i >= 0; i--) {
+                            tempTable = Tools.addNewHeaderRow(table[i], tempTable);
                             //   console.log("temp table: " + tempTable);
                         }
                     }
@@ -626,6 +672,7 @@
                 //console.log("calculate values for " + p_element.getName());
                 var dataHeaders: any[][] = []; //the header rows from data
                 var data: any[][] = element.getData();
+                var newValues: any[];
                 //console.log("data: " + data + " size " + math.size(data));
                 //console.log(data);
                 //copy headerrows to dataHeaders to be updated
@@ -637,19 +684,22 @@
                     dataHeaders.push(newRow);
                 }
                 //console.log("data headers: " + dataHeaders);
-                if (element.getType() !== 1) {//If its a chance or value node
+                if (element.getType() === 3 && math.size(data)[1] < 1) {//If the def table in a super value node is empty, value should just be zero
+                    newValues = [0];
+                }
+                else if (element.getType() !== 1) {//If its a chance or value node
                     var headerRows = []; //Used to add decisions to value matrix
-                    var newValues = Tools.getMatrixWithoutHeader(data);
+                    newValues = Tools.getMatrixWithoutHeader(data);
                     //console.log(newValues);
                     element.getParentElements().forEach(function (elmt) {
-                        console.log("parent: " + elmt.getName());
+                        //console.log("parent: " + elmt.getName());
                         if (elmt.getType() === 0 || elmt.getType() === 2) {//If Parent is a chance or value
                             //  console.log("dataheaders: " + dataHeaders);
                             //Parent must be updated
                             if (!elmt.isUpdated()) {
-                                console.log("updating " + elmt.getName());
+                                //console.log("updating " + elmt.getName());
                                 elmt.update();
-                                console.log(elmt.getName() + " has been updated");
+                               //console.log(elmt.getName() + " has been updated");
                             }
                             var parentValuesMatrix = Tools.getMatrixWithoutHeader(elmt.getValues());
                             // console.log("current element: " + element.getName());
@@ -658,7 +708,7 @@
                             var temp:any[] = Tools.createSubMatrices(element, newValues, elmt, dataHeaders);
                             //console.log("newValues: " + newValues);
                             var submatrices = temp[0];
-                            console.log("submatrices have size: " + math.size(submatrices));
+                           // console.log("submatrices have size: " + math.size(submatrices));
                             //console.log(submatrices);
                             dataHeaders = temp[1];
                             //console.log("data headers: " + dataHeaders);
@@ -670,41 +720,43 @@
                             for (var i = 0; i < Tools.numOfHeaderRows(elmt.getValues()); i++) {
                                 //console.log("i:" + i + " decInParent: " + decInParent);
                                 var decRow = elmt.getValues()[i];
+                                //console.log("checking if: " + decRow[0] + " is in " + math.flatten(dataHeaders) + " : " + (math.flatten(dataHeaders).indexOf(decRow[0]) > -1));
                                 //If the parents decision already is in data headers add it to decRows to be used when creating parentsubmatrices
                                 if (math.flatten(dataHeaders).indexOf(decRow[0]) > -1) {
                                     decRows.push(decRow);
                                 }
                                 else {
                                     newRow = model.getElement(elmt.getValues()[i][0]).getMainValues();
-                                    //console.log("new row: " + newRow);
+                                   // console.log("new row: " + newRow);
                                     //The decision does not already exist. Insert it into headerrows
                                     headerRows = Tools.insertNewHeaderRowAtBottom(newRow, headerRows);
                                     //console.log("new header rows: " + headerRows);
                                     //Update data headers to contain the new dec row
                                     dataHeaders = Tools.insertNewHeaderRowAtBottom(newRow, dataHeaders);
-                                    // console.log("new dataHeaders: " + (dataHeaders));
+                                   // console.log("new dataHeaders: " + dataHeaders);
                                 }
+                            } if (element.getType() === 0 || element.getType() === 2) {
+                                if (decRows.length > 0) { var parentSubMatrices = Tools.createSubMatrices(element, parentValuesMatrix, undefined, decRows)[0]; }
+                                var j: number = 0;
+                                for (var i = 0; i < submatrices.length; i++) {//For each submatrix multiply it by parentmatrix or parent submatrices
+                                    if (decRows.length > 0) {//If there are decisions in decRows we need to use parent submatrices when multiplying
+                                       // console.log("multiplying " + submatrices[i] + " size " + math.size(submatrices[i]) + " and " + parentSubMatrices[j] + " size " + math.size(parentSubMatrices[j]));
+                                        var newMatrix = Tools.makeSureItsAnArray(math.multiply(submatrices[i], parentSubMatrices[j]));
+                                        if (j < parentSubMatrices.length - 1) { j++; }
+                                        else { j = 0; }
+                                    }
+                                    else {//This means there were no decisions that already existed in dataheaders and we multiply by parent matrix
+                                        //console.log("multiplying " + submatrices[i] + " size " + math.size(submatrices[i]) + " and " + parentValuesMatrix + " size " + math.size(parentValuesMatrix));
+                                        var newMatrix = Tools.makeSureItsAnArray(math.multiply(submatrices[i], parentValuesMatrix));
+                                    }
+                                    // console.log("size of new matrix: " + math.size(newMatrix));
+                                    result.push(newMatrix);
+                                    //console.log("size of result: " + math.size(result));
+                                }
+                                newValues = Tools.concatMatrices(result);
+                               // console.log("newValues: " + newValues);
+                               // console.log(newValues);
                             }
-                            if (decRows.length > 0) { var parentSubMatrices = Tools.createSubMatrices(element, parentValuesMatrix, undefined, decRows)[0]; }
-                            var j: number = 0;
-                            for (var i = 0; i < submatrices.length; i++) {//For each submatrix multiply it by parentmatrix or parent submatrices
-                                if (decRows.length > 0) {//If there are decisions in decRows we need to use parent submatrices when multiplying
-                                    console.log("multiplying " + submatrices[i] + " size " + math.size(submatrices[i]) + " and " + parentSubMatrices[j] + " size " + math.size(parentSubMatrices[j]));
-                                    var newMatrix = Tools.makeSureItsAnArray(math.multiply(submatrices[i], parentSubMatrices[j]));
-                                    if (j < parentSubMatrices.length - 1) {j++; }
-                                    else { j = 0; }
-                                }
-                                else {//This means there were no decisions that already existed in dataheaders and we multiply by parent matrix
-                                    console.log("multiplying " + submatrices[i] + " size " + math.size(submatrices[i]) + " and " + parentValuesMatrix + " size " + math.size(parentValuesMatrix));
-                                    var newMatrix = Tools.makeSureItsAnArray(math.multiply(submatrices[i], parentValuesMatrix));
-                                }
-                                // console.log("size of new matrix: " + math.size(newMatrix));
-                                result.push(newMatrix);
-                                console.log("size of result: " + math.size(result));
-                            }
-                            newValues = Tools.concatMatrices(result);
-                            console.log("newValues: " + newValues);
-                            console.log(newValues);
                         } else if (elmt.getType() === 1) {//If Parent is a decision
                             //console.log("parent is a decision");
                             //Only add if it does not already exist
@@ -712,13 +764,57 @@
                                 headerRows = Tools.addNewHeaderRow(elmt.getMainValues(), headerRows);
                             }
                         }
-                        console.log("done with parent " + elmt.getName());
+                      //  console.log("done with parent " + elmt.getName());
                     });
+                    if (element.getType() === 3) {
+                        var valueArray: number[] = [];
+                        var defValue: number; //This is the value from the def table which we multiply by
+                        headerRows = Tools.makeSureItsTwoDimensional(headerRows);
+                       // console.log("headerrows: " + headerRows);
+                        if (headerRows[0].length < 2) {//If headerrows is empty 
+                            headerRows = [[undefined, undefined]];
+                        }
+                       // console.log(headerRows);
+                        var conditionElmts: string[] = math.flatten(Tools.makeSureItsAnArray(Tools.getColumn(headerRows, 0)));
+                        for (var i = 1; i < math.size(headerRows)[1]; i++) {//For each column in headerRows
+                            valueArray.push(0);//Make room for the new value
+                            var conditions: string[] = math.flatten(Tools.makeSureItsAnArray(Tools.getColumn(headerRows, i)))
+                            element.getParentElements().forEach(function (parent) {
+                                /*for (var n = 0; n < conditionElmts.length; n++) {//For each parent element
+                                    var parent: Element = model.getElement(conditionElmts[n]);*/
+
+                                for (var j = 0; j < data.length; j++) {//Find the right value in def table 
+                                    if (data[j][0] === parent.getID()) {
+                                        defValue = data[j][1];
+                                        break;
+                                    }
+                                }
+                                var parentMatrix: any[];
+                                if (parent === undefined) {
+                                    parentMatrix = undefined;
+                                }
+                                else {
+                                    parentMatrix = parent.getValues();
+                                }
+                                valueArray[i-1] += Tools.getValueWithConditions(parentMatrix, conditionElmts, conditions) * defValue;
+                            });
+                        }
+                        if (headerRows[0][0] === undefined) {
+                            headerRows = [];
+                        }
+                        newValues = [valueArray];
+                    }
+                    
                     newValues = Tools.makeSureItsTwoDimensional(newValues);
-                    //Inserting the element id first in each row
-                    for (var i = 0; i < newValues.length; i++) {
-                        //   console.log("unshifting " + data[i + Tools.numOfHeaderRows(element.getData())][0])
-                        newValues[i].unshift(data[i + Tools.numOfHeaderRows(element.getData())][0]);
+                    if (element.getType() === 0 || element.getType() === 1) {
+                        //Inserting the element id first in each row
+                        for (var i = 0; i < newValues.length; i++) {
+                     //       console.log("unshifting " + data[i + Tools.numOfHeaderRows(element.getData())][0])
+                            newValues[i].unshift(data[i + Tools.numOfHeaderRows(element.getData())][0]);
+                        }
+                    }
+                    else {
+                        newValues[0].unshift("Value");
                     }
                     // console.log("new values: \n" + newValues);
                     // console.log("size: " + math.size(newValues));
@@ -733,7 +829,7 @@
                         }
                         newValues = headerRows;
                     }
-                    console.log("new values: " + newValues);
+                    //console.log("new values: " + newValues);
                     p_element.setValues(Tools.makeSureItsTwoDimensional(newValues));
                 } else {//If it is a decision node
                     //console.log("decisions node begin");
@@ -751,7 +847,7 @@
                     for (var i = numOfHeaderRows; i < values.length; i++) {
                         //For each values column
                         for (var j = 1; j < values[0].length; j++) {
-                            var conditions = values[i][0];
+                            var condition = values[i][0];
                             //console.log("conditions: "+conditions);
                             var value = 0;
                             //For each value node in the model
@@ -763,7 +859,7 @@
                                         elmt.update();
                                     }
                                     //Sum values that meet the condition
-                                    var valueArray = Tools.getValueWithCondition(elmt.getValues(), element, conditions);
+                                    var valueArray = Tools.getValueWithCondition(elmt.getValues(), element, condition);
                                     //console.log("value array: " + valueArray);
                                     //If there are several values that meet the condition, use the highest
                                     value += Tools.getHighest(valueArray);
@@ -771,7 +867,6 @@
                             })
                             //console.log("i: " + i + "  j: " + j + "  Value: " + value);
                             values[i][j] = value;
-
                         }
                     }
                     //     console.log("decisions end");
@@ -954,8 +1049,8 @@
             }
             //Copies all data and adds it to the table. This should be used when new parent elements have been added
             static fillDataTable(p_elmt: Element, p_dataTable: any[][]) {
-                console.log("filling table: " + p_dataTable);
-                console.log(p_dataTable);
+               // console.log("filling table: " + p_dataTable);
+               // console.log(p_dataTable);
                 var headerRows: any[][] = [];
                 var data: any[][] = [];
                 var tempData: any[][] = [];
@@ -1011,17 +1106,18 @@
                         newDataTable.push(data[i]);
                     }
                 }
-                console.log("new table after filling: " + newDataTable);
+                //console.log("new table after filling: " + newDataTable);
                 return newDataTable;
             }
 
             //removes headerrow and updates the datatable accordingly
-            static removeHeaderRow(p_rowName: string, p_oldData: any[][]): any[][] {
+            static removeHeaderRow(p_elmt:Element, p_rowName: string, p_oldData: any[][]): any[][] {
                 //var newData: Array<Array<any>> = [];
                 var newData: any[][] = [];
 
-                var numHeaderRows = this.numOfHeaderRows(p_oldData);
-
+                var numHeaderRows = this.numOfHeaderRows(p_oldData,p_elmt);
+                console.log(p_oldData);
+                console.log("numHeaderRows: " + numHeaderRows);
                 var dims: number[] = [];
                 var underDim: number[] = [];
                 var overDim: number[] = [];
@@ -1086,7 +1182,7 @@
                 
                 var found: boolean = false;
                 for (var i = 0; i < numHeaderRows; i++) {
-                    //console.log(p_oldData[i][0]);
+                    console.log("checking " + p_oldData[i][0] + " and " + p_rowName + " : " + (p_rowName == p_oldData[i][0]));
                     if (p_rowName == p_oldData[i][0]) {
                         //console.log("newDatatable constrict");
                         //console.log("Before splice p_dims: " + p_dims);
@@ -1177,6 +1273,7 @@
                 }
 
                 if (!found) {
+                    console.log("not found");
                     newData = p_oldData;
                 }
 
@@ -1186,8 +1283,32 @@
                     console.log(this.getRow(newData, i));
                 }
                 console.log("newData: " + newData);
+                console.log(newData);
 
                 return newData;
+            }
+            static validConnection(inputElmt: Element, outputElmt: Element): boolean {
+                var valid: boolean = true;
+                if (inputElmt.isAncestorOf(outputElmt)) { //Cannot connect to its ancestor. This would create a cycle
+                    valid = false;
+                    alert("Can not create a cycle");
+                  
+                }
+                //Value cannot connect to value if output cannot be converted to super value
+                else if (inputElmt.getType() === 2 && (outputElmt.getType() === 1 || outputElmt.getType() === 0 || (outputElmt.getType() === 2 && outputElmt.getParentElements().length > 0))) {
+                    valid = false;
+                    alert("Value nodes cannot have children");
+                }
+                else if (inputElmt.getType() === 0 && outputElmt.getType() === 1) {
+                    valid = false;
+                    alert("Chance nodes can not have decsion node children");
+                }
+                else if (outputElmt.getType() === 3 && inputElmt.getType() !== 2) {//Super value nodes can only have value children
+                    valid = false;
+                    alert("Super value nodes can only have value children");
+                }
+                console.log("valid connection between " + inputElmt.getType() + " and  " + outputElmt.getType() + ": " + valid);
+                return valid;
             }
 
         }

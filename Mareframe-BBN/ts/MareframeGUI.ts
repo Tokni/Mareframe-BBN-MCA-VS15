@@ -122,7 +122,6 @@ module Mareframe {
                 this.createNewChance = this.createNewChance.bind(this);
                 this.createNewDec = this.createNewDec.bind(this);
                 this.createNewValue = this.createNewValue.bind(this);
-                this.createNewSuperValue = this.createNewSuperValue.bind(this);
                 this.createNewElement = this.createNewElement.bind(this);
                 this.deleteSelected = this.deleteSelected.bind(this);
                 this.resetDcmt = this.resetDcmt.bind(this);
@@ -162,7 +161,6 @@ module Mareframe {
                 $("#newChance").on("click", this.createNewChance);
                 $("#newDec").on("click", this.createNewDec);
                 $("#newValue").on("click", this.createNewValue);
-                $("#newSuperValue").on("click", this.createNewSuperValue);
                 $("#deleteElmt").on("click", this.deleteSelected);
                 $("#editorMode").on("click", this.setEditorMode);
                 $("#showDescription").on("click", this.setShowDescription);
@@ -390,6 +388,7 @@ module Mareframe {
             }
             updateMiniTables(p_elmtArr: Element[]) {
                 //console.log("updating minitable");
+                
                 for (var j = 0; j < p_elmtArr.length; j++) {
                     var elmt = p_elmtArr[j];
                     //  console.log(elmt.getName() + " minitable is being updated");
@@ -490,7 +489,6 @@ module Mareframe {
                         $("#newChance").hide();
                         $("#newDec").hide();
                         $("#newValue").hide();
-                        $("#newSuperValue").hide();
                         $("#elementType").show();
                     }
                 } else {
@@ -685,13 +683,6 @@ module Mareframe {
                 elmt.update();
                 this.updateMiniTables([elmt]);
             }
-            private createNewSuperValue(p_evt: Event) {
-
-                var elmt = this.m_model.createNewElement(3)
-                this.addElementToStage(elmt);
-                elmt.update();
-                this.updateMiniTables([elmt]);
-            }
             private createNewElement(p_evt: Event) {
 
                 var elmt = this.m_model.createNewElement(undefined)
@@ -781,7 +772,7 @@ module Mareframe {
             private populateElmtDetails(p_elmt: Element): void {
                 this.m_unsavedChanges = false;
                 console.log("unsaved changes: " + this.m_unsavedChanges);
-                console.log(p_elmt.getName() + " is updated: " + p_elmt.isUpdated());
+                console.log(p_elmt.getName() + " type: "+ p_elmt.getType()+ " is updated: " + p_elmt.isUpdated());
                 //console.log(p_elmt)
                 //set dialog title
                 $("#detailsDialog").dialog({
@@ -1072,7 +1063,7 @@ module Mareframe {
                                         }
                                         $(this).parent().text(newText);
                                         if (newText !== originalName) {
-                                            console.log("unsaved changes");
+                                            //console.log("unsaved changes");
                                             mareframeGUI.m_unsavedChanges = true;
                                         }
                                         originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
@@ -1096,7 +1087,7 @@ module Mareframe {
 
                             });
                             // $(function () {
-                            console.log("original value: " + originalDesc);
+                        //    console.log("original value: " + originalDesc);
                             $("#description_div").dblclick(function () {
                                 $("#submit").show();
                                 //var originalValue = $(this).text();
@@ -1120,8 +1111,8 @@ module Mareframe {
                                 });
                                 $(this).children().first().blur(function () { //If user has clicked outside the box
                                     var newText = $(this).val();
-                                    console.log("newtext = " + newText + " length: " + newText.length);
-                                    console.log("original text: " + originalDesc);
+                                    //console.log("newtext = " + newText + " length: " + newText.length);
+                                    //console.log("original text: " + originalDesc);
                                     if (newText.length < 1) {
                                         $("#description_div").html(originalDesc);
                                         newText = originalDesc;
@@ -1139,13 +1130,13 @@ module Mareframe {
                             var editing = false;//this is used to make sure the text does not disapear when double clicking several times
                             $(function () {
                                 $("td").dblclick(function () {
-                                    console.log("editing: " + editing);
+                                   // console.log("editing: " + editing);
                                     if (!editing) {
                                         editing = true;
                                         $("#submit").show();
 
                                         var originalValue = $(this).text();
-                                        console.log("original value : " + originalValue);
+                                      //  console.log("original value : " + originalValue);
                                         $(this).addClass("editable");
                                         $(this).html("<input type='text' value='" + originalValue + "' />");
                                         $(this).children().first().focus();
@@ -1172,12 +1163,12 @@ module Mareframe {
                                             var newText = $(this).val();
                                             if (isNaN(newText) || newText.length < 1) {
                                                 //alert("Value must be a number");
-                                                console.log("orignal value: " + originalValue);
+                                               // console.log("orignal value: " + originalValue);
                                                 //TODO find better solution than alert
                                                 $(this).parent().text(originalValue);
                                             } else {
                                                 $(this).parent().text(newText);
-                                                console.log(" new text: " + newText + " originalValue: " + originalValue);
+                                                //console.log(" new text: " + newText + " originalValue: " + originalValue);
                                                 if (newText !== originalValue) {
                                                     mareframeGUI.m_unsavedChanges = true;
                                                 }
@@ -1192,7 +1183,7 @@ module Mareframe {
                                 });
                                 //TODO Prevent user from editing the top rows. That data should come from the child elements
                                 $(".editable_cell").dblclick(function () {
-                                    console.log("editing: " + editing);
+                                    //console.log("editing: " + editing);
                                     if (!editing) {
                                         editing = true;
                                         $("#submit").show();
@@ -1205,7 +1196,7 @@ module Mareframe {
                                                 var newText = $(this).val();
                                                 if (newText.length < 1) {
                                                     //alert("Cell cannot be empty");
-                                                    console.log("cell cannot be emtpy");
+                                                   // console.log("cell cannot be emtpy");
                                                     $(this).parent().text(originalText);
                                                 }
                                                 else {
@@ -1222,7 +1213,7 @@ module Mareframe {
                                             var newText = $(this).val();
                                             if (newText.length < 1) {
                                                 //alert("Cell cannot be empty");
-                                                console.log("cell cannot be emtpy");
+                                                //console.log("cell cannot be emtpy");
                                                 $(this).parent().text(originalText);
                                             }
                                             else {
@@ -1250,7 +1241,7 @@ module Mareframe {
                             $(this).children().first().keypress(function (e) {
                                 if (e.which == 13) {
                                     var newText = $(this).val();
-                                    console.log("new text: " + newText);
+                                    //console.log("new text: " + newText);
                                     if (newText.length < 1) { //Must not update the text if the new text string is empty
                                         $("#info_name").html(originalName);
                                         newText = originalName;
@@ -1266,7 +1257,7 @@ module Mareframe {
                             });
                             $(this).children().first().blur(function () {
                                 var newText = $(this).val();
-                                console.log("new text: " + newText);
+                                //console.log("new text: " + newText);
                                 if (newText.length < 1) { //Must not update the text if the new text string is empty
                                     $("#info_name").html(originalName);
                                     newText = originalName;
@@ -1650,6 +1641,8 @@ module Mareframe {
 
                 return false;
             }
+            
+
             private connectTo(p_evt: createjs.MouseEvent): void {
                 var elmtIdent = p_evt.target.name;
                 var connected = false;
@@ -1660,85 +1653,80 @@ module Mareframe {
                     if (e.name.substr(0, 4) === "elmt" && e.name !== elmtIdent) {
                         var outputElmt: Element = this.m_model.getElement(elmtIdent);
                         var inputElmt: Element = this.m_model.getElement(e.name);
-                        if (inputElmt.isAncestorOf(outputElmt)) { //Cannot connect to its ancestor. This would create a cycle
-                            if (inputElmt.isChildOf(outputElmt)) {
-                                //alert("Parent");
-                                var conn = outputElmt.getConnectionFrom(inputElmt);
-                                console.log("deleting connection: " + conn.getID() + "  From: " + outputElmt.getName() + "  To: " + inputElmt.getName());
-                                //for (var index in outputElmt.getConnections()) {
-                                //    console.log(outputElmt.getName() + "  Before: " + outputElmt.getConnections()[index].getID());
-                                //}
+                       
+                        if (inputElmt.isChildOf(outputElmt)) {// Creating a connection in the reverse direction of an existing connection, deletes the connection
+                            //alert("Parent");
+                            var conn = outputElmt.getConnectionFrom(inputElmt);
+                            console.log("deleting connection: " + conn.getID() + "  From: " + outputElmt.getName() + "  To: " + inputElmt.getName());
+                            //for (var index in outputElmt.getConnections()) {
+                            //    console.log(outputElmt.getName() + "  Before: " + outputElmt.getConnections()[index].getID());
+                            //}
 
-                                //for (var index in inputElmt.getConnections()) {
-                                //    console.log(inputElmt.getName() + "  Before: " + inputElmt.getConnections()[index].getID());
-                                //}
-                                //this.m_model.deleteConnection( inputElmt.getConnectionFrom(outputElmt).getID() );
+                            //for (var index in inputElmt.getConnections()) {
+                            //    console.log(inputElmt.getName() + "  Before: " + inputElmt.getConnections()[index].getID());
+                            //}
+                            //this.m_model.deleteConnection( inputElmt.getConnectionFrom(outputElmt).getID() );
                                 
-                                //this.m_model.deleteConnection(conn.getID());
-                                //outputElmt.deleteConnection(inputElmt.getConnectionFrom(outputElmt).getID());
-                                console.log("connection from " + outputElmt.getName() + " to " + inputElmt.getName() + " named " + inputElmt.getConnectionFrom(outputElmt));
-                                console.log("connection from " + inputElmt.getName() + " to " + outputElmt.getName() + " named " + outputElmt.getConnectionFrom(inputElmt).getID());
-                                inputElmt.deleteConnection(outputElmt.getConnectionFrom(inputElmt).getID());
-                                outputElmt.deleteConnection(outputElmt.getConnectionFrom(inputElmt).getID());
-                                //for (var index in outputElmt.getConnections()) {
-                                //    console.log(outputElmt.getName() + "  After: " + outputElmt.getConnections()[index].getID());
-                                //}
-                                //for (var index in inputElmt.getConnections()) {
-                                //    console.log(inputElmt.getName() + "  After: " + inputElmt.getConnections()[index].getID());
-                                //}
+                            //this.m_model.deleteConnection(conn.getID());
+                            //outputElmt.deleteConnection(inputElmt.getConnectionFrom(outputElmt).getID());
+                            console.log("connection from " + outputElmt.getName() + " to " + inputElmt.getName() + " named " + inputElmt.getConnectionFrom(outputElmt));
+                            console.log("connection from " + inputElmt.getName() + " to " + outputElmt.getName() + " named " + outputElmt.getConnectionFrom(inputElmt).getID());
+                            inputElmt.deleteConnection(outputElmt.getConnectionFrom(inputElmt).getID());
+                            outputElmt.deleteConnection(outputElmt.getConnectionFrom(inputElmt).getID());
+                            //for (var index in outputElmt.getConnections()) {
+                            //    console.log(outputElmt.getName() + "  After: " + outputElmt.getConnections()[index].getID());
+                            //}
+                            //for (var index in inputElmt.getConnections()) {
+                            //    console.log(inputElmt.getName() + "  After: " + inputElmt.getConnections()[index].getID());
+                            //}
 
-                                inputElmt.setUpdated(false);
-                                inputElmt.getAllDescendants().forEach(function (e) {
-                                    e.setUpdated(false);
-                                });
+                            inputElmt.setUpdated(false);
+                            inputElmt.getAllDescendants().forEach(function (e) {
+                                e.setUpdated(false);
+                            });
 
 
-                                //this.m_mcaContainer.removeChild(conn);
-                                //outputElmt.setUpdated(false);
-                                //outputElmt.getAllDescendants().forEach(function (e) {
-                                //    e.setUpdated(false);
-                                //    this.clear();
-                                //});
-                                //alert("updating");
-                                this.m_model.update();
+                            //this.m_mcaContainer.removeChild(conn);
+                            //outputElmt.setUpdated(false);
+                            //outputElmt.getAllDescendants().forEach(function (e) {
+                            //    e.setUpdated(false);
+                            //    this.clear();
+                            //});
+                            //alert("updating");
+                            this.m_model.update();
 
-                                this.importStage();
-                                this.m_mcaStage.update();
-                                //alert("done updating");
-                            } else {
-                                alert("cannot create a cycle");
-                            }
-                        }
-
-                        else if (inputElmt.getType() === 2 && (outputElmt.getType() === 1 || outputElmt.getType() === 0 || (outputElmt.getType() === 2 && outputElmt.getParentElements().length > 0))) {//Value cannot connect to value if output cannot be converted to super value
-                            alert("Value nodes cannot have children");
-                        }
-                        else if (inputElmt.getType() === 0 && outputElmt.getType() === 1) {
-                            alert("Chance nodes can not have decsion node children");
-                        }
-                        else {
-                            if (inputElmt.getType() === 2 && outputElmt.getType() === 2) {//Output element should be converted to a super value node
-                                outputElmt.convertToSuperValue();
-                            }
-                            var c = this.m_model.createNewConnection(inputElmt, outputElmt);
-                            //console.log("connection: " + c);
-                            if (this.m_model.addConnection(c)) {
-                                this.addConnectionToStage(c);
-                                connected = true;
-                            }
-                            if (this.m_model.m_bbnMode) {
-                                if (outputElmt.getType() !== 1) { //Dec nodes data does not rely on parents
-                                    outputElmt.updateData();
+                            this.importStage();
+                            this.m_mcaStage.update();
+                            //alert("done updating");
+                        } else {
+                            if (Tools.validConnection(inputElmt, outputElmt)) { 
+                        
+                                if ((inputElmt.getType() === 2 || inputElmt.getType() === 3) && outputElmt.getType() === 2) {//Output element should be converted to a super value node
+                                    outputElmt.convertToSuperValue();
                                 }
-                                outputElmt.setUpdated(false);
-                                outputElmt.getAllDescendants().forEach(function (e) {
-                                    e.setUpdated(false);
-                                });
-                                inputElmt.setUpdated(false);
-                                console.log("connection created from " + outputElmt.getID() + " to " + inputElmt.getID());
+                                var c = this.m_model.createNewConnection(inputElmt, outputElmt);
+                                //console.log("connection: " + c);
+                                if (this.m_model.addConnection(c)) {
+                                    this.addConnectionToStage(c);
+                                    connected = true;
+                                }
+                                if (this.m_model.m_bbnMode) {
+                                    if (outputElmt.getType() !== 1) { //Dec nodes data does not rely on parents
+                                        outputElmt.updateData();
+                                    }
+                                    outputElmt.setUpdated(false);
+                                    outputElmt.getAllDescendants().forEach(function (e) {
+                                        e.setUpdated(false);
+                                    });
+                                    inputElmt.setUpdated(false);
+                                    console.log("connection created from " + outputElmt.getID() + " to " + inputElmt.getID());
+                                }
                             }
                         }
                     }
+                }
+                if (this.m_model.getAutoUpdate()) {//If auto update is on, update the model
+                    this.m_model.update();
                 }
                 if (!connected) {
                     this.select(p_evt);

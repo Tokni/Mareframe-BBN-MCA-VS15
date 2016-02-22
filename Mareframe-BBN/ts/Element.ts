@@ -150,24 +150,24 @@
                 return (this.getAllAncestors().indexOf(elmt) > -1);
             }
             getAllDescendants(): Element[]{
-             //   console.log("get all decendants for " + this.getName());
-                var decendants: Element[] = [];
+               //console.log("get all decendants for " + this.getName());
+                var descendants: Element[] = [];
                 var children: Element[] = this.getChildrenElements();
                 if (children.length === 0) {
                  //   console.log("returned: " + decendants);
-                    return decendants;
+                    return descendants;
                 }
                 else {
                     children.forEach(function (e) {
-                        if (decendants.indexOf(e) === -1) {
+                        if (descendants.indexOf(e) === -1) {
                             //   console.log("pushing " + e.getName());
-                            decendants.push(e);
-                            decendants = decendants.concat(e.getAllDescendants());
+                            descendants.push(e);
+                            descendants = descendants.concat(e.getAllDescendants());
                         }
                     });
                 }
-                //console.log("returned: " + decendants);
-                return decendants;
+               // console.log("returned: " + descendants);
+                return descendants;
             }
 
             copyDefArray(): any[] {
@@ -184,33 +184,28 @@
             }
 
             updateData() {
-                console.log("updateData " + this.m_name);
-                console.log("original data:");
-                console.log(this.m_data);
+                //console.log("updateData " + this.m_name);
                 this.m_data = Tools.makeSureItsTwoDimensional(this.updateHeaderRows(this.m_data));
                 
-                // console.log("data: " + this.m_data);
+                // console.log("updating data: " + this.m_data);
                 var size: number[] = math.size(this.m_data);
                 var rows: number = size[0];
                 var columns: number = size[1];
-
-                if (this.getType() === 3 && columns === 0) {//There needs to be an empty cell for the value
+                /*if (this.getType() === 3 && columns === 0) {//There needs to be an empty cell for the value
                     columns = 1;
-                }
+                }*/
                 //console.log("rows " + rows + " columns " + columns);
-                console.log("in filling " + this.m_name + " last cell is " + this.m_data[rows - 1][columns - 1]);
-                if (this.m_data[rows - 1][columns - 1] === undefined) {
+                // console.log("in filling " + this.m_name + " last cell is " + this.m_data[rows - 1][columns - 1]);
+                if (columns > 0 && this.m_data[rows - 1][columns - 1] === undefined) {
                     this.m_data = Tools.fillDataTable(this, this.m_data);
                 }
-                console.log("new data:");
-                console.log(this.m_data);
             }
 
             updateHeaderRows(p_originalData: any[][]): any[][] {
-                console.log("updating header rows in " + this.getName())
-                console.log("data: " + p_originalData);
-                    var data: any[][] = [];
-                    var parents: Element[] = this.getParentElements();
+                //console.log("updating header rows in " + this.getName())
+                //console.log("data: " + p_originalData);
+                var data: any[][] = [];
+                var parents: Element[] = this.getParentElements();
                 if (this.m_type === 3) {
                     for (var i = 0; i < parents.length; i++) {
                         data.push([parents[i].m_id]);
@@ -218,7 +213,7 @@
                     for (var i = 0; i < p_originalData.length; i++) {
                         data[i].push(p_originalData[i][1]);
                     }
-                    
+
                 }
                 else {
                     for (var i = 0; i < parents.length; i++) {
@@ -226,7 +221,6 @@
                         // console.log("Parent: " + elmt.getName());
                         data = Tools.addNewHeaderRow(elmt.getMainValues(), data);
                         //console.log(data);
-
                     }
                     //console.log("number of header rows : " + Tools.numOfHeaderRows(this.m_data));
                     //Add original values to the table
@@ -236,24 +230,24 @@
                         data.push(p_originalData[i]);
                     }
                 }
-               // console.log(data);
+                // console.log(data);
                 return data;
             }
             
             addDefaultDataInEmptyCells(p_originalData: any[][], p_editedElmt: Element, p_addedState: String): any[][]{
-                console.log("adding default values in " + this.getName());
+                //console.log("adding default values in " + this.getName());
                 var data:any[][] = Tools.makeSureItsTwoDimensional(p_originalData);
                 var rows: number = data.length;
                 var columns: number = data[0].length;
                
                 for (var i = 0; i < rows; i++) {
                     if (data[i][0] === p_editedElmt.getID()) {//This is the right row
-                        console.log("found row");
+                        //console.log("found row");
                         for (var j = 0; j < columns; j++) { 
                             if (data[i][j] === p_addedState) {//This is the right column
-                                console.log("found column");
+                                //console.log("found column");
                                 for (var n = Tools.numOfHeaderRows(data); n < rows; n++) { //For each row in this column add a default value
-                                    console.log("adding " + (1 / (rows - Tools.numOfHeaderRows(data))));
+                                    //console.log("adding " + (1 / (rows - Tools.numOfHeaderRows(data))));
                                     data[n].splice(j, 0, (1 / (rows - Tools.numOfHeaderRows(data))));
                                 }
                             }

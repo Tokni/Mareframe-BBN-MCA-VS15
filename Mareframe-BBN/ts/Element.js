@@ -140,24 +140,24 @@ var Mareframe;
                 return (this.getAllAncestors().indexOf(elmt) > -1);
             };
             Element.prototype.getAllDescendants = function () {
-                //   console.log("get all decendants for " + this.getName());
-                var decendants = [];
+                //console.log("get all decendants for " + this.getName());
+                var descendants = [];
                 var children = this.getChildrenElements();
                 if (children.length === 0) {
                     //   console.log("returned: " + decendants);
-                    return decendants;
+                    return descendants;
                 }
                 else {
                     children.forEach(function (e) {
-                        if (decendants.indexOf(e) === -1) {
+                        if (descendants.indexOf(e) === -1) {
                             //   console.log("pushing " + e.getName());
-                            decendants.push(e);
-                            decendants = decendants.concat(e.getAllDescendants());
+                            descendants.push(e);
+                            descendants = descendants.concat(e.getAllDescendants());
                         }
                     });
                 }
-                //console.log("returned: " + decendants);
-                return decendants;
+                // console.log("returned: " + descendants);
+                return descendants;
             };
             Element.prototype.copyDefArray = function () {
                 var valueArray = [];
@@ -171,28 +171,24 @@ var Mareframe;
                 return valueArray;
             };
             Element.prototype.updateData = function () {
-                console.log("updateData " + this.m_name);
-                console.log("original data:");
-                console.log(this.m_data);
+                //console.log("updateData " + this.m_name);
                 this.m_data = DST.Tools.makeSureItsTwoDimensional(this.updateHeaderRows(this.m_data));
-                // console.log("data: " + this.m_data);
+                // console.log("updating data: " + this.m_data);
                 var size = math.size(this.m_data);
                 var rows = size[0];
                 var columns = size[1];
-                if (this.getType() === 3 && columns === 0) {
+                /*if (this.getType() === 3 && columns === 0) {//There needs to be an empty cell for the value
                     columns = 1;
-                }
+                }*/
                 //console.log("rows " + rows + " columns " + columns);
-                console.log("in filling " + this.m_name + " last cell is " + this.m_data[rows - 1][columns - 1]);
-                if (this.m_data[rows - 1][columns - 1] === undefined) {
+                // console.log("in filling " + this.m_name + " last cell is " + this.m_data[rows - 1][columns - 1]);
+                if (columns > 0 && this.m_data[rows - 1][columns - 1] === undefined) {
                     this.m_data = DST.Tools.fillDataTable(this, this.m_data);
                 }
-                console.log("new data:");
-                console.log(this.m_data);
             };
             Element.prototype.updateHeaderRows = function (p_originalData) {
-                console.log("updating header rows in " + this.getName());
-                console.log("data: " + p_originalData);
+                //console.log("updating header rows in " + this.getName())
+                //console.log("data: " + p_originalData);
                 var data = [];
                 var parents = this.getParentElements();
                 if (this.m_type === 3) {
@@ -221,18 +217,18 @@ var Mareframe;
                 return data;
             };
             Element.prototype.addDefaultDataInEmptyCells = function (p_originalData, p_editedElmt, p_addedState) {
-                console.log("adding default values in " + this.getName());
+                //console.log("adding default values in " + this.getName());
                 var data = DST.Tools.makeSureItsTwoDimensional(p_originalData);
                 var rows = data.length;
                 var columns = data[0].length;
                 for (var i = 0; i < rows; i++) {
                     if (data[i][0] === p_editedElmt.getID()) {
-                        console.log("found row");
+                        //console.log("found row");
                         for (var j = 0; j < columns; j++) {
                             if (data[i][j] === p_addedState) {
-                                console.log("found column");
+                                //console.log("found column");
                                 for (var n = DST.Tools.numOfHeaderRows(data); n < rows; n++) {
-                                    console.log("adding " + (1 / (rows - DST.Tools.numOfHeaderRows(data))));
+                                    //console.log("adding " + (1 / (rows - Tools.numOfHeaderRows(data))));
                                     data[n].splice(j, 0, (1 / (rows - DST.Tools.numOfHeaderRows(data))));
                                 }
                             }

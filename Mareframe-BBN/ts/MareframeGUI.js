@@ -150,7 +150,6 @@ var Mareframe;
                 this.createNewChance = this.createNewChance.bind(this);
                 this.createNewDec = this.createNewDec.bind(this);
                 this.createNewValue = this.createNewValue.bind(this);
-                this.createNewSuperValue = this.createNewSuperValue.bind(this);
                 this.createNewElement = this.createNewElement.bind(this);
                 this.deleteSelected = this.deleteSelected.bind(this);
                 this.resetDcmt = this.resetDcmt.bind(this);
@@ -186,7 +185,6 @@ var Mareframe;
                 $("#newChance").on("click", this.createNewChance);
                 $("#newDec").on("click", this.createNewDec);
                 $("#newValue").on("click", this.createNewValue);
-                $("#newSuperValue").on("click", this.createNewSuperValue);
                 $("#deleteElmt").on("click", this.deleteSelected);
                 $("#editorMode").on("click", this.setEditorMode);
                 $("#showDescription").on("click", this.setShowDescription);
@@ -480,7 +478,6 @@ var Mareframe;
                         $("#newChance").hide();
                         $("#newDec").hide();
                         $("#newValue").hide();
-                        $("#newSuperValue").hide();
                         $("#elementType").show();
                     }
                 }
@@ -626,12 +623,6 @@ var Mareframe;
                 elmt.update();
                 this.updateMiniTables([elmt]);
             };
-            GUIHandler.prototype.createNewSuperValue = function (p_evt) {
-                var elmt = this.m_model.createNewElement(3);
-                this.addElementToStage(elmt);
-                elmt.update();
-                this.updateMiniTables([elmt]);
-            };
             GUIHandler.prototype.createNewElement = function (p_evt) {
                 var elmt = this.m_model.createNewElement(undefined);
                 this.addElementToStage(elmt);
@@ -715,7 +706,7 @@ var Mareframe;
             GUIHandler.prototype.populateElmtDetails = function (p_elmt) {
                 this.m_unsavedChanges = false;
                 console.log("unsaved changes: " + this.m_unsavedChanges);
-                console.log(p_elmt.getName() + " is updated: " + p_elmt.isUpdated());
+                console.log(p_elmt.getName() + " type: " + p_elmt.getType() + " is updated: " + p_elmt.isUpdated());
                 //console.log(p_elmt)
                 //set dialog title
                 $("#detailsDialog").dialog({
@@ -990,7 +981,7 @@ var Mareframe;
                                     }
                                     $(this).parent().text(newText);
                                     if (newText !== originalName) {
-                                        console.log("unsaved changes");
+                                        //console.log("unsaved changes");
                                         mareframeGUI.m_unsavedChanges = true;
                                     }
                                     originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
@@ -1013,7 +1004,7 @@ var Mareframe;
                             });
                         });
                         // $(function () {
-                        console.log("original value: " + originalDesc);
+                        //    console.log("original value: " + originalDesc);
                         $("#description_div").dblclick(function () {
                             $("#submit").show();
                             //var originalValue = $(this).text();
@@ -1037,8 +1028,8 @@ var Mareframe;
                             });
                             $(this).children().first().blur(function () {
                                 var newText = $(this).val();
-                                console.log("newtext = " + newText + " length: " + newText.length);
-                                console.log("original text: " + originalDesc);
+                                //console.log("newtext = " + newText + " length: " + newText.length);
+                                //console.log("original text: " + originalDesc);
                                 if (newText.length < 1) {
                                     $("#description_div").html(originalDesc);
                                     newText = originalDesc;
@@ -1056,12 +1047,12 @@ var Mareframe;
                         var editing = false; //this is used to make sure the text does not disapear when double clicking several times
                         $(function () {
                             $("td").dblclick(function () {
-                                console.log("editing: " + editing);
+                                // console.log("editing: " + editing);
                                 if (!editing) {
                                     editing = true;
                                     $("#submit").show();
                                     var originalValue = $(this).text();
-                                    console.log("original value : " + originalValue);
+                                    //  console.log("original value : " + originalValue);
                                     $(this).addClass("editable");
                                     $(this).html("<input type='text' value='" + originalValue + "' />");
                                     $(this).children().first().focus();
@@ -1089,13 +1080,13 @@ var Mareframe;
                                         var newText = $(this).val();
                                         if (isNaN(newText) || newText.length < 1) {
                                             //alert("Value must be a number");
-                                            console.log("orignal value: " + originalValue);
+                                            // console.log("orignal value: " + originalValue);
                                             //TODO find better solution than alert
                                             $(this).parent().text(originalValue);
                                         }
                                         else {
                                             $(this).parent().text(newText);
-                                            console.log(" new text: " + newText + " originalValue: " + originalValue);
+                                            //console.log(" new text: " + newText + " originalValue: " + originalValue);
                                             if (newText !== originalValue) {
                                                 mareframeGUI.m_unsavedChanges = true;
                                             }
@@ -1110,7 +1101,7 @@ var Mareframe;
                             });
                             //TODO Prevent user from editing the top rows. That data should come from the child elements
                             $(".editable_cell").dblclick(function () {
-                                console.log("editing: " + editing);
+                                //console.log("editing: " + editing);
                                 if (!editing) {
                                     editing = true;
                                     $("#submit").show();
@@ -1123,7 +1114,7 @@ var Mareframe;
                                             var newText = $(this).val();
                                             if (newText.length < 1) {
                                                 //alert("Cell cannot be empty");
-                                                console.log("cell cannot be emtpy");
+                                                // console.log("cell cannot be emtpy");
                                                 $(this).parent().text(originalText);
                                             }
                                             else {
@@ -1140,7 +1131,7 @@ var Mareframe;
                                         var newText = $(this).val();
                                         if (newText.length < 1) {
                                             //alert("Cell cannot be empty");
-                                            console.log("cell cannot be emtpy");
+                                            //console.log("cell cannot be emtpy");
                                             $(this).parent().text(originalText);
                                         }
                                         else {
@@ -1167,7 +1158,7 @@ var Mareframe;
                             $(this).children().first().keypress(function (e) {
                                 if (e.which == 13) {
                                     var newText = $(this).val();
-                                    console.log("new text: " + newText);
+                                    //console.log("new text: " + newText);
                                     if (newText.length < 1) {
                                         $("#info_name").html(originalName);
                                         newText = originalName;
@@ -1183,7 +1174,7 @@ var Mareframe;
                             });
                             $(this).children().first().blur(function () {
                                 var newText = $(this).val();
-                                console.log("new text: " + newText);
+                                //console.log("new text: " + newText);
                                 if (newText.length < 1) {
                                     $("#info_name").html(originalName);
                                     newText = originalName;
@@ -1558,78 +1549,72 @@ var Mareframe;
                     if (e.name.substr(0, 4) === "elmt" && e.name !== elmtIdent) {
                         var outputElmt = this.m_model.getElement(elmtIdent);
                         var inputElmt = this.m_model.getElement(e.name);
-                        if (inputElmt.isAncestorOf(outputElmt)) {
-                            if (inputElmt.isChildOf(outputElmt)) {
-                                //alert("Parent");
-                                var conn = outputElmt.getConnectionFrom(inputElmt);
-                                console.log("deleting connection: " + conn.getID() + "  From: " + outputElmt.getName() + "  To: " + inputElmt.getName());
-                                //for (var index in outputElmt.getConnections()) {
-                                //    console.log(outputElmt.getName() + "  Before: " + outputElmt.getConnections()[index].getID());
-                                //}
-                                //for (var index in inputElmt.getConnections()) {
-                                //    console.log(inputElmt.getName() + "  Before: " + inputElmt.getConnections()[index].getID());
-                                //}
-                                //this.m_model.deleteConnection( inputElmt.getConnectionFrom(outputElmt).getID() );
-                                //this.m_model.deleteConnection(conn.getID());
-                                //outputElmt.deleteConnection(inputElmt.getConnectionFrom(outputElmt).getID());
-                                console.log("connection from " + outputElmt.getName() + " to " + inputElmt.getName() + " named " + inputElmt.getConnectionFrom(outputElmt));
-                                console.log("connection from " + inputElmt.getName() + " to " + outputElmt.getName() + " named " + outputElmt.getConnectionFrom(inputElmt).getID());
-                                inputElmt.deleteConnection(outputElmt.getConnectionFrom(inputElmt).getID());
-                                outputElmt.deleteConnection(outputElmt.getConnectionFrom(inputElmt).getID());
-                                //for (var index in outputElmt.getConnections()) {
-                                //    console.log(outputElmt.getName() + "  After: " + outputElmt.getConnections()[index].getID());
-                                //}
-                                //for (var index in inputElmt.getConnections()) {
-                                //    console.log(inputElmt.getName() + "  After: " + inputElmt.getConnections()[index].getID());
-                                //}
-                                inputElmt.setUpdated(false);
-                                inputElmt.getAllDescendants().forEach(function (e) {
-                                    e.setUpdated(false);
-                                });
-                                //this.m_mcaContainer.removeChild(conn);
-                                //outputElmt.setUpdated(false);
-                                //outputElmt.getAllDescendants().forEach(function (e) {
-                                //    e.setUpdated(false);
-                                //    this.clear();
-                                //});
-                                //alert("updating");
-                                this.m_model.update();
-                                this.importStage();
-                                this.m_mcaStage.update();
-                            }
-                            else {
-                                alert("cannot create a cycle");
-                            }
-                        }
-                        else if (inputElmt.getType() === 2 && (outputElmt.getType() === 1 || outputElmt.getType() === 0 || (outputElmt.getType() === 2 && outputElmt.getParentElements().length > 0))) {
-                            alert("Value nodes cannot have children");
-                        }
-                        else if (inputElmt.getType() === 0 && outputElmt.getType() === 1) {
-                            alert("Chance nodes can not have decsion node children");
+                        if (inputElmt.isChildOf(outputElmt)) {
+                            //alert("Parent");
+                            var conn = outputElmt.getConnectionFrom(inputElmt);
+                            console.log("deleting connection: " + conn.getID() + "  From: " + outputElmt.getName() + "  To: " + inputElmt.getName());
+                            //for (var index in outputElmt.getConnections()) {
+                            //    console.log(outputElmt.getName() + "  Before: " + outputElmt.getConnections()[index].getID());
+                            //}
+                            //for (var index in inputElmt.getConnections()) {
+                            //    console.log(inputElmt.getName() + "  Before: " + inputElmt.getConnections()[index].getID());
+                            //}
+                            //this.m_model.deleteConnection( inputElmt.getConnectionFrom(outputElmt).getID() );
+                            //this.m_model.deleteConnection(conn.getID());
+                            //outputElmt.deleteConnection(inputElmt.getConnectionFrom(outputElmt).getID());
+                            console.log("connection from " + outputElmt.getName() + " to " + inputElmt.getName() + " named " + inputElmt.getConnectionFrom(outputElmt));
+                            console.log("connection from " + inputElmt.getName() + " to " + outputElmt.getName() + " named " + outputElmt.getConnectionFrom(inputElmt).getID());
+                            inputElmt.deleteConnection(outputElmt.getConnectionFrom(inputElmt).getID());
+                            outputElmt.deleteConnection(outputElmt.getConnectionFrom(inputElmt).getID());
+                            //for (var index in outputElmt.getConnections()) {
+                            //    console.log(outputElmt.getName() + "  After: " + outputElmt.getConnections()[index].getID());
+                            //}
+                            //for (var index in inputElmt.getConnections()) {
+                            //    console.log(inputElmt.getName() + "  After: " + inputElmt.getConnections()[index].getID());
+                            //}
+                            inputElmt.setUpdated(false);
+                            inputElmt.getAllDescendants().forEach(function (e) {
+                                e.setUpdated(false);
+                            });
+                            //this.m_mcaContainer.removeChild(conn);
+                            //outputElmt.setUpdated(false);
+                            //outputElmt.getAllDescendants().forEach(function (e) {
+                            //    e.setUpdated(false);
+                            //    this.clear();
+                            //});
+                            //alert("updating");
+                            this.m_model.update();
+                            this.importStage();
+                            this.m_mcaStage.update();
                         }
                         else {
-                            if (inputElmt.getType() === 2 && outputElmt.getType() === 2) {
-                                outputElmt.convertToSuperValue();
-                            }
-                            var c = this.m_model.createNewConnection(inputElmt, outputElmt);
-                            //console.log("connection: " + c);
-                            if (this.m_model.addConnection(c)) {
-                                this.addConnectionToStage(c);
-                                connected = true;
-                            }
-                            if (this.m_model.m_bbnMode) {
-                                if (outputElmt.getType() !== 1) {
-                                    outputElmt.updateData();
+                            if (DST.Tools.validConnection(inputElmt, outputElmt)) {
+                                if ((inputElmt.getType() === 2 || inputElmt.getType() === 3) && outputElmt.getType() === 2) {
+                                    outputElmt.convertToSuperValue();
                                 }
-                                outputElmt.setUpdated(false);
-                                outputElmt.getAllDescendants().forEach(function (e) {
-                                    e.setUpdated(false);
-                                });
-                                inputElmt.setUpdated(false);
-                                console.log("connection created from " + outputElmt.getID() + " to " + inputElmt.getID());
+                                var c = this.m_model.createNewConnection(inputElmt, outputElmt);
+                                //console.log("connection: " + c);
+                                if (this.m_model.addConnection(c)) {
+                                    this.addConnectionToStage(c);
+                                    connected = true;
+                                }
+                                if (this.m_model.m_bbnMode) {
+                                    if (outputElmt.getType() !== 1) {
+                                        outputElmt.updateData();
+                                    }
+                                    outputElmt.setUpdated(false);
+                                    outputElmt.getAllDescendants().forEach(function (e) {
+                                        e.setUpdated(false);
+                                    });
+                                    inputElmt.setUpdated(false);
+                                    console.log("connection created from " + outputElmt.getID() + " to " + inputElmt.getID());
+                                }
                             }
                         }
                     }
+                }
+                if (this.m_model.getAutoUpdate()) {
+                    this.m_model.update();
                 }
                 if (!connected) {
                     this.select(p_evt);
