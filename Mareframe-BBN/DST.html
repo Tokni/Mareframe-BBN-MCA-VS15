@@ -92,6 +92,7 @@
             <label for="cnctTool" class="advButton">Connect Tool</label> 
             
             <div style="float:right">
+                <button class="button" id="fitToModel" >Fit canvas to model</button>
                 <input class="button" type="checkbox" id="fullscreen">
                 <label for="fullscreen" class="button">Fullscreen</label>
                 <input class="button" type="checkbox" id="editorMode">
@@ -208,6 +209,7 @@
         $("#editorMode").button({ icons: { primary: "ui-icon-link" } });
         $("#autoUpdate").button({ icons: { primary: "ui-icon-refresh" } });
         $("#updateMdl").button({ icons: { primary: "ui-icon-refresh" } });
+        $("#fitToModel").button({ icons: { primary: "ui-icon-arrow-4-diag" } });
         $("#resetDcmt").button({ icons: { primary: "ui-icon-arrowreturnthick-1-w" } })
         $("#selectAllElmt").button({ icons: { primary: "ui-icon-star" } });
         $("#detailsDialog").dialog({

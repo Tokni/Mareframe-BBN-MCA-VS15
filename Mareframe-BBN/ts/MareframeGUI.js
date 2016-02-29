@@ -133,6 +133,7 @@ var Mareframe;
                 this.allModeltoConsole = this.allModeltoConsole.bind(this);
                 this.allConnectionstoConsole = this.allConnectionstoConsole.bind(this);
                 this.addDataRowClick = this.addDataRowClick.bind(this);
+                this.fitToModel = this.fitToModel.bind(this);
                 this.pressMove = this.pressMove.bind(this);
                 this.pressUp = this.pressUp.bind(this);
                 this.mouseDown = this.mouseDown.bind(this);
@@ -193,6 +194,7 @@ var Mareframe;
                 $("#autoUpdate").on("click", this.setAutoUpdate);
                 $("#resetDcmt").on("click", this.resetDcmt);
                 $("#updateMdl").on("click", this.updateModel);
+                $("#fitToModel").on("click", this.fitToModel);
                 $("#selectAllElmt").on("click", this.selectAll);
                 $("#savDcmt").on("click", this.saveModel);
                 $("#downloadLink").on("click", function (evt) {
@@ -278,6 +280,10 @@ var Mareframe;
                 this.m_model.update();
                 this.updateMiniTables(this.m_model.getElementArr());
             };
+            GUIHandler.prototype.fitToModel = function () {
+                this.repositionModel();
+                this.updateSize();
+            };
             GUIHandler.prototype.setSize = function (p_width, p_height) {
                 console.log("setting size to " + p_width + " , " + p_height);
                 this.m_mcaStageCanvas.height = p_height;
@@ -351,7 +357,6 @@ var Mareframe;
                 console.log("canvas width: " + this.m_mcaStageCanvas.width + " window width: " + $(window).width());
                 console.log("canvas height: " + this.m_mcaStageCanvas.height + " window height: " + $(window).height());
                 if (this.m_mcaStageCanvas.width > $(window).width() || this.m_mcaStageCanvas.height > 650) {
-                    this.updateSize();
                 }
                 /*
                 var modelPos: number[] = this.getModelPos();
@@ -630,6 +635,32 @@ var Mareframe;
                         rightmostElement = e.m_easelElmt.x + gui.m_mcaContainer.x + 250;
                     }
                 });
+                return [lowestElement, highestElement, leftmostElement, rightmostElement];
+            };
+            GUIHandler.prototype.getSelectedPos = function () {
+                var gui = this;
+                var lowestElement = 0;
+                var highestElement = $(window).height();
+                var leftmostElement = $(window).width();
+                var rightmostElement = 0;
+                var selected = this.getSelected();
+                for (var i = 0; i < selected.length; i += 2) {
+                    //console.log("e y = " + (e.m_easelElmt.y + gui.m_mcaContainer.y) + " and lowestElement: " + lowestElement);
+                    var e = selected[i];
+                    if (e.y + gui.m_mcaContainer.y > lowestElement) {
+                        lowestElement = gui.m_mcaContainer.y + e.y + 40;
+                    }
+                    if (e.y + gui.m_mcaContainer.y < highestElement) {
+                        highestElement = e.y + gui.m_mcaContainer.y;
+                    }
+                    if (e.x + gui.m_mcaContainer.x < leftmostElement) {
+                        leftmostElement = e.x + gui.m_mcaContainer.x;
+                    }
+                    if (e.x + gui.m_mcaContainer.x > rightmostElement) {
+                        rightmostElement = e.x + gui.m_mcaContainer.x + 250;
+                    }
+                }
+                // console.log("highest: " + highestElement + " lowest: " + lowestElement + " leftmost: " + leftmostElement + " rightmost: " + rightmostElement);
                 return [lowestElement, highestElement, leftmostElement, rightmostElement];
             };
             GUIHandler.prototype.createNewChance = function (p_evt) {
@@ -1441,16 +1472,12 @@ var Mareframe;
                     }
                     else if (this.m_editorMode) {
                         //console.log("elements off screen: "+ this.elementOffScreen( p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
-                        if (!this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
+                        if (!this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY, this.getModelPos())) {
                             //document.body.style.cursor = "auto"; 
                             //console.log("panning");
                             $("#mAction").html("Action: Panning");
                             //This moves all elements instead of the background
                             this.moveAllElements(p_evt.stageX - gui.m_oldX, p_evt.stageY - gui.m_oldY);
-                            /*this.m_mcaContainer.x += p_evt.stageX - this.m_oldX;
-                            this.m_mcaContainer.y += p_evt.stageY - this.m_oldY;
-                                */
-                            this.resizeWindow();
                         }
                     }
                 }
@@ -1462,7 +1489,7 @@ var Mareframe;
                     }
                     else {
                         //console.log("elements off screen: " + this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
-                        if (!this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
+                        if (!this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY, this.getSelectedPos())) {
                             //document.body.style.cursor = "auto";
                             for (var i = 0; i < this.m_selectedItems.length; i++) {
                                 var elmt = this.m_selectedItems[i];
@@ -1474,11 +1501,11 @@ var Mareframe;
                                     var c = this.m_model.getElement(elmt.name).getConnections()[j];
                                     this.updateConnection(c);
                                 }
-                                this.resizeWindow();
                             }
                         }
                     }
                 }
+                this.resizeWindow();
                 this.scrollWindow(p_evt);
                 this.m_oldX = p_evt.stageX;
                 this.m_oldY = p_evt.stageY;
@@ -1531,8 +1558,8 @@ var Mareframe;
                 var maxY = 0; //Bottom edge
                 var x;
                 var y;
-                var yEdge = 40; //The distance from the position to the bottom edge
-                var xEdge = 200; //Distance from the center to the right edge
+                var yEdge = 40; //The distance from the position to the bottom edge of elements
+                var xEdge = 200; //Distance from the center to the right edge of elements
                 var moveDistance = 10; //The distance to move the canvas in each step
                 var gui = this;
                 this.m_model.getElementArr().forEach(function (e) {
@@ -1559,16 +1586,13 @@ var Mareframe;
                     window.scrollBy(0, moveDistance);
                 }
             };
-            GUIHandler.prototype.elementOffScreen = function (xMovement, yMovement) {
-                var modelPos = this.getModelPos();
-                var lowestElement = modelPos[0];
-                var highestElement = modelPos[1];
-                var leftmostElement = modelPos[2];
-                var rightmostElement = modelPos[3];
-                //console.log("highest element: " + highestElement);
-                //console.log("lowest element: " + lowestElement);
-                //console.log("rightmost element: " + rightmostElement);
-                //console.log("leftmost element: " + leftmostElement);
+            GUIHandler.prototype.elementOffScreen = function (xMovement, yMovement, positions) {
+                var SelectedPos = this.getSelectedPos();
+                var lowestElement = positions[0];
+                var highestElement = positions[1];
+                var leftmostElement = positions[2];
+                var rightmostElement = positions[3];
+                console.log(highestElement - 30);
                 return highestElement - 30 + yMovement < 0 || leftmostElement - 80 + xMovement < 0 || lowestElement + yMovement - 30 > this.m_mcaStageCanvas.height || rightmostElement - 80 + xMovement > this.m_mcaStageCanvas.width;
             };
             GUIHandler.prototype.tick = function () {
