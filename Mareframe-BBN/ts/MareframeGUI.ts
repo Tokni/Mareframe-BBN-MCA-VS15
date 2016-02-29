@@ -242,6 +242,7 @@ module Mareframe {
                 }
             }
             private selectModel(p_evt: Event) {
+                this.clearSelection();
                 this.m_handler.getFileIO().loadModel($("#selectModel").val(), this.m_model, this.importStage);
             }
             private loadModel(p_evt: Event) {
@@ -1538,6 +1539,7 @@ module Mareframe {
                     } else if (this.m_editorMode) {
                         //console.log("elements off screen: "+ this.elementOffScreen( p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
                         if (!this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
+                            //document.body.style.cursor = "auto"; 
                             //console.log("panning");
                             $("#mAction").html("Action: Panning");
                             //This moves all elements instead of the background
@@ -1548,6 +1550,10 @@ module Mareframe {
                                 */
                             this.resizeWindow();
                         }
+                        /*else {
+                            console.log("not allowed");
+                            document.body.style.cursor = "not-allowed";
+                        }*/
                     }
                 } else if (p_evt.target.name.substr(0, 4) === "elmt") {
                     var connectTool = $("#cnctTool").prop("checked");
@@ -1558,28 +1564,66 @@ module Mareframe {
                     else {
                         //console.log("elements off screen: " + this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
                         if (!this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
-                        for (var i = 0; i < this.m_selectedItems.length; i++) {
-                            var elmt = this.m_selectedItems[i];
+                            //document.body.style.cursor = "auto";
+                            for (var i = 0; i < this.m_selectedItems.length; i++) {
+                                var elmt = this.m_selectedItems[i];
 
-                            elmt.x += p_evt.stageX - this.m_oldX;
-                            elmt.y += p_evt.stageY - this.m_oldY;
+                                elmt.x += p_evt.stageX - this.m_oldX;
+                                elmt.y += p_evt.stageY - this.m_oldY;
 
-                            //console.log("selected elements: " + this.m_selectedItems);
-                            //        console.log("element: " + elmt.name);
-                            for (var j = 0; j < this.m_model.getElement(elmt.name).getConnections().length; j++) {
-                                var c = this.m_model.getElement(elmt.name).getConnections()[j];
-                                this.updateConnection(c);
-                            }
-                            this.resizeWindow();
+                                //console.log("selected elements: " + this.m_selectedItems);
+                                console.log("element: " + elmt.name);
+                                for (var j = 0; j < this.m_model.getElement(elmt.name).getConnections().length; j++) {
+                                    var c = this.m_model.getElement(elmt.name).getConnections()[j];
+                                    this.updateConnection(c);
+                                }
+                                this.resizeWindow();
                             }
                         }
+                        /*else {
+                            console.log("not allowed");
+                            document.body.style.cursor = "not-allowed";
+                        }*/
                     }
                 }
-                
+                this.scrollWindow(p_evt);
                 this.m_oldX = p_evt.stageX;
                 this.m_oldY = p_evt.stageY;
                // console.log("this.m_mcaSizeX " + this.m_mcaSizeX);
                 this.m_updateMCAStage = true;
+            }
+
+            private scrollWindow(p_evt: createjs.MouseEvent): void {
+                //console.log("x: " + p_evt.rawX + " y: " + p_evt.rawY);
+                var y: number = p_evt.rawY + (1126 - 763);
+                var x: number = p_evt.rawX;
+                var pxFromTop:number = $(parent.window).scrollTop();
+                var pxFromLeft: number = $(parent.window).scrollLeft();
+                var screenWidth: number = $(parent.window).width();
+                var userScreenHeight: number = $(parent.window).height();
+                if (y > ((userScreenHeight + pxFromTop - 30))) {
+                    console.log("scroll");
+                    if (pxFromTop > 0) {
+                        parent.window.scrollBy(0, (userScreenHeight / 50));
+                    }
+                }
+                else if (y < (pxFromTop + 20)) {
+
+                    parent.window.scrollBy(0, -(userScreenHeight / 50));
+
+                }
+                //console.log(p_evt.rawY, y, pxFromTop, userScreenHeight);
+
+                if (x > ((screenWidth + pxFromLeft - 130))) {
+                    console.log("scroll");
+                    parent.window.scrollBy( (screenWidth / 50),0);
+                }
+                else if (x < (pxFromLeft + 30)) {
+
+                    parent.window.scrollBy( -(screenWidth / 50),0);
+
+                }
+                //console.log(p_evt.rawX, x, pxFromLeft, screenWidth);
             }
             private moveAllElements(xDistance: number, yDistance:number): void {
                 var gui = this;
@@ -1601,8 +1645,8 @@ module Mareframe {
                 var maxY: number = 0; //Bottom edge
                 var x: number;
                 var y: number;
-                var yEdge: number = 40; //The distance from the position to the bottom edge
-                var xEdge: number = 200; //Distance from the center to the right edge
+                var yEdge: number = 40; //The distance from the position to the bottom edge of elements
+                var xEdge: number = 200; //Distance from the center to the right edge of elements
                 var moveDistance: number = 10; //The distance to move the canvas in each step
                 var gui = this;
                 this.m_model.getElementArr().forEach(function (e) {
@@ -1911,7 +1955,7 @@ module Mareframe {
                 return this.m_selectedItems;
             }
             private clearSelection(): void {
-                //console.log("clear");
+                console.log("clear");
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
                     var easelElmt = this.m_selectedItems[i];
                     if (easelElmt.id != this.m_model.getElement(easelElmt.name).m_minitableEaselElmt.id) {//if this is not the minitable

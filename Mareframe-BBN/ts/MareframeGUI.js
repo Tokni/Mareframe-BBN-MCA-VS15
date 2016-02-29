@@ -256,6 +256,7 @@ var Mareframe;
                 }
             };
             GUIHandler.prototype.selectModel = function (p_evt) {
+                this.clearSelection();
                 this.m_handler.getFileIO().loadModel($("#selectModel").val(), this.m_model, this.importStage);
             };
             GUIHandler.prototype.loadModel = function (p_evt) {
@@ -1441,6 +1442,7 @@ var Mareframe;
                     else if (this.m_editorMode) {
                         //console.log("elements off screen: "+ this.elementOffScreen( p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
                         if (!this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
+                            //document.body.style.cursor = "auto"; 
                             //console.log("panning");
                             $("#mAction").html("Action: Panning");
                             //This moves all elements instead of the background
@@ -1461,12 +1463,13 @@ var Mareframe;
                     else {
                         //console.log("elements off screen: " + this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
                         if (!this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
+                            //document.body.style.cursor = "auto";
                             for (var i = 0; i < this.m_selectedItems.length; i++) {
                                 var elmt = this.m_selectedItems[i];
                                 elmt.x += p_evt.stageX - this.m_oldX;
                                 elmt.y += p_evt.stageY - this.m_oldY;
                                 //console.log("selected elements: " + this.m_selectedItems);
-                                //        console.log("element: " + elmt.name);
+                                console.log("element: " + elmt.name);
                                 for (var j = 0; j < this.m_model.getElement(elmt.name).getConnections().length; j++) {
                                     var c = this.m_model.getElement(elmt.name).getConnections()[j];
                                     this.updateConnection(c);
@@ -1476,10 +1479,38 @@ var Mareframe;
                         }
                     }
                 }
+                this.scrollWindow(p_evt);
                 this.m_oldX = p_evt.stageX;
                 this.m_oldY = p_evt.stageY;
                 // console.log("this.m_mcaSizeX " + this.m_mcaSizeX);
                 this.m_updateMCAStage = true;
+            };
+            GUIHandler.prototype.scrollWindow = function (p_evt) {
+                //console.log("x: " + p_evt.rawX + " y: " + p_evt.rawY);
+                var y = p_evt.rawY + (1126 - 763);
+                var x = p_evt.rawX;
+                var pxFromTop = $(parent.window).scrollTop();
+                var pxFromLeft = $(parent.window).scrollLeft();
+                var screenWidth = $(parent.window).width();
+                var userScreenHeight = $(parent.window).height();
+                if (y > ((userScreenHeight + pxFromTop - 30))) {
+                    console.log("scroll");
+                    if (pxFromTop > 0) {
+                        parent.window.scrollBy(0, (userScreenHeight / 50));
+                    }
+                }
+                else if (y < (pxFromTop + 20)) {
+                    parent.window.scrollBy(0, -(userScreenHeight / 50));
+                }
+                //console.log(p_evt.rawY, y, pxFromTop, userScreenHeight);
+                if (x > ((screenWidth + pxFromLeft - 130))) {
+                    console.log("scroll");
+                    parent.window.scrollBy((screenWidth / 50), 0);
+                }
+                else if (x < (pxFromLeft + 30)) {
+                    parent.window.scrollBy(-(screenWidth / 50), 0);
+                }
+                //console.log(p_evt.rawX, x, pxFromLeft, screenWidth);
             };
             GUIHandler.prototype.moveAllElements = function (xDistance, yDistance) {
                 var gui = this;
@@ -1787,7 +1818,7 @@ var Mareframe;
                 return this.m_selectedItems;
             };
             GUIHandler.prototype.clearSelection = function () {
-                //console.log("clear");
+                console.log("clear");
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
                     var easelElmt = this.m_selectedItems[i];
                     if (easelElmt.id != this.m_model.getElement(easelElmt.name).m_minitableEaselElmt.id) {
