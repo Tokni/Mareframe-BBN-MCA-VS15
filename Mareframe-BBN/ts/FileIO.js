@@ -24,10 +24,12 @@ var Mareframe;
                 //    }
                 //}
                 var datastream = p_model.saveModel();
-                var base64 = window.btoa(datastream);
+                //var base64: string = window.btoa(datastream);
+                var savedContent = encodeURIComponent(datastream);
                 // create an a tag
                 var a = $("#downloadLink").get(0);
-                a.href = 'data:application/octet-stream;base64,' + base64;
+                //a.href = 'data:application/octet-stream;base64,' + base64;
+                a.href = 'data:application/octet-stream,' + savedContent;
                 if (p_filename == undefined) {
                     a.download = "test.xdsl";
                 }
@@ -35,6 +37,7 @@ var Mareframe;
                     a.download = p_filename;
                 }
                 a.innerHTML = 'Download';
+                //おやすみ愛するヨナタンさん
             };
             FileIO.prototype.savePiecewiseLinearFunction = function (p_pwl, p_filename) {
                 var datastream = p_pwl.savePWL();

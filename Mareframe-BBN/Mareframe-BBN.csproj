@@ -81,6 +81,7 @@
     <TypeScriptCompile Include="ts\Handler.ts" />
     <TypeScriptCompile Include="ts\MareframeGUI.ts" />
     <TypeScriptCompile Include="ts\Model.ts" />
+    <TypeScriptCompile Include="ts\testHandler.ts" />
     <TypeScriptCompile Include="ts\TKN_Dialog.ts" />
     <TypeScriptCompile Include="ts\TKN_Widget.ts" />
     <TypeScriptCompile Include="ts\Tools.ts" />

@@ -83,7 +83,7 @@ module Mareframe {
                 
 
                     //$("#detailsDialog").dialog({
-                    //    beforeClose: function (event, ui) {
+                    //    beforeClose: function(event, ui) {
                     //        if (mareframeGUI.m_unsavedChanges) {
                     //            console.log("unsaved changes");
                     //            if (!confirm("You have unsaved changes. Pressing OK will close the window and discard all changes.")) {
@@ -117,6 +117,9 @@ module Mareframe {
                     $("#newDcmt").hide();
                     $("#lodDcmtDiv").show();
                     $("#elementType").hide();
+                    $("#selectModelDiv").hide();
+                    $("#submit").hide();
+                    $("#showDescriptionButtonLabel").hide();
                     //$("#MCAelmtType").selectmenu();
                     //$("#MCAWeightingMethod").selectmenu();
                     $("#weightingMethodSelector").hide();
@@ -244,75 +247,78 @@ module Mareframe {
                 }
                 console.log("AttrIndex: " + this.m_attributeIndex);
             }
-            private editTableData(p_evt: Event) {
-            //    //document.attributes(
-            //    this.updateAtributeIndex();
-            //    var gui = this;
-            //    console.log("id: " + '"#' + p_evt.target.id + '"');
-            //    var id: string = "#" + p_evt.target.id;
-            //    //var originalName: any = $('"#' + p_evt.target.id + '"')[0];
-            //    var originalName: any = $("#" + p_evt.target.id)[0].textContent;
-            //    console.log("id: " + originalName );
-            //    if (this.m_model.getAutoUpdate()) {
-            //        $("#updateMdl").hide();
-            //    }
+            private editTableData(p_evt: createjs.MouseEvent) {
+                //document.attributes(
+                this.updateAtributeIndex();
+                var gui = this;
+                console.log("id: " + '"#' + p_evt.target.id + '"');
+                var id: string = "#" + p_evt.target.id;
+                //var originalName: any = $('"#' + p_evt.target.id + '"')[0];
+                var originalName: any = $("#" + p_evt.target.id)[0].textContent;
+                console.log("id: " + originalName );
+                if (this.m_model.getAutoUpdate()) {
+                    $("#updateMdl").hide();
+                }
 
-            //    $(id).addClass("editable");
-            //    $(id).html("<input type='text' value='" + originalName + "' />");
-            //    $(id).children().first().focus();
-            //    $(id).children().first().keypress(function (e) {
-            //        if (e.which == 13) {
-            //            var newText = $(this).val();
-            //            console.log("new text1: " + newText);
-            //            if (newText.length < 1) { //Must not update the text if the new text string is empty
-            //                $("#info_name").html(originalName);
-            //                newText = originalName;
-            //}
-            //            $(this).parent().text(newText);
+                $(id).addClass("editable");
+                $(id).html("<input type='text' value='" + originalName + "' />");
+                $(id).children().first().focus();
+                $(id).children().first().keypress(function (e) {
+                    if (e.which == 13) {
+                        var newText = $(this).val();
+                        console.log("new text1: " + newText);
+                        if (newText.length < 1) { //Must not update the text if the new text string is empty
+                            $("#info_name").html(originalName);
+                            newText = originalName;
+            }
+                        $(this).parent().text(newText);
 
-            //            originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
-            //            var tableX = id.slice(10).split("x")[0];
-            //            var tableY = id.slice(10).split("x")[1];
-            //            console.log("tableX: " + tableX + "  tableY: " + tableY);
-            //            console.log("atrributeIndex: " + gui.m_attributeIndex);
-            //            if (parseInt(tableX) !== 0) {
-            //                var elmt: Element = gui.m_model.getElementArr()[gui.m_attributeIndex[parseInt(tableX) - 1]];
-            //                console.log("element: " + elmt.getName());
-            //                if (parseInt(tableY) === 0) {
-            //                    elmt.setName(originalName);
-            //                }
-            //                if (parseInt(tableY) === 1) {
-            //                    elmt.setDataMin(parseFloat(originalName));
-            //                }
-            //                if (parseInt(tableY) > 1 && parseInt(tableY) < gui.m_alternativCount + 2) {
-            //                    elmt.changeDataArrAtIndex(parseInt(tableY) - 2 , parseFloat(originalName));
-            //                }
-            //                if (parseInt(tableY) === gui.m_alternativCount + 2) {
-            //                    elmt.m_dataUnit = originalName;
-            //                }
-            //                if (parseInt(tableY) === gui.m_alternativCount + 3) {
-            //                    elmt.setDataMax(parseFloat(originalName));
-            //                }
-            //            }
-            //            gui.updateTable(gui.m_model.getDataMatrix(true));
-            //            gui.updateFinalScores();
-            //        }
-            //        $(this).parent().removeClass("editable");
-            //    });
-            //    $(id).children().first().blur(function () {
-            //        var newText = $(this).val();
-            //        console.log("new text2: " + newText);
-            //        if (newText.length < 1) { //Must not update the text if the new text string is empty
-            //            $("#info_name").html(originalName);
-            //            newText = originalName;
-            //        }
-            //        $(this).parent().text(newText);
+                        originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                        var tableX = id.slice(10).split("x")[0];
+                        var tableY = id.slice(10).split("x")[1];
+                        console.log("tableX: " + tableX + "  tableY: " + tableY);
+                        console.log("atrributeIndex: " + gui.m_attributeIndex);
+                        if (parseInt(tableX) !== 0) {
+                            var elmt: Element = gui.m_model.getElementArr()[gui.m_attributeIndex[parseInt(tableX) - 1]];
+                            console.log("element: " + elmt.getName());
+                            if (parseInt(tableY) === 0) {
+                                elmt.setName(originalName);
+                            }
+                            if (parseInt(tableY) === 1) {                               
+                                elmt.setDataMin(parseFloat(originalName));
+                            }
+                            if (parseInt(tableY) === 2) {
+                                elmt.setDataBaseLine(parseFloat(originalName)); 
+                            }
+                            if (parseInt(tableY) > 1 && parseInt(tableY) < gui.m_alternativCount + 3) {
+                                elmt.changeDataArrAtIndex(parseInt(tableY) - 3 , parseFloat(originalName));
+                            }
+                            if (parseInt(tableY) === gui.m_alternativCount + 3) {
+                                elmt.m_dataUnit = originalName;
+                            }
+                            if (parseInt(tableY) === gui.m_alternativCount + 4) {
+                                elmt.setDataMax(parseFloat(originalName));
+                            }
+                        }
+                        gui.updateTable(gui.m_model.getDataMatrix(true));
+                        gui.updateFinalScores();
+                    }
+                    $(this).parent().removeClass("editable");
+                });
+                $(id).children().first().blur(function () {
+                    var newText = $(this).val();
+                    console.log("new text2: " + newText);
+                    if (newText.length < 1) { //Must not update the text if the new text string is empty
+                        $("#info_name").html(originalName);
+                        newText = originalName;
+                    }
+                    $(this).parent().text(newText);
                    
-            //        originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
-            //        $(this).parent().removeClass("editable");
-            //    });
+                    originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                    $(this).parent().removeClass("editable");
+                });
                 
-            //    //this.updateFinalScores();
+                //this.updateFinalScores();
 
             }
             private optionTypeChange(p_evt: Event) {
@@ -1047,8 +1053,11 @@ module Mareframe {
                     if (this.addToTrash(elmt)) {
                         ////console.log(this.m_trashBin);
                         //alert("begin delete connections from " + elmt.getName() );
-                        for (var j = 0; j < elmt.getConnections().length; j++) {
-                            this.m_model.deleteConnection(elmt.getConnections()[j].getID());
+                        //for (var j = 0; j < elmt.getConnections().length; j++) {
+                        //var j = 0;
+                            while (elmt.getConnections().length){
+          //                  //it is going wrong here, as the connenction array is changed by deleteconnection
+                            this.m_model.deleteConnection(elmt.getConnections()[0].getID());
                             //var conn: Connection = elmt.getConnections()[j];
                             //console.log("deleting connection " + conn.getID());
                             //if (conn.getOutputElement().getID() === elmt.getID()) {
@@ -1836,7 +1845,7 @@ module Mareframe {
             }
             private updateTable(p_matrix: any[][]): void {
                 this.updateAlternativeCount();
-                $(".tableEdit").off("dblclick", this.editTableData);
+                $(".tableEdit").off('dblclick', 'td');
                 var tableHTML = "";
 
                 var topRow = true;
@@ -2335,7 +2344,7 @@ module Mareframe {
                             break;
                         case 2:
                             //Value
-                            shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
+                            shape.graphics.setStrokeStyle(3).drawRoundRect(0, 0, 150, 30, 10);
                         default:
                             break;
                     }

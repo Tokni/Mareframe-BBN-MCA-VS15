@@ -18,6 +18,7 @@
             constructor(p_bbnMode: boolean) {
                 this.m_bbnMode = p_bbnMode;
                 //this.m_bbnMode = true;
+                //this.m_counter.
                 this.createNewElement = this.createNewElement.bind(this);
                 this.deleteElement = this.deleteElement.bind(this);
                 console.log("model loaded, MCA is: " + !this.m_bbnMode);
@@ -464,6 +465,7 @@
             }
             deleteConnection(p_connID: string): boolean {
                 var key = 0;
+                //finding the index 'key' in the connection array
                 this.m_connectionArr.every(function (p_conn: Connection) {
                     if (p_conn.getID() === p_connID)
                         return false;
@@ -509,21 +511,22 @@
                         var elmtOut = this.m_connectionArr[key].getOutputElement();
                         var elmtIn = this.m_connectionArr[key].getInputElement();
                         switch (elmtOut.getType()) {
-                            case 100:
+                            case 100: //attribute
                                 break;
-                            case 101:
+                            case 101: //objective
                                 console.log("updating  data:  ");
-                                for (var e in elmtOut.m_swingWeightsArr ) {
+                                for (var e in elmtOut.m_swingWeightsArr) {
+                                    var out = elmtOut.m_swingWeightsArr[e][0];
+                                    var id = this.m_connectionArr[key].getID();
                                     if (elmtOut.m_swingWeightsArr[e][0] === this.m_connectionArr[key].getID()) {
                                         //elmt.m_swingWeightsArr.splice(parseInt(e) , 1);
-                                        elmtOut.m_swingWeightsArr.splice(e, 1);
-                                        
+                                        elmtOut.m_swingWeightsArr.splice(e, 1);                                       
                                     }
                                 }
                                 break;
-                            case 102:
+                            case 102: //alternative
                                 break;
-                            case 103:
+                            case 103: //goal
                                 console.log("updating  data:  ");
                                 for (var e in elmtOut.m_swingWeightsArr) {
                                     if (elmtOut.m_swingWeightsArr[e][0] === this.m_connectionArr[key].getID()) {
