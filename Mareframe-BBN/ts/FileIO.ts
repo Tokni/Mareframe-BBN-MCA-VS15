@@ -26,18 +26,20 @@
                 //    }
                 //}
                 var datastream = p_model.saveModel();
-                var base64: string = window.btoa(datastream);
-                
+                //var base64: string = window.btoa(datastream);
+                var savedContent: string = encodeURIComponent(datastream);
                 // create an a tag
                 var a: any = $("#downloadLink").get(0);
 
-                a.href = 'data:application/octet-stream;base64,' + base64;
+                //a.href = 'data:application/octet-stream;base64,' + base64;
+                a.href = 'data:application/octet-stream,' + savedContent;
                 if (p_filename == undefined) {
                     a.download = "test.xdsl";
                 } else {
                     a.download = p_filename;
                 }
                 a.innerHTML = 'Download';
+                //おやすみ愛するヨナタンさん
                 
 
             }

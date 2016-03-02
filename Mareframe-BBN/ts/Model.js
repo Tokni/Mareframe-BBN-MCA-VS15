@@ -18,6 +18,7 @@ var Mareframe;
                 this.m_autoUpdate = true; //auto update is on by default
                 this.m_bbnMode = p_bbnMode;
                 //this.m_bbnMode = true;
+                //this.m_counter.
                 this.createNewElement = this.createNewElement.bind(this);
                 this.deleteElement = this.deleteElement.bind(this);
                 console.log("model loaded, MCA is: " + !this.m_bbnMode);
@@ -430,6 +431,7 @@ var Mareframe;
             };
             Model.prototype.deleteConnection = function (p_connID) {
                 var key = 0;
+                //finding the index 'key' in the connection array
                 this.m_connectionArr.every(function (p_conn) {
                     if (p_conn.getID() === p_connID)
                         return false;
@@ -476,6 +478,8 @@ var Mareframe;
                             case 101:
                                 console.log("updating  data:  ");
                                 for (var e in elmtOut.m_swingWeightsArr) {
+                                    var out = elmtOut.m_swingWeightsArr[e][0];
+                                    var id = this.m_connectionArr[key].getID();
                                     if (elmtOut.m_swingWeightsArr[e][0] === this.m_connectionArr[key].getID()) {
                                         //elmt.m_swingWeightsArr.splice(parseInt(e) , 1);
                                         elmtOut.m_swingWeightsArr.splice(e, 1);

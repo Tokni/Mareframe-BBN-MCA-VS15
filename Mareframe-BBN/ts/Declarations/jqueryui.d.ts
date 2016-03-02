@@ -338,6 +338,7 @@ declare module JQueryUI {
 
     interface DialogOptions {
         autoOpen?: boolean;
+        //beforeClose?: Function;
         buttons?: any; // object or []
         closeOnEscape?: boolean;
         closeText?: string;
@@ -370,6 +371,7 @@ declare module JQueryUI {
 
     interface DialogEvents {
         beforeClose?: DialogEvent;
+        //beforeClose?: function(event, ui);
         close?: DialogEvent;
         create?: DialogEvent;
         drag?: DialogEvent;

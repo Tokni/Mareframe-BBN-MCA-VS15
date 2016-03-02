@@ -13,10 +13,24 @@
     <script src="ts/FileIO.js" type="text/javascript"></script>
     <script src="ts/TKN_Widget.js" type="text/javascript"></script>
     <script src="ts/ValueFunction.js" type="text/javascript"></script>
+    <script src="ts/ElementOO.js" type="text/javascript"></script>
+    <script src="ts/TestHandler.js" type="text/javascript"></script>
 </head>
 <body>
-    
-    <canvas id="testCanvas" width="700" height="700" style="border: solid black;background-color:lightgrey; float: left;" ></canvas>
+    <!--ElementOO inventing START-->
+    <script>
+        $(document).ready(function () {
+            $(document).ready(function () {
+
+                test = new Mareframe.DST.TestHandler();
+
+            }); // end ready function
+        });
+    </script>
+    <!--ElementOO inventing END-->
+
+    <!--valueFunction Piecewise linear START-->
+    <!--<canvas id="testCanvas" width="700" height="700" style="border: solid black;background-color:lightgrey; float: left;" ></canvas>
 
     <div style="margin: 30px">
         <button id="flipHorizontal">Flip Horizontal</button>
@@ -24,7 +38,7 @@
     </div>
     <div style="margin: 30px">
         <button id="linearize">Linearize</button>
-        <!--<button id="loadFromFile">Load from file</button>-->
+        <button id="loadFromFile">Load from file</button>
         <div class="LoadFileBtn advButton" id="loadFromFileDiv">
             <input class="advButton upload" type="file" id="loadFromFile" />
             <span class="advButton">Load from file</span>
@@ -62,6 +76,7 @@
 
             }); // end ready function
         });
-    </script>
+    </script>-->
+    <!--valueFunction Piecewise linear END-->
 </body>
 </html>
