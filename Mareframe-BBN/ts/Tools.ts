@@ -143,16 +143,21 @@
                 return counter
             }
 
-            static htmlTableFromArray(p_header: string, p_elmt: Element, p_model: Model, p_editorMode: boolean) {
+            static htmlTableFromArray(p_header: string, p_elmt: Element, p_model: Model, p_editorMode: boolean, p_data?: any[][]): string {
                 // console.log("header: " + p_header);
                 //console.log("type of elmt: " + p_elmt.getType());
 
                 var data: any[][];
-                if (p_header === "Definition") {
-                    data = p_elmt.getData();
+                if (p_data === undefined) {
+                    if (p_header === "Definition") {
+                        data = p_elmt.getData();
+                    }
+                    else if (p_header === "Values") {
+                        data = p_elmt.getValues();
+                    }
                 }
-                else if (p_header === "Values") {
-                    data = p_elmt.getValues();
+                else {
+                    data = p_data;
                 }
                 console.log(data);
                 var numOfHeaderRows = Tools.numOfHeaderRows(data);
@@ -196,7 +201,7 @@
                 }
                 else {
                     for (var i = 0; i < numOfHeaderRows; i++) {
-                        console.log("i: " + i);
+                        //console.log("i: " + i);
                         htmlString += "<tr>";
                         if (p_editorMode && p_header === "Definition" && (p_elmt.getType() === 0 || p_elmt.getType() === 1)) { htmlString += "<th></th>"; }//Create empty cell above minus cells
                         for (var j = 0; j < (data[0].length); j++) {
@@ -225,7 +230,22 @@
                                     htmlString += "<th> " + p_model.getElement(data[i][j]).getName() + "</th>";//This is because super value nodes have parents horizontial in def table
                                 }
                                 else {
-                                    htmlString += "<th><div class='editable_cell'> " + value + "</div></th>";
+                                    if (p_elmt.getType() === 1) {//If element is a dec element add the decCell class 
+                                        htmlString += "<th><div id='" + i + "' class='editable_cell decCell";
+                                        //console.log("checking: " + i + " against: " + p_elmt.getDecision());
+                                        if (i == p_elmt.getDecision()) {//Mark the set decision
+                                           // console.log("decision found");
+                                            htmlString += " setDecision";
+                                        }
+                                        else {
+                                            //console.log(i + " and " + p_elmt.getDecision() + " do not match");
+                                        }
+                                        htmlString += "' > " + value + "</div></th>";
+
+                                    }
+                                    else {
+                                        htmlString += "<th><div class='editable_cell'> " + value + "</div></th>";
+                                    }
                                 }
                             } else {
                                 if (j === highestValue || (i == bestDecRow && j == bestDecCol)) {//mark highest if it is the value table of a value node or a decision node
@@ -270,9 +290,9 @@
                 }
                 return math.subset(p_matrix, math.index(p_index, range));
             }
-            static addDataRow(p_elmt: Element): any[][] {
+            static addDataRow(p_elmt: Element, p_matrix: any[][]): any[][] {
                 var oldData: any[][] = [];
-                oldData = p_elmt.getData();
+                oldData = p_matrix
                 var newData: any[][] = [];
                 //Copy every row to new data
                 for (var i = 0; i < oldData.length; i++) {
@@ -299,7 +319,7 @@
                 return newData;
             }
             static removeRow(p_matrix: any[][], p_index: number): any[][] {
-                var matrix: any[][] = Tools.makeSureItsAnArray(p_matrix);
+                var matrix: any[][] = Tools.makeSureItsAnArray(Tools.copy(p_matrix));
                 var headerRows: number = Tools.numOfHeaderRows(matrix);
                 var rows: number = math.size(matrix)[0];
                 if (p_index < headerRows) {
@@ -315,6 +335,19 @@
                 }
                 return matrix;
 
+            }
+            //Returns a copy of the given matrix/array
+            static copy(p_matrix: any[][]): any[][] {
+                var matrix:any[][] = Tools.makeSureItsTwoDimensional(p_matrix);
+                var newMatrix: any[][] = [];
+                for (var i = 0; i < matrix.length; i++) {
+                    var row:any[] = [];
+                    for (var j = 0; j < matrix[0].length; j++) {
+                        row.push(matrix[i][j]);
+                    }
+                    newMatrix.push(row);
+                }
+                return newMatrix;
             }
             //This method concats all matrixes in a list one by one
             static concatMatrices(p_list: any[][][]): any[][] {
@@ -908,7 +941,7 @@
                 for (var i = 0; i < rows; i++) {
                     newRow = [];
                     for (var j = 0; j < columns; j++) {
-                        if (data[changedRow][j] !== p_state) {//This column dows not need to be deleted
+                        if (data[changedRow][j] !== p_state) {//This column does not need to be deleted
                             newRow.push(data[i][j]);
                         }
                     }

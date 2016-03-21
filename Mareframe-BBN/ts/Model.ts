@@ -111,9 +111,9 @@
 
             update() {
                 var m: Model = this;
-                console.log("updating model");
+                //console.log("updating model");
                 this.m_elementArr.forEach(function (p_elmt: Element) {
-                    console.log(p_elmt.getID() + " has been updated: " + p_elmt.isUpdated());
+                    //console.log(p_elmt.getID() + " has been updated: " + p_elmt.isUpdated());
                     if (!p_elmt.isUpdated()) {
                         p_elmt.update();
                     }
@@ -487,8 +487,6 @@
                 if (header.indexOf(">", header.length - 1) !== -1) {
                     $("#model_header").append(p_jsonObject.mdlName);
                 }
-
-                
                 this.m_modelName = p_jsonObject.mdlName;
                 this.m_modelIdent = p_jsonObject.mdlIdent;
 
@@ -497,12 +495,10 @@
                 this.m_elementArr = [];
                 this.m_connectionArr = [];
                 this.m_counter = 0;
-
-
+                
                 var maxX = 0;
                 var maxY = 0;
-                for (var i = 0; i < p_jsonObject.elements.length; i++)
-                {
+                for (var i = 0; i < p_jsonObject.elements.length; i++) {
                     var JsonElmt = p_jsonObject.elements[i];
                     var elmt = this.createNewElement(undefined)
                     //if (JsonElmt.posX > maxX)
@@ -538,8 +534,9 @@
                 //h.gui.setSize(maxX + 80, maxY + 20);
 
                 //h.gui.updateTable(this.dataMatrix);
-                ////console.log("model.fromJSON()");
-                ////console.log(this);
+                //console.log("model.fromJSON()");
+                //console.log(this);
+                console.log("finnished loading from json");
             }
 
             createNewConnection(p_inputElmt: Element, p_outputElmt: Element): Connection {

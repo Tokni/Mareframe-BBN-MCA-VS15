@@ -4,10 +4,9 @@ var Mareframe;
     (function (DST) {
         var GUIHandler = (function () {
             function GUIHandler(p_model, p_handler) {
+                this.m_noOfDialogsOpen = 0;
                 this.m_windowResizable = false;
                 this.m_editorMode = false;
-                this.m_showDescription = true;
-                this.m_unsavedChanges = false;
                 this.m_fullscreen = false;
                 this.m_mcaStage = new createjs.Stage("MCATool");
                 this.m_valueFnStage = new createjs.Stage("valueFn_canvas");
@@ -43,17 +42,6 @@ var Mareframe;
                 };
                 this.m_elementColors = [["#efefff", "#15729b", "#dfdfff",], ["#ffefef", "#c42f33", "#ffdfdf"], ["#fff6e0", "#f6a604", "#fef4c6"], ["#fff6e0", "#f6a604", "#fef4c6"], ["#efffef", "#2fc433", "#dfffdf"]];
                 this.m_trashBin = [];
-                this.setShowDescription = function (cb) {
-                    this.m_showDescription = cb.currentTarget.checked;
-                    if (this.m_showDescription) {
-                        $("#description_div").show();
-                        $("#showDescription").siblings('label').html("Hide description");
-                    }
-                    else {
-                        $("#description_div").hide();
-                        $("#showDescription").siblings('label').html("Show description");
-                    }
-                };
                 this.setEditorMode = function (cb) {
                     //console.log(cb);
                     this.m_editorMode = cb.currentTarget.checked;
@@ -99,25 +87,12 @@ var Mareframe;
                     $("#ui_css").attr("href", "jQueryUI/jquery-ui_light.css");
                     $("#dialog_css").attr("href", "css/dialog_tokni.css");
                 }
+                else {
+                    $("#selectModel").hide();
+                    $("#selectModelLabel").hide();
+                }
                 var mareframeGUI = this;
                 if (p_model.m_bbnMode) {
-                    $("#detailsDialog").dialog({
-                        beforeClose: function (event, ui) {
-                            if (mareframeGUI.m_unsavedChanges) {
-                                console.log("unsaved changes");
-                                if (!confirm("You have unsaved changes. Pressing OK will close the window and discard all changes.")) {
-                                    return false;
-                                }
-                                $("#valuesTable_div").show();
-                            }
-                        }
-                    });
-                    $("#detailsDialog").on('dialogclose', function (event) {
-                        console.log("closing window");
-                        $("#valuesTable_div").hide();
-                    });
-                    $("#submit").on("click", this.saveChanges);
-                    $("#values").on("click", this.showValues);
                     this.setEditorMode = this.setEditorMode.bind(this);
                     this.setAutoUpdate = this.setAutoUpdate.bind(this);
                     $("#MCADataTable").hide();
@@ -190,7 +165,6 @@ var Mareframe;
                 $("#newValue").on("click", this.createNewValue);
                 $("#deleteElmt").on("click", this.deleteSelected);
                 $("#editorMode").on("click", this.setEditorMode);
-                $("#showDescription").on("click", this.setShowDescription);
                 $("#autoUpdate").on("click", this.setAutoUpdate);
                 $("#resetDcmt").on("click", this.resetDcmt);
                 $("#updateMdl").on("click", this.updateModel);
@@ -202,7 +176,6 @@ var Mareframe;
                 });
                 $("#fullscreen").on("click", this.fullscreen);
                 $("#cnctTool").on("click", this.cnctStatus);
-                $("#addDataRow").on("click", this.addDataRowClick);
                 $("#lodDcmt").on("change", this.loadModel);
                 $("#lodDcmt").on("click", function () {
                     console.log("click");
@@ -277,6 +250,7 @@ var Mareframe;
                 }
             };
             GUIHandler.prototype.updateModel = function () {
+                console.log("model: " + this.m_model.getName());
                 this.m_model.update();
                 this.updateMiniTables(this.m_model.getElementArr());
             };
@@ -285,7 +259,7 @@ var Mareframe;
                 this.updateSize();
             };
             GUIHandler.prototype.setSize = function (p_width, p_height) {
-                console.log("setting size to " + p_width + " , " + p_height);
+                //console.log("setting size to " + p_width + " , " + p_height);
                 this.m_mcaStageCanvas.height = p_height;
                 this.m_mcaStageCanvas.width = p_width;
                 this.m_mcaBackground.scaleY = p_height / this.m_mcaSizeY;
@@ -339,6 +313,8 @@ var Mareframe;
                     this.updateMiniTables(elmts);
                 }
                 this.m_updateMCAStage = true;
+                this.repositionModel();
+                this.updateSize();
                 //this.m_handler.getFileIO().quickSave(this.m_model); //This is commented out the because it was preventing reset from working properly
             };
             ;
@@ -490,7 +466,7 @@ var Mareframe;
                 //}
             };
             GUIHandler.prototype.clickedDecision = function (p_evt) {
-                if (!this.m_editorMode) {
+                if (!this.m_editorMode && this.m_noOfDialogsOpen == 0) {
                     //console.log("clicked a decision");
                     //console.log(p_evt);
                     this.m_model.setDecision(p_evt.currentTarget.name, Math.floor(p_evt.localY / 12));
@@ -539,6 +515,19 @@ var Mareframe;
                         }
                     }
                     this.updateModel();
+                }
+            };
+            GUIHandler.prototype.setShowDescription = function (p_evt) {
+                var id = p_evt.data.param1.getID();
+                $("#detailsDialog_" + id).data("showDescription", !$("#detailsDialog_" + id).data("showDescription"));
+                console.log("show description: " + $("#detailsDialog_" + id).data("showDescription"));
+                if ($("#detailsDialog_" + id).data("showDescription")) {
+                    $("#description_div_" + id).show();
+                    $("#showDescription_" + id).html("Hide description");
+                }
+                else {
+                    $("#description_div_" + id).hide();
+                    $("#showDescription_" + id).html("Show description");
                 }
             };
             GUIHandler.prototype.fullscreen = function (p_evt) {
@@ -594,7 +583,7 @@ var Mareframe;
                 this.moveAllElements(moveDistanceX, moveDistanceY);
             };
             GUIHandler.prototype.updateSize = function () {
-                //  console.log("updating size");
+                console.log("updating size");
                 var modelPos = this.getModelPos();
                 var lowestElement = modelPos[0];
                 var highestElement = modelPos[1];
@@ -607,7 +596,7 @@ var Mareframe;
                 // console.log("rightmost element: " + rightmostElement);
                 //console.log("leftmost element: " + leftmostElement);
                 this.m_updateMCAStage = true;
-                this.setSize(Math.max($(window).width(), rightmostElement), lowestElement); //Sets size 
+                this.setSize(Math.max($(window).width(), rightmostElement), Math.max($(window).height(), lowestElement)); //Sets size 
             };
             GUIHandler.prototype.getModelSize = function () {
                 var modelPos = this.getModelPos();
@@ -756,217 +745,706 @@ var Mareframe;
             GUIHandler.prototype.dblClick = function (p_evt) {
                 ////console.log(this);
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
-                    this.populateElmtDetails(this.m_model.getElement(p_evt.target.name));
-                    $("#submit").hide();
-                    $("#detailsDialog").dialog("open");
+                    this.populateElmtDetails2(this.m_model.getElement(p_evt.target.name));
                 }
             };
-            GUIHandler.prototype.populateElmtDetails = function (p_elmt) {
-                this.m_unsavedChanges = false;
-                console.log("unsaved changes: " + this.m_unsavedChanges);
-                console.log(p_elmt.getName() + " type: " + p_elmt.getType() + " is updated: " + p_elmt.isUpdated());
-                //console.log(p_elmt)
-                //set dialog title
-                $("#detailsDialog").dialog({
-                    title: p_elmt.getName()
+            GUIHandler.prototype.addSetDecFunction = function (p_elmt) {
+                console.log("adding decision function");
+                var gui = this;
+                $(".decCell").click(function () {
+                    console.log("decision cell clicked");
+                    gui.m_model.setDecision(p_elmt.getID(), this.id);
+                    gui.updateModel();
+                    //Create the table again
+                    var s = DST.Tools.htmlTableFromArray("Definition", p_elmt, gui.m_model, gui.m_editorMode);
+                    $("#defTable_div_" + p_elmt.getID()).html(s);
+                    //Add the edit functions again
+                    gui.addEditFunction(p_elmt, gui.m_editorMode);
+                    gui.addSetDecFunction(p_elmt);
                 });
-                document.getElementById("info_name").innerHTML = p_elmt.getName();
-                this.addEditFunction(p_elmt, this.m_editorMode);
-                if (this.m_model.m_bbnMode) {
-                    //bbn mode only
-                    $("#elementType").hide();
-                    //console.log("hiding selector");
-                    $("#detailsDialog").data("element", p_elmt);
-                    $("#detailsDialog").data("model", this.m_model);
-                    //console.log("data: " + p_elmt.getData());
-                    var s = DST.Tools.htmlTableFromArray("Definition", p_elmt, this.m_model, this.m_editorMode);
-                    $("#defTable_div").html(s);
-                    $("#defTable_div").show();
-                    var typeText;
-                    switch (p_elmt.getType()) {
-                        case 0:
-                            typeText = "Chance";
-                            break;
-                        case 1:
-                            typeText = "Decision";
-                            break;
-                        case 2:
-                            typeText = "Value";
-                            break;
-                        case 3:
-                            typeText = "Super Value";
-                            break;
-                        default:
-                            break;
-                    }
-                    document.getElementById("info_name").innerHTML = p_elmt.getName();
-                    document.getElementById("info_type").innerHTML = typeText;
-                    this.addEditFunction(p_elmt, this.m_editorMode);
-                    if (this.m_showDescription) {
-                        //set description
-                        var description = p_elmt.getDescription();
-                        if (description.length < 1) {
-                            description = "empty";
+            };
+            GUIHandler.prototype.createDetailsDialog = function (p_elmt) {
+                console.log("creating dialog");
+                var mareframeGUI = this;
+                var id = p_elmt.getID();
+                var newDialog = document.createElement("div");
+                newDialog.setAttribute("id", "detailsDialog_" + id);
+                var info_div = document.createElement("div");
+                info_div.setAttribute("class", "info_div");
+                info_div.style.overflow = "hidden";
+                var nameDiv = document.createElement("div");
+                nameDiv.setAttribute("class", "info_div");
+                nameDiv.style.width = "80px";
+                nameDiv.style.cssFloat = "left";
+                nameDiv.innerHTML = "Name:";
+                info_div.appendChild(nameDiv);
+                var info_Name = document.createElement("div");
+                nameDiv.setAttribute("class", "info_div");
+                info_Name.setAttribute("id", "info_name_" + id);
+                info_Name.style.marginLeft = "50px";
+                info_div.appendChild(info_Name);
+                var info_type_tag = document.createElement("div");
+                nameDiv.setAttribute("class", "info_div");
+                info_type_tag.style.width = "80px";
+                info_type_tag.style.cssFloat = "left";
+                info_type_tag.innerHTML = "Type:";
+                info_div.appendChild(info_type_tag);
+                var info_type = document.createElement("div");
+                info_type.setAttribute("class", "info_div");
+                info_type.setAttribute("id", "info_type_" + id);
+                info_type.style.marginLeft = "50px";
+                info_div.appendChild(info_type);
+                newDialog.appendChild(info_div);
+                var mcaClass = document.createElement("div");
+                mcaClass.setAttribute("class", "mcaClass");
+                var elementType = document.createElement("div");
+                elementType.setAttribute("id", "elementType");
+                var form = document.createElement("form");
+                var fieldset = document.createElement("fieldset");
+                var label1 = document.createElement("label");
+                label1.innerHTML = "Type of Element";
+                label1.htmlFor = "MCAelmtType";
+                fieldset.appendChild(label1);
+                var select = document.createElement("select");
+                select.setAttribute("name", "MCAelmtType");
+                select.setAttribute("id", "MCAelmtType");
+                var option1 = document.createElement("option");
+                option1.setAttribute("id", "optionAttribute");
+                option1.setAttribute("value", "0");
+                option1.innerHTML = "Attribute";
+                select.appendChild(option1);
+                var option2 = document.createElement("option");
+                option2.setAttribute("id", "optionObjective");
+                option2.setAttribute("value", "1");
+                option2.innerHTML = "Objective";
+                select.appendChild(option2);
+                var option3 = document.createElement("option");
+                option3.setAttribute("id", "optionAlternative");
+                option3.setAttribute("value", "2");
+                option3.innerHTML = "Alternative";
+                select.appendChild(option3);
+                fieldset.appendChild(select);
+                var label2 = document.createElement("label");
+                label2.innerHTML = "Type of Weighting Method";
+                label2.htmlFor = "MCAWeightingMethod";
+                fieldset.appendChild(label2);
+                var select2 = document.createElement("select");
+                select2.setAttribute("name", "MCAWeightingMethod");
+                select2.setAttribute("id", "MCAWeightingMethod");
+                var option4 = document.createElement("option");
+                option4.setAttribute("id", "optionSwingDirect");
+                option4.setAttribute("value", "1");
+                option4.innerHTML = "Swing / Direct";
+                select2.appendChild(option4);
+                var option5 = document.createElement("option");
+                option5.setAttribute("id", "optionValueFunction");
+                option5.setAttribute("value", "2");
+                option5.innerHTML = "Value Function";
+                select2.appendChild(option5);
+                fieldset.appendChild(select2);
+                form.appendChild(fieldset);
+                elementType.appendChild(form);
+                mcaClass.appendChild(elementType);
+                var weightingMethodSelector = document.createElement("div");
+                weightingMethodSelector.setAttribute("id", "weightingMethodSelector");
+                mcaClass.appendChild(weightingMethodSelector);
+                var valueFn_div = document.createElement("div");
+                valueFn_div.setAttribute("id", "valueFn_div");
+                var valueFn_canvas = document.createElement("canvas");
+                valueFn_canvas.setAttribute("id", "valueFn_canvas");
+                valueFn_canvas.style.width = "100";
+                valueFn_canvas.style.height = "100";
+                valueFn_div.appendChild(valueFn_canvas);
+                var valueFn_Linear = document.createElement("button");
+                valueFn_Linear.setAttribute("class", "button");
+                valueFn_Linear.setAttribute("id", "valueFn_Linear");
+                valueFn_Linear.innerHTML = "Linearize";
+                valueFn_div.appendChild(valueFn_Linear);
+                var valueFn_Flip = document.createElement("button");
+                valueFn_Flip.setAttribute("class", "button");
+                valueFn_Flip.setAttribute("id", "valueFn_Flip");
+                valueFn_Flip.innerHTML = "Flip Direction";
+                valueFn_div.appendChild(valueFn_Flip);
+                mcaClass.appendChild(valueFn_div);
+                var sliders_div = document.createElement("div");
+                sliders_div.setAttribute("id", "sliders_div");
+                mcaClass.appendChild(sliders_div);
+                var datatable_div = document.createElement("div");
+                datatable_div.setAttribute("id", "datatable_div");
+                mcaClass.appendChild(datatable_div);
+                var description_div = document.createElement("div");
+                description_div.setAttribute("id", "description_div_" + id);
+                newDialog.appendChild(description_div);
+                var chart_div = document.createElement("div");
+                chart_div.setAttribute("id", "chart_div");
+                mcaClass.appendChild(chart_div);
+                newDialog.appendChild(mcaClass);
+                var showDescription = document.createElement("button");
+                showDescription.setAttribute("class", "dialogButton");
+                showDescription.setAttribute("id", "showDescription_" + id);
+                showDescription.innerHTML = "Hide descrition";
+                newDialog.appendChild(showDescription);
+                var defTable_div_outer = document.createElement("div");
+                defTable_div_outer.setAttribute("class", "editable defTable_div");
+                var defTable_div = document.createElement("div");
+                defTable_div.setAttribute("id", "defTable_div_" + id);
+                defTable_div.setAttribute("class", "defTable_div");
+                defTable_div_outer.appendChild(defTable_div);
+                newDialog.appendChild(defTable_div_outer);
+                var addDataRow = document.createElement("button");
+                addDataRow.setAttribute("class", "dialogButton");
+                addDataRow.setAttribute("id", "addDataRow_" + id);
+                addDataRow.innerHTML = "Add Data Row";
+                newDialog.appendChild(addDataRow);
+                var submit = document.createElement("button");
+                submit.setAttribute("class", "dialogButton");
+                submit.setAttribute("id", "submit_" + id);
+                submit.innerHTML = "Submit Changes";
+                newDialog.appendChild(submit);
+                var values = document.createElement("button");
+                values.setAttribute("class", "dialogButton");
+                values.style.marginBottom = "20px";
+                values.setAttribute("id", "values_" + id);
+                values.innerHTML = "Show Values";
+                newDialog.appendChild(values);
+                var valuesTable_div = document.createElement("div");
+                valuesTable_div.setAttribute("id", "valuesTable_div_" + id);
+                valuesTable_div.setAttribute("class", "valuesTable_div");
+                newDialog.appendChild(valuesTable_div);
+                var userDescription_div = document.createElement("div");
+                userDescription_div.setAttribute("id", "userDescription_div_" + id);
+                newDialog.appendChild(userDescription_div);
+                $("#detailsDialogs").append(newDialog);
+                $("#detailsDialog_" + id).dialog({
+                    beforeClose: function (event, ui) {
+                        if ($("#detailsDialog_" + p_elmt.getID()).data("unsavedChanges")) {
+                            console.log("unsaved changes");
+                            if (!confirm("You have unsaved changes. Pressing OK will close the window and discard all changes.")) {
+                                return false;
+                            }
+                            $("#valuesTable_div_" + id).show();
                         }
-                        document.getElementById("description_div").innerHTML = p_elmt.getDescription();
-                        $("#description_div").show();
                     }
-                    //set user description
-                    if (p_elmt.getUserDescription().length < 1) {
-                        document.getElementById("userDescription_div").innerHTML = "write your own description or comments here";
+                });
+                $("#detailsDialog_" + id).on('dialogclose', function (event) {
+                    console.log("closing window");
+                    mareframeGUI.m_noOfDialogsOpen--;
+                    console.log("number of dialogs open: " + mareframeGUI.m_noOfDialogsOpen);
+                    $("#valuesTable_div_" + id).hide();
+                    $("#detailsDialog_" + id).data("isOpen", false);
+                    if (mareframeGUI.m_noOfDialogsOpen == 0) {
+                        console.log("all dialogs closed");
+                        mareframeGUI.disableButtons(false);
                     }
-                    else {
-                        document.getElementById("userDescription_div").innerHTML = p_elmt.getUserDescription();
-                    }
-                    $("#userDescription_div").show();
-                    if (p_elmt.isUpdated()) {
-                        $("#values").prop('disabled', false);
-                    }
-                    else {
-                        $("#values").prop('disabled', true);
-                    }
+                    // $("#detailsDialogs").empty();
+                });
+                $("#detailsDialog_" + id).data("isOpen", false);
+                return newDialog.id;
+            };
+            GUIHandler.prototype.populateElmtDetails2 = function (p_elmt) {
+                var id = p_elmt.getID();
+                if (document.getElementById("detailsDialog_" + id) == null) {
+                    var dialogID = "#" + this.createDetailsDialog(p_elmt);
                 }
                 else {
-                    //MCA mode only
-                    $("#info_type").hide();
-                    $("#info_type_tag").hide();
-                    $("#detailsDialog").data("element", p_elmt);
-                    //console.log(tableMat);
-                    var chartOptions = {
-                        width: 700,
-                        height: 400,
-                        vAxis: { minValue: 0 },
-                        legend: { position: 'none', maxLines: 3 },
-                        bar: { groupWidth: '60%' }
+                    var dialogID = "#detailsDialog_" + id;
+                }
+                if ($(dialogID).data("isOpen") === false) {
+                    $(dialogID).data("isOpen", true);
+                    this.disableButtons(true);
+                    this.m_noOfDialogsOpen++;
+                    console.log("number of dialogs open: " + this.m_noOfDialogsOpen);
+                    var opt = {
+                        title: p_elmt.getName()
                     };
-                    switch (p_elmt.getType()) {
-                        case 2:
-                            //show: tabledata,description
-                            $("#description_div").show();
-                            break;
-                        case 0:
-                            //show: valueFn,direct(sliders),ahp
-                            $("#weightingMethodSelector").show();
-                            $("#datatable_div").show();
-                            $("#chart_div").show();
-                            // Create the data table.
-                            // Instantiate and draw our chart, passing in some options.
-                            var chartData = google.visualization.arrayToDataTable(this.m_model.getWeightedData(p_elmt, true));
-                            var chart = new google.visualization.ColumnChart($("#chart_div").get(0));
-                            chart.draw(chartData, chartOptions);
-                            break;
-                        case 3: //objective
-                        case 1:
-                            //show: swing(sliders),direct(sliders),ahp
-                            $("#weightingMethodSelector").show();
-                            break;
+                    var dialog = $(dialogID).dialog(opt);
+                    dialog.dialog("open");
+                    dialog.dialog({
+                        width: 600,
+                        height: 500
+                    });
+                    $("#submit_" + id).hide();
+                    $("#values_" + id).show();
+                    $("#detailsDialog_" + p_elmt.getID()).data("unsavedChanges", false);
+                    //console.log("unsaved changes: " + this.m_unsavedChanges);
+                    //console.log(p_elmt.getName() + " type: " + p_elmt.getType() + " is updated: " + p_elmt.isUpdated());
+                    //console.log(p_elmt)
+                    //set dialog title
+                    // $("#detailsDialog").dialog("open");
+                    if (this.m_model.m_bbnMode) {
+                        //bbn mode only
+                        //console.log($("#elementType"));
+                        $(".mcaClass").hide();
+                        //$("#valueFn_div").hide();
+                        //console.log("hiding selector");
+                        dialog.data("element", p_elmt);
+                        dialog.data("model", this.m_model);
+                        dialog.data("showDescription", true);
+                        if (this.m_editorMode) {
+                            dialog.data("defTable", DST.Tools.copy(p_elmt.getData())); //Save an instance of the def table 
+                            dialog.data("deletedRows", []); //Save which rows are deleted
+                            dialog.data("newStates", []); //Save the new states that are added
+                        }
+                        //console.log("data: " + dialog.data("defTable"));
+                        var s = DST.Tools.htmlTableFromArray("Definition", p_elmt, this.m_model, this.m_editorMode, $("#detailsDialog_" + id).data("defTable"));
+                        $("#defTable_div_" + id).html(s);
+                        $("#defTable_div_" + id).show();
+                        var typeText;
+                        switch (p_elmt.getType()) {
+                            case 0:
+                                typeText = "Chance";
+                                break;
+                            case 1:
+                                typeText = "Decision";
+                                break;
+                            case 2:
+                                typeText = "Value";
+                                break;
+                            case 3:
+                                typeText = "Super Value";
+                                break;
+                            default:
+                                break;
+                        }
+                        document.getElementById("info_name_" + id).innerHTML = p_elmt.getName();
+                        document.getElementById("info_type_" + id).innerHTML = typeText;
+                        if (dialog.data("showDescription")) {
+                            //set description
+                            var description = p_elmt.getDescription();
+                            if (description.length < 1) {
+                                description = "empty";
+                            }
+                            document.getElementById("description_div_" + id).innerHTML = p_elmt.getDescription();
+                            $("#description_div_" + id).show();
+                        }
+                        //set user description
+                        if (p_elmt.getUserDescription().length < 1) {
+                            document.getElementById("userDescription_div_" + id).innerHTML = "write your own description or comments here";
+                        }
+                        else {
+                            document.getElementById("userDescription_div_" + id).innerHTML = p_elmt.getUserDescription();
+                        }
+                        $("#userDescription_div_" + id).show();
+                        $("#submit_" + id).click({ param1: p_elmt }, this.saveChanges);
+                        $("#values_" + id).click({ param1: p_elmt }, this.showValues);
+                        $("#addDataRow_" + id).click({ param1: p_elmt }, this.addDataRowClick);
+                        $("#showDescription_" + id).click({ param1: p_elmt }, this.setShowDescription);
+                        if (p_elmt.isUpdated()) {
+                            $("#values_" + id).prop('disabled', false);
+                        }
+                        else {
+                            $("#values_" + id).prop('disabled', true);
+                        }
+                        this.addEditFunction(p_elmt, this.m_editorMode);
+                        if (!(this.m_editorMode)) {
+                            this.addSetDecFunction(p_elmt);
+                        }
                     }
-                    switch (p_elmt.getMethod()) {
-                        case 0:
-                            console.log("WeigthMethodDirect");
-                            console.log("Weigthed data: " + this.m_model.getWeightedData(p_elmt, false));
-                            break;
-                        case 1:
-                            console.log("WeigthMethodSwing");
-                            var sliderHtml = "";
-                            $("#sliders_div").empty();
-                            for (var i = 0; i < p_elmt.getData(0).length; i++) {
-                                var childEl = this.m_model.getConnection(p_elmt.getData(0, i)).getInputElement();
-                                sliderHtml = "<div><p>" + childEl.getName() + ":<input id=\"inp_" + childEl.getID() + "\"type=\"number\" min=\"0\" max=\"100\"></p><div style=\"margin-top:5px ;margin-bottom:10px\"class =\"slider\"id=\"slid_" + childEl.getID() + "\"></div></div>";
-                                $("#sliders_div").append(sliderHtml);
-                                function makeSlider(count, id, _this) {
-                                    $("#slid_" + id).slider({
-                                        min: 0,
-                                        max: 100,
-                                        value: p_elmt.getData(1, count),
-                                        slide: function (event, ui) {
-                                            p_elmt.setData(ui.value, 1, count);
-                                            console.log("Slide: " + ui.value);
-                                            $("#inp_" + id).val(ui.value);
-                                            this.updateFinalScores();
-                                        }.bind(_this)
-                                    });
-                                    $("#inp_" + id).val(p_elmt.getData(1, count));
-                                    $("#inp_" + id).on("input", function () {
-                                        var val = parseInt(this.value);
-                                        if (val <= 100 && val >= 0) {
-                                            p_elmt.setData(val, 1, count);
-                                            $("#slid_" + id).slider("option", "value", val);
-                                            _this.updateFinalScores();
-                                        }
-                                        else if (val > 100) {
-                                            val = 100;
-                                        }
-                                        else {
-                                            val = 0;
-                                        }
-                                        ////console.log(p_elmt.getData(1));
-                                    });
+                    else {
+                        //MCA mode only
+                        $("#info_type").hide();
+                        $("#info_type_tag").hide();
+                        $("#detailsDialog").data("element", p_elmt);
+                        //console.log(tableMat);
+                        var chartOptions = {
+                            width: 700,
+                            height: 400,
+                            vAxis: { minValue: 0 },
+                            legend: { position: 'none', maxLines: 3 },
+                            bar: { groupWidth: '60%' }
+                        };
+                        switch (p_elmt.getType()) {
+                            case 2:
+                                //show: tabledata,description
+                                $("#description_div").show();
+                                break;
+                            case 0:
+                                //show: valueFn,direct(sliders),ahp
+                                $("#weightingMethodSelector").show();
+                                $("#datatable_div").show();
+                                $("#chart_div").show();
+                                // Create the data table.
+                                // Instantiate and draw our chart, passing in some options.
+                                var chartData = google.visualization.arrayToDataTable(this.m_model.getWeightedData(p_elmt, true));
+                                var chart = new google.visualization.ColumnChart($("#chart_div").get(0));
+                                chart.draw(chartData, chartOptions);
+                                break;
+                            case 3: //objective
+                            case 1:
+                                //show: swing(sliders),direct(sliders),ahp
+                                $("#weightingMethodSelector").show();
+                                break;
+                        }
+                        switch (p_elmt.getMethod()) {
+                            case 0:
+                                console.log("WeigthMethodDirect");
+                                console.log("Weigthed data: " + this.m_model.getWeightedData(p_elmt, false));
+                                break;
+                            case 1:
+                                console.log("WeigthMethodSwing");
+                                var sliderHtml = "";
+                                $("#sliders_div").empty();
+                                for (var i = 0; i < p_elmt.getData(0).length; i++) {
+                                    var childEl = this.m_model.getConnection(p_elmt.getData(0, i)).getInputElement();
+                                    sliderHtml = "<div><p>" + childEl.getName() + ":<input id=\"inp_" + childEl.getID() + "\"type=\"number\" min=\"0\" max=\"100\"></p><div style=\"margin-top:5px ;margin-bottom:10px\"class =\"slider\"id=\"slid_" + childEl.getID() + "\"></div></div>";
+                                    $("#sliders_div").append(sliderHtml);
+                                    function makeSlider(count, id, _this) {
+                                        $("#slid_" + id).slider({
+                                            min: 0,
+                                            max: 100,
+                                            value: p_elmt.getData(1, count),
+                                            slide: function (event, ui) {
+                                                p_elmt.setData(ui.value, 1, count);
+                                                console.log("Slide: " + ui.value);
+                                                $("#inp_" + id).val(ui.value);
+                                                this.updateFinalScores();
+                                            }.bind(_this)
+                                        });
+                                        $("#inp_" + id).val(p_elmt.getData(1, count));
+                                        $("#inp_" + id).on("input", function () {
+                                            var val = parseInt(this.value);
+                                            if (val <= 100 && val >= 0) {
+                                                p_elmt.setData(val, 1, count);
+                                                $("#slid_" + id).slider("option", "value", val);
+                                                _this.updateFinalScores();
+                                            }
+                                            else if (val > 100) {
+                                                val = 100;
+                                            }
+                                            else {
+                                                val = 0;
+                                            }
+                                            ////console.log(p_elmt.getData(1));
+                                        });
+                                    }
+                                    makeSlider(i, childEl.getID(), this);
                                 }
-                                makeSlider(i, childEl.getID(), this);
-                            }
-                            $("#sliders_div").show();
-                            break;
-                        case 2:
-                            console.log("WeigthMethodValueFn");
-                            var tableMat = this.m_model.getWeightedData(p_elmt, false);
-                            console.log("getWeigthedData: " + tableMat);
-                            var cPX = p_elmt.getData(1);
-                            var cPY = p_elmt.getData(2);
-                            ////console.log("draw line");
-                            this.m_valueFnLineCont.removeAllChildren();
-                            this.m_controlP.regX = 3;
-                            this.m_controlP.regY = 3;
-                            this.m_controlP.x = cPX;
-                            this.m_controlP.y = cPY;
-                            this.m_valFnBackground.name = p_elmt.getID();
-                            $("#valueFn_Flip").data("name", p_elmt.getID());
-                            $("#valueFn_Linear").data("name", p_elmt.getID());
-                            var maxVal = 0;
-                            for (var i = 1; i < tableMat.length; i++) {
-                                if (tableMat[i][1] > maxVal)
-                                    maxVal = tableMat[i][1];
-                            }
-                            //set minimum and maximum values
-                            var maxVal = p_elmt.getData(5);
-                            var minVal = p_elmt.getData(4);
-                            //check if data is within min-max values, and expand as necessary
-                            for (var i = 1; i < tableMat.length - 1; i++) {
-                                if (tableMat[i][1] > maxVal) {
-                                    maxVal = tableMat[i][1];
+                                $("#sliders_div").show();
+                                break;
+                            case 2:
+                                console.log("WeigthMethodValueFn");
+                                var tableMat = this.m_model.getWeightedData(p_elmt, false);
+                                console.log("getWeigthedData: " + tableMat);
+                                var cPX = p_elmt.getData(1);
+                                var cPY = p_elmt.getData(2);
+                                ////console.log("draw line");
+                                this.m_valueFnLineCont.removeAllChildren();
+                                this.m_controlP.regX = 3;
+                                this.m_controlP.regY = 3;
+                                this.m_controlP.x = cPX;
+                                this.m_controlP.y = cPY;
+                                this.m_valFnBackground.name = p_elmt.getID();
+                                $("#valueFn_Flip").data("name", p_elmt.getID());
+                                $("#valueFn_Linear").data("name", p_elmt.getID());
+                                var maxVal = 0;
+                                for (var i = 1; i < tableMat.length; i++) {
+                                    if (tableMat[i][1] > maxVal)
+                                        maxVal = tableMat[i][1];
                                 }
-                            }
-                            for (var i = 1; i < tableMat.length - 1; i++) {
-                                if (tableMat[i][1] < minVal) {
-                                    minVal = tableMat[i][1];
+                                //set minimum and maximum values
+                                var maxVal = p_elmt.getData(5);
+                                var minVal = p_elmt.getData(4);
+                                //check if data is within min-max values, and expand as necessary
+                                for (var i = 1; i < tableMat.length - 1; i++) {
+                                    if (tableMat[i][1] > maxVal) {
+                                        maxVal = tableMat[i][1];
+                                    }
                                 }
-                            }
-                            for (var i = 1; i < tableMat.length; i++) {
-                                ////console.log(tableMat[i][1]);
-                                var vertLine = new createjs.Shape(this.getValueFnLine((tableMat[i][1] - minVal) / (maxVal - minVal) * this.m_valueFnSize, this.m_googleColors[i - 1]));
-                                this.m_valueFnLineCont.addChild(vertLine);
-                            }
-                            this.updateValFnCP(cPX, cPY, p_elmt.getData(3));
-                            this.updateDataTableDiv(p_elmt);
-                            break;
-                        case 3: //ahp
+                                for (var i = 1; i < tableMat.length - 1; i++) {
+                                    if (tableMat[i][1] < minVal) {
+                                        minVal = tableMat[i][1];
+                                    }
+                                }
+                                for (var i = 1; i < tableMat.length; i++) {
+                                    ////console.log(tableMat[i][1]);
+                                    var vertLine = new createjs.Shape(this.getValueFnLine((tableMat[i][1] - minVal) / (maxVal - minVal) * this.m_valueFnSize, this.m_googleColors[i - 1]));
+                                    this.m_valueFnLineCont.addChild(vertLine);
+                                }
+                                this.updateValFnCP(cPX, cPY, p_elmt.getData(3));
+                                this.updateDataTableDiv(p_elmt);
+                                break;
+                            case 3: //ahp
+                        }
+                        //set description
+                        document.getElementById("description_div_" + id).innerHTML = p_elmt.getDescription();
                     }
-                    //set description
-                    document.getElementById("description_div").innerHTML = p_elmt.getDescription();
                 }
             };
             ;
+            /*  private populateElmtDetails(p_elmt: Element): void {
+                  var dialogID: String = "#" + this.createDetailsDialog(p_elmt);
+  
+                  $("#submit").hide();
+  
+                  this.m_unsavedChanges = false;
+                  console.log("unsaved changes: " + this.m_unsavedChanges);
+                  console.log(p_elmt.getName() + " type: " + p_elmt.getType() + " is updated: " + p_elmt.isUpdated());
+                  //console.log(p_elmt)
+                  //set dialog title
+                  var opt = {
+                      title: p_elmt.getName()
+                  }
+                  var theDialog = $(dialogID).dialog(opt);
+                  console.log(theDialog);
+                  theDialog.dialog("open");
+                  // $("#detailsDialog").dialog("open");
+                  $("#info_name").innerHTML = p_elmt.getName();
+                  if (this.m_model.m_bbnMode) {
+                      //bbn mode only
+                      $("#elementType").hide();
+                      //console.log("hiding selector");
+                      $("#detailsDialog").data("element", p_elmt);
+                      $("#detailsDialog").data("model", this.m_model);
+                      if (this.m_editorMode) {
+                          $("#detailsDialog").data("defTable", Tools.copy(p_elmt.getData()));//Save an instance of the def table
+                          $("#detailsDialog").data("deletedRows", []);//Save which rows are deleted
+                          $("#detailsDialog").data("newStates", []);//Save the new states that are added
+                      }
+                      else {//User can only set decision if the user is not in editormode
+                          this.addSetDecFunction(p_elmt);
+                      }
+                     
+                      //console.log("data: " + p_elmt.getData());
+                      var s = Tools.htmlTableFromArray("Definition", p_elmt, this.m_model, this.m_editorMode, $("#detailsDialog").data("defTable"));
+                      $("#defTable_div").html(s);
+                      $("#defTable_div").show();
+                      var typeText: string;
+                      switch (p_elmt.getType()) {
+                          case 0:
+                              typeText = "Chance";
+                              break;
+                          case 1:
+                              typeText = "Decision";
+                              break;
+                          case 2:
+                              typeText = "Value";
+                              break;
+                          case 3:
+                              typeText = "Super Value";
+                              break;
+                          default:
+                              break;
+                      }
+                      document.getElementById("info_name").innerHTML = p_elmt.getName();
+                      document.getElementById("info_type").innerHTML = typeText;
+                      this.addEditFunction(p_elmt, this.m_editorMode);
+  
+                      if (this.m_showDescription) {
+                          //set description
+                          var description = p_elmt.getDescription();
+                          if (description.length < 1) {
+                              description = "empty";
+                          }
+                          document.getElementById("description_div").innerHTML = p_elmt.getDescription();
+                          $("#description_div").show();
+                      }
+                      //set user description
+                      if (p_elmt.getUserDescription().length < 1) {
+                          document.getElementById("userDescription_div").innerHTML = "write your own description or comments here";
+                      }
+                      else {
+                          document.getElementById("userDescription_div").innerHTML = p_elmt.getUserDescription();
+                      }
+                      $("#userDescription_div").show();
+  
+                      if (p_elmt.isUpdated()) {
+                          $("#values").prop('disabled', false);
+                      } else {
+                          $("#values").prop('disabled', true);
+                      }
+  
+                  } else {
+                      //MCA mode only
+                      $("#info_type").hide();
+                      $("#info_type_tag").hide();
+                      $("#detailsDialog").data("element", p_elmt);
+                      //console.log(tableMat);
+                      var chartOptions: Object = {
+                          width: 700,
+                          height: 400,
+                          vAxis: { minValue: 0 },
+                          legend: { position: 'none', maxLines: 3 },
+                          bar: { groupWidth: '60%' }
+  
+                      };
+                      switch (p_elmt.getType()) {
+                          case 2://scenario
+                              //show: tabledata,description
+                              $("#description_div").show();
+                              break;
+  
+                          case 0://attribute
+                              //show: valueFn,direct(sliders),ahp
+                              $("#weightingMethodSelector").show();
+                              $("#datatable_div").show();
+                              $("#chart_div").show();
+                              // Create the data table.
+                              // Instantiate and draw our chart, passing in some options.
+                              var chartData = google.visualization.arrayToDataTable(this.m_model.getWeightedData(p_elmt, true));
+                              var chart = new google.visualization.ColumnChart($("#chart_div").get(0));
+                              chart.draw(chartData, chartOptions);
+  
+                              break;
+                          case 3://objective
+                          case 1://sub objective
+                              //show: swing(sliders),direct(sliders),ahp
+                              $("#weightingMethodSelector").show();
+                              break;
+                      }
+                      switch (p_elmt.getMethod()) {
+                          case 0://direct or undefined
+                              console.log("WeigthMethodDirect");
+                              console.log("Weigthed data: " + this.m_model.getWeightedData(p_elmt, false));
+                              break;
+                          case 1://swing
+                              console.log("WeigthMethodSwing");
+                              var sliderHtml = "";
+                              $("#sliders_div").empty();
+  
+                              for (var i = 0; i < p_elmt.getData(0).length; i++) {
+                                  var childEl = this.m_model.getConnection(p_elmt.getData(0, i)).getInputElement();
+                                  sliderHtml = "<div><p>" + childEl.getName() + ":<input id=\"inp_" + childEl.getID() + "\"type=\"number\" min=\"0\" max=\"100\"></p><div style=\"margin-top:5px ;margin-bottom:10px\"class =\"slider\"id=\"slid_" + childEl.getID() + "\"></div></div>";
+                                  $("#sliders_div").append(sliderHtml);
+                                  function makeSlider(count, id, _this) {
+                                      $("#slid_" + id).slider({
+                                          min: 0,
+                                          max: 100,
+                                          value: p_elmt.getData(1, count),
+                                          slide: function (event, ui) {
+                                              p_elmt.setData(ui.value, 1, count);
+                                              console.log("Slide: " + ui.value);
+                                              $("#inp_" + id).val(ui.value);
+                                              this.updateFinalScores();
+                                          }.bind(_this)
+                                      });
+                                      $("#inp_" + id).val(p_elmt.getData(1, count));
+  
+                                      $("#inp_" + id).on("input", function () {
+                                          var val = parseInt(this.value);
+                                          if (val <= 100 && val >= 0) {
+                                              p_elmt.setData(val, 1, count);
+                                              $("#slid_" + id).slider("option", "value", val);
+                                              _this.updateFinalScores();
+                                          } else if (val > 100) {
+                                              val = 100;
+                                          } else {
+                                              val = 0;
+                                          }
+  
+                                          ////console.log(p_elmt.getData(1));
+                                      });
+                                  }
+                                  makeSlider(i, childEl.getID(), this);
+                              }
+                              $("#sliders_div").show();
+  
+                              break;
+                          case 2://valueFn
+                              console.log("WeigthMethodValueFn");
+                              var tableMat = this.m_model.getWeightedData(p_elmt, false);
+                              console.log("getWeigthedData: " + tableMat);
+                              var cPX: number = p_elmt.getData(1);
+                              var cPY: number = p_elmt.getData(2);
+                              ////console.log("draw line");
+                              this.m_valueFnLineCont.removeAllChildren();
+  
+                              this.m_controlP.regX = 3;
+                              this.m_controlP.regY = 3;
+                              this.m_controlP.x = cPX;
+                              this.m_controlP.y = cPY;
+                              this.m_valFnBackground.name = p_elmt.getID();
+                              $("#valueFn_Flip").data("name", p_elmt.getID());
+                              $("#valueFn_Linear").data("name", p_elmt.getID());
+                              var maxVal = 0;
+                              for (var i = 1; i < tableMat.length; i++) {
+                                  if (tableMat[i][1] > maxVal)
+                                      maxVal = tableMat[i][1];
+                              }
+  
+                              //set minimum and maximum values
+                              var maxVal: number = p_elmt.getData(5);
+                              var minVal: number = p_elmt.getData(4);
+  
+                              //check if data is within min-max values, and expand as necessary
+                              for (var i = 1; i < tableMat.length - 1; i++) {
+                                  if (tableMat[i][1] > maxVal) {
+                                      maxVal = tableMat[i][1];
+                                  }
+                              }
+  
+                              for (var i = 1; i < tableMat.length - 1; i++) {
+                                  if (tableMat[i][1] < minVal) {
+                                      minVal = tableMat[i][1];
+                                  }
+                              }
+  
+  
+                              for (var i = 1; i < tableMat.length; i++) {
+                                  ////console.log(tableMat[i][1]);
+                                  var vertLine = new createjs.Shape(this.getValueFnLine((tableMat[i][1] - minVal) / (maxVal - minVal) * this.m_valueFnSize, this.m_googleColors[i - 1]));
+  
+                                  this.m_valueFnLineCont.addChild(vertLine);
+                              }
+  
+  
+                              this.updateValFnCP(cPX, cPY, p_elmt.getData(3));
+                              this.updateDataTableDiv(p_elmt);
+                              break;
+                          case 3://ahp
+                      }
+  
+                      //set description
+                      document.getElementById("description_div").innerHTML = p_elmt.getDescription();
+                  }
+              };*/
+            GUIHandler.prototype.updateValue = function (p_elmt, p_div, p_field, p_originalValue, p_newValue) {
+                console.log("new text: " + p_newValue);
+                if (p_newValue.length < 1) {
+                    p_div.html(p_originalValue);
+                    p_newValue = p_originalValue;
+                }
+                p_field.parent().text(p_newValue);
+                if (p_newValue !== p_originalValue) {
+                    console.log("unsaved changes");
+                    $("#detailsDialog_" + p_elmt.getID()).data("unsavedChanges", true);
+                }
+                p_originalValue = p_newValue; //This is needed if the user wants to change the value multiple times without saving inbetween
+                p_field.parent().removeClass("editable");
+                return p_originalValue;
+            };
+            //This function is not being used at the time since it does not work properly for some reason
+            /*private editFunction(p_div: any, p_field: any, p_originalValue: string) {
+                var mareframeGUI = this;
+                $("#submit").show();
+                //var originalValue = $(this).text();
+                p_field.addClass("editable");
+                p_field.html("<input type='text' value='" + p_originalValue + "' />"); //Prevents the box from becoming emtpy when clicked
+                p_field.children().first().focus();
+                p_field.children().first().keypress(function (e) {
+                    if (e.which == 13) {//If enter is pressed
+                        var newText = p_field.val();
+                        p_originalValue = mareframeGUI.updateValue(p_elmt, p_div, p_field, p_originalValue, newText);
+                    }
+                });
+                p_field.children().first().blur(function () { //If user has clicked outside the box
+                    var newText = p_field.val();
+                    p_originalValue = mareframeGUI.updateValue(p_elmt, p_div, p_field, p_originalValue, newText);
+                });
+            }*/
             GUIHandler.prototype.addEditFunction = function (p_elmt, p_editorMode) {
+                console.log("adding edit function");
                 var originalName = p_elmt.getName();
                 var mareframeGUI = this;
                 var model = this.m_model;
+                var id = p_elmt.getID();
                 if (this.m_model.m_bbnMode) {
                     var originalDesc = p_elmt.getDescription();
                     var originalUserComments = p_elmt.getUserDescription();
                     console.log("Element: " + p_elmt.getName() + "ready for editing");
                     // $(function () {
-                    $("#userDescription_div").dblclick(function () {
-                        $("#submit").show();
+                    $("#userDescription_div_" + id).dblclick(function () {
+                        //mareframeGUI.editFunction($("#userDescription_div"), $(this), originalUserComments); //This is for some reason not working
+                        $("#submit_" + id).show();
                         $(this).addClass("editable");
                         console.log("original value : " + originalUserComments);
                         $(this).html("<input type='text' value='" + originalUserComments + "' />");
@@ -974,97 +1452,56 @@ var Mareframe;
                         $(this).children().first().keypress(function (e) {
                             if (e.which == 13) {
                                 var newText = $(this).val();
-                                console.log("new text: " + newText);
-                                if (newText.length < 1) {
-                                    $("#userDescription_div").html(originalUserComments);
-                                    newText = originalUserComments;
-                                }
-                                $(this).parent().text(newText);
-                                if (newText !== originalUserComments) {
-                                    console.log("unsaved changes");
-                                    mareframeGUI.m_unsavedChanges = true;
-                                }
-                                originalUserComments = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                                originalUserComments = mareframeGUI.updateValue(p_elmt, $("#userDescription_div_" + id), $(this), originalUserComments, newText);
                             }
-                            $(this).parent().removeClass("editable");
                         });
                         $(this).children().first().blur(function () {
                             var newText = $(this).val();
-                            console.log("new text: " + newText);
-                            if (newText.length < 1) {
-                                $("#userDescription_div").html(originalUserComments);
-                                newText = originalUserComments;
-                            }
-                            $(this).parent().text(newText);
-                            if (newText !== originalUserComments) {
-                                mareframeGUI.m_unsavedChanges = true;
-                            }
-                            originalUserComments = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
-                            $(this).parent().removeClass("editable");
+                            originalUserComments = mareframeGUI.updateValue(p_elmt, $("#userDescription_div_" + id), $(this), originalUserComments, newText);
                         });
                     });
-                    // });
                     if (p_editorMode) {
+                        //Minus button
                         if (p_elmt.getType() === 0 || p_elmt.getType() === 1) {
-                            $("#addDataRow").show();
+                            $("#addDataRow_" + id).show();
                             $(".minus").button({
                                 icons: { primary: "ui-icon-minus" }
                             });
                             //Add function to minus button
                             $(".minus").click(function () {
+                                $("#valuesTable_div_" + id).hide();
                                 var row = this.id;
-                                mareframeGUI.removeRow(p_elmt, row);
-                                //create the html table again
-                                var s = DST.Tools.htmlTableFromArray("Definition", p_elmt, model, p_editorMode);
-                                $("#defTable_div").html(s);
+                                mareframeGUI.removeRowVisually(p_elmt, row);
                                 //Add the edit function again
                                 mareframeGUI.addEditFunction(p_elmt, p_editorMode);
+                                $("#detailsDialog_" + p_elmt.getID()).data("unsavedChanges", true);
+                                $("#values_" + id).prop("disabled", true);
+                                $("#values_" + id).show();
+                                $("#submit_" + id).show();
                             });
                         }
                         else {
-                            $("#addDataRow").hide();
+                            $("#addDataRow_" + id).hide();
                         }
-                        $("#info_name").dblclick(function () {
-                            $("#submit").show();
+                        $("#info_name_" + id).dblclick(function () {
+                            $("#submit_" + id).show();
                             $(this).addClass("editable");
                             $(this).html("<input type='text' value='" + originalName + "' />");
                             $(this).children().first().focus();
                             $(this).children().first().keypress(function (e) {
                                 if (e.which == 13) {
                                     var newText = $(this).val();
-                                    console.log("new text: " + newText);
-                                    if (newText.length < 1) {
-                                        $("#info_name").html(originalName);
-                                        newText = originalName;
-                                    }
-                                    $(this).parent().text(newText);
-                                    if (newText !== originalName) {
-                                        //console.log("unsaved changes");
-                                        mareframeGUI.m_unsavedChanges = true;
-                                    }
-                                    originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                                    originalName = mareframeGUI.updateValue(p_elmt, $("#info_name_" + id), $(this), originalName, newText);
                                 }
-                                $(this).parent().removeClass("editable");
                             });
                             $(this).children().first().blur(function () {
                                 var newText = $(this).val();
-                                console.log("new text: " + newText);
-                                if (newText.length < 1) {
-                                    $("#info_name").html(originalName);
-                                    newText = originalName;
-                                }
-                                $(this).parent().text(newText);
-                                if (newText !== originalName) {
-                                    mareframeGUI.m_unsavedChanges = true;
-                                }
-                                originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
-                                $(this).parent().removeClass("editable");
+                                originalName = mareframeGUI.updateValue(p_elmt, $("#info_name_" + id), $(this), originalName, newText);
                             });
                         });
-                        // $(function () {
                         //    console.log("original value: " + originalDesc);
-                        $("#description_div").dblclick(function () {
-                            $("#submit").show();
+                        $("#description_div_" + id).dblclick(function () {
+                            $("#submit_" + id).show();
                             //var originalValue = $(this).text();
                             $(this).addClass("editable");
                             $(this).html("<input type='text' value='" + originalDesc + "' />"); //Prevents the box from becoming emtpy when clicked
@@ -1072,138 +1509,134 @@ var Mareframe;
                             $(this).children().first().keypress(function (e) {
                                 if (e.which == 13) {
                                     var newText = $(this).val();
-                                    $(this).parent().text(newText);
-                                    if (newText.length < 1) {
-                                        $("#description_div").html(originalDesc);
-                                        newText = originalDesc;
-                                    }
-                                    if (newText !== originalDesc) {
-                                        mareframeGUI.m_unsavedChanges = true;
-                                    }
-                                    originalDesc = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                                    originalDesc = mareframeGUI.updateValue(p_elmt, $("#description_div_" + id), $(this), originalDesc, newText);
                                 }
-                                $(this).parent().removeClass("editable");
                             });
                             $(this).children().first().blur(function () {
                                 var newText = $(this).val();
-                                //console.log("newtext = " + newText + " length: " + newText.length);
-                                //console.log("original text: " + originalDesc);
-                                if (newText.length < 1) {
-                                    $("#description_div").html(originalDesc);
-                                    newText = originalDesc;
-                                }
-                                $(this).parent().text(newText);
-                                if (newText !== originalDesc) {
-                                    mareframeGUI.m_unsavedChanges = true;
-                                }
-                                originalDesc = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
-                                $(this).parent().removeClass("editable");
+                                originalDesc = mareframeGUI.updateValue(p_elmt, $("#description_div_" + id), $(this), originalDesc, newText);
                             });
-                            // });
                         });
                         //Data table
                         var editing = false; //this is used to make sure the text does not disapear when double clicking several times
-                        $(function () {
-                            $("td").dblclick(function () {
-                                // console.log("editing: " + editing);
-                                if (!editing) {
-                                    editing = true;
-                                    $("#submit").show();
-                                    var originalValue = $(this).text();
-                                    //  console.log("original value : " + originalValue);
-                                    $(this).addClass("editable");
-                                    $(this).html("<input type='text' value='" + originalValue + "' />");
-                                    $(this).children().first().focus();
-                                    $(this).children().first().keypress(function (e) {
-                                        if (e.which == 13) {
-                                            var newText = $(this).val();
-                                            console.log("new text: " + newText);
-                                            if (isNaN(newText) || newText.length < 1) {
-                                                console.log("value is not a number");
-                                                // alert("Value must be a number");
-                                                //TODO find better solution than alert
-                                                $(this).parent().text(originalValue);
-                                            }
-                                            else {
-                                                $(this).parent().text(newText);
-                                                if (newText !== originalValue) {
-                                                    mareframeGUI.m_unsavedChanges = true;
-                                                }
-                                            }
-                                            $(this).parent().removeClass("editable");
-                                            editing = false;
-                                        }
-                                    });
-                                    $(this).children().first().blur(function () {
+                        $("td").dblclick(function () {
+                            $("#valuesTable_div_" + id).hide();
+                            $("#values_" + id).show();
+                            // console.log("editing: " + editing);
+                            if (!editing) {
+                                editing = true;
+                                $("#submit_" + id).show();
+                                var originalValue = $(this).text();
+                                //  console.log("original value : " + originalValue);
+                                $(this).addClass("editable");
+                                $(this).html("<input type='text' value='" + originalValue + "' />");
+                                $(this).children().first().focus();
+                                $(this).children().first().keypress(function (e) {
+                                    if (e.which == 13) {
                                         var newText = $(this).val();
+                                        console.log("new text: " + newText);
                                         if (isNaN(newText) || newText.length < 1) {
-                                            //alert("Value must be a number");
-                                            // console.log("orignal value: " + originalValue);
+                                            console.log("value is not a number");
+                                            // alert("Value must be a number");
                                             //TODO find better solution than alert
                                             $(this).parent().text(originalValue);
                                         }
                                         else {
                                             $(this).parent().text(newText);
-                                            //console.log(" new text: " + newText + " originalValue: " + originalValue);
                                             if (newText !== originalValue) {
-                                                mareframeGUI.m_unsavedChanges = true;
-                                            }
-                                            else {
-                                                mareframeGUI.m_unsavedChanges = false;
+                                                $("#detailsDialog_" + p_elmt.getID()).data("unsavedChanges", true);
                                             }
                                         }
                                         $(this).parent().removeClass("editable");
                                         editing = false;
-                                    });
-                                }
-                            });
-                            //TODO Prevent user from editing the top rows. That data should come from the child elements
-                            $(".editable_cell").dblclick(function () {
-                                //console.log("editing: " + editing);
-                                if (!editing) {
-                                    editing = true;
-                                    $("#submit").show();
-                                    var originalText = $(this).text();
-                                    $(this).addClass("editable");
-                                    $(this).html("<input type='text' value='" + originalText + "' />");
-                                    $(this).children().first().focus();
-                                    $(this).children().first().keypress(function (e) {
-                                        if (e.which == 13) {
-                                            var newText = $(this).val();
-                                            if (newText.length < 1) {
-                                                //alert("Cell cannot be empty");
-                                                // console.log("cell cannot be emtpy");
-                                                $(this).parent().text(originalText);
-                                            }
-                                            else {
-                                                $(this).parent().text(newText);
-                                                if (newText !== originalText) {
-                                                    mareframeGUI.m_unsavedChanges = true;
-                                                }
-                                            }
-                                            $(this).parent().removeClass("editable");
-                                            editing = false;
+                                    }
+                                });
+                                $(this).children().first().blur(function () {
+                                    var newText = $(this).val();
+                                    if (isNaN(newText) || newText.length < 1) {
+                                        //alert("Value must be a number");
+                                        // console.log("orignal value: " + originalValue);
+                                        //TODO find better solution than alert
+                                        $(this).parent().text(originalValue);
+                                    }
+                                    else {
+                                        $(this).parent().text(newText);
+                                        //console.log(" new text: " + newText + " originalValue: " + originalValue);
+                                        if (newText !== originalValue) {
+                                            $("#detailsDialog_" + p_elmt.getID()).data("unsavedChanges", true);
                                         }
-                                    });
-                                    $(this).children().first().blur(function () {
+                                    }
+                                    $(this).parent().removeClass("editable");
+                                    editing = false;
+                                });
+                            }
+                            if ($("#detailsDialog_" + p_elmt.getID()).data("unsavedChanges")) {
+                                $("#values_" + id).prop("disabled", true);
+                            }
+                            else {
+                                $("#values_" + id).prop("disabled", false);
+                            }
+                        });
+                        console.log("editable cells: " + $(".editable_cell").length);
+                        $(".editable_cell").dblclick(function () {
+                            console.log("clicked editable cell");
+                            $("#valuesTable_div_" + id).hide();
+                            $("#values_" + id).show();
+                            //console.log("editing: " + editing);
+                            if (!editing) {
+                                editing = true;
+                                $("#submit_" + id).show();
+                                var originalText = $(this).text();
+                                $(this).addClass("editable");
+                                $(this).html("<input type='text' value='" + originalText + "' />");
+                                $(this).children().first().focus();
+                                $(this).children().first().keypress(function (e) {
+                                    if (e.which == 13) {
                                         var newText = $(this).val();
                                         if (newText.length < 1) {
                                             //alert("Cell cannot be empty");
-                                            //console.log("cell cannot be emtpy");
+                                            // console.log("cell cannot be emtpy");
                                             $(this).parent().text(originalText);
                                         }
                                         else {
                                             $(this).parent().text(newText);
                                             if (newText !== originalText) {
-                                                mareframeGUI.m_unsavedChanges = true;
+                                                mareframeGUI.updateNewStates(p_elmt, originalText, newText);
+                                                $("#detailsDialog_" + p_elmt.getID()).data("unsavedChanges", true);
                                             }
                                         }
                                         $(this).parent().removeClass("editable");
                                         editing = false;
-                                    });
-                                }
-                            });
+                                    }
+                                });
+                                $(this).children().first().blur(function () {
+                                    var newText = $(this).val();
+                                    if (newText.length < 1) {
+                                        //alert("Cell cannot be empty");
+                                        //console.log("cell cannot be emtpy");
+                                        $(this).parent().text(originalText);
+                                    }
+                                    else {
+                                        $(this).parent().text(newText);
+                                        if (newText !== originalText) {
+                                            mareframeGUI.updateNewStates(p_elmt, originalText, newText);
+                                            $("#detailsDialog_" + p_elmt.getID()).data("unsavedChanges", true);
+                                        }
+                                    }
+                                    $(this).parent().removeClass("editable");
+                                    editing = false;
+                                });
+                            }
+                            if ($("#detailsDialog_" + p_elmt.getID()).data("unsavedChanges")) {
+                                $("#values_" + id).prop("disabled", true);
+                            }
+                            else {
+                                $("#values_" + id).prop("disabled", false);
+                            }
                         });
+                    }
+                    else {
+                        $("#addDataRow_" + id).hide();
                     }
                 }
                 else {
@@ -1249,31 +1682,48 @@ var Mareframe;
                     }
                 }
             };
-            GUIHandler.prototype.showValues = function () {
-                var elmt = $("#detailsDialog").data("element");
+            //This updates the state name if it is one of the new states
+            GUIHandler.prototype.updateNewStates = function (p_elmt, originalText, newText) {
+                var states = $("#detailsDialog_" + p_elmt.getID()).data("newStates");
+                for (var i = 0; i < states.length; i++) {
+                    console.log("checking " + states[i] + " against " + originalText);
+                    if (states[i].trim() === originalText.trim()) {
+                        states[i] = newText; //Update the state name
+                        console.log("match");
+                    }
+                }
+                $("#detailsDialog").data("newStates", states);
+                console.log($("#detailsDialog").data("newStates"));
+            };
+            GUIHandler.prototype.showValues = function (p_evt) {
+                var elmt = p_evt.data.param1;
+                console.log("showing values");
+                var id = elmt.getID();
                 //console.log("Data: " + elmt.getData());
                 //console.log("Values: " + elmt.getValues());
                 //console.log(elmt.getValues());
                 //console.log("size of values: " + math.size(elmt.getValues()));
-                $("#valuesTable_div").html(DST.Tools.htmlTableFromArray("Values", elmt, $("#detailsDialog").data("model"), this.m_editorMode));
-                $("#valuesTable_div").show();
-                $("#values").prop("disabled", true);
+                $("#valuesTable_div_" + id).html(DST.Tools.htmlTableFromArray("Values", elmt, $("#detailsDialog_" + id).data("model"), this.m_editorMode));
+                $("#valuesTable_div_" + id).show();
+                $("#values_" + id).hide();
             };
-            GUIHandler.prototype.saveChanges = function () {
-                var elmt = $("#detailsDialog").data("element");
+            GUIHandler.prototype.saveChanges = function (p_evt) {
+                var elmt = p_evt.data.param1;
+                console.log("saving changes");
+                var id = elmt.getID();
                 var oldData = elmt.getData();
                 var model = this.m_model;
                 //Save user description
-                var userDescription = $("#userDescription_div").text();
+                var userDescription = $("#userDescription_div_" + id).text();
                 elmt.setUserDescription(userDescription);
                 //Save description
-                var description = $("#description_div").text();
+                var description = $("#description_div_" + id).text();
                 elmt.setDescription(description);
                 //Save def table
-                var table = $("#defTable_div");
+                var table = $("#defTable_div_" + id);
                 var newTable = [];
                 var newRow = [];
-                elmt.setName($("#info_name").text());
+                elmt.setName($("#info_name_" + id).text());
                 //console.log(this);
                 table.find("tr").each(function () {
                     $(this).find("th,td").each(function () {
@@ -1311,7 +1761,22 @@ var Mareframe;
                     alert("The values in each column must add up to 1");
                 }
                 else {
-                    elmt.setData(newTable);
+                    if (this.m_editorMode) {
+                        //Delete the deleted states from the child elements
+                        var rowsToDelete = $("#detailsDialog_" + id).data("deletedRows");
+                        console.log("rows to delete: " + rowsToDelete);
+                        elmt.getChildrenElements().forEach(function (e) {
+                            for (var i = 0; i < rowsToDelete.length; i++) {
+                                console.log(elmt.getData());
+                                console.log("updating child  " + e.getName());
+                                e.setData(DST.Tools.removeState(e.getData(), elmt, elmt.getData()[rowsToDelete[i]][0]));
+                            }
+                        });
+                        elmt.setData(newTable);
+                        console.log("new data: " + elmt.getData());
+                        //This updates the children accourding to the new states
+                        this.saveAddedRows(elmt, $("#detailsDialog_" + id).data("newStates"));
+                    }
                     elmt.setUpdated(false);
                     elmt.getAllDescendants().forEach(function (e) {
                         e.setUpdated(false);
@@ -1321,10 +1786,17 @@ var Mareframe;
                     });
                     if (model.getAutoUpdate()) {
                         this.updateModel();
+                        $("#values_" + id).prop("disabled", false); //Make the value button clickable again
                         console.log("auto update is on");
                     }
+                    //console.log("new table after submit:");
+                    //console.log(elmt.getData());
+                    //The two lists need to be emptied
+                    $("#detailsDialog_" + id).data("deletedRows", []);
+                    $("#detailsDialog_" + id).data("newStates", []);
+                    $("#detailsDialog_" + id).data("unsavedChanges", false);
+                    $("#submit_" + id).hide();
                 }
-                this.m_unsavedChanges = false;
                 //this.m_updateMCAStage = true;
                 //this.m_mcaContainer.removeChild(elmt.m_easelElmt);
                 this.addElementToStage(elmt); //repaint the element. This is necessary if the name of the elemnt has been changed
@@ -1592,7 +2064,7 @@ var Mareframe;
                 var highestElement = positions[1];
                 var leftmostElement = positions[2];
                 var rightmostElement = positions[3];
-                console.log(highestElement - 30);
+                //console.log(highestElement - 30);
                 return highestElement - 30 + yMovement < 0 || leftmostElement - 80 + xMovement < 0 || lowestElement + yMovement - 30 > this.m_mcaStageCanvas.height || rightmostElement - 80 + xMovement > this.m_mcaStageCanvas.width;
             };
             GUIHandler.prototype.tick = function () {
@@ -1634,36 +2106,14 @@ var Mareframe;
                             //alert("Parent");
                             var conn = outputElmt.getConnectionFrom(inputElmt);
                             console.log("deleting connection: " + conn.getID() + "  From: " + outputElmt.getName() + "  To: " + inputElmt.getName());
-                            //for (var index in outputElmt.getConnections()) {
-                            //    console.log(outputElmt.getName() + "  Before: " + outputElmt.getConnections()[index].getID());
-                            //}
-                            //for (var index in inputElmt.getConnections()) {
-                            //    console.log(inputElmt.getName() + "  Before: " + inputElmt.getConnections()[index].getID());
-                            //}
-                            //this.m_model.deleteConnection( inputElmt.getConnectionFrom(outputElmt).getID() );
-                            //this.m_model.deleteConnection(conn.getID());
-                            //outputElmt.deleteConnection(inputElmt.getConnectionFrom(outputElmt).getID());
                             console.log("connection from " + outputElmt.getName() + " to " + inputElmt.getName() + " named " + inputElmt.getConnectionFrom(outputElmt));
                             console.log("connection from " + inputElmt.getName() + " to " + outputElmt.getName() + " named " + outputElmt.getConnectionFrom(inputElmt).getID());
                             inputElmt.deleteConnection(outputElmt.getConnectionFrom(inputElmt).getID());
                             outputElmt.deleteConnection(outputElmt.getConnectionFrom(inputElmt).getID());
-                            //for (var index in outputElmt.getConnections()) {
-                            //    console.log(outputElmt.getName() + "  After: " + outputElmt.getConnections()[index].getID());
-                            //}
-                            //for (var index in inputElmt.getConnections()) {
-                            //    console.log(inputElmt.getName() + "  After: " + inputElmt.getConnections()[index].getID());
-                            //}
                             inputElmt.setUpdated(false);
                             inputElmt.getAllDescendants().forEach(function (e) {
                                 e.setUpdated(false);
                             });
-                            //this.m_mcaContainer.removeChild(conn);
-                            //outputElmt.setUpdated(false);
-                            //outputElmt.getAllDescendants().forEach(function (e) {
-                            //    e.setUpdated(false);
-                            //    this.clear();
-                            //});
-                            //alert("updating");
                             this.m_model.update();
                             this.importStage();
                             this.m_mcaStage.update();
@@ -1878,41 +2328,88 @@ var Mareframe;
                 this.m_updateMCAStage = true;
             };
             GUIHandler.prototype.addDataRowClick = function (p_evt) {
+                console.log("adding data row");
+                var elmt = p_evt.data.param1;
+                var id = elmt.getID();
+                $("#valuesTable_div_" + id).hide(); //Hides the value table
+                $("#values_" + id).prop("disabled", true); //Disables the show values button until element is updated
                 //console.log("add row");
-                var elmt = $("#detailsDialog").data("element");
-                elmt.setData(DST.Tools.addDataRow(elmt));
-                elmt.update();
+                $("#detailsDialog_" + id).data("defTable", DST.Tools.addDataRow(elmt, $("#detailsDialog_" + id).data("defTable")));
+                var newState = $("#detailsDialog_" + id).data("defTable")[$("#detailsDialog_" + id).data("defTable").length - 1][0];
+                var states = $("#detailsDialog_" + id).data("newStates");
+                states.push(newState);
+                $("#detailsDialog_" + id).data("newStates", states);
                 //Create the html tabel again and add the edit function again
-                var s = DST.Tools.htmlTableFromArray("Definition", elmt, this.m_model, this.m_editorMode);
-                $("#defTable_div").html(s);
+                var s = DST.Tools.htmlTableFromArray("Definition", elmt, this.m_model, this.m_editorMode, $("#detailsDialog_" + id).data("defTable"));
+                $("#defTable_div_" + id).html(s);
                 this.addEditFunction(elmt, this.m_editorMode);
-                var newStateName = elmt.getData()[elmt.getData().length - 1][0];
-                //Add default values for the new state in all children
-                elmt.getChildrenElements().forEach(function (e) {
-                    e.setData(e.updateHeaderRows(e.getData()));
-                    e.setData(e.addDefaultDataInEmptyCells(e.getData(), elmt, newStateName));
-                });
-                elmt.getAllDescendants().forEach(function (e) {
-                    e.setUpdated(false);
-                });
+                $("#detailsDialog_" + id).data("unsavedChanges", true);
+                $("#values_" + id).show();
+                $("#submit_" + id).show();
             };
-            GUIHandler.prototype.removeRow = function (p_element, p_n) {
-                //console.log("remove row " + p_n + " in " + p_element.getName());
-                var data = DST.Tools.makeSureItsTwoDimensional(p_element.getData());
-                var state = data[p_n][0];
-                if (data.length - DST.Tools.numOfHeaderRows(data) < 3) {
-                    alert("Can not be less than two outcomes");
+            GUIHandler.prototype.saveAddedRows = function (p_elmt, p_states) {
+                console.log("new States: " + p_states);
+                for (var i = 0; i < p_states.length; i++) {
+                    var newStateName = p_states[i];
+                    //Add default values for the new state in all children
+                    p_elmt.getChildrenElements().forEach(function (e) {
+                        // console.log("updating header for " + e.getName());
+                        e.setData(e.updateHeaderRows(e.getData()));
+                        //console.log("new Data: " + e.getData());
+                        e.setData(e.addDefaultDataInEmptyCells(e.getData(), p_elmt, newStateName));
+                    });
+                }
+            };
+            GUIHandler.prototype.removeRowVisually = function (p_element, p_row) {
+                var id = p_element.getID();
+                var rowToDelete = $("#detailsDialog_" + id).data("defTable")[p_row];
+                //console.log("delete row: " + rowToDelete);
+                if ($("#detailsDialog_" + id).data("defTable").length - DST.Tools.numOfHeaderRows($("#detailsDialog_" + id).data("defTable")) < 3) {
+                    alert("Must be at least two outcomes");
                 }
                 else {
-                    p_element.setData(DST.Tools.removeRow(p_element.getData(), p_n));
-                    //Remove this state from all children data tables
-                    p_element.getChildrenElements().forEach(function (e) {
-                        e.setData(DST.Tools.removeState(e.getData(), p_element, state));
-                    });
-                    p_element.getAllDescendants().forEach(function (e) {
-                        e.setUpdated(false);
-                    });
+                    $("#detailsDialog_" + id).data("defTable", DST.Tools.removeRow($("#detailsDialog_" + id).data("defTable"), p_row));
+                    var statesToAdd = $("#detailsDialog_" + id).data("newStates");
+                    var deletedRowState = rowToDelete[0];
+                    var newStatesToAdd = [];
+                    if (statesToAdd !== undefined && statesToAdd.indexOf(deletedRowState) > -1) {
+                        console.log("deleted row is a new row");
+                        for (var i = 0; i < statesToAdd.length; i++) {
+                            if (statesToAdd[i] !== deletedRowState) {
+                                newStatesToAdd.push(statesToAdd[i]);
+                            }
+                        }
+                        $("#detailsDialog_" + id).data("newStates", newStatesToAdd); //Update the new states
+                    }
+                    else {
+                        console.log("deleted row is not a new row");
+                        var rowsToDelete = $("#detailsDialog_" + id).data("deletedRows");
+                        rowsToDelete.push(p_row);
+                        $("#detailsDialog_" + id).data("deletedRows", rowsToDelete);
+                    }
+                    //create the html table again
+                    var s = DST.Tools.htmlTableFromArray("Definition", p_element, this.m_model, this.m_editorMode, $("#detailsDialog_" + id).data("defTable"));
+                    $("#defTable_div_" + id).html(s);
                 }
+            };
+            GUIHandler.prototype.disableButtons = function (b) {
+                $("#newDcmt").prop('disabled', b);
+                $("#lodDcmt").prop('disabled', b);
+                $("#savDcmt").prop('disabled', b);
+                $("#resetDcmt").prop('disabled', b);
+                $("#newElmt").prop('disabled', b);
+                $("#newChance").prop('disabled', b);
+                $("#newDec").prop('disabled', b);
+                $("#newValue").prop('disabled', b);
+                $("#deleteElmt").prop('disabled', b);
+                $("#selectAllElmt").prop('disabled', b);
+                $("#cnctTool").prop('disabled', b);
+                $("#fitToModel").prop('disabled', b);
+                $("#fullscreen").prop('disabled', b);
+                $("#editorMode").prop('disabled', b);
+                $("#autoUpdate").prop('disabled', b);
+                $("#updateMdl").prop('disabled', b);
+                $("#selectModel").prop('disabled', b);
             };
             return GUIHandler;
         })();

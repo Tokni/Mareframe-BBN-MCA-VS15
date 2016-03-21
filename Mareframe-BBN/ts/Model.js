@@ -98,9 +98,9 @@ var Mareframe;
             };
             Model.prototype.update = function () {
                 var m = this;
-                console.log("updating model");
+                //console.log("updating model");
                 this.m_elementArr.forEach(function (p_elmt) {
-                    console.log(p_elmt.getID() + " has been updated: " + p_elmt.isUpdated());
+                    //console.log(p_elmt.getID() + " has been updated: " + p_elmt.isUpdated());
                     if (!p_elmt.isUpdated()) {
                         p_elmt.update();
                     }
@@ -474,8 +474,9 @@ var Mareframe;
                 }
                 //h.gui.setSize(maxX + 80, maxY + 20);
                 //h.gui.updateTable(this.dataMatrix);
-                ////console.log("model.fromJSON()");
-                ////console.log(this);
+                //console.log("model.fromJSON()");
+                //console.log(this);
+                console.log("finnished loading from json");
             };
             Model.prototype.createNewConnection = function (p_inputElmt, p_outputElmt) {
                 var c = new DST.Connection(p_inputElmt, p_outputElmt, this.m_bbnMode, "conn" + this.m_counter);

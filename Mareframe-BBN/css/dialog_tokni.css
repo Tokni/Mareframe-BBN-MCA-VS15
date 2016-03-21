@@ -1,34 +1,36 @@
 
-#defTable_div, #valuesTable_div {
+.defTable_div, .valuesTable_div {
 	margin-top: 10px;
 	vertical-align: middle;
 	}
 	
-#defTable_div td, th {
+.defTable_div td, th {
     border: 1px solid #000000; 
     padding: 3px;
 }
-
-#defTable_div th {
+.setDecision {
+    border: 3.5px solid
+}
+.defTable_div th {
     background-color: #fdcb2d;
 }
-#defTable_div td {
+.defTable_div td {
     background-color: #ffefb3;
 }
 
-#description_div {
+.description_div {
 	margin-top: 10px;
 }
 
-#valuesTable_div td, th {
+.valuesTable_div td, th {
     border: 1px solid #000000; 
     padding: 3px;
 }
 
-#valuesTable_div th {
+.valuesTable_div th {
     background-color: #fdcb2d;
 }
-#valuesTable_div td {
+.valuesTable_div td {
     background-color: #ffefb3;
 }
 .dialogButton {

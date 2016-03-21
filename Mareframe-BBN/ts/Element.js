@@ -217,18 +217,20 @@ var Mareframe;
                 return data;
             };
             Element.prototype.addDefaultDataInEmptyCells = function (p_originalData, p_editedElmt, p_addedState) {
-                //console.log("adding default values in " + this.getName());
+                console.log("adding default values in " + this.getName() + " for the new state " + p_addedState + " in element: " + p_editedElmt.getName());
                 var data = DST.Tools.makeSureItsTwoDimensional(p_originalData);
                 var rows = data.length;
                 var columns = data[0].length;
+                console.log("original data: " + p_originalData);
                 for (var i = 0; i < rows; i++) {
                     if (data[i][0] === p_editedElmt.getID()) {
-                        //console.log("found row");
+                        console.log("found row");
                         for (var j = 0; j < columns; j++) {
-                            if (data[i][j] === p_addedState) {
-                                //console.log("found column");
+                            console.log("comparing " + (data[i][j] + " and " + p_addedState));
+                            if (data[i][j].trim() === p_addedState.trim()) {
+                                console.log("found column");
                                 for (var n = DST.Tools.numOfHeaderRows(data); n < rows; n++) {
-                                    //console.log("adding " + (1 / (rows - Tools.numOfHeaderRows(data))));
+                                    console.log("adding " + (1 / (rows - DST.Tools.numOfHeaderRows(data))));
                                     data[n].splice(j, 0, (1 / (rows - DST.Tools.numOfHeaderRows(data))));
                                 }
                             }

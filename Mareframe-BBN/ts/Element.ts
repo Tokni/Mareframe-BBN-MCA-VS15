@@ -235,19 +235,20 @@
             }
             
             addDefaultDataInEmptyCells(p_originalData: any[][], p_editedElmt: Element, p_addedState: String): any[][]{
-                //console.log("adding default values in " + this.getName());
+                console.log("adding default values in " + this.getName() + " for the new state " + p_addedState + " in element: "+ p_editedElmt.getName());
                 var data:any[][] = Tools.makeSureItsTwoDimensional(p_originalData);
                 var rows: number = data.length;
                 var columns: number = data[0].length;
-               
+                console.log("original data: " + p_originalData);
                 for (var i = 0; i < rows; i++) {
                     if (data[i][0] === p_editedElmt.getID()) {//This is the right row
-                        //console.log("found row");
+                        console.log("found row");
                         for (var j = 0; j < columns; j++) { 
-                            if (data[i][j] === p_addedState) {//This is the right column
-                                //console.log("found column");
+                            console.log("comparing " + (data[i][j] + " and " + p_addedState);
+                            if (data[i][j].trim() === p_addedState.trim()) {//This is the right column
+                                console.log("found column");
                                 for (var n = Tools.numOfHeaderRows(data); n < rows; n++) { //For each row in this column add a default value
-                                    //console.log("adding " + (1 / (rows - Tools.numOfHeaderRows(data))));
+                                    console.log("adding " + (1 / (rows - Tools.numOfHeaderRows(data))));
                                     data[n].splice(j, 0, (1 / (rows - Tools.numOfHeaderRows(data))));
                                 }
                             }

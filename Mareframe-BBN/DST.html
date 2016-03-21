@@ -66,7 +66,7 @@
 
 
         <div style="padding: 1em 1em 0.5em 1.4em; font-size: 0.7em">
-            <label for="selctModel">Select a model</label>
+            <label id="selectModelLabel"for="selectModel">Select a model</label>
             <select id="selectModel">
                 <option value="resturant"selected="selected">Opening a Resturant</option>
                 <option value="happiness" >Happiness</option>
@@ -92,14 +92,14 @@
             <label for="cnctTool" class="advButton">Connect Tool</label> 
             
             <div style="float:right">
-                <button class="button" id="fitToModel" >Fit canvas to model</button>
-                <input class="button" type="checkbox" id="fullscreen">
+                <button class="button advButton" id="fitToModel" >Resize window</button>
+                <input class="button advButton" type="checkbox" id="fullscreen">
                 <label for="fullscreen" class="button">Fullscreen</label>
-                <input class="button" type="checkbox" id="editorMode">
+                <input class="button advButton" type="checkbox" id="editorMode">
                 <label for="editorMode" class="button">Editor Mode</label>
-                <input class="button" type="checkbox" id="autoUpdate" checked>
+                <input class="button advButton" type="checkbox" id="autoUpdate" checked>
                 <label for="autoUpdate" class="button" >Automatically update</label>
-                <button class="button" id="updateMdl">Update</button>
+                <button class="button advButton" id="updateMdl">Update</button>
             </div>
         </div>
 
@@ -138,53 +138,9 @@
 
 
     <!--Popup Dialog-->
-    <div id="detailsDialog">
-        <div class="info_div" style="width: 30%; overflow: hidden;">
-            <div class="info_div" style="width: 80px; float: left;"> Name: </div>
-            <div class="info_div" id="info_name" style="margin-left: 50px;">  </div>
-            <div class="info_div" id="info_type_tag"style="width: 80px; float: left;"> Type: </div>
-            <div class="info_div" id="info_type" style="margin-left: 50px;">  </div>
-        </div>
-        <div id="elementType">
-            <form >
-                <fieldset>
-                    <label for = "MCAelmtType" >Type of Element</label>
-                    <select name="MCAelmtType" id="MCAelmtType">
-                        <option id="optionAttribute" value="0">Attribute</option>
-                        <option id="optionObjective" value="1">Objective</option>
-                        <option id="optionAlternative" value="2">Alternative</option>
-                    </select>
+    <div id="detailsDialogs">
 
-                    <label for="MCAWeightingMethod">Type of Weighting Method</label>
-                    <select name="MCAWeightingMethod" id="MCAWeightingMethod">
-                        <option id="optionSwingDirect" value="1">Swing / Direct</option>
-                        <option id="optionValueFunction" value="2">Value Function</option>
-                    </select>
-                </fieldset>
-            </form>
-        </div>
-        <div id="weightingMethodSelector"></div>
-        <div id="valueFn_div">
-            <canvas id="valueFn_canvas" width="100" height="100"></canvas>
-            <button class="button" id="valueFn_Linear">Linearize</button>
-            <button class="button" id="valueFn_Flip">Flip Direction</button>
-        </div>
-        <div id="sliders_div"></div>
-        <div id="datatable_div"></div>
-        <div id="description_div"></div>
-        <div id="chart_div"></div>
-        <input class="dialogButton" type="checkbox" id="showDescription" checked>
-        <label for="showDescription" >Hide Description</label>
-        <div class="editable ">
-            <div id="defTable_div"></div>
-        </div>
-        <button class="dialogButton" id="addDataRow">Add Data Row</button>
-        <button class="dialogButton" id="submit">Submit changes</button>
-        <button class="dialogButton" id="values">Show values</button>
-        <div id="valuesTable_div"></div>
-        <div id="userDescription_div"> </div>
     </div>
-    
     <script>
         function cnctPress() {
             $this.hide();
@@ -214,6 +170,7 @@
         $("#selectAllElmt").button({ icons: { primary: "ui-icon-star" } });
         $("#detailsDialog").dialog({
             autoOpen: false,
+            modal: true,
             resizable: true,
             height: 600,
             width: 800,

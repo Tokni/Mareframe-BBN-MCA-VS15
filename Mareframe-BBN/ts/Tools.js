@@ -131,15 +131,20 @@ var Mareframe;
                 //console.log("returned : " + counter);
                 return counter;
             };
-            Tools.htmlTableFromArray = function (p_header, p_elmt, p_model, p_editorMode) {
+            Tools.htmlTableFromArray = function (p_header, p_elmt, p_model, p_editorMode, p_data) {
                 // console.log("header: " + p_header);
                 //console.log("type of elmt: " + p_elmt.getType());
                 var data;
-                if (p_header === "Definition") {
-                    data = p_elmt.getData();
+                if (p_data === undefined) {
+                    if (p_header === "Definition") {
+                        data = p_elmt.getData();
+                    }
+                    else if (p_header === "Values") {
+                        data = p_elmt.getValues();
+                    }
                 }
-                else if (p_header === "Values") {
-                    data = p_elmt.getValues();
+                else {
+                    data = p_data;
                 }
                 console.log(data);
                 var numOfHeaderRows = Tools.numOfHeaderRows(data);
@@ -181,7 +186,7 @@ var Mareframe;
                 }
                 else {
                     for (var i = 0; i < numOfHeaderRows; i++) {
-                        console.log("i: " + i);
+                        //console.log("i: " + i);
                         htmlString += "<tr>";
                         if (p_editorMode && p_header === "Definition" && (p_elmt.getType() === 0 || p_elmt.getType() === 1)) {
                             htmlString += "<th></th>";
@@ -213,7 +218,20 @@ var Mareframe;
                                     htmlString += "<th> " + p_model.getElement(data[i][j]).getName() + "</th>"; //This is because super value nodes have parents horizontial in def table
                                 }
                                 else {
-                                    htmlString += "<th><div class='editable_cell'> " + value + "</div></th>";
+                                    if (p_elmt.getType() === 1) {
+                                        htmlString += "<th><div id='" + i + "' class='editable_cell decCell";
+                                        //console.log("checking: " + i + " against: " + p_elmt.getDecision());
+                                        if (i == p_elmt.getDecision()) {
+                                            // console.log("decision found");
+                                            htmlString += " setDecision";
+                                        }
+                                        else {
+                                        }
+                                        htmlString += "' > " + value + "</div></th>";
+                                    }
+                                    else {
+                                        htmlString += "<th><div class='editable_cell'> " + value + "</div></th>";
+                                    }
                                 }
                             }
                             else {
@@ -255,9 +273,9 @@ var Mareframe;
                 }
                 return math.subset(p_matrix, math.index(p_index, range));
             };
-            Tools.addDataRow = function (p_elmt) {
+            Tools.addDataRow = function (p_elmt, p_matrix) {
                 var oldData = [];
-                oldData = p_elmt.getData();
+                oldData = p_matrix;
                 var newData = [];
                 //Copy every row to new data
                 for (var i = 0; i < oldData.length; i++) {
@@ -282,7 +300,7 @@ var Mareframe;
                 return newData;
             };
             Tools.removeRow = function (p_matrix, p_index) {
-                var matrix = Tools.makeSureItsAnArray(p_matrix);
+                var matrix = Tools.makeSureItsAnArray(Tools.copy(p_matrix));
                 var headerRows = Tools.numOfHeaderRows(matrix);
                 var rows = math.size(matrix)[0];
                 if (p_index < headerRows) {
@@ -296,6 +314,19 @@ var Mareframe;
                     matrix.splice(p_index, 1);
                 }
                 return matrix;
+            };
+            //Returns a copy of the given matrix/array
+            Tools.copy = function (p_matrix) {
+                var matrix = Tools.makeSureItsTwoDimensional(p_matrix);
+                var newMatrix = [];
+                for (var i = 0; i < matrix.length; i++) {
+                    var row = [];
+                    for (var j = 0; j < matrix[0].length; j++) {
+                        row.push(matrix[i][j]);
+                    }
+                    newMatrix.push(row);
+                }
+                return newMatrix;
             };
             //This method concats all matrixes in a list one by one
             Tools.concatMatrices = function (p_list) {

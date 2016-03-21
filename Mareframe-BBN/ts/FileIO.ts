@@ -260,7 +260,6 @@
                     p_activeModelInstance.fromJSON(data);
                     p_updateGui();
                 });
-
             }
         }
     }
