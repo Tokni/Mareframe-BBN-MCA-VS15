@@ -144,8 +144,8 @@
             }
 
             static htmlTableFromArray(p_header: string, p_elmt: Element, p_model: Model, p_editorMode: boolean, p_data?: any[][]): string {
-                // console.log("header: " + p_header);
-                //console.log("type of elmt: " + p_elmt.getType());
+                 console.log("header: " + p_header);
+                console.log("type of elmt: " + p_elmt.getType());
 
                 var data: any[][];
                 if (p_data === undefined) {
@@ -161,30 +161,26 @@
                 }
                 console.log(data);
                 var numOfHeaderRows = Tools.numOfHeaderRows(data);
-                if (p_elmt.getType() === 2 && p_header === "Values") {//Find best decision by finding the highest value in value value table
+                if (p_elmt.getType() === 1 && p_header === "Values") {//Find best decision by finding the highest value in dec value table
                     var highestValue: number = 1;
-                    for (var i = 2; i < data.length; i++) {
-                        if (data[numOfHeaderRows][i] > data[numOfHeaderRows][highestValue]) {
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i][1] > data[highestValue][1]) {
                             highestValue = i;
                         }
                     }
-                    //console.log("highest is : " + highestValue);
+                    console.log("highest is : " + highestValue);
                 }
-                if (p_elmt.getType() == 1 && p_header === "Values") {//Find best decision by finding the highest value in dec value table
-                    var bestDecRow: number = numOfHeaderRows;
+                if (p_elmt.getType() == 2 && p_header === "Values") {//Find best decision by finding the highest value in value values table
                     var bestDecCol: number = 1;
                     // console.log("data length: " + data.length);
                     // console.log("data [0] length: " + data[0].length);
-                    for (var i = numOfHeaderRows + 1; i < data.length; i++) {
-                        for (var j = 1; j < data[0].length; j++) {
-                            console.log("i: " + i + " j: " + j);
-                            if (data[i][j] > data[bestDecRow][bestDecCol]) {
-                                bestDecRow = i;
-                                bestDecCol = j;
-                            }
+                    for (var j = 2; j < data[0].length; j++) {
+                        if (data[numOfHeaderRows][j] > data[numOfHeaderRows][bestDecCol]) {
+                            bestDecCol = j;
+
                         }
                     }
-                    //console.log("best decision: " + bestDecRow + " , " + bestDecCol);
+                    console.log("best column " + bestDecCol + " value: " + data[numOfHeaderRows][bestDecCol]);
                 }
                 //console.log("p_header: " + p_header);
                 //console.log("data: " + data);
@@ -219,7 +215,7 @@
                 
                     for (var i = numOfHeaderRows; i < data.length; i++) {
                         htmlString += "<tr>";
-                        if (p_editorMode && p_header === "Definition" && (p_elmt.getType() === 0 || p_elmt.getType() === 1)) { htmlString += "<th><button class='minus' id='" + i + "'></button></th>"; }//add minus button
+                        if (p_editorMode && p_header === "Definition" && (p_elmt.getType() === 0 || p_elmt.getType() === 1)) { htmlString += "<th><button class='minus minus_"+p_elmt.getID()+"' id='" + i + "'></button></th>"; }//add minus button
                         for (var j = 0; j < (data[0].length); j++) {
                             var value: number = data[i][j];
                             if (value === -Infinity) {//In decision nodes the default value is -infinity, but this should be 0 to the user
@@ -231,7 +227,7 @@
                                 }
                                 else {
                                     if (p_elmt.getType() === 1) {//If element is a dec element add the decCell class 
-                                        htmlString += "<th><div id='" + i + "' class='editable_cell decCell";
+                                        htmlString += "<th><div id='" + i + "' class='editable_cell editable_cell_" + p_elmt.getID() +" decCell";
                                         //console.log("checking: " + i + " against: " + p_elmt.getDecision());
                                         if (i == p_elmt.getDecision()) {//Mark the set decision
                                            // console.log("decision found");
@@ -244,15 +240,15 @@
 
                                     }
                                     else {
-                                        htmlString += "<th><div class='editable_cell'> " + value + "</div></th>";
+                                        htmlString += "<th><div class='editable_cell editable_cell_"+ p_elmt.getID()+"'> " + value + "</div></th>";
                                     }
                                 }
                             } else {
-                                if (j === highestValue || (i == bestDecRow && j == bestDecCol)) {//mark highest if it is the value table of a value node or a decision node
+                                if (i === highestValue ||  j == bestDecCol) {//mark highest if it is the value table of a value node or a decision node
                                     htmlString += "<td> <b>" + Tools.round(value) + "</b></td>";
                                 }
                                 else {
-                                    htmlString += "<td>" + Tools.round(value) + "</td>";
+                                    htmlString += "<td><div class='data_" + p_elmt.getID() + "'>" + Tools.round(value) + "</div></td>";
                                 }
                             }
 

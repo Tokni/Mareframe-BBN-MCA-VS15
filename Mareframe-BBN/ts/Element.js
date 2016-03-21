@@ -29,6 +29,12 @@ var Mareframe;
                 this.m_model = p_model;
                 this.getChildrenElements = this.getChildrenElements.bind(this);
             }
+            Element.prototype.getDialog = function () {
+                return this.m_dialog;
+            };
+            Element.prototype.setDialog = function (dialog) {
+                this.m_dialog = dialog;
+            };
             Element.prototype.getValues = function () {
                 return this.m_values;
             };
@@ -393,6 +399,10 @@ var Mareframe;
                 this.setType(3);
                 this.setData([[]]);
                 this.setValues([[]]);
+            };
+            Element.prototype.actualRowsDoesNotEqualVisualRows = function () {
+                //console.log("dialog: " + this.m_dialog);
+                return (this.m_dialog !== undefined && (!(this.m_dialog.data("deletedRows").length === 0 && this.m_dialog.data("newStates").length === 0)));
             };
             return Element;
         })();

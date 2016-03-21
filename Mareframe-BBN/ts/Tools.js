@@ -132,8 +132,8 @@ var Mareframe;
                 return counter;
             };
             Tools.htmlTableFromArray = function (p_header, p_elmt, p_model, p_editorMode, p_data) {
-                // console.log("header: " + p_header);
-                //console.log("type of elmt: " + p_elmt.getType());
+                console.log("header: " + p_header);
+                console.log("type of elmt: " + p_elmt.getType());
                 var data;
                 if (p_data === undefined) {
                     if (p_header === "Definition") {
@@ -148,28 +148,25 @@ var Mareframe;
                 }
                 console.log(data);
                 var numOfHeaderRows = Tools.numOfHeaderRows(data);
-                if (p_elmt.getType() === 2 && p_header === "Values") {
+                if (p_elmt.getType() === 1 && p_header === "Values") {
                     var highestValue = 1;
-                    for (var i = 2; i < data.length; i++) {
-                        if (data[numOfHeaderRows][i] > data[numOfHeaderRows][highestValue]) {
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i][1] > data[highestValue][1]) {
                             highestValue = i;
                         }
                     }
+                    console.log("highest is : " + highestValue);
                 }
-                if (p_elmt.getType() == 1 && p_header === "Values") {
-                    var bestDecRow = numOfHeaderRows;
+                if (p_elmt.getType() == 2 && p_header === "Values") {
                     var bestDecCol = 1;
                     // console.log("data length: " + data.length);
                     // console.log("data [0] length: " + data[0].length);
-                    for (var i = numOfHeaderRows + 1; i < data.length; i++) {
-                        for (var j = 1; j < data[0].length; j++) {
-                            console.log("i: " + i + " j: " + j);
-                            if (data[i][j] > data[bestDecRow][bestDecCol]) {
-                                bestDecRow = i;
-                                bestDecCol = j;
-                            }
+                    for (var j = 2; j < data[0].length; j++) {
+                        if (data[numOfHeaderRows][j] > data[numOfHeaderRows][bestDecCol]) {
+                            bestDecCol = j;
                         }
                     }
+                    console.log("best column " + bestDecCol + " value: " + data[numOfHeaderRows][bestDecCol]);
                 }
                 //console.log("p_header: " + p_header);
                 //console.log("data: " + data);
@@ -206,7 +203,7 @@ var Mareframe;
                     for (var i = numOfHeaderRows; i < data.length; i++) {
                         htmlString += "<tr>";
                         if (p_editorMode && p_header === "Definition" && (p_elmt.getType() === 0 || p_elmt.getType() === 1)) {
-                            htmlString += "<th><button class='minus' id='" + i + "'></button></th>";
+                            htmlString += "<th><button class='minus minus_" + p_elmt.getID() + "' id='" + i + "'></button></th>";
                         } //add minus button
                         for (var j = 0; j < (data[0].length); j++) {
                             var value = data[i][j];
@@ -219,7 +216,7 @@ var Mareframe;
                                 }
                                 else {
                                     if (p_elmt.getType() === 1) {
-                                        htmlString += "<th><div id='" + i + "' class='editable_cell decCell";
+                                        htmlString += "<th><div id='" + i + "' class='editable_cell editable_cell_" + p_elmt.getID() + " decCell";
                                         //console.log("checking: " + i + " against: " + p_elmt.getDecision());
                                         if (i == p_elmt.getDecision()) {
                                             // console.log("decision found");
@@ -230,16 +227,16 @@ var Mareframe;
                                         htmlString += "' > " + value + "</div></th>";
                                     }
                                     else {
-                                        htmlString += "<th><div class='editable_cell'> " + value + "</div></th>";
+                                        htmlString += "<th><div class='editable_cell editable_cell_" + p_elmt.getID() + "'> " + value + "</div></th>";
                                     }
                                 }
                             }
                             else {
-                                if (j === highestValue || (i == bestDecRow && j == bestDecCol)) {
+                                if (i === highestValue || j == bestDecCol) {
                                     htmlString += "<td> <b>" + Tools.round(value) + "</b></td>";
                                 }
                                 else {
-                                    htmlString += "<td>" + Tools.round(value) + "</td>";
+                                    htmlString += "<td><div class='data_" + p_elmt.getID() + "'>" + Tools.round(value) + "</div></td>";
                                 }
                             }
                         }

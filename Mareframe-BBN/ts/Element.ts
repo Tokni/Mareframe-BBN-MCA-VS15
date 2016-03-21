@@ -16,6 +16,7 @@
             public m_minitableEaselElmt: createjs.Container = new createjs.Container();
             private m_model: Model;
             private m_decision: number;
+            private m_dialog: JQuery;
 
             constructor(p_id: string, p_model: Model, p_type: number) {
                 if (p_id.substr(0, 4) == "elmt")
@@ -27,7 +28,12 @@
                 this.m_model = p_model;
                 this.getChildrenElements = this.getChildrenElements.bind(this);
             }
-
+            getDialog(): JQuery {
+                return this.m_dialog;
+            }
+            setDialog(dialog: JQuery) {
+                this.m_dialog = dialog;
+            }
             getValues(): any[][] {
                 return this.m_values;
             }
@@ -425,6 +431,9 @@
                 this.setData([[]]);
                 this.setValues([[]]);
             }
+            actualRowsDoesNotEqualVisualRows(): boolean {
+                //console.log("dialog: " + this.m_dialog);
+                return (this.m_dialog !== undefined && (!(this.m_dialog.data("deletedRows").length === 0 && this.m_dialog.data("newStates").length === 0)));
         }
     }
 }
