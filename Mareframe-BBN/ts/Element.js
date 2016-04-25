@@ -51,7 +51,19 @@ var Mareframe;
                 return this.m_decision;
             };
             Element.prototype.setDecision = function (n) {
+                if (this.getType() !== 1) {
+                    throw "Error. Trying to set decision in nondecision element";
+                }
                 this.m_decision = n;
+            };
+            Element.prototype.getEvidence = function () {
+                return this.m_evidence;
+            };
+            Element.prototype.setEvidence = function (n) {
+                if (this.getType() !== 0) {
+                    throw "Error. Trying to set evidence in nonchance element";
+                }
+                this.m_evidence = n;
             };
             Element.prototype.update = function () {
                 //console.log("Updating element " + this.getName() );
@@ -208,7 +220,7 @@ var Mareframe;
                 else {
                     for (var i = 0; i < parents.length; i++) {
                         var elmt = parents[i];
-                        // console.log("Parent: " + elmt.getName());
+                        //console.log("Parent: " + elmt.getName());
                         data = DST.Tools.addNewHeaderRow(elmt.getMainValues(), data);
                     }
                     //console.log("number of header rows : " + Tools.numOfHeaderRows(this.m_data));
@@ -223,20 +235,20 @@ var Mareframe;
                 return data;
             };
             Element.prototype.addDefaultDataInEmptyCells = function (p_originalData, p_editedElmt, p_addedState) {
-                console.log("adding default values in " + this.getName() + " for the new state " + p_addedState + " in element: " + p_editedElmt.getName());
+                // console.log("adding default values in " + this.getName() + " for the new state " + p_addedState + " in element: "+ p_editedElmt.getName());
                 var data = DST.Tools.makeSureItsTwoDimensional(p_originalData);
                 var rows = data.length;
                 var columns = data[0].length;
-                console.log("original data: " + p_originalData);
+                //console.log("original data: " + p_originalData);
                 for (var i = 0; i < rows; i++) {
                     if (data[i][0] === p_editedElmt.getID()) {
-                        console.log("found row");
+                        //console.log("found row");
                         for (var j = 0; j < columns; j++) {
-                            console.log("comparing " + (data[i][j] + " and " + p_addedState));
+                            // console.log("comparing " + (data[i][j] + " and " + p_addedState);
                             if (data[i][j].trim() === p_addedState.trim()) {
-                                console.log("found column");
+                                //console.log("found column");
                                 for (var n = DST.Tools.numOfHeaderRows(data); n < rows; n++) {
-                                    console.log("adding " + (1 / (rows - DST.Tools.numOfHeaderRows(data))));
+                                    //console.log("adding " + (1 / (rows - Tools.numOfHeaderRows(data))));
                                     data[n].splice(j, 0, (1 / (rows - DST.Tools.numOfHeaderRows(data))));
                                 }
                             }
@@ -247,18 +259,20 @@ var Mareframe;
             };
             //returns the different variables (conditions or choices) that belong to the element
             Element.prototype.getMainValues = function () {
+                //console.log("getting main values from " + this.getName());
                 //console.log(this.m_data);
                 var row = [];
                 var data = this.m_data;
                 row.push(this.m_id);
                 for (var i = 0; i < data.length; i++) {
                     // //console.log("i: " + i);
-                    // //console.log("check data: " + data[i][1]);
+                    //console.log("check data: " + data[i][1]);
+                    //If the second column contains a number or is undefined this is a main value
                     if (!isNaN(parseFloat(data[i][1])) || data[i][1] === undefined) {
                         row.push(data[i][0]);
                     }
                 }
-                ////console.log("new row: " + row);
+                //console.log("new row: " + row);
                 return row;
             };
             //MCA TOOL
@@ -403,6 +417,31 @@ var Mareframe;
             Element.prototype.actualRowsDoesNotEqualVisualRows = function () {
                 //console.log("dialog: " + this.m_dialog);
                 return (this.m_dialog !== undefined && (!(this.m_dialog.data("deletedRows").length === 0 && this.m_dialog.data("newStates").length === 0)));
+            };
+            Element.prototype.getMinAndMaxValue = function () {
+                var max = this.m_values[0][1];
+                var min = this.m_values[0][1];
+                if (this.m_type === 1) {
+                    for (var i = 1; i < this.m_values.length; i++) {
+                        if (this.m_values[i][1] > max) {
+                            max = this.m_values[i][1];
+                        }
+                        if (this.m_values[i][1] < min) {
+                            min = this.m_values[i][1];
+                        }
+                    }
+                }
+                else {
+                    throw "Get max value was called on element of type not decision";
+                }
+                return [min, max];
+            };
+            Element.prototype.getSumOfValues = function () {
+                var sum = 0;
+                for (var i = 0; i < this.m_values.length; i++) {
+                    sum += this.m_values[i][1];
+                }
+                return sum;
             };
             return Element;
         })();

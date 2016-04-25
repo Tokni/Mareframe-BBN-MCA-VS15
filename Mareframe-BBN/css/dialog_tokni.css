@@ -11,6 +11,9 @@
 .setDecision {
     border: 3.5px solid
 }
+.setEvidence{
+    border: 3.5px solid
+}
 .defTable_div th {
     background-color: #fdcb2d;
 }
@@ -42,4 +45,15 @@
 }
 .info_div {
     font-weight: bold;
+}
+input {
+    width: 100%;
+    padding: 1px;
+    margin: 0px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+td {
+min-width:50px
 }

@@ -17,6 +17,7 @@
             private m_model: Model;
             private m_decision: number;
             private m_dialog: JQuery;
+            private m_evidence: number;
 
             constructor(p_id: string, p_model: Model, p_type: number) {
                 if (p_id.substr(0, 4) == "elmt")
@@ -50,7 +51,19 @@
                 return this.m_decision;
             }
             setDecision(n: number): void {
+                if (this.getType() !== 1) {
+                    throw "Error. Trying to set decision in nondecision element";
+                }
                 this.m_decision = n;
+            }
+            getEvidence(): number {
+                return this.m_evidence;
+            }
+            setEvidence(n: number): void {
+                if (this.getType() !== 0) {
+                    throw "Error. Trying to set evidence in nonchance element";
+                }
+                this.m_evidence = n;
             }
             update(): void {
                 //console.log("Updating element " + this.getName() );
@@ -224,9 +237,9 @@
                 else {
                     for (var i = 0; i < parents.length; i++) {
                         var elmt: Element = parents[i];
-                        // console.log("Parent: " + elmt.getName());
+                         //console.log("Parent: " + elmt.getName());
                         data = Tools.addNewHeaderRow(elmt.getMainValues(), data);
-                        //console.log(data);
+                       // console.log(data);
                     }
                     //console.log("number of header rows : " + Tools.numOfHeaderRows(this.m_data));
                     //Add original values to the table
@@ -241,20 +254,20 @@
             }
             
             addDefaultDataInEmptyCells(p_originalData: any[][], p_editedElmt: Element, p_addedState: String): any[][]{
-                console.log("adding default values in " + this.getName() + " for the new state " + p_addedState + " in element: "+ p_editedElmt.getName());
+               // console.log("adding default values in " + this.getName() + " for the new state " + p_addedState + " in element: "+ p_editedElmt.getName());
                 var data:any[][] = Tools.makeSureItsTwoDimensional(p_originalData);
                 var rows: number = data.length;
                 var columns: number = data[0].length;
-                console.log("original data: " + p_originalData);
+                //console.log("original data: " + p_originalData);
                 for (var i = 0; i < rows; i++) {
                     if (data[i][0] === p_editedElmt.getID()) {//This is the right row
-                        console.log("found row");
+                        //console.log("found row");
                         for (var j = 0; j < columns; j++) { 
-                            console.log("comparing " + (data[i][j] + " and " + p_addedState);
+                           // console.log("comparing " + (data[i][j] + " and " + p_addedState);
                             if (data[i][j].trim() === p_addedState.trim()) {//This is the right column
-                                console.log("found column");
+                                //console.log("found column");
                                 for (var n = Tools.numOfHeaderRows(data); n < rows; n++) { //For each row in this column add a default value
-                                    console.log("adding " + (1 / (rows - Tools.numOfHeaderRows(data))));
+                                    //console.log("adding " + (1 / (rows - Tools.numOfHeaderRows(data))));
                                     data[n].splice(j, 0, (1 / (rows - Tools.numOfHeaderRows(data))));
                                 }
                             }
@@ -264,20 +277,22 @@
                 return data;
             }
 	        //returns the different variables (conditions or choices) that belong to the element
-            getMainValues(): any[]{
+            getMainValues(): string[]{
+                //console.log("getting main values from " + this.getName());
                 //console.log(this.m_data);
                 var row = [];
                 var data = this.m_data;
                 row.push(this.m_id);
                 for (var i = 0; i < data.length; i++) {
                     // //console.log("i: " + i);
-                    // //console.log("check data: " + data[i][1]);
+                    //console.log("check data: " + data[i][1]);
+                    //If the second column contains a number or is undefined this is a main value
                     if (!isNaN(parseFloat(data[i][1])) || data[i][1] === undefined) {
                         row.push(data[i][0]);
-                        ////console.log("push data " + data[i][0]);
+                        //console.log("push data " + data[i][0]);
                     }
                 }
-                ////console.log("new row: " + row);
+               //console.log("new row: " + row);
                 return row;
             }
 
@@ -434,6 +449,32 @@
             actualRowsDoesNotEqualVisualRows(): boolean {
                 //console.log("dialog: " + this.m_dialog);
                 return (this.m_dialog !== undefined && (!(this.m_dialog.data("deletedRows").length === 0 && this.m_dialog.data("newStates").length === 0)));
-        }
+            }
+            getMinAndMaxValue(): number[] {//Only works for decision nodes
+                var max: number = this.m_values[0][1];
+                var min: number = this.m_values[0][1];
+                if (this.m_type === 1) {
+                    for (var i = 1; i < this.m_values.length; i++) {
+                        if (this.m_values[i][1] > max) {
+                            max = this.m_values[i][1];
+                        }
+                        if (this.m_values[i][1] < min) {
+                            min = this.m_values[i][1];
+                        }
+                    }
+                }
+                else {
+                    throw "Get max value was called on element of type not decision";
+                }
+                return [min,max];
+            }
+            getSumOfValues(): number {//Only works for decision nodes 
+                var sum: number = 0;
+                for (var i = 0; i < this.m_values.length; i++) {
+                    sum += this.m_values[i][1];
+                }
+                return sum;
+
+            }
     }
 }

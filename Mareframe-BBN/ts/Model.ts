@@ -3,7 +3,8 @@
         export class Model {
             public m_bbnMode: boolean = false;
             private m_modelIdent: string = "temp";
-            private m_counter: number = 0;
+            private m_elmtCounter: number = 0;
+            private m_ConnCounter: number = 0;
             private m_elementArr: Element[] = [];
             private m_connectionArr: Connection[] = [];
             private m_modelName: string = "untitled";
@@ -111,9 +112,9 @@
 
             update() {
                 var m: Model = this;
-                //console.log("updating model");
+                console.log("updating model");
                 this.m_elementArr.forEach(function (p_elmt: Element) {
-                    //console.log(p_elmt.getID() + " has been updated: " + p_elmt.isUpdated());
+                    console.log(p_elmt.getID() + " has been updated: " + p_elmt.isUpdated());
                     if (!p_elmt.isUpdated()) {
                         p_elmt.update();
                     }
@@ -122,6 +123,9 @@
                 this.m_elementArr.forEach(function (p_elmt: Element) {
                     Tools.updateConcerningDecisions(p_elmt);
                 });
+                if (this.getElmtsWithEvidence().length > 0) {
+                    Tools.calcValueWithEvidence(this);
+                }
             }
             getIdent(): string {
                 return this.m_modelIdent;
@@ -296,8 +300,8 @@
 
             createNewElement(p_type: number): Element {
                 ////console.log(this.m_counter);
-                var e = new Element("elmt" + this.m_counter, this, p_type);
-                this.m_counter++;
+                var e = new Element("elmt" + this.m_elmtCounter, this, p_type);
+                this.m_elmtCounter++;
                 this.m_elementArr.push(e);
                 switch (p_type) {
                     case 0:
@@ -494,7 +498,7 @@
 
                 this.m_elementArr = [];
                 this.m_connectionArr = [];
-                this.m_counter = 0;
+                this.m_elmtCounter = 0;
                 
                 var maxX = 0;
                 var maxY = 0;
@@ -540,8 +544,8 @@
             }
 
             createNewConnection(p_inputElmt: Element, p_outputElmt: Element): Connection {
-                var c = new Connection(p_inputElmt, p_outputElmt, this.m_bbnMode, "conn" + this.m_counter);
-                this.m_counter++;
+                var c = new Connection(p_inputElmt, p_outputElmt, "conn" + this.m_ConnCounter,this.m_bbnMode);
+                this.m_ConnCounter++;
                 return c;
 
 
@@ -568,10 +572,29 @@
                 });*/
                 //console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
             }
-
-
-
-
+            setEvidence(p_elmtIdent: string, p_evidenceNumber: number): void {
+                var elmt: Element = this.getElement(p_elmtIdent);
+                console.log("setting evidence no. " + p_evidenceNumber + " previous evidence: " + elmt.getEvidence());
+                if (elmt.getEvidence() == p_evidenceNumber) {
+                    console.log("unsetting decision");
+                    elmt.setEvidence(undefined)
+                }
+                else {
+                    elmt.setEvidence(p_evidenceNumber);
+                }
+                this.getElementArr().forEach(function (e) {
+                    e.setUpdated(false);
+                });
+            }
+            getElmtsWithEvidence() {
+                var elements = [];
+                this.getElementArr().forEach(function (e) {
+                    if (e.getType() === 0 && e.getEvidence() !== undefined) {
+                        elements.push(e);
+                    }
+                });
+                return elements;
+            }
         }
 
 

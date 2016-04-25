@@ -3,14 +3,12 @@ var Mareframe;
     var DST;
     (function (DST) {
         var Connection = (function () {
-            function Connection(p_inputElmt, p_outputElmt, p_bbnMode, p_connID) {
+            function Connection(p_inputElmt, p_outputElmt, p_connID, p_bbnMode) {
                 this.m_easelElmt = new createjs.Container();
                 this.m_color = "black";
                 this.m_inputElement = p_inputElmt;
                 this.m_outputElement = p_outputElmt;
-                if (p_connID) {
-                    this.m_id = p_connID;
-                }
+                this.m_id = p_connID;
                 if (p_bbnMode && p_inputElmt.getType() === 1 && p_outputElmt.getType() === 1) {
                     this.m_color = "gray";
                 }
@@ -19,6 +17,7 @@ var Mareframe;
                 return this.m_color;
             };
             Connection.prototype.getID = function () {
+                //console.log("id of connection: " + this.m_id);
                 return this.m_id;
             };
             Connection.prototype.setID = function (p_id) {

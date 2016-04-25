@@ -253,7 +253,7 @@ module Mareframe {
                 }
             }
             private updateModel() {
-                console.log("model: " + this.m_model.getName());
+                //console.log("model: " + this.m_model.getName());
                 this.m_model.update();
                 this.updateMiniTables(this.m_model.getElementArr());
                 this.updateOpenDialogs();
@@ -432,14 +432,20 @@ module Mareframe {
                                 valueData = 0;
                             }
                             var decisBarBackgr: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(backgroundColor).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
-                            var decisBar: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
+                            
 
-                            if (elmt.getType() === 0) {
-                                var decisPercVal: createjs.Text = new createjs.Text(Math.floor(valueData * 100) + "%", "0.8em trebuchet", "#303030");
-                            } else {
+                            if (elmt.getType() === 0) {//Chance
+                                var decisBar: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
+                                var decisPercVal: createjs.Text = new createjs.Text(Math.round(valueData * 100) + "%", "0.8em trebuchet", "#303030");
+                            } else if (elmt.getType() === 1) {//Decision
+                                //NB decisBar not working with negative values
+                                var decisBar: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * Math.abs(valueData / elmt.getSumOfValues()), 10));
                                 decisBar.visible = false;
                                 var decisPercVal: createjs.Text = new createjs.Text("" + Tools.round(valueData), "0.8em trebuchet", "#303030");
-
+                            }
+                            else {
+                                var decisBar: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
+                                var decisPercVal: createjs.Text = new createjs.Text(Math.floor(valueData * 100) + "%", "0.8em trebuchet", "#303030");
                             }
                             decisPercVal.textBaseline = "middle";
                             decisPercVal.maxWidth = 22;
@@ -476,6 +482,7 @@ module Mareframe {
             }
             private updateEditorMode() {
                 console.log("updating editormode");
+                var mareframe = this;
                 if (this.m_editorMode) {
                     $(".advButton").show();
                     $("#reset").show();
@@ -509,13 +516,31 @@ module Mareframe {
 
                     this.m_mcaBackground.removeEventListener("pressup", this.pressUp);
                 }
+                var connArr = this.m_model.getConnectionArr();
+                if (connArr) {
+                    for (var i = 0; i < connArr.length; i++) {
+                        console.log(connArr[i].m_easelElmt.name);
+                        if (this.m_editorMode) {
+                            connArr[i].m_easelElmt.children.forEach(function (c) {
+                                c.addEventListener("mousedown", mareframe.mouseDown);
+                            });
+                        } else {
+                            connArr[i].m_easelElmt.children.forEach(function (c) {
+
+                                c.removeEventListener("mousedown", mareframe.mouseDown);
+                            });
+                        }
+                    }
+                }
                 var elementArr = this.m_model.getElementArr();
                 if (elementArr) {
                     for (var i = 0; i < elementArr.length; i++) {
                         if (this.m_editorMode) {
                             elementArr[i].m_easelElmt.addEventListener("pressmove", this.pressMove);
                             elementArr[i].m_easelElmt.addEventListener("pressup", this.pressUp);
-                            this.m_model.setDecision(elementArr[i].getID(), elementArr[i].getDecision());//Unsets all decisions
+                            if (elementArr[i].getType() === 1) {
+                                this.m_model.setDecision(elementArr[i].getID(), elementArr[i].getDecision());//Unsets all decisions
+                            }
                         } else {
                             elementArr[i].m_easelElmt.removeEventListener("pressmove", this.pressMove);
                             elementArr[i].m_easelElmt.removeEventListener("pressup", this.pressUp);
@@ -806,28 +831,51 @@ module Mareframe {
             private addSetDecFunction(p_elmt: Element) {
                 console.log("adding decision function");
                 var gui = this;
-                $(".decCell").click(function () {
+                $(".decCell_" + p_elmt.getID()).click(function () {
                     console.log("decision cell clicked");
                     gui.m_model.setDecision(p_elmt.getID(), this.id);
                     gui.updateModel();
                     //Create the table again
-                    var s = Tools.htmlTableFromArray("Definition", p_elmt, gui.m_model, gui.m_editorMode);
-                    $("#defTable_div_" + p_elmt.getID()).html(s);
+                    $("#defTable_div_" + p_elmt.getID()).empty();
+                    document.getElementById("defTable_div_" + p_elmt.getID()).appendChild(gui.htmlTableFromArray("Definition", p_elmt, gui.m_model, gui.m_editorMode));
+                    //var s = Tools.htmlTableFromArray("Definition", p_elmt, gui.m_model, gui.m_editorMode);
+                    //$("#defTable_div_" + p_elmt.getID()).html(s);
                     //Add the edit functions again
                     gui.addEditFunction(p_elmt, gui.m_editorMode);
-                    gui.addSetDecFunction(p_elmt);
                 });
 
             }
+
+            private addSetEvidenceFunction(p_elmt: Element) {
+                console.log("adding evidence function");
+                var gui = this;
+                $(".evidenceCell_"+p_elmt.getID()).click(function () {
+                    console.log("evidence cell clicked");
+                    gui.m_model.setEvidence(p_elmt.getID(), this.id.substring(0,1));
+                    gui.updateModel();
+                    //Create the table again
+                    $("#defTable_div_" + p_elmt.getID()).empty();
+                    document.getElementById("defTable_div_" + p_elmt.getID()).appendChild(gui.htmlTableFromArray("Definition", p_elmt, gui.m_model, gui.m_editorMode));
+                    //var s = Tools.htmlTableFromArray("Definition", p_elmt, gui.m_model, gui.m_editorMode);
+                    //$("#defTable_div_" + p_elmt.getID()).html(s);
+                    //Add the edit functions again
+                    gui.addEditFunction(p_elmt, gui.m_editorMode);
+                });
+
+            }
+
+            
             private createDetailsDialog(p_elmt: Element): String {
                 console.log("creating dialog for " + p_elmt.getName());
                 var mareframeGUI = this; 
                 var id: string = p_elmt.getID();
                 var newDialog = document.createElement("div");
                 newDialog.setAttribute("id", "detailsDialog_" + id);
+
                 var info_div = document.createElement("div");
                 info_div.setAttribute("class", "info_div");
                 info_div.style.overflow = "hidden";
+
                 var nameDiv = document.createElement("div");
                 nameDiv.setAttribute("class", "info_div");
                 nameDiv.style.width = "80px";
@@ -968,6 +1016,7 @@ module Mareframe {
                 var defTable_div = document.createElement("div");
                 defTable_div.setAttribute("id", "defTable_div_" + id);
                 defTable_div.setAttribute("class", "defTable_div");
+                
                 defTable_div_outer.appendChild(defTable_div);
                 newDialog.appendChild(defTable_div_outer);
 
@@ -1025,7 +1074,7 @@ module Mareframe {
                 });
                 $("#detailsDialog_" + id).data("isOpen", false);
                 $("#submit_" + id).click({ param1: p_elmt }, this.saveChanges);
-                $("#values_" + id).click({ param1: p_elmt }, this.showValues);
+                $("#values_" + id).click({ param1: p_elmt param2: this}, this.showValues);
                 $("#addDataRow_" + id).click({ param1: p_elmt }, this.addDataRowClick);
                 $("#showDescription_" + id).click({ param1: p_elmt }, this.setShowDescription);
                 return newDialog.id;
@@ -1074,17 +1123,19 @@ module Mareframe {
                         dialog.data("element", p_elmt);
                         dialog.data("model", this.m_model);
                         dialog.data("showDescription", true);
-
-                        if (this.m_editorMode) {
-                            dialog.data("defTable", Tools.copy(p_elmt.getData()));//Save an instance of the def table 
-                            dialog.data("deletedRows", []);//Save which rows are deleted
-                            dialog.data("newStates", []);//Save the new states that are added
-                        }
+                        
+                        dialog.data("defTable", Tools.copy(p_elmt.getData()));//Save an instance of the def table 
+                        dialog.data("deletedRows", []);//Save which rows are deleted
+                        dialog.data("newStates", []);//Save the new states that are added
+                        
                    
                         //console.log("data: " + dialog.data("defTable"));
 
-                        var s = Tools.htmlTableFromArray("Definition", p_elmt, this.m_model, this.m_editorMode, $("#detailsDialog_" + id).data("defTable"));
-                        $("#defTable_div_" + id).html(s);
+                       // var s = Tools.htmlTableFromArray("Definition", p_elmt, this.m_model, this.m_editorMode, $("#detailsDialog_" + id).data("defTable"));
+                        // $("#defTable_div_" + id).html(s);
+                        $("#defTable_div_" + id).empty();
+                        document.getElementById("defTable_div_" + id).appendChild(this.htmlTableFromArray("Definition", p_elmt, this.m_model, this.m_editorMode, $("#detailsDialog_" + id).data("defTable")));
+
 
                         $("#defTable_div_" + id).show();
                         var typeText: string;
@@ -1132,9 +1183,6 @@ module Mareframe {
                             $("#values_" + id).prop('disabled', true);
                         }
                         this.addEditFunction(p_elmt, this.m_editorMode);
-                        if (!(this.m_editorMode)) {//User can only set decision if the user is not in editormode
-                            this.addSetDecFunction(p_elmt);
-                        }
                     } else {
                         //MCA mode only
                         $("#info_type").hide();
@@ -1281,7 +1329,8 @@ module Mareframe {
             private getElementWithUnsavedChanges(): Element {
                 var elmt: Element = null;
                 this.m_model.getElementArr().forEach(function (e) {
-                    if (e.actualRowsDoesNotEqualVisualRows()) {
+                    //if (e.actualRowsDoesNotEqualVisualRows()) {
+                    if (e.getDialog() !== undefined && e.getDialog().data("unsavedChanges")) {
                         if (elmt !== null) {
                             throw "ERROR Multiple elements with unsaved changes";
                         }
@@ -1327,6 +1376,10 @@ module Mareframe {
              }*/
             private addEditFunction(p_elmt: Element, p_editorMode: boolean) {
                 console.log("adding edit function");
+                if (!(p_editorMode)) {//User can only set decision and evidence if the user is not in editormode {
+                    this.addSetDecFunction(p_elmt);
+                    this.addSetEvidenceFunction(p_elmt);
+                }
                 var originalName: string = p_elmt.getName();
                 var mareframeGUI = this;
                 var model: Model = this.m_model;
@@ -1343,7 +1396,8 @@ module Mareframe {
                         $("#submit_" + id).show();
                         $(this).addClass("editable");
                         console.log("original value : " + originalUserComments);
-                        $(this).html("<input type='text' value='" + originalUserComments + "' />");
+                        $(this).html("<textarea rows='4' cols='50' '>" + originalUserComments+"</textarea>" );
+                        //$(this).html("<input type='text' value='" + originalUserComments + "' />");
                         $(this).children().first().focus();
                         $(this).children().first().keypress(function (e) {
                             if (e.which == 13) {
@@ -1355,9 +1409,6 @@ module Mareframe {
                             var newText = $(this).val();
                             originalUserComments = mareframeGUI.updateValue(p_elmt, $("#userDescription_div_" + id), $(this), originalUserComments, newText);
                         });
-
-
-
                     });
                     if (p_editorMode) {
                         //Minus button
@@ -1386,13 +1437,13 @@ module Mareframe {
                                 }
                             });
                         }
-                        else {//If editor mode is not on
+                        else {//If it is a value node
                             $("#addDataRow_" + id).hide();
                         }
                         $("#info_name_" + id).dblclick(function () {
                             $("#submit_" + id).show();
                             $(this).addClass("editable");
-                            $(this).html("<input type='text' value='" + originalName + "' />");
+                            $(this).html("<input style='width:80%' type='text' value='" + originalName + "' />");
                             $(this).children().first().focus();
                             $(this).children().first().keypress(function (e) {
                                 if (e.which == 13) {
@@ -1411,7 +1462,8 @@ module Mareframe {
                             $("#submit_" + id).show();
                             //var originalValue = $(this).text();
                             $(this).addClass("editable");
-                            $(this).html("<input type='text' value='" + originalDesc + "' />"); //Prevents the box from becoming emtpy when clicked
+                            $(this).html("<textarea rows='4' cols='50' >" + originalDesc + "</textarea>");
+                            //$(this).html("<input type='text' value='" + originalDesc + "' />"); //Prevents the box from becoming emtpy when clicked
                             $(this).children().first().focus();
                             $(this).children().first().keypress(function (e) {
                                 if (e.which == 13) {//If enter is pressed
@@ -1426,6 +1478,7 @@ module Mareframe {
                         });
                         //Data table
                         var editing = false;//this is used to make sure the text does not disapear when double clicking several times
+                        
                         $(".data_" + id).dblclick(function () {
                             elementWithUnsavedChanges = mareframeGUI.getElementWithUnsavedChanges();
                             if (elementWithUnsavedChanges === null || elementWithUnsavedChanges === p_elmt) {
@@ -1439,7 +1492,7 @@ module Mareframe {
                                     var originalValue = $(this).text();
                                     //  console.log("original value : " + originalValue);
                                     $(this).addClass("editable");
-                                    $(this).html("<input type='text' value='" + originalValue + "' />");
+                                    $(this).html("<input type='text' value='" + originalValue + "'size='" + $(this).offsetWidth + "' />");
                                     $(this).children().first().focus();
                                     $(this).children().first().keypress(function (e) {//if enter is pressed
                                         if (e.which == 13) {
@@ -1618,13 +1671,16 @@ module Mareframe {
             }
             private showValues(p_evt: Event) {
                 var elmt: Element = p_evt.data.param1;
+                var gui: GUIHandler = p_evt.data.param2;
                 console.log("showing values");
                 var id: string = elmt.getID();
                 //console.log("Data: " + elmt.getData());
                 //console.log("Values: " + elmt.getValues());
                 //console.log(elmt.getValues());
                 //console.log("size of values: " + math.size(elmt.getValues()));
-                $("#valuesTable_div_" + id).html(Tools.htmlTableFromArray("Values", elmt, $("#detailsDialog_" + id).data("model"), this.m_editorMode));
+                $("#valuesTable_div_" + id).empty();
+                document.getElementById("valuesTable_div_" + id).appendChild(gui.htmlTableFromArray("Values", elmt, $("#detailsDialog_" + id).data("model"), this.m_editorMode));
+                //$("#valuesTable_div_" + id).html(Tools.htmlTableFromArray2("Values", elmt, $("#detailsDialog_" + id).data("model"), this.m_editorMode));
                 $("#valuesTable_div_" + id).show();
                 $("#values_" + id).hide();
             }
@@ -1647,37 +1703,37 @@ module Mareframe {
                 elmt.setName($("#info_name_" + id).text());
                 //console.log(this);
                 table.find("tr").each(function () {
-                    $(this).find("th,td").each(function () {
-                        if ($(this).text().length > 0) {//This prevents the function from adding the minus column
-                            //console.log("text to be added: " + $(this).text());
+                    console.log("row");
+                    $(this).find("th,td,input").each(function () {
+                        //console.log("td or th");
+                            console.log("text to be added: " + $(this).val());
+                        if ($(this).val().length > 0) {//This prevents the function from adding the minus column
                             //console.log("does it exsist: " + $.inArray($(this).text(), newRow) === -1)
-                            var value: any = $(this).text();
-                            //Don't add the same value twice if it is in one of the header cells
+                            var value: any = $(this).val();
+                            //Don't add the same value twice if it is in one of the main value cells
                             //(Better solution: check before the text is saved in the cell)
                             if ($.inArray(value, newRow) === -1 || !isNaN(value)) {	
                                 //Convert to number
                                 if (!isNaN(value)) {
                                     value = Number(value);
                                 }
-                                //console.log("pushing " + value);
+                                console.log("pushing " + value);
                                 newRow.push(value);
                             }
                         }
                     });
-                    newTable.push(newRow);
-                    newRow = [];
-                });
-                //console.log(newTable);
-                //Remove header row with the title "Definition"
-                newTable.splice(0, 1);
-                //Reset the headerrows. (Better solution would be to prevent the user from editing them
-                for (var i = 0; i < Tools.numOfHeaderRows(oldData); i++) {
-                    for (var j = 0; j < oldData[0].length; j++) {
-                        newTable[i][j] = oldData[i][j];
+                    if (newRow.length > 0) {//Do not add an empty row
+                    console.log("pushing row: " + newRow);
+
+                        newTable.push(newRow);
+                        newRow = [];
                     }
-                    newTable[i][0] = oldData[i][0];
-                }
-                if (!Tools.columnSumsAreValid(newTable, Tools.numOfHeaderRows(elmt.getData())) && elmt.getType() == 0) {
+                });
+                console.log("new table: "+ newTable);
+                //Remove header row with the title "Definition"
+                //newTable.splice(0, 1);
+                
+                if (!Tools.columnSumsAreValid(newTable, Tools.numOfHeaderRows(newTable) && elmt.getType() == 0) {
                     //Should also show which row is unvalid (maybe right after the user has changed the value)
                     alert("The values in each column must add up to 1");
                 } else {
@@ -1693,7 +1749,9 @@ module Mareframe {
                             }
                         });
                         elmt.setData(newTable);
+
                         console.log("new data: " + elmt.getData());
+                        console.log(newTable);
                         //This updates the children accourding to the new states
                         this.saveAddedRows(elmt, $("#detailsDialog_" + id).data("newStates"));
                     }
@@ -1714,7 +1772,7 @@ module Mareframe {
                     }
                     //console.log("new table after submit:");
                     //console.log(elmt.getData());
-                    //The two lists need to be emptied
+                    //The lists need to be emptied
                     $("#detailsDialog_" + id).data("deletedRows", []);
                     $("#detailsDialog_" + id).data("newStates", []);
                     $("#detailsDialog_" + id).data("unsavedChanges", false);
@@ -1817,27 +1875,18 @@ module Mareframe {
                 ////console.log(this.m_model.getDataMatrix());
             }
             private mouseDown(p_evt: createjs.MouseEvent): void {
-                //console.log("mouse down");
+
+                console.log("mouse down on " + p_evt.target.name);
                 $("#mX").html("X: " + p_evt.stageX);
                 $("#mY").html("Y: " + p_evt.stageY);
                 $("#mAction").html("Action: mousedown");
                 $("#mTarget").html("Target: " + p_evt.target.name);
-                if (p_evt.target.name.substr(0, 4) === "elmt") {
-                    var elmt: Element = this.m_model.getElement(p_evt.target.name);
-                    //console.log("");
-                    //console.log("*********************");
-                    for (var i in elmt.getConnections()) {
-                        //console.log(elmt.getID() + "  " + elmt.getConnections()[i].getID())
-                    }
-                    //console.log("Data: " + elmt.getData());
-                    //console.log("Values: " + elmt.getValues());
-                }
-                //////console.log("mouse down at: ("+e.stageX+","+e.stageY+")");
+
                 this.m_oldX = p_evt.stageX;
                 this.m_oldY = p_evt.stageY;
                 this.m_originalPressX = p_evt.stageX;
                 this.m_originalPressY = p_evt.stageY;
-                //////console.log("cnctool options: "+$("#cnctTool").button("option","checked"));
+                //console.log("cnctool options: "+$("#cnctTool").button("option","checked"));
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
                     var cnctChkbox: HTMLInputElement = <HTMLInputElement>document.getElementById("cnctTool")   // What the hell no jQuery
                     if (cnctChkbox.checked) //check if connect tool is enabled
@@ -1852,7 +1901,11 @@ module Mareframe {
                     } else {
                         this.select(p_evt);
                     }
-                } else {
+                } else if (p_evt.target.name.substr(0, 4) === "conn") {
+                    console.log("connection pressed");
+
+                }
+                else {
                     this.clearSelection();
                 }
             }
@@ -2139,9 +2192,16 @@ module Mareframe {
                 //cont.addEventListener("mousedown", mouseDown);
                 cont.addChild(arrowCont);
                 cont.addChild(conn);
-
+                arrowCont.name = p_connection.getID();;
+                conn.name = p_connection.getID();
+                //Add event listener to the arrow
+                if (this.m_editorMode) {
+                    arrowCont.addEventListener("mousedown", this.mouseDown);
+                    conn.addEventListener("mousedown", this.mouseDown);
+                }
                 this.m_mcaContainer.addChildAt(cont, 0);
                 p_connection.m_easelElmt = cont;
+               
                 this.m_updateMCAStage = true;
             }
             private updateConnection(p_connection: Connection): void {
@@ -2316,8 +2376,11 @@ module Mareframe {
                 states.push(newState);
                 $("#detailsDialog_" + id).data("newStates", states);
                 //Create the html tabel again and add the edit function again
-                var s = Tools.htmlTableFromArray("Definition", elmt, this.m_model, this.m_editorMode, $("#detailsDialog_" + id).data("defTable"));
-                $("#defTable_div_" + id).html(s);
+                $("#defTable_div_" + id).empty();
+                document.getElementById("defTable_div_" + id).appendChild(this.htmlTableFromArray("Definition", elmt, this.m_model, this.m_editorMode, $("#detailsDialog_" + id).data("defTable")));
+                console.log("new data table: " + $("#detailsDialog_" + id).data("defTable"));
+                //var s = Tools.htmlTableFromArray("Definition", elmt, this.m_model, this.m_editorMode, $("#detailsDialog_" + id).data("defTable"));
+                //$("#defTable_div_" + id).html(s);
                 this.addEditFunction(elmt, this.m_editorMode);
                 $("#detailsDialog_" + id).data("unsavedChanges", true);
                 $("#values_" + id).show();
@@ -2330,9 +2393,9 @@ module Mareframe {
                 
                     //Add default values for the new state in all children
                     p_elmt.getChildrenElements().forEach(function (e) {
-                        // console.log("updating header for " + e.getName());
+                         console.log("updating header for " + e.getName());
                         e.setData(e.updateHeaderRows(e.getData()));
-                        //console.log("new Data: " + e.getData());
+                        console.log("new Data: " + e.getData());
                         e.setData(e.addDefaultDataInEmptyCells(e.getData(), p_elmt, newStateName));
                     });
                 }
@@ -2366,8 +2429,10 @@ module Mareframe {
                         $("#detailsDialog_" + id).data("deletedRows", rowsToDelete);
                     }
                     //create the html table again
-                    var s = Tools.htmlTableFromArray("Definition", p_element, this.m_model, this.m_editorMode, $("#detailsDialog_" + id).data("defTable"));
-                    $("#defTable_div_" + id).html(s);
+                    $("#defTable_div_" + id).empty();
+                    document.getElementById("defTable_div_" + id).appendChild(this.htmlTableFromArray("Definition", p_element, this.m_model, this.m_editorMode, $("#detailsDialog_" + id).data("defTable")));
+                    //var s = Tools.htmlTableFromArray("Definition", p_element, this.m_model, this.m_editorMode, $("#detailsDialog_" + id).data("defTable"));
+                    //$("#defTable_div_" + id).html(s);
                 }
             }
 
@@ -2411,11 +2476,15 @@ module Mareframe {
 
             private updateTablesVisually(p_elmt: Element): void {
                 var id: string = p_elmt.getID();
-                var s = Tools.htmlTableFromArray("Definition", p_elmt, this.m_model, this.m_editorMode);
-                $("#defTable_div_" + id).html(s);
+                $("#defTable_div_" + id).empty();
+                document.getElementById("defTable_div_" + id).appendChild(this.htmlTableFromArray("Definition", p_elmt, this.m_model, this.m_editorMode));
+                //var s = Tools.htmlTableFromArray("Definition", p_elmt, this.m_model, this.m_editorMode);
+                //$("#defTable_div_" + id).html(s);
                 // $("#defTable_div_" + id).show();
                 console.log("is values visible: " + $("#valuesTable_div_" + id).is(":visible"));
-                $("#valuesTable_div_" + id).html(Tools.htmlTableFromArray("Values", p_elmt, this.m_model, this.m_editorMode));
+                $("#valuesTable_div_" + id).empty();
+                document.getElementById("valuesTable_div_" + id).appendChild(this.htmlTableFromArray("Values", p_elmt, this.m_model, this.m_editorMode));
+                //$("#valuesTable_div_" + id).html(Tools.htmlTableFromArray("Values", p_elmt, this.m_model, this.m_editorMode));
                 if (!($("#values_" + id).is(":visible"))) {
                     $("#valuesTable_div_" + id).show();
                 }
@@ -2424,7 +2493,198 @@ module Mareframe {
                 }
                 this.addEditFunction(p_elmt, this.m_editorMode);
             }
+            private htmlTableFromArray(p_header: string, p_elmt: Element, p_model: Model, p_editorMode: boolean, p_data?: any[][]) {
+                //console.log("header: " + p_header);
+                //console.log("type of elmt: " + p_elmt.getType());
+                console.log("creating htmlTable");
+                var data: any[][];
+                var gui: GUIHandler = this;
+                if (p_data === undefined) {
+                    if (p_header === "Definition") {
+                        data = p_elmt.getData();
+                    }
+                    else if (p_header === "Values") {
+                        data = p_elmt.getValues();
+                    }
+                }
+                else {
+                    data = p_data;
+                }
+                var numOfHeaderRows = Tools.numOfHeaderRows(data);
+                if (p_elmt.getType() === 1 && p_header === "Values") {//Find best decision by finding the highest value in dec value table
+                    var highestValue: number = 1;
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i][1] > data[highestValue][1]) {
+                            highestValue = i;
+                        }
+                    }
+                    console.log("highest is : " + highestValue);
+                }
+                if (p_elmt.getType() == 2 && p_header === "Values") {//Find best decision by finding the highest value in value values table
+                    var bestDecCol: number = 1;
+                    // console.log("data length: " + data.length);
+                    // console.log("data [0] length: " + data[0].length);
+                    for (var j = 2; j < data[0].length; j++) {
+                        if (data[numOfHeaderRows][j] > data[numOfHeaderRows][bestDecCol]) {
+                            bestDecCol = j;
+                        }
+                    }
+                    console.log("best column " + bestDecCol + " value: " + data[numOfHeaderRows][bestDecCol]);
+                }
+                
+                var table = document.createElement("table");
+                var rowPlaceholder;
+                rowPlaceholder = table.insertRow(-1)
+                var cellPlaceholder = document.createElement("th");
+                cellPlaceholder.style.textAlign = "center";
+                if (data[0] !== undefined) {
+                    cellPlaceholder.colSpan = (data[0].length + 1);
 
+                }
+                cellPlaceholder.innerHTML = p_header;
+                rowPlaceholder.appendChild(cellPlaceholder);
+                if (p_elmt.getType() === 3 && math.size(data)[1] < 1) {//The data table is empty in the super value node
+                    //console.log("super value with empty def");
+                    rowPlaceholder = table.insertRow(-1);
+                    cellPlaceholder = rowPlaceholder.insertCell(-1);
+                    cellPlaceholder.innerHTML = "This super value node has no parents";
+                }
+                else {
+
+                    //Create the header rows
+                
+                    for (var i = 0; i < numOfHeaderRows; i++) {
+                        rowPlaceholder = table.insertRow(-1);
+                        if (p_editorMode && p_header === "Definition" && (p_elmt.getType() === 0 || p_elmt.getType() === 1)) {//Create empty cell above minus cells
+                            var emptyCell = document.createElement("th");
+                            rowPlaceholder.appendChild(emptyCell);
+                        }
+                        for (var j = 0; j < (data[0].length); j++) {//Create a new header element for each element
+                            var headerCell = document.createElement("th");
+                            if (j === 0) {
+                                headerCell.innerHTML = p_model.getElement(data[i][j]).getName();
+                            }
+                            else {
+                                headerCell.innerHTML = data[i][j];
+                            }
+                            rowPlaceholder.appendChild(headerCell);
+                        }
+                    }
+                    //Create the data rows
+                    for (var i = numOfHeaderRows; i < data.length; i++) {
+                        rowPlaceholder = table.insertRow(-1);
+                        if (p_editorMode && p_header === "Definition" && (p_elmt.getType() === 0 || p_elmt.getType() === 1)) {//add minus button
+                            var minusCell = document.createElement("th");
+                            var button = document.createElement("button");
+                            button.setAttribute("class", "minus minus_" + p_elmt.getID());
+                            button.setAttribute("id", i + "");
+                            minusCell.appendChild(button);
+                            rowPlaceholder.appendChild(minusCell);
+                        }
+                        for (var j = 0; j < data[0].length; j++) {
+                            var value: any = data[i][j];
+                            if (value === -Infinity) {//In decision nodes the default value is -infinity, but this should be 0 to the user
+                                value = 0;
+                            }
+                            if (j === 0) {//If this is first column this is main values
+                                if (p_elmt.getType() === 3 && p_header === "Definition") {//This is because super value nodes have parents horizontial in def table
+                                    cellPlaceholder = document.createElement("th");
+                                    cellPlaceholder.innerHTML = p_model.getElement(data[i][j]).getName();
+                                    rowPlaceholder.appendChild(cellPlaceholder);
+                                }
+                                else {
+                                    cellPlaceholder = document.createElement("th");
+                                    if (p_editorMode) {
+                                        var input = document.createElement("input");
+                                        input.type = "text";
+                                        input.value = value.trim();
+                                        $(input).on("input",{ field: input, elmt: p_elmt, gui: gui }, gui.inputChanged);//Add on input change function to the cell
+                                        $(input).data("originalValue", value.trim()); // Save the original value in the cell
+                                        cellPlaceholder.appendChild(input);
+                                    }
+                                    else {
+                                        var classes: string = "editable_cell editable_cell_" + p_elmt.getID();
+                                        var div = document.createElement("div");
+                                        div.setAttribute("id", i + "");
+                                        if (p_elmt.getType() === 1) {//If element is a dec element add the decCell class
+                                            classes += " decCell_" + p_elmt.getID();
+                                            if (i == p_elmt.getDecision()) { //Mark the set decision
+                                                classes += " setDecision";
+                                            }
+                                        }
+                                        else if (p_elmt.getType() === 0) {//If this is a chance element add the evidenceCell class
+                                            classes += " evidenceCell_" + p_elmt.getID();
+                                            if (i == p_elmt.getEvidence()) {//Mark the set evidence
+                                                classes += " setEvidence";
+                                            }
+                                        }
+                                        div.setAttribute("class", classes);
+                                        div.innerHTML = value;
+                                        cellPlaceholder.appendChild(div);
+                                    }
+                                    rowPlaceholder.appendChild(cellPlaceholder);
+                                }
+                            } else {
+                                if (i === highestValue || j == bestDecCol) {//mark highest if it is the value table of a value node or a decision node
+                                    cellPlaceholder = rowPlaceholder.insertCell(-1);//insert cell at the end of row
+                                    cellPlaceholder.innerHTML = (Tools.round(value) + "").bold();
+                                }
+                                else if (p_editorMode) {
+                                    cellPlaceholder = rowPlaceholder.insertCell(-1);//insert cell at the end of row
+                                    var input = document.createElement("input");
+                                    input.setAttribute("class", "data_" + p_elmt.getID());
+                                    input.type = "number";
+                                    if (p_elmt.getType() === 0) {//Chance
+                                        input.max = "1";
+                                        input.min = "0";
+                                        input.step = "0.05";
+                                    }
+                                    input.value = Tools.round(value) + "";
+                                    $(input).on("input", { field: input, elmt: p_elmt, gui: gui }, gui.inputChanged);//Add on input change function to the cell
+                                    $(input).data("originalValue", Tools.round(value)); // Save the original value in the cell
+                                    cellPlaceholder.appendChild(input);
+                                }
+                                else {
+                                    cellPlaceholder = rowPlaceholder.insertCell(-1);//insert cell at the end of row
+                                    var div = document.createElement("div");
+                                    div.setAttribute("class", "data_" + p_elmt.getID());
+                                    div.innerHTML = Tools.round(value) + "";
+                                    cellPlaceholder.appendChild(div);
+                                }
+                            }
+                        }
+                    }
+                }
+                return table;
+
+            }
+            private inputChanged(p_evt: Event): void {
+                console.log("evt: " + p_evt);
+                var field = p_evt.data.field;
+                var elmt: Element = p_evt.data.elmt;
+                var gui: GUIHandler = p_evt.data.gui;
+                var id: string = elmt.getID();
+                var originalValue: string =  $(field).data("originalValue");
+                    console.log("original value: " + originalValue);
+                console.log("input changed");
+                var elementWithUnsavedChanges = gui.getElementWithUnsavedChanges();
+                console.log("elementWithUnsavedChanges: " + elementWithUnsavedChanges);
+                if (elementWithUnsavedChanges === null || elementWithUnsavedChanges === elmt) {
+                    var newText = field.value;
+                        $("#valuesTable_div_" + id).hide();
+                        $("#values_" + id).show();
+                        $("#submit_" + id).show();
+                        $("#detailsDialog_" + elmt.getID()).data("unsavedChanges", true);
+                        console.log("setting unsaved changes = true in " + elmt.getID());
+                        $("#values_" + id).prop("disabled", true);
+                        $(field).data("originalValue", newText);
+                }
+                else {
+                    field.value = $(field).data("originalValue");
+                    alert("Please submit changes in " + elementWithUnsavedChanges.getName() + " before editing this data table");
+                }
+            }
+            
         }
     }
 }

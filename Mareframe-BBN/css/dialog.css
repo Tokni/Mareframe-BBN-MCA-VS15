@@ -36,9 +36,15 @@
 .setDecision {
     border: 3.5px solid
 }
+.setEvidence{
+    border: 3.5px solid
+}
 .editableTable .editable input[type=text]{
      
 }
 .info_div {
     font-weight: bold;
+}
+td {
+min-width:50px
 }

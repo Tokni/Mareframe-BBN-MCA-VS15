@@ -6,7 +6,8 @@ var Mareframe;
             function Model(p_bbnMode) {
                 this.m_bbnMode = false;
                 this.m_modelIdent = "temp";
-                this.m_counter = 0;
+                this.m_elmtCounter = 0;
+                this.m_ConnCounter = 0;
                 this.m_elementArr = [];
                 this.m_connectionArr = [];
                 this.m_modelName = "untitled";
@@ -98,9 +99,9 @@ var Mareframe;
             };
             Model.prototype.update = function () {
                 var m = this;
-                //console.log("updating model");
+                console.log("updating model");
                 this.m_elementArr.forEach(function (p_elmt) {
-                    //console.log(p_elmt.getID() + " has been updated: " + p_elmt.isUpdated());
+                    console.log(p_elmt.getID() + " has been updated: " + p_elmt.isUpdated());
                     if (!p_elmt.isUpdated()) {
                         p_elmt.update();
                     }
@@ -108,6 +109,9 @@ var Mareframe;
                 this.m_elementArr.forEach(function (p_elmt) {
                     DST.Tools.updateConcerningDecisions(p_elmt);
                 });
+                if (this.getElmtsWithEvidence().length > 0) {
+                    DST.Tools.calcValueWithEvidence(this);
+                }
             };
             Model.prototype.getIdent = function () {
                 return this.m_modelIdent;
@@ -258,8 +262,8 @@ var Mareframe;
             };
             Model.prototype.createNewElement = function (p_type) {
                 ////console.log(this.m_counter);
-                var e = new DST.Element("elmt" + this.m_counter, this, p_type);
-                this.m_counter++;
+                var e = new DST.Element("elmt" + this.m_elmtCounter, this, p_type);
+                this.m_elmtCounter++;
                 this.m_elementArr.push(e);
                 switch (p_type) {
                     case 0:
@@ -443,7 +447,7 @@ var Mareframe;
                 this.m_dataMatrix = p_jsonObject.dataMat;
                 this.m_elementArr = [];
                 this.m_connectionArr = [];
-                this.m_counter = 0;
+                this.m_elmtCounter = 0;
                 var maxX = 0;
                 var maxY = 0;
                 for (var i = 0; i < p_jsonObject.elements.length; i++) {
@@ -479,8 +483,8 @@ var Mareframe;
                 console.log("finnished loading from json");
             };
             Model.prototype.createNewConnection = function (p_inputElmt, p_outputElmt) {
-                var c = new DST.Connection(p_inputElmt, p_outputElmt, this.m_bbnMode, "conn" + this.m_counter);
-                this.m_counter++;
+                var c = new DST.Connection(p_inputElmt, p_outputElmt, "conn" + this.m_ConnCounter, this.m_bbnMode);
+                this.m_ConnCounter++;
                 return c;
             };
             Model.prototype.setDecision = function (p_elmtIdent, p_decisNumb) {
@@ -503,6 +507,29 @@ var Mareframe;
                     console.log(e.getName() + " not updated");
                 });*/
                 //console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
+            };
+            Model.prototype.setEvidence = function (p_elmtIdent, p_evidenceNumber) {
+                var elmt = this.getElement(p_elmtIdent);
+                console.log("setting evidence no. " + p_evidenceNumber + " previous evidence: " + elmt.getEvidence());
+                if (elmt.getEvidence() == p_evidenceNumber) {
+                    console.log("unsetting decision");
+                    elmt.setEvidence(undefined);
+                }
+                else {
+                    elmt.setEvidence(p_evidenceNumber);
+                }
+                this.getElementArr().forEach(function (e) {
+                    e.setUpdated(false);
+                });
+            };
+            Model.prototype.getElmtsWithEvidence = function () {
+                var elements = [];
+                this.getElementArr().forEach(function (e) {
+                    if (e.getType() === 0 && e.getEvidence() !== undefined) {
+                        elements.push(e);
+                    }
+                });
+                return elements;
             };
             return Model;
         })();

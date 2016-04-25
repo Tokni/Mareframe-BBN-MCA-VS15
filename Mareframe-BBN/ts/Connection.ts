@@ -9,13 +9,13 @@
 
 
 
-            constructor(p_inputElmt: Element, p_outputElmt: Element, p_bbnMode?: boolean, p_connID?: string) {
+            constructor(p_inputElmt: Element, p_outputElmt: Element, p_connID: string, p_bbnMode?: boolean) {
 
                 this.m_inputElement = p_inputElmt;
                 this.m_outputElement = p_outputElmt;
-                if (p_connID) {
+               
                     this.m_id = p_connID;
-                }
+                
 
                 if (p_bbnMode&&p_inputElmt.getType() === 1 && p_outputElmt.getType() === 1) {
                     this.m_color = "gray";
@@ -27,6 +27,7 @@
                 return this.m_color
             }
             getID(): string {
+                //console.log("id of connection: " + this.m_id);
                 return this.m_id;
             }
             setID(p_id: string): string {
