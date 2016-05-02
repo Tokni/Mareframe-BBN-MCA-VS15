@@ -15,7 +15,7 @@
             public m_easelElmt: createjs.Container = new createjs.Container();
             public m_minitableEaselElmt: createjs.Container = new createjs.Container();
             private m_model: Model;
-            private m_decision: number;
+            private m_decision: number; //undefined if no decision is sat
             private m_dialog: JQuery;
             private m_evidence: number;
 

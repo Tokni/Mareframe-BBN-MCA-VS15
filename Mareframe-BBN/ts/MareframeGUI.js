@@ -137,6 +137,7 @@ var Mareframe;
                 this.loadModel = this.loadModel.bind(this);
                 this.selectModel = this.selectModel.bind(this);
                 this.clickedDecision = this.clickedDecision.bind(this);
+                this.clickedEvidence = this.clickedEvidence.bind(this);
                 this.fullscreen = this.fullscreen.bind(this);
                 this.cnctStatus = this.cnctStatus.bind(this);
                 this.optionTypeChange = this.optionTypeChange.bind(this);
@@ -437,7 +438,12 @@ var Mareframe;
                             decisionCont.addChild(decisPercVal);
                         }
                     }
-                    decisionCont.addEventListener("click", this.clickedDecision);
+                    if (elmt.getType() === 1) {
+                        decisionCont.addEventListener("click", this.clickedDecision);
+                    }
+                    else if (elmt.getType() === 0) {
+                        decisionCont.addEventListener("click", this.clickedEvidence);
+                    }
                     decisionCont.x = elmt.m_easelElmt.x + 75;
                     decisionCont.y = elmt.m_easelElmt.y - 15;
                     decisionCont.name = elmt.getID();
@@ -455,6 +461,14 @@ var Mareframe;
                     //console.log("clicked a decision");
                     //console.log(p_evt);
                     this.m_model.setDecision(p_evt.currentTarget.name, Math.floor(p_evt.localY / 12));
+                    this.updateModel();
+                }
+            };
+            GUIHandler.prototype.clickedEvidence = function (p_evt) {
+                if (!this.m_editorMode && this.m_noOfDialogsOpen == 0) {
+                    //console.log("clicked a decision");
+                    //console.log(p_evt);
+                    this.m_model.setEvidence(p_evt.currentTarget.name, Math.floor(p_evt.localY / 12));
                     this.updateModel();
                 }
             };
@@ -487,6 +501,9 @@ var Mareframe;
                     $(".advButton").hide();
                     $("#lodDcmtDiv").hide();
                     $("#cnctTool").prop("checked", false);
+                    if (!this.m_model.getAutoUpdate()) {
+                        $("#updateMdl").show();
+                    }
                 }
                 if (this.m_editorMode) {
                     this.m_mcaBackground.addEventListener("pressup", this.pressUp);
@@ -518,6 +535,9 @@ var Mareframe;
                             elementArr[i].m_easelElmt.addEventListener("pressup", this.pressUp);
                             if (elementArr[i].getType() === 1) {
                                 this.m_model.setDecision(elementArr[i].getID(), elementArr[i].getDecision()); //Unsets all decisions
+                            }
+                            if (elementArr[i].getType() === 0) {
+                                this.m_model.setEvidence(elementArr[i].getID(), elementArr[i].getEvidence()); //Unset all evidence
                             }
                         }
                         else {
@@ -764,7 +784,7 @@ var Mareframe;
                 var gui = this;
                 $(".decCell_" + p_elmt.getID()).click(function () {
                     console.log("decision cell clicked");
-                    gui.m_model.setDecision(p_elmt.getID(), this.id);
+                    gui.m_model.setDecision(p_elmt.getID(), Number(this.id));
                     gui.updateModel();
                     //Create the table again
                     $("#defTable_div_" + p_elmt.getID()).empty();
@@ -780,7 +800,7 @@ var Mareframe;
                 var gui = this;
                 $(".evidenceCell_" + p_elmt.getID()).click(function () {
                     console.log("evidence cell clicked");
-                    gui.m_model.setEvidence(p_elmt.getID(), this.id.substring(0, 1));
+                    gui.m_model.setEvidence(p_elmt.getID(), Number(this.id.substring(0, 1)));
                     gui.updateModel();
                     //Create the table again
                     $("#defTable_div_" + p_elmt.getID()).empty();
@@ -1596,7 +1616,7 @@ var Mareframe;
                 console.log("new table: " + newTable);
                 //Remove header row with the title "Definition"
                 //newTable.splice(0, 1);
-                if (!DST.Tools.columnSumsAreValid(newTable, DST.Tools.numOfHeaderRows(newTable) && elmt.getType() == 0)) {
+                if (elmt.getType() == 0 && !DST.Tools.columnSumsAreValid(newTable, DST.Tools.numOfHeaderRows(newTable))) {
                     //Should also show which row is unvalid (maybe right after the user has changed the value)
                     alert("The values in each column must add up to 1");
                 }
@@ -1765,7 +1785,6 @@ var Mareframe;
                 if (!p_evt.nativeEvent.ctrlKey && this.m_selectedItems.indexOf(p_evt.target) === -1) {
                     this.clearSelection();
                 }
-                //console.log("adding to selection: " + p_evt.target);
                 this.addToSelection(p_evt.target);
             };
             GUIHandler.prototype.pressMove = function (p_evt) {
@@ -1810,6 +1829,7 @@ var Mareframe;
                                 elmt.y += p_evt.stageY - this.m_oldY;
                                 //console.log("selected elements: " + this.m_selectedItems);
                                 console.log("element: " + elmt.name);
+                                //Updating connections to moved elemeents
                                 for (var j = 0; j < this.m_model.getElement(elmt.name).getConnections().length; j++) {
                                     var c = this.m_model.getElement(elmt.name).getConnections()[j];
                                     this.updateConnection(c);
@@ -2047,7 +2067,6 @@ var Mareframe;
                         console.log(elmt.getName() + "  " + elmt.getConnections[i].getID());
                     }
                     this.m_selectedItems.push(p_easelElmt);
-                    //console.log("pushed " + p_easelElmt);
                     if (this.m_model.m_bbnMode) {
                         this.m_selectedItems.push(elmt.m_minitableEaselElmt);
                     }
@@ -2406,16 +2425,16 @@ var Mareframe;
                                     else {
                                         var classes = "editable_cell editable_cell_" + p_elmt.getID();
                                         var div = document.createElement("div");
-                                        div.setAttribute("id", i + "");
+                                        div.setAttribute("id", (i - numOfHeaderRows) + "");
                                         if (p_elmt.getType() === 1) {
                                             classes += " decCell_" + p_elmt.getID();
-                                            if (i == p_elmt.getDecision()) {
+                                            if ((i - numOfHeaderRows) == p_elmt.getDecision()) {
                                                 classes += " setDecision";
                                             }
                                         }
                                         else if (p_elmt.getType() === 0) {
                                             classes += " evidenceCell_" + p_elmt.getID();
-                                            if (i == p_elmt.getEvidence()) {
+                                            if ((i - numOfHeaderRows) == p_elmt.getEvidence()) {
                                                 classes += " setEvidence";
                                             }
                                         }

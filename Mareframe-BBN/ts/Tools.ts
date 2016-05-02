@@ -145,136 +145,6 @@
                 return counter
             }
             
-            /*static htmlTableFromArray(p_header: string, p_elmt: Element, p_model: Model, p_editorMode: boolean, p_data?: any[][]): string {
-                 console.log("header: " + p_header);
-                console.log("type of elmt: " + p_elmt.getType());
-
-                var data: any[][];
-                if (p_data === undefined) {
-                    if (p_header === "Definition") {
-                        data = p_elmt.getData();
-                    }
-                    else if (p_header === "Values") {
-                        data = p_elmt.getValues();
-                    }
-                }
-                else {
-                    data = p_data;
-                }
-                console.log(data);
-                var numOfHeaderRows = Tools.numOfHeaderRows(data);
-                if (p_elmt.getType() === 1 && p_header === "Values") {//Find best decision by finding the highest value in dec value table
-                    var highestValue: number = 1;
-                    for (var i = 0; i < data.length; i++) {
-                        if (data[i][1] > data[highestValue][1]) {
-                            highestValue = i;
-                        }
-                    }
-                    console.log("highest is : " + highestValue);
-                }
-                if (p_elmt.getType() == 2 && p_header === "Values") {//Find best decision by finding the highest value in value values table
-                    var bestDecCol: number = 1;
-                    // console.log("data length: " + data.length);
-                    // console.log("data [0] length: " + data[0].length);
-                    for (var j = 2; j < data[0].length; j++) {
-                        if (data[numOfHeaderRows][j] > data[numOfHeaderRows][bestDecCol]) {
-                            bestDecCol = j;
-
-                        }
-                    }
-                    console.log("best column " + bestDecCol + " value: " + data[numOfHeaderRows][bestDecCol]);
-                }
-                //console.log("p_header: " + p_header);
-                //console.log("data: " + data);
-                var htmlString = "";
-
-                if (data[0] !== undefined) {
-                    htmlString += "<tr><th style='text-align:center' colspan=\"" + (data[0].length + 1) + "\" >" + p_header + " </th></tr>";
-                } else {
-                    htmlString += "<tr><th style='text-align:center'>" + p_header + " </th></tr>";
-                }
-                if (p_elmt.getType() === 3 && math.size(data)[1] < 1) {//The data table is empty in the super value node
-                    //console.log("super value with empty def");
-                    htmlString += " <tr> <th> This super value node has no parents</th></tr>";
-                }
-                else {
-                    for (var i = 0; i < numOfHeaderRows; i++) {
-                        //console.log("i: " + i);
-                        htmlString += "<tr>";
-                        if (p_editorMode && p_header === "Definition" && (p_elmt.getType() === 0 || p_elmt.getType() === 1)) { htmlString += "<th></th>"; }//Create empty cell above minus cells
-                        for (var j = 0; j < (data[0].length); j++) {
-                            if (j === 0) {
-                                htmlString += "<th>" + p_model.getElement(data[i][j]).getName() + "</th>";
-                            }
-                            else {
-                                htmlString += "<th>" + data[i][j] + "</th>";
-                            }
-                        }
-                        htmlString += "</tr>";
-                    }
-                    //console.log("numOfHeaderRows: " + numOfHeaderRows);
-                    //console.log("data.length: " + data.length);
-                
-                    for (var i = numOfHeaderRows; i < data.length; i++) {
-                        htmlString += "<tr>";
-                        if (p_editorMode && p_header === "Definition" && (p_elmt.getType() === 0 || p_elmt.getType() === 1)) { htmlString += "<th><button class='minus minus_"+p_elmt.getID()+"' id='" + i + "'></button></th>"; }//add minus button
-                        for (var j = 0; j < (data[0].length); j++) {
-                            var value: any = data[i][j];
-                            if (value === -Infinity) {//In decision nodes the default value is -infinity, but this should be 0 to the user
-                                value = 0;
-                            }
-                            if (j === 0) {
-                                if (p_elmt.getType() === 3 && p_header === "Definition") {
-                                    htmlString += "<th> " + p_model.getElement(data[i][j]).getName() + "</th>";//This is because super value nodes have parents horizontial in def table
-                                }
-                                else {
-                                    if (p_editorMode) {
-                                        htmlString += "<th><input type='text' value='"+value.trim() +"'/></th>";
-                                    }
-                                    else {
-                                        htmlString += "<th><div id='" + i + "' class='editable_cell editable_cell_" + p_elmt.getID();
-                                        if (p_elmt.getType() === 1) {//If element is a dec element add the decCell class 
-                                            htmlString += " decCell_" + p_elmt.getID();
-                                            //console.log("checking: " + i + " against: " + p_elmt.getDecision());
-                                            if (i == p_elmt.getDecision()) {//Mark the set decision
-                                                // console.log("decision found");
-                                                htmlString += " setDecision";
-                                            }
-                                            else {
-                                                //console.log(i + " and " + p_elmt.getDecision() + " do not match");
-                                            }
-
-                                        }
-                                        if (p_elmt.getType() === 0) {//If this is a chance element add the evidenceCell class
-                                            htmlString += " evidenceCell_" + p_elmt.getID();
-                                            if (i == p_elmt.getEvidence()) {//Mark the set evidence
-                                                htmlString += " setEvidence";
-                                            }
-                                        }
-                                        htmlString += "' > " + value + "</div></th>";
-                                    }
-                                }
-                            } else {
-                                if (i === highestValue ||  j == bestDecCol) {//mark highest if it is the value table of a value node or a decision node
-                                    htmlString += "<td> <b>" + Tools.round(value) + "</b></td>";
-                                }
-                                else if (p_editorMode) {
-
-                                    htmlString += "<td><input class='data_" + p_elmt.getID() +"type='text' value='" + Tools.round(value) + "' /></td>";
-                                }
-                                else {
-                                    htmlString += "<td><div class='data_" + p_elmt.getID() + "'>" + Tools.round(value) + "</div></td>";
-                                }
-                            }
-
-                        }
-                        htmlString += "</tr>";
-                    }
-                }
-                //console.log("html table: " + htmlString);
-                return htmlString;
-            }
-            */
             static round(numb: number) {
                 //return numb.toFixed(2);
                 return Number(Math.round(numb * 1000) / 1000);
@@ -335,7 +205,7 @@
                 var headerRows: number = Tools.numOfHeaderRows(matrix);
                 var rows: number = math.size(matrix)[0];
                 if (p_index < headerRows) {
-                    console.log("ERROR Can not delete headerrows");
+                    throw "ERROR Can not delete headerrows");
                 }
                 if (rows < headerRows + 2) { //The last row is being deleted and the matrix is now empty
                     //console.log("matrix is now empty");
@@ -419,7 +289,7 @@
             }
 
             static getValueWithCondition(p_values: any[][], p_elmt: Element, p_conditions: String[]): number[] {
-                //console.log("getting value with condition " + p_condition + " from " + p_values);
+                //console.log("getting value with condition " + p_conditions + " from " + p_values);
                 var values: any[][] = Tools.makeSureItsTwoDimensional(p_values);
                 // //console.log("values table : \n " + values);
                 var valuesFound = [];
@@ -714,7 +584,7 @@
             static calculateValues(p_model: Model, p_element: Element) {
                 var model: Model = p_model;
                 var element: Element = p_element;
-                //console.log("calculate values for " + p_element.getName());
+                console.log("calculate values for " + p_element.getName());
                 var dataHeaders: any[][] = []; //the header rows from data
                 var data: any[][] = element.getData();
                 var newValues: any[];
@@ -761,9 +631,10 @@
                             var decRows: any[] = [];
                             var newRow: any[] = [];
                             //If parent has dec in values table these are added to dataHeaders or parent submatrices are created
+                            //console.log("parent values: " + elmt.getValues());
                             //For each dec in parent
                             for (var i = 0; i < Tools.numOfHeaderRows(elmt.getValues()); i++) {
-                                //console.log("i:" + i + " decInParent: " + decInParent);
+                                //console.log("i:" + i + " decInParent: " + Tools.numOfHeaderRows(elmt.getValues()));
                                 var decRow = elmt.getValues()[i];
                                 //console.log("checking if: " + decRow[0] + " is in " + math.flatten(dataHeaders) + " : " + (math.flatten(dataHeaders).indexOf(decRow[0]) > -1));
                                 //If the parents decision already is in data headers add it to decRows to be used when creating parentsubmatrices
@@ -877,47 +748,55 @@
                     //console.log("new values: " + newValues);
                     p_element.setValues(Tools.makeSureItsTwoDimensional(newValues));
                 } else {//If it is a decision node
-                    //console.log("decisions node begin");
-                    element.setValues(Tools.fillEmptySpaces((element.copyDefArray())));
-                    var values: any[] = element.getValues();
-                    //Number of header rows is equal to number of rows in values minus number of rows in definition
-                    var numOfHeaderRows = values.length - element.getData().length;
-                    //If there are no header rows add an empty column for the values
-                    if (numOfHeaderRows === 0) {
-                        for (var i = 0; i < values.length; i++) {
-                            values[i].push([]);
-                        }
-                    }
-                    //For each value row
-                    for (var i = numOfHeaderRows; i < values.length; i++) {
-                        //For each values column
-                        for (var j = 1; j < values[0].length; j++) {
-                            var condition = values[i][0];
-                            //console.log("conditions: "+conditions);
-                            var value = 0;
-                            //For each value node in the model
-                            model.getElementArr().forEach(function (elmt) {
-                                if (elmt.getType() === 2) {
-                                    //console.log("value: " + elmt.getName());
-                                    //If the node is not updated, update
-                                    if (!elmt.isUpdated()) {
-                                        elmt.update();
-                                    }
-                                    //Sum values that meet the condition
-                                    var valueArray = Tools.getValueWithCondition(elmt.getValues(), element, condition);
-                                    //console.log("value array: " + valueArray);
-                                    //If there are several values that meet the condition, use the highest
-                                    value += Tools.getHighest(valueArray);
-                                }
-                            })
-                            //console.log("i: " + i + "  j: " + j + "  Value: " + value);
-                            values[i][j] = value;
-                        }
-                    }
-                    //     console.log("decisions end");
-                    p_element.setValues(values);
+                    Tools.calculateDecisionValues(element, model);
+                    
                 }
                 //console.log("done calculatint values for " + p_element.getName());
+            }
+            static calculateDecisionValues(p_elmt: Element, p_model: Model) {
+                if (p_elmt.getType() !== 1) {
+                    throw "ERROR Trying to use calculateDecisionValues on non decision element";
+                }
+               console.log("decisions node begin");
+                p_elmt.setValues(Tools.fillEmptySpaces((p_elmt.copyDefArray())));
+                var values: any[] = p_elmt.getValues();
+                //Number of header rows is equal to number of rows in values minus number of rows in definition
+                var numOfHeaderRows = values.length - p_elmt.getData().length;
+                //If there are no header rows add an empty column for the values
+                if (numOfHeaderRows === 0) {
+                    for (var i = 0; i < values.length; i++) {
+                        values[i].push([]);
+                    }
+                }
+                //For each value row
+                for (var i = numOfHeaderRows; i < values.length; i++) {
+                    //For each values column
+                    for (var j = 1; j < values[0].length; j++) {
+                        var condition = values[i][0];
+                        //console.log("condition: " + condition);
+                        var value = 0;
+                        //For each value node in the model
+                        p_model.getElementArr().forEach(function (elmt) {
+                            if (elmt.getType() === 2) {
+                                //console.log("value: " + elmt.getName());
+                                //If the node is not updated, update
+                                if (!elmt.isUpdated()) {
+                                    elmt.update();
+                                }
+                                //Sum values that meet the condition
+                                var valueArray = Tools.getValueWithCondition(elmt.getValues(), p_elmt, condition);
+                               // console.log("value array: " + valueArray);
+                                //If there are several values that meet the condition, use the highest
+                                value += Tools.getHighest(valueArray);
+                            }
+                        })
+                        //console.log("i: " + i + "  j: " + j + "  Value: " + value);
+                        values[i][j] = value;
+                    }
+                }
+                //     console.log("decisions end");
+                p_elmt.setValues(values);
+
             }
             static isOneDimensional(p_array: any[][]): Boolean {
                 //console.log(p_array.length);
@@ -1357,19 +1236,20 @@
             }
 
             static calcValueWithEvidence(p_model: Model) {
-                var numberOfRuns = 5000;
-                var table = [];
-                var evindeceElmts: Element[] = p_model.getElmtsWithEvidence();
+                console.log("calculating values with evidence");
+                var numberOfRuns = 100;
+                var table = [];//contains all cases
+                var evidenceElmts: Element[] = p_model.getElmtsWithEvidence();
                 for (var n = 0; n < numberOfRuns; n++) {
                     var w = 1;
                     var aCase = {};
                     var sampledElmts: Element[] = [];
                     p_model.getElementArr().forEach(function (e) {
-                        if (e.getType() === 0 && sampledElmts.indexOf(e) < 0) {
-                            var result = Tools.sample(sampledElmts, evindeceElmts, aCase, w, e, p_model);
-                            aCase = result[0];//Update the case to includes cases from the recursive call
-                            w = result[1];//Update weight if it has been changed in the recursive call
-                            sampledElmts = result[2]; //Update sampled elements to include all elements from the recursive call
+                        if (e.getType() === 0 && sampledElmts.indexOf(e) < 0) {//If this is a chance and it has not already been sampled
+                            var result = Tools.sample(sampledElmts, evidenceElmts, aCase, w, e, p_model);
+                            aCase = result[0];//Update the case 
+                            w = result[1];//Update weight
+                            sampledElmts = result[2]; //Update sampled elements
                             sampledElmts.push(e);
                         }
                     });
@@ -1377,57 +1257,93 @@
                 }
                 var weightSum = 0;
                 for (var i = 0; i < table.length; i++) {
+                    console.log("weight: " + table[i][1]);
                     weightSum += table[i][1];
                 }
                 console.log("weightSum " + weightSum);
                 p_model.getElementArr().forEach(function (e) {
-                    var data = e.getData();
-                    var values = [];
-                    for (var i = Tools.numOfHeaderRows(data, e); i < data.length; i++) {//For each of the different values
-                        var valRow = [];
-                        var value = 0;
-                        //console.log("calculating for " + data[i][0] + " in " + e.getName());
-                        for (var j = 0; j < table.length; j++) {
-                            //console.log("case: " + JSON.stringify(table[j]));
-                            if (table[j][0][e.getID()] === data[i][0]) {//If this value exists in this case
-                                //console.log("does contain the right value");
-                                value += table[j][1];//Add the weight
-                            }
+                    if (e.getType() === 0) {
+                        var data = e.getData();
+                        var values = [];
+                        var oldValues = e.getValues(); //This is used to gain information about the headerrows in values
+                        //Add the headerrows into values
+                        for (var row = 0; row < Tools.numOfHeaderRows(oldValues, e); row++) {
+                            values.push(oldValues[row]);
                         }
-                        valRow.push(data[i][0]);
-                        valRow.push(value / weightSum);
-                        //console.log("value for " + e.getName() + ": " + value);
-                        values.push(valRow);
+
+                        for (var i = Tools.numOfHeaderRows(data, e); i < data.length; i++) {//For each of the different values
+                            var valRow = [];
+                            valRow.push(data[i][0]);//push name of value
+
+                            for (var col = 1; col < oldValues[0].length; col++) {//There must be the same amount of columns in new values as there were in old values
+                                var value = 0;
+                                
+                                console.log("calculating for " + data[i][0] + " column: " + col+ " in " + e.getName());
+                                for (var j = 0; j < table.length; j++) {
+                                    console.log("case: " + JSON.stringify(table[j][0]));
+                                    var matchingCase = true;
+                                    if (table[j][0][e.getID()] !== data[i][0]) {
+                                        console.log("value does not match");
+                                        matchingCase = false;
+                                    }
+                                    for (var headerRow = 0; headerRow < Tools.numOfHeaderRows(oldValues, e); headerRow++) {//Checking if all elements in this column match
+                                        var headerElmt = oldValues[headerRow][0];
+                                        console.log("checking if case includes " + p_model.getElement(headerElmt).getName() + " : " + oldValues[headerRow][col]); 
+                                        if (table[j][0][headerElmt] !== oldValues[headerRow][col]) {
+                                            console.log("does not match");
+                                            matchingCase = false;
+                                        }
+                                    }
+                                    if (matchingCase) {
+                                        console.log("matching case");
+                                        value += table[j][1];//Add the weight
+                                        console.log("value = " + value);
+                                    
+                                    } else {
+                                        console.log("does not match");
+                                    }
+                                }
+                                valRow.push(value / weightSum);
+                            }
+                            values.push(valRow);
+                        }
+                        e.setValues(values);
                     }
-                    e.setValues(values);
+                    else {
+                        Tools.calculateValues(p_model, e);
+                        e.setUpdated(true);
+                    }
                 });
             }
             static sample(p_sampledElmts: Element[], p_evindeceElmts: Element[], p_case, p_weight: number, p_elmt: Element, p_model: Model) {
-                //console.log("sampling " + p_elmt.getName());
+                var oldValues = p_elmt.getValues();
+                console.log("\nsampling " + p_elmt.getName());
                 p_elmt.getParentElements().forEach(function (parent) {
-                    if (parent.getType() === 0) {
-                        if (p_sampledElmts.indexOf(parent) < 0 && parent.getType() === 0) {
-                            var result = Tools.sample(p_sampledElmts, p_evindeceElmts, p_case, p_weight, parent, p_model);
-                            p_case = result[0];
-                            p_weight = result[1];
-                            p_sampledElmts = result[2];
-                            p_sampledElmts.push(parent);
-                        }
+                    if (p_sampledElmts.indexOf(parent) < 0 && parent.getType() !== 2) {
+                        var result = Tools.sample(p_sampledElmts, p_evindeceElmts, p_case, p_weight, parent, p_model);
+                        p_case = result[0];
+                        p_weight = result[1];
+                        p_sampledElmts = result[2];
+                        p_sampledElmts.push(parent);
+
                     }
                 });
                 if (p_evindeceElmts.indexOf(p_elmt) > -1) {//If this is a evidence element
-                    //console.log("this is evindece elmt");
+
+                    console.log("this is evindece elmt");
                     p_weight = p_weight * Tools.getValueFromParentSamples(p_elmt, p_case, p_model);
-                    //console.log("weight updated to " + p_weight);
-                    var row = Number(p_elmt.getEvidence());
+                    console.log("weight updated to " + p_weight);
+                    var row = Number(p_elmt.getEvidence()) + Tools.numOfHeaderRows(p_elmt.getData());
                     //console.log("row: " + row);
                     p_case[p_elmt.getID()] = p_elmt.getData()[row][0];
-                    //p_case.push([p_elmt.getID(), p_elmt.getEvidence()]);
+
                 }
                 else {
-                    //console.log("not evidence");
-                    p_case[p_elmt.getID()] = Tools.getWeightedSample(p_elmt, p_case);
-                    //p_case.push([p_elmt.getID(), Tools.getWeightedSample(p_elmt, p_case)]);
+                    console.log("not evidence");
+
+                    var sample = Tools.getWeightedSample(p_elmt, p_case);
+                    console.log("sampled: " + sample);
+                    p_case[p_elmt.getID()] = sample;
                 }
                 return [p_case, p_weight, p_sampledElmts];
             }
@@ -1445,15 +1361,23 @@
                 var data = p_elmt.getData();
                 var columnNumbers = Tools.getColumnFromCase(p_case, p_elmt);
                 var sum = 0;
-
+                console.log("columnnumbers: " + columnNumbers);
                 for (var i = Tools.numOfHeaderRows(data, p_elmt); i < data.length; i++) {
                     var columnSum = 0;
-                    for (var j = 0; j < columnNumbers.length; j++) {//Finding the avarage probability if there is a decision parent
-                        //console.log("data[i][columnNumber[j]]: " + data[i][columnNumber[j]]);
-                        columnSum += data[i][columnNumbers[j]];
-                    }
-                    columnSum /= j;
+                    if (p_elmt.getType() === 0) {
+                        for (var j = 0; j < columnNumbers.length; j++) {//Finding the avarage probability if there is a decision parent
+                            //console.log("data[i][columnNumber[j]]: " + data[i][columnNumber[j]]);
+                            columnSum += data[i][columnNumbers[j]];
+                        }
+                        columnSum /= j;
 
+                    }
+                    else if (p_elmt.getType() === 1) {//If this is a decision node
+                        if (p_elmt.getDecision() !== undefined) {//If the choice is made
+                            return data[Number(p_elmt.getDecision()) + Tools.numOfHeaderRows(data, p_elmt)][0];//Return the choice (Is  + Tools.numOfHeaderRows needed??)
+                        }
+                        columnSum = 1 / (data.length - Tools.numOfHeaderRows(data, p_elmt));// otherwise just sample randomly from the choices
+                    }
                     sum += columnSum; // If there is just one matching column (no decision parent) this is the same as sum += data[i][columnNumber]
                     //console.log("sum: " + sum);
                     if (randomNumber <= sum) {//The retuned value is weighted by the probabilities
@@ -1464,13 +1388,13 @@
             }
         
             static getColumnFromCase(p_case, p_elmt: Element) {
+                //console.log("Looking for columns in " + p_elmt.getName());
                 var parents = p_elmt.getParentElements();
                 var conditions = [];
                 parents.forEach(function (e) {
                     //console.log("pushing " + p_case[e.getID()] + " elmt " +e.getID() + " into conditions");
-                    if (e.getType() === 0) {
                         conditions.push([e.getID(), p_case[e.getID()]]);
-                    }
+                    
                 });
                 //console.log("conditions: " + conditions);
                 //Find the right column in data table
@@ -1482,11 +1406,11 @@
                     for (var j = 0; j < Tools.numOfHeaderRows(data, p_elmt); j++) {//For each header row
                         //console.log("checking row: " + data[j]);
                         for (var n = 0; n < conditions.length; n++) {//For each condition
-                            //console.log("elmt " + data[j][0] + " matches: " + conditions[n][0] + "?");
-                            // console.log( data[j][0] === conditions[n][0]);
-                            //console.log("data condition: " + data[j][i] + " does not match: " + conditions[n][1] + "?")
-                            //console.log(data[j][i] !== conditions[n][1]);
-                            if (data[j][0] === conditions[n][0] && data[j][i] !== conditions[n][1]) {//If this is the right row, but the value does not match
+                           // console.log("elmt " + data[j][0] + " matches: " + conditions[n][0] + "?");
+                             //console.log( data[j][0] === conditions[n][0]);
+                            //console.log("data condition: " + data[j][i].trim() + " does not match: " + conditions[n][1].trim() + "?")
+                            //console.log(data[j][i].trim() !== conditions[n][1].trim());
+                            if (data[j][0] === conditions[n][0] && data[j][i].trim() !== conditions[n][1].trim()) {//If this is the right row, but the value does not match
                                 //console.log("not correct column");
                                 matchingColumn = false;// then it's not the right column
                                 break;
@@ -1494,18 +1418,21 @@
                         }
                     }
                     if (matchingColumn) {
-                        //console.log("correct column " + i);
+                       // console.log("correct column " + i);
                         columnNumbers.push(i);
                         
                     }
                 }
+                //console.log("found columns: " + columnNumbers);
                 return columnNumbers;
             }
             static getValueFromParentSamples(p_elmt: Element, p_case, p_model: Model): number {
-                var columns = Tools.getColumnFromCase(p_case, p_elmt)
+                var columns = Tools.getColumnFromCase(p_case, p_elmt);
+                console.log("col: " + columns);
                 var averageLikelihood: number = 0;
                 for (var i = 0; i < columns.length; i++) {
-                    averageLikelihood += p_elmt.getData()[p_elmt.getEvidence()][columns[i]];
+                    var row: number = Number(p_elmt.getEvidence()) + Tools.numOfHeaderRows(p_elmt.getData());
+                    averageLikelihood += p_elmt.getData()[row][columns[i]];
                 }
                 averageLikelihood /= i;
                 //console.log("averageLikelihood: " + averageLikelihood);

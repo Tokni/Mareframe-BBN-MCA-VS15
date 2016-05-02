@@ -124,6 +124,11 @@
                     Tools.updateConcerningDecisions(p_elmt);
                 });
                 if (this.getElmtsWithEvidence().length > 0) {
+                    this.getElementArr().forEach(function (e) {//This is needed to make sure values and decisions are updated in the right order
+                        if (e.getType() !== 0) {
+                            e.setUpdated(false);
+                        }
+                    });
                     Tools.calcValueWithEvidence(this);
                 }
             }
@@ -299,9 +304,14 @@
             }
 
             createNewElement(p_type: number): Element {
-                ////console.log(this.m_counter);
-                var e = new Element("elmt" + this.m_elmtCounter, this, p_type);
-                this.m_elmtCounter++;
+                console.log("number of elements: " + this.m_elmtCounter);
+                //This loop makes sure that no two elements have the same id
+                do {
+                    var name: string = "elmt" + this.m_elmtCounter;
+                    this.m_elmtCounter++;
+                }
+                while (this.getElement(name) != undefined)
+                var e = new Element(name, this, p_type);
                 this.m_elementArr.push(e);
                 switch (p_type) {
                     case 0:

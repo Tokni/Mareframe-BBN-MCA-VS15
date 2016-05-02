@@ -124,6 +124,8 @@ module Mareframe {
                 this.loadModel = this.loadModel.bind(this);
                 this.selectModel = this.selectModel.bind(this);
                 this.clickedDecision = this.clickedDecision.bind(this);
+                this.clickedEvidence = this.clickedEvidence.bind(this);
+                
                 this.fullscreen = this.fullscreen.bind(this);
                 this.cnctStatus = this.cnctStatus.bind(this);
                 this.optionTypeChange = this.optionTypeChange.bind(this);
@@ -457,7 +459,13 @@ module Mareframe {
                             decisionCont.addChild(decisPercVal);
                         }
                     }
-                    decisionCont.addEventListener("click", this.clickedDecision);
+                    if (elmt.getType() === 1) {
+
+                        decisionCont.addEventListener("click", this.clickedDecision);
+                    }
+                    else if (elmt.getType() === 0) {
+                        decisionCont.addEventListener("click", this.clickedEvidence);
+                    }
                     decisionCont.x = elmt.m_easelElmt.x + 75;
                     decisionCont.y = elmt.m_easelElmt.y - 15;
                     decisionCont.name = elmt.getID();
@@ -477,6 +485,14 @@ module Mareframe {
                     //console.log("clicked a decision");
                     //console.log(p_evt);
                     this.m_model.setDecision(p_evt.currentTarget.name, Math.floor(p_evt.localY / 12));
+                    this.updateModel();
+                }
+            }
+            private clickedEvidence(p_evt: createjs.MouseEvent) {
+                if (!this.m_editorMode && this.m_noOfDialogsOpen == 0) {// Setting decision while in editor mode messes with the calculations
+                    //console.log("clicked a decision");
+                    //console.log(p_evt);
+                    this.m_model.setEvidence(p_evt.currentTarget.name, Math.floor(p_evt.localY / 12));
                     this.updateModel();
                 }
             }
@@ -508,6 +524,9 @@ module Mareframe {
                     $(".advButton").hide();
                     $("#lodDcmtDiv").hide();
                     $("#cnctTool").prop("checked", false);
+                    if (!this.m_model.getAutoUpdate()) {
+                        $("#updateMdl").show();
+                    }
                 }
                 if (this.m_editorMode) {
                     this.m_mcaBackground.addEventListener("pressup", this.pressUp);
@@ -540,6 +559,9 @@ module Mareframe {
                             elementArr[i].m_easelElmt.addEventListener("pressup", this.pressUp);
                             if (elementArr[i].getType() === 1) {
                                 this.m_model.setDecision(elementArr[i].getID(), elementArr[i].getDecision());//Unsets all decisions
+                            }
+                            if (elementArr[i].getType() === 0) {
+                                this.m_model.setEvidence(elementArr[i].getID(), elementArr[i].getEvidence());//Unset all evidence
                             }
                         } else {
                             elementArr[i].m_easelElmt.removeEventListener("pressmove", this.pressMove);
@@ -833,7 +855,7 @@ module Mareframe {
                 var gui = this;
                 $(".decCell_" + p_elmt.getID()).click(function () {
                     console.log("decision cell clicked");
-                    gui.m_model.setDecision(p_elmt.getID(), this.id);
+                    gui.m_model.setDecision(p_elmt.getID(), Number(this.id));
                     gui.updateModel();
                     //Create the table again
                     $("#defTable_div_" + p_elmt.getID()).empty();
@@ -851,7 +873,7 @@ module Mareframe {
                 var gui = this;
                 $(".evidenceCell_"+p_elmt.getID()).click(function () {
                     console.log("evidence cell clicked");
-                    gui.m_model.setEvidence(p_elmt.getID(), this.id.substring(0,1));
+                    gui.m_model.setEvidence(p_elmt.getID(), Number(this.id.substring(0,1)));
                     gui.updateModel();
                     //Create the table again
                     $("#defTable_div_" + p_elmt.getID()).empty();
@@ -1733,7 +1755,7 @@ module Mareframe {
                 //Remove header row with the title "Definition"
                 //newTable.splice(0, 1);
                 
-                if (!Tools.columnSumsAreValid(newTable, Tools.numOfHeaderRows(newTable) && elmt.getType() == 0) {
+                if (elmt.getType() == 0 && !Tools.columnSumsAreValid(newTable, Tools.numOfHeaderRows(newTable))) {
                     //Should also show which row is unvalid (maybe right after the user has changed the value)
                     alert("The values in each column must add up to 1");
                 } else {
@@ -1914,8 +1936,8 @@ module Mareframe {
                 if (!p_evt.nativeEvent.ctrlKey && this.m_selectedItems.indexOf(p_evt.target) === -1) {
                     this.clearSelection();
                 }
-                //console.log("adding to selection: " + p_evt.target);
                 this.addToSelection(p_evt.target);
+
             }
             private pressMove(p_evt: createjs.MouseEvent): void {
                 var gui = this;
@@ -1967,6 +1989,7 @@ module Mareframe {
 
                                 //console.log("selected elements: " + this.m_selectedItems);
                                 console.log("element: " + elmt.name);
+                                //Updating connections to moved elemeents
                                 for (var j = 0; j < this.m_model.getElement(elmt.name).getConnections().length; j++) {
                                     var c = this.m_model.getElement(elmt.name).getConnections()[j];
                                     this.updateConnection(c);
@@ -2225,7 +2248,6 @@ module Mareframe {
                         console.log(elmt.getName() + "  " + elmt.getConnections[i].getID())
                     }
                     this.m_selectedItems.push(p_easelElmt);
-                    //console.log("pushed " + p_easelElmt);
                     if (this.m_model.m_bbnMode) {
                         this.m_selectedItems.push(elmt.m_minitableEaselElmt);
                     }
@@ -2605,16 +2627,16 @@ module Mareframe {
                                     else {
                                         var classes: string = "editable_cell editable_cell_" + p_elmt.getID();
                                         var div = document.createElement("div");
-                                        div.setAttribute("id", i + "");
+                                        div.setAttribute("id", (i - numOfHeaderRows) + "");
                                         if (p_elmt.getType() === 1) {//If element is a dec element add the decCell class
                                             classes += " decCell_" + p_elmt.getID();
-                                            if (i == p_elmt.getDecision()) { //Mark the set decision
+                                            if ((i - numOfHeaderRows) == p_elmt.getDecision()) { //Mark the set decision
                                                 classes += " setDecision";
                                             }
                                         }
                                         else if (p_elmt.getType() === 0) {//If this is a chance element add the evidenceCell class
                                             classes += " evidenceCell_" + p_elmt.getID();
-                                            if (i == p_elmt.getEvidence()) {//Mark the set evidence
+                                            if ((i-numOfHeaderRows) == p_elmt.getEvidence()) {//Mark the set evidence
                                                 classes += " setEvidence";
                                             }
                                         }

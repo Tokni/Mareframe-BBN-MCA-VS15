@@ -110,6 +110,11 @@ var Mareframe;
                     DST.Tools.updateConcerningDecisions(p_elmt);
                 });
                 if (this.getElmtsWithEvidence().length > 0) {
+                    this.getElementArr().forEach(function (e) {
+                        if (e.getType() !== 0) {
+                            e.setUpdated(false);
+                        }
+                    });
                     DST.Tools.calcValueWithEvidence(this);
                 }
             };
@@ -261,9 +266,13 @@ var Mareframe;
                 return tempMatrix;
             };
             Model.prototype.createNewElement = function (p_type) {
-                ////console.log(this.m_counter);
-                var e = new DST.Element("elmt" + this.m_elmtCounter, this, p_type);
-                this.m_elmtCounter++;
+                console.log("number of elements: " + this.m_elmtCounter);
+                //This loop makes sure that no two elements have the same id
+                do {
+                    var name = "elmt" + this.m_elmtCounter;
+                    this.m_elmtCounter++;
+                } while (this.getElement(name) != undefined);
+                var e = new DST.Element(name, this, p_type);
                 this.m_elementArr.push(e);
                 switch (p_type) {
                     case 0:
