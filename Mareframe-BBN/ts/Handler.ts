@@ -22,7 +22,7 @@ module Mareframe {
 
                     //var m = new Model(true);
                     this.m_fileHandler = new FileIO();
-                    var w = new TKN_Widget("testCanvas", this.m_fileHandler);
+                    var w = new TKN_Widget("testCanvas", this.m_fileHandler, this.m_gui);
 
                     w.setSize(700, 700);
                     var pw = new Mareframe.DST.PiecewiseLinear(1, 1, 6, 7, 0, 10);

@@ -30,6 +30,31 @@ module Mareframe {
             private m_originalPressY: number = 0;
             private m_selectedItems: createjs.Container[] = [];
             private m_finalScoreChart: google.visualization.ColumnChart = new google.visualization.ColumnChart($("#finalScore_div").get(0));
+            private m_SAScatterChart: google.visualization.ScatterChart = new google.visualization.ScatterChart($("#lineChart_div").get(0));
+            private m_SATableChart: google.visualization.Table = new google.visualization.Table($("#tableChart_div").get(0));
+            private m_pointOld = null;
+            private m_pointCurrent = null;
+            private m_pwlDataArray : any[][] = [['xx', 'yy', { role: 'annotation' }, 'y1','s'], [0, 1000, null,1200,1], [10, 3000, null,3200,2], [20, 1500, null,1700,3], [30, 500, null,700,3], [40, 1800, null,2000,4], [100, 2000, null,2200,5]];
+            private m_altData: any[][] = [['Alt', 'Value'], ['car1', 0.111], ['car2', 0.222], ['car3', 0.395], ['car4', 0.765]];
+            //private m_pwlDataArray: any[][] = [['xx', 'yy', { role: 'annotation' }, 'y1', 's'], [0, 1000, null, 1200, 1]];
+            //private m_altData: any[][] = [['Alt', 'Value'], ['car1', 0.111]];
+            private m_lineOptions = {
+                hAxis: {
+                    //title: 'Slidervalue', minValue: this.m_pwlDataArray[1][0], maxValue: this.m_pwlDataArray[this.m_pwlDataArray.length - 1][0]
+                    title: 'Slidervalue', minValue: 0, maxValue: 1
+                },
+                vAxis: {
+                    title: 'Cumulative Value'
+                },
+                title: '',
+                lineWidth: 1,
+                height: 600,
+                width: 600
+            }
+            private m_tableOptions = {
+                height: 400,
+                width: 400
+            }
             private m_finalScoreChartOptions: Object = {
                 width: 1024,
                 height: 400,
@@ -49,6 +74,10 @@ module Mareframe {
             private m_alternativCount = 0;
             private m_attributeIndex: number[] = [];
             private m_pwWidget;
+            private m_SASliderValue;
+            public m_SAChosenElement: Element;
+            public m_SAChosenSubElement: Element;
+            private m_this = this;
 
             constructor(p_model: Model, p_handler: Handler) {
                 this.m_handler = p_handler;
@@ -125,14 +154,24 @@ module Mareframe {
                     //$("#MCAelmtType").selectmenu();
                     //$("#MCAWeightingMethod").selectmenu();
                     $("#weightingMethodSelector").hide();
-                    this.m_pwWidget = new TKN_Widget("pwl", this.m_handler.getFileIO());
-                    var pw: PiecewiseLinear = new PiecewiseLinear(1, 1, 5, 5, 0, 10);
-                    this.m_pwWidget.setPwl(pw);
+                    this.m_pwWidget = new TKN_Widget("pwl", this.m_handler.getFileIO(), this);
+                    //var pw: PiecewiseLinear = new PiecewiseLinear(0, 0, 1, 1, 0, 1);
+                    //this.m_pwWidget.setPwl(pw);
                    // $("#MCAelmtType").on("fff", function () { });
                     //$("#detailsDialog").on("fff", function() { });
                     //$("#MCAweightingMethod").hide();
                     //$("#testList").selectmenu();
                     //$("#testList").selectmenu();
+                    $("#sliderControl_div").slider().css( 'position', 'absolute' );
+                    
+                    this.updateSADropdown();
+                    $("#lineChart_div").draggable();
+                    $("#tableChart_div").draggable();
+                    //$("#sliderControl_div").draggable();
+                    //$("#sliderValDebug").hide();
+                    //$("#elementSelect").selectmenu();
+                    //$("#elementSubSelect").selectmenu();
+                    
                 }
 
                 this.allModeltoConsole = this.allModeltoConsole.bind(this);
@@ -188,6 +227,9 @@ module Mareframe {
 
                 $("#selectModel").on("change", this.selectModel);
                 $("#MCAelmtType").on("change", this.optionTypeChange);
+                $("#elementSelect").on("change", this.selectElementChange);
+                $("#elementSubSelect").on("change", this.selectSubElementChange);
+                $("#sliderControl_div").on("slide", this.handleSlide);
                 $("#MCAWeightingMethod").on("change", this.optionMethodChange);
                 $("#debugButton").on("click", this.allModeltoConsole);
                 $("#debugConnect").on("click", this.allConnectionstoConsole);
@@ -230,13 +272,14 @@ module Mareframe {
                 this.m_valueFnStage.addChild(this.m_controlP);
                 createjs.Ticker.addEventListener("tick", this.tick);
                 createjs.Ticker.setFPS(60);
-                //$("#debug").hide();
+                $("#debug").hide();
                 //this.setEditorMode(true);
                 this.updateEditorMode();
-                }
+            }           
             setHasGoal(p_goal: boolean) {
                 this.m_hasGoal = true;
-            }
+            }            
+            private se() { console.log("res"); }
             private updateAlternativeCount() {
                 this.m_alternativCount = 0;
                 for (var i in this.m_model.getElementArr()) {
@@ -307,6 +350,10 @@ module Mareframe {
                         }
                         gui.updateTable(gui.m_model.getDataMatrix(true));
                         gui.updateFinalScores();
+                        if (this.m_SAChosenElement != null && this.m_SAChosenSubElement != 0) {
+                            gui.updateChartData(gui.m_SAChosenElement);
+                            gui.updateSA();
+                        }
                     }
                     $(this).parent().removeClass("editable");
                 });
@@ -393,6 +440,7 @@ module Mareframe {
                                 console.log("--preserve connection: " + elmt.getConnections()[i].getID());
                             }
                         }
+                        
                         //define data based on alternative elements
                         var altKeyes: number[] = [];
                         var index: number = 0;
@@ -406,6 +454,9 @@ module Mareframe {
                         elmt.setDataMax(100);
                         elmt.setDataBaseLine(50)
                         elmt.m_dataUnit = "Unit";
+                        //var vf: ValueFunction = new PiecewiseLinear(0, 0, elmt.getDataMin(), elmt.getDataMax(), 0, 1);
+                        var vf: PiecewiseLinear = new PiecewiseLinear(elmt.getDataMin(), 0, elmt.getDataMax(), 1, 0, 1);
+                        elmt.setPwlVF(vf);
                 
                         for (var j in altKeyes) {
                             elmt.pushValueToDataArr(50);
@@ -446,6 +497,9 @@ module Mareframe {
                         this.m_alternativCount++;
                         this.updateAtributeIndex();
                         this.updateFinalScores();
+                        this.updateSATableData();
+                        this.updateChartData(this.m_SAChosenElement);
+                        this.updateSA();
                         break;
                     
                     case "103": 
@@ -554,10 +608,30 @@ module Mareframe {
                 this.m_handler.getFileIO().loadfromGenie(this.m_model, this.importStage);
                 } else {
                     this.m_handler.getFileIO().loadMCAModelFromFile(this.m_model, this.importStage);
-                    if (this.m_model.getMainObjective() != undefined)
-                        this.m_hasGoal = true; 
-            }
+                    //this.updateAltData();
+                }
                 this.updateAtributeIndex();
+                
+                
+            }
+            private updateAltData() {
+                var altCount = 0;
+                this.m_altData.length = 0;
+                for (var e of this.m_model.getElementArr()) {
+                    
+                    if (e.getType() === 102) {
+                        this.m_altData[altCount++][0] = e.getName();
+                    }
+                }
+                for (var e of this.m_model.getElementArr()) {
+                    if (e.getType() === 100) {
+                        for (var i = 1; i < this.m_altData.length + 1; i++) {
+                            for (var j = 1; j < e.getDataArr().length + 1; j++) {
+                                this.m_altData[i][j];
+                            }
+                        }    
+                    }
+                }
             }
             private saveModel(p_evt: Event) {
                 //var originalName: string = $("#saveFile_div").html();
@@ -648,6 +722,16 @@ module Mareframe {
                 //console.log("importing stage");
                 this.m_mcaContainer.removeAllChildren();
                 //console.log(this);
+                var tmp = this.m_model.getMainObjective();
+                if (this.m_model.getMainObjective() != undefined) {
+                    var tmp2 = this.m_SAChosenElement;
+                    if (this.m_SAChosenElement == undefined) {
+                        this.m_SAChosenElement = this.m_model.getMainObjective();
+                        this.m_SAChosenSubElement = this.m_model.getMainObjective().getParentElements()[1];
+                        //this.m_SASliderValue = this.m_model.getMainObjective().getDataArr
+                    }
+                    this.m_hasGoal = true;
+                }
                 var elmts = this.m_model.getElementArr();
                 var conns = this.m_model.getConnectionArr();
                 for (var i = 0; i < elmts.length; i++) {
@@ -660,12 +744,19 @@ module Mareframe {
                 }
                 if (!this.m_model.m_bbnMode) {
                     this.updateFinalScores();
+                    this.updateSADropdown();
+                    this.updateSA();
                     this.updateTable(this.m_model.getDataMatrix(true));
 
                 } else {
                     this.updateMiniTables(elmts);
-                }                
-                this.m_updateMCAStage = true
+                }
+                if (this.m_model.getMainObjective() != undefined && this.m_SAChosenElement != null && this.m_SAChosenSubElement != null)
+                    this.updateChartData(this.m_model.getMainObjective());              
+                this.m_updateMCAStage = true;
+                //this.updateAltData();
+                this.updateSATableData();
+                this.updateSA();
 
                 //this.m_handler.getFileIO().quickSave(this.m_model); //This is commented out the because it was preventing reset from working properly
             };
@@ -1052,6 +1143,10 @@ module Mareframe {
 
                 var elmt = this.m_model.createNewElement(undefined)
                 this.addElementToStage(elmt);
+                if (this.m_model.getElementArr().length === 1) {
+                    this.m_SAChosenElement = elmt;
+                    this.updateSA();
+                }
                // elmt.update();
                 this.updateMiniTables([elmt]);
             }
@@ -1281,7 +1376,7 @@ module Mareframe {
                                
                                 sliderHtml = "<div><p>" + childEl.getName() + ":<input id=\"inp_" + childEl.getID() + "\"type=\"number\" min=\"0\" max=\"100\"></p><div style=\"margin-top:5px ;margin-bottom:10px\"class =\"slider\"id=\"slid_" + childEl.getID() + "\"></div></div>";
                                 $("#sliders_div").append(sliderHtml);
-                                function makeSlider(count, id, _this) {
+                                function makeSlider(count, id, _this1) {
                                     $("#slid_" + id).slider({
                                         min: 0,
                                         max: 100,
@@ -1293,7 +1388,7 @@ module Mareframe {
                                             console.log("Slide: " + ui.value);
                                             $("#inp_" + id).val(ui.value);
                                             this.updateFinalScores();
-                                        }.bind(_this)
+                                        }.bind(_this1)
                                     });
                                     //$("#inp_" + id).val(p_elmt.getDataArr(1, count));
                                     $("#inp_" + id).val(p_elmt.m_swingWeightsArr[count][1]);
@@ -1304,7 +1399,7 @@ module Mareframe {
                                             //p_elmt.setData(val, 1, count);
                                             p_elmt.m_swingWeightsArr[count][1] = val;
                                             $("#slid_" + id).slider("option", "value", val);
-                                            _this.updateFinalScores();
+                                            _this1.updateFinalScores();
                                         } else if (val > 100) {
                                             val = 100;
                                         } else {
@@ -1320,9 +1415,14 @@ module Mareframe {
 
                             break;
                         case 2://valueFn
-                            $("#valueFn_div").show();
-                            //$("#pwl_div").show();
+                            //$("#valueFn_div").show();
+                            $("#pwl_div").show();
                             console.log("WeigthMethodValueFn");
+                            this.m_pwWidget.setPwl(p_elmt.getPwlVF());
+                            this.m_pwWidget.setFlipHorizontal(p_elmt.getFlipHorizontal());
+                            this.m_pwWidget.setFlipVertical(p_elmt.getFlipVertical());
+                            this.m_pwWidget.setCurrentElement(p_elmt);
+                            
                             var tableMat = this.m_model.getWeightedData(p_elmt, false);
                             //console.log("getWeigthedData: " + tableMat);
                             //var cPX: number = p_elmt.getData(1);
@@ -1384,7 +1484,8 @@ module Mareframe {
                             //this.m_pwWidget.addPWLToStage();
                             //this.m_pwWidget.update();
                             this.updateDataTableDiv(p_elmt);
-                            
+                            this.m_pwWidget.addPWLToStage();
+                            this.m_pwWidget.update();
                             break;
                         case 3://ahp
                         case 4: {
@@ -1478,7 +1579,7 @@ module Mareframe {
                                 $(this).children().first().keypress(function (e) {
                                     if (e.which == 13) {
                                         var newText = $(this).val();
-                                        console.log("new text: " + newText);
+                                        console.log("new text13: " + newText);
                                         if (newText.length < 1) { //Must not update the text if the new text string is empty
                                             $("#info_name").html(originalName);
                                             newText = originalName;
@@ -1489,12 +1590,19 @@ module Mareframe {
                                             mareframeGUI.m_unsavedChanges = true;
                                         }
                                         originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                                        this.updateSADropdown();
+                                        mareframeGUI.updateTable(mareframeGUI.m_model.getDataMatrix(true));
+                                        mareframeGUI.updateFinalScores();
+                                        if (this.m_SAChosenElement != null && this.m_SAChosenSubElement != 0) {
+                                            mareframeGUI.updateChartData(mareframeGUI.m_SAChosenElement);
+                                            mareframeGUI.updateSA();
+                                        }
                                     }
                                     $(this).parent().removeClass("editable");
                                 });
                                 $(this).children().first().blur(function () {
                                     var newText = $(this).val();
-                                    console.log("new text: " + newText);
+                                    console.log("new textblur: " + newText);
                                     if (newText.length < 1) { //Must not update the text if the new text string is empty
                                         $("#info_name").html(originalName);
                                         newText = originalName;
@@ -1505,6 +1613,7 @@ module Mareframe {
                                     }
                                     originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
                                     $(this).parent().removeClass("editable");
+                                    this.updateSADropdown();
                                 });
 
                             });
@@ -1565,7 +1674,7 @@ module Mareframe {
                                         $(this).children().first().keypress(function (e) {//if enter is pressed
                                             if (e.which == 13) {
                                                 var newText = $(this).val();
-                                                console.log("new text: " + newText);
+                                                console.log("new texttd: " + newText);
                                                 if (isNaN(newText) || newText.length < 1) {
                                                     console.log("value is not a number");
                                                     // alert("Value must be a number");
@@ -1663,10 +1772,11 @@ module Mareframe {
                             $(this).addClass("editable");
                             $(this).html("<input type='text' value='" + originalName + "' />");
                             $(this).children().first().focus();
-                            $(this).children().first().keypress(function (e) {
+                            var gui = this;
+                            $(this).children().first().keypress(function(e) {
                                 if (e.which == 13) {
                                     var newText = $(this).val();
-                                    console.log("new text: " + newText);
+                                    console.log("new text13edi: " + newText);
                                     if (newText.length < 1) { //Must not update the text if the new text string is empty
                                         $("#info_name").html(originalName);
                                         newText = originalName;
@@ -1677,12 +1787,13 @@ module Mareframe {
                                         mareframeGUI.addElementToStage(p_elmt);//repaints the element
                                     }
                                     originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
+                                    mareframeGUI.updateSADropdown();
                                 }
                                 $(this).parent().removeClass("editable");
                             });
                             $(this).children().first().blur(function () {
                                 var newText = $(this).val();
-                                console.log("new text: " + newText);
+                                console.log("new textbluredi: " + newText);
                                 if (newText.length < 1) { //Must not update the text if the new text string is empty
                                     $("#info_name").html(originalName);
                                     newText = originalName;
@@ -1694,6 +1805,7 @@ module Mareframe {
                                 }
                                 originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
                                 $(this).parent().removeClass("editable");
+                                mareframeGUI.updateSADropdown();
                         });
 
                     });
@@ -1848,7 +1960,7 @@ module Mareframe {
             }
             private getValueFnLine(p_xValue: number, p_color: string): createjs.Graphics {
                 return new createjs.Graphics().beginStroke(p_color).mt(p_xValue, 0).lt(p_xValue, this.m_valueFnSize);
-            }
+            }           
             private updateFinalScores(): void {
                // if (this.m_model.getFinalScore() 
                 //var data = google.visualization.arrayToDataTable([
@@ -1862,14 +1974,17 @@ module Mareframe {
                 //    ['ID', 232, 1904569, 'Annotated'],
                 //    ['BR', 187, 8514877, 'Annotated']
                 //]);
-
-                var data = google.visualization.arrayToDataTable(this.m_model.getFinalScore());
+                
+                var finalScores = this.m_model.getFinalScore();
+                
+                var data = google.visualization.arrayToDataTable(finalScores);
                 data.removeRow(data.getNumberOfRows() - 1);
                 data.removeRow(data.getNumberOfRows() - 1);
                 data.removeRow(0);
                 data.removeRow(0);
                 //data.removeRow(4);
                 this.m_finalScoreChart.draw(data, this.m_finalScoreChartOptions);
+                this.updateSA();
             }
             private updateTable(p_matrix: any[][]): void {
                 this.updateAlternativeCount();
@@ -2546,6 +2661,348 @@ module Mareframe {
                     });
                 }
             }   
+
+            handleSlide = (event, ui) => {
+                var tthis = this;
+                var tmo = this.m_pwlDataArray;
+                console.log("HandleSlide: pwlData Before: " + this.m_pwlDataArray);
+                $("#sliderValDebug").html(ui.value);
+                if (this.m_SAChosenElement != undefined)
+                    //$("#sliderValNormDebug").html(''+this.m_SAChosenElement.getPwlVF().getValue(ui.value)); 
+                this.m_SASliderValue = ui.value;
+                var tmp5 = this.m_pwlDataArray;
+                //$("#sliderValNormDebug").html( ui.value );
+                if (this.m_pointOld !== null)
+                    this.m_pwlDataArray.splice(this.m_pwlDataArray.indexOf(this.m_pointOld), 1);
+                this.m_pointCurrent = [ui.value, 1];
+                //find current point position in pwlDataArray
+                var i = 2;
+                //console.log("i: " + i + "  uiVal: " + ui.value + "  pwlAt_i: " + pwlDataArray[pwlDataArray.length-1][0]);
+                console.log(this.m_pwlDataArray);
+                var tmp9 = this.m_pwlDataArray[this.m_pwlDataArray.length - 1][0];
+                if (ui.value > this.m_pwlDataArray[this.m_pwlDataArray.length - 1][0]) {
+                    console.log("hrll " + this.m_pointCurrent[0]);
+                    var tmp6 = this.m_pwlDataArray;
+                    this.m_pwlDataArray.splice(this.m_pwlDataArray.length, 0, this.m_pointCurrent);
+                    var tmp7 = this.m_pwlDataArray;
+                }
+                else {
+                    while (i < this.m_pwlDataArray.length) {
+                        //console.log(i);
+                        var tmp = this.m_pwlDataArray[i][0];
+                        if (ui.value > this.m_pwlDataArray[i][0]) { i++; }
+                        else {
+                            console.log("before: " + this.m_pwlDataArray);
+                            this.m_pwlDataArray.splice(i, 0, this.m_pointCurrent); //break;
+                            console.log("after: " + this.m_pwlDataArray);break; 
+                        }
+
+                    }
+                }
+                console.log(this.m_pwlDataArray);
+                tmp5 = this.m_pwlDataArray;
+                var tmp = this.m_pwlDataArray[i + 1][1];
+                var tmp2 = this.m_pwlDataArray[i - 1][1];
+                var tmp3 = this.m_pwlDataArray[i + 1][0];
+                var tmp4 = this.m_pwlDataArray[i - 1][0];
+                for (var k = 1; k < this.m_pwlDataArray[0].length; k++) {
+                    var a: number = (this.m_pwlDataArray[i + 1][k] - this.m_pwlDataArray[i - 1][k]) / (this.m_pwlDataArray[i + 1][0] - this.m_pwlDataArray[i - 1][0]);
+                    var b: number = this.m_pwlDataArray[i + 1][k] - a * this.m_pwlDataArray[i + 1][0];
+                    this.m_pointCurrent[k] = a * this.m_pwlDataArray[i][0] + b;
+                }
+                //console.log("hrll " + this.m_pointCurrent[0]);
+                //this.m_pointCurrent[0] = this.m_SASliderValue;
+                this.m_pointCurrent[0] = ui.value;
+                console.log("hrll " + this.m_pointCurrent[0]);
+                //for (var k = 1; k < this.m_pwlDataArray[0].length; k++) {
+                //    this.m_pointCurrent[k] = 0.5+k*0.05;
+                //}
+                //pwlDataArray.push(pointCurrent);
+                //console.log(this.m_pwlDataArray);
+                this.m_pointOld = this.m_pointCurrent;
+                var tmmp2 = this.m_SAChosenElement;
+                var tmmp3 = this.m_SAChosenSubElement;
+                var tmmp = this.m_SAChosenSubElement.getConnectionFrom(this.m_SAChosenElement);
+                //var finalScores = this.m_model.getFinalScore(this.m_SAChosenSubElement, this.m_SAChosenElement, ui.value);
+                //for (var k = 1; k < this.m_altData.length; k++) {
+                //    this.m_altData[k][1] = 0;
+                //}
+                //for (var i = 3; i < finalScores.length - 2; i++) {
+                //    this.m_altData[i - 2][0] = finalScores[i][0];
+                //    for (var j = 1; j < finalScores[0].length; j++) {
+                //        this.m_altData[i - 2][1] += finalScores[i][j];
+                //        //var tmp = this.m_altData[i - 2][1];
+                //    }
+                //}
+                var tmp11 = this.m_altData;
+                var tmp12 = this.m_pwlDataArray;
+                //this.updateChartData(this.m_SAChosenElement);
+                //this.setSliderValue();
+                this.updateSATableData();
+                this.updateSA();
+                console.log("HandleSlide: pwlData After: " + this.m_pwlDataArray);
+            }
+            selectElementChange = (p_evt: Event) => {
+                var tthis = this;              
+                this.m_SAChosenElement = this.m_model.getElement($("#elementSelect > option:selected").attr('id').substring(2));
+                this.updateSASubDropdown();
+                var tmp10 = this.m_SASliderValue;
+                if (this.m_SAChosenElement.getType() === 100) {
+                    $("#sliderControl_div").slider('option', 'min', this.m_SAChosenElement.getDataMin())
+                        .slider('option', 'max', this.m_SAChosenElement.getDataMax())
+                        .slider('value', this.m_SASliderValue); 
+                    $("#sliderValNormDebug").html(' ' + this.m_SASliderValue); 
+                    var tmp11 = this.m_SAChosenElement.getDataMax();
+                    var tmp12 = this.m_SAChosenElement.getDataMin();
+                    this.m_lineOptions.hAxis.maxValue = this.m_SAChosenElement.getDataMax();
+                    this.m_lineOptions.hAxis.minValue = this.m_SAChosenElement.getDataMin();                     
+                }
+                else {
+                    $("#sliderControl_div").slider('option', 'min', 0).slider('option', 'max', 100).slider('value', this.m_SASliderValue); //.slider('option', 'value', this.m_SAChosenElement.getDataMin());                 
+                    this.m_lineOptions.hAxis.maxValue = 100;
+                    this.m_lineOptions.hAxis.minValue = 0;
+                }    
+                this.m_pointOld = null;            
+                if (this.m_SAChosenElement != null && this.m_SAChosenSubElement != null) {
+                    this.updateChartData(this.m_SAChosenElement);
+                }
+                var tmp13 = this.m_SAChosenSubElement;
+                this.updateSATableData();
+                this.setSliderValue();
+                this.updateSA();
+            }
+            selectSubElementChange = (p_evt: Event) => {
+                this.m_SAChosenSubElement = this.m_model.getElement($("#elementSubSelect > option:selected").attr('id').substring(3));
+                var tmp2 = this.m_SAChosenSubElement;
+                //this.updateChartData(this.m_SAChosenSubElement);
+                var tmp7 = this.m_alternativCount;
+                for (var i = 0; i < this.m_alternativCount; i++) {
+                    var tmp = this.m_SAChosenSubElement.getType();
+                    if (this.m_SAChosenSubElement.getType() === 100) {
+                        var tmp5 = this.m_lineOptions.hAxis.maxValue;
+                        this.m_lineOptions.hAxis.maxValue = this.m_SAChosenElement.getDataMax();
+                        this.m_lineOptions.hAxis.minValue = this.m_SAChosenElement.getDataMin(); 
+                    }
+                    else {                        
+                        var tmp6 = this.m_lineOptions.hAxis.maxValue;
+                        this.m_lineOptions.hAxis.maxValue = this.m_SAChosenElement.getDataMax();
+                        this.m_lineOptions.hAxis.minValue = this.m_SAChosenElement.getDataMin(); 
+                    }
+                }
+                this.m_pointOld = null; 
+                this.setSliderValue();
+                if (this.m_SAChosenElement != null && this.m_SAChosenSubElement != null) {
+                    this.updateChartData(this.m_SAChosenElement);
+                }
+                this.updateSATableData(); 
+                this.updateSA();
+            }
+            private updateSADropdown() {
+                $("#elementSelect > option").remove();
+                if (this.m_model !== undefined) {
+                    for (var e of this.m_model.getElementArr()) {
+                        if (e.getType() !== 102) {
+                            $("#elementSelect").append("<option id='es" + e.getID() + "'>" + e.getName() + "</option>");
+                        }
+                    }
+                    this.updateSASubDropdown();
+                    //this.setSliderValue();
+                    this.updateSA();
+                }               
+            }
+            private updateSASubDropdown() {
+                var tthis = this;
+                $("#elementSubSelect > option").remove();
+                this.m_SAChosenSubElement = null;
+                var e = this.m_model.getElement($("#elementSelect > option:selected").attr('id').substring(2)); //id of the element selected in the dropdown
+                if (e.getType() !== 100) {
+                    for (var con of e.getConnections()) {
+                        var t = con.getOutputElement().getID();
+                        var t2 = e.getID();
+                        if (con.getOutputElement().getID() === e.getID()) {
+                            if (this.m_SAChosenSubElement === null) this.m_SAChosenSubElement = con.getInputElement();
+                            $("#elementSubSelect").append("<option id='sub" + con.getInputElement().getID() + "'>" + con.getInputElement().getName() + "</option>");
+                        }
+                    }
+                }
+                else {
+                    for (var elmt of this.m_model.getElementArr()) {
+                        if (elmt.getType() === 102) {
+                            if (this.m_SAChosenSubElement === null) this.m_SAChosenSubElement = elmt;
+                            $("#elementSubSelect").append("<option id='sub" + elmt.getID() + "'>" + elmt.getName() + "</option>");
+                        }
+                    }
+                }
+                
+                
+                //this.updateChartData(this.m_SAChosenElement);
+                this.setSliderValue();
+                this.updateSATableData();            
+            }
+            private updateChartData(p_elmt: Element) {
+                this.m_pointOld = null;
+                console.log("updating Scatter and Table " + p_elmt.getName());
+                console.log("pwlData Before: " + this.m_pwlDataArray);
+                this.m_pwlDataArray.length = 0;
+                var i = 1;
+                this.m_pwlDataArray[0] = [];
+                this.m_pwlDataArray[0][0] = 'kk';
+                for (var el of this.m_model.getElementArr()) {
+                    if (el.getType() === 102) {
+                        this.m_pwlDataArray[0][i++] = el.getName();
+                        //this.m_pwlDataArray[0][i++] = el.getID();
+                    }
+                }
+                var tmp = p_elmt.getType();
+                if (p_elmt.getType() === 100) {
+                    // setting x-values
+                    for (var l = 1; l < p_elmt.getPwlVF().getPoints().length+1; l++) {
+                        
+                        this.m_pwlDataArray[l] = [];
+                        this.m_pwlDataArray[l][0] = p_elmt.getPwlVF().getPoints()[l - 1].x;
+                        //for (var p = 1; p<
+                        //this.m_pwlDataArray
+                    }
+                    //console.log(this.m_pwlDataArray);
+                    //setting y-values
+                    var j = 1;
+                    for (var e of this.m_model.getElementArr()) {
+                        if (e.getType() === 102) {
+                            this.m_pwlDataArray[1][j] = 0;
+                            var spw = this.m_model.getFinalScore(this.m_SAChosenSubElement, p_elmt, 0);
+                            for (var m = 1; m < spw[0].length; m++) {
+                                var tmp1 = spw[j + 2][m];
+                                this.m_pwlDataArray[1][j] += spw[j + 2][m];
+                                var tmp4 = this.m_pwlDataArray[1][j];
+                            }
+                            this.m_pwlDataArray[2][j] = 0;
+                            var epw = this.m_model.getFinalScore(this.m_SAChosenSubElement, p_elmt, 100);
+                            for (var m = 1; m < epw[0].length; m++) {
+                                var tmp2 = epw[j + 2][m];
+                                this.m_pwlDataArray[p_elmt.getPwlVF().getPoints().length][j] += epw[j + 2][m];
+                                var tmp3 = this.m_pwlDataArray[2][j];
+                            }
+                            for (var n = 2; n < p_elmt.getPwlVF().getPoints().length + 1; n++) {
+                                this.m_pwlDataArray[n][j] = 0;
+                                if (e === this.m_SAChosenSubElement) {
+                                    var tmp8 = this.m_pwlDataArray[n][0];
+                                    var mpw = this.m_model.getFinalScore(this.m_SAChosenSubElement, p_elmt, this.m_pwlDataArray[n][0]);
+                                    for (var m = 1; m < epw[0].length; m++) {
+                                        this.m_pwlDataArray[n][j] = this.m_pwlDataArray[n][j] += mpw[j + 2][m];
+                                    }
+                                }
+
+                                else {
+                                    this.m_pwlDataArray[n][j] = this.m_pwlDataArray[1][j];
+                                }
+                            }
+                            j++;
+                        }
+                        //if (this.m_SAChosenSubElement ===                
+                        //for (var k = 1; k < p_elmt.getPwlVF().getPoints().length+1; k++) {
+                            
+                        //    this.m_pwlDataArray[k][j] = p_elmt.getPwlVF().getPoints()[k-1].y;
+                        //}                    
+                    }
+                    var tmp5 = this.m_pwlDataArray;
+                    
+                    this.m_lineOptions.hAxis.title = p_elmt.m_dataUnit;
+                }
+                else if (p_elmt.getType() === 101 || p_elmt.getType() === 103) {                   
+                    for (var l = 1; l < 3; l++) {
+                        this.m_pwlDataArray[l] = [];
+                        //this.m_pwlDataArray[l][0] = l.toString();
+                    }                    
+                    this.m_pwlDataArray[1][0] = 0;
+                    this.m_pwlDataArray[2][0] = 100;
+                    //console.log(this.m_pwlDataArray);
+                    for (var j = 1; j < i; j++) {
+                        this.m_pwlDataArray[1][j] = 0;
+                        this.m_pwlDataArray[2][j] = 0;
+                    }
+                    for (var j = 1; j < i; j++) {
+                        var startPointWeights = this.m_model.getFinalScore(this.m_SAChosenSubElement, this.m_SAChosenElement, 0);
+                        for (var m = 1; m < startPointWeights[0].length; m++) {
+                            var tmp1 = startPointWeights[j+2][m];
+                            this.m_pwlDataArray[1][j] += startPointWeights[j + 2][m];
+                            var tmp4 = this.m_pwlDataArray[1][j];
+                        }
+                         
+                        var endPointWeights = this.m_model.getFinalScore(this.m_SAChosenSubElement, this.m_SAChosenElement, 100);
+                        for (var m = 1; m < endPointWeights[0].length; m++) {
+                            var tmp2 = endPointWeights[j+2][m];
+                            this.m_pwlDataArray[2][j] += endPointWeights[j + 2][m];
+                            var tmp3 = this.m_pwlDataArray[2][j];
+                        }
+                    }
+                    //console.log(this.m_pwlDataArray);
+                    this.m_lineOptions.hAxis.title = this.m_SAChosenSubElement.getName();
+                    this.m_lineOptions.title = this.m_SAChosenElement.getName();
+                } else {
+                    console.log(" this is bad! ");
+                }
+                
+                console.log("pwlData After: " + this.m_pwlDataArray);
+                var tmp5 = this.m_pwlDataArray;
+                //updating chart options
+                var tmp6 = this.m_pwlDataArray[1][0];
+                var tmp7 = this.m_pwlDataArray[2][0];
+                
+                
+                //this.m_lineOptions.hAxis.minValue = this.m_pwlDataArray[1][0];
+                //this.m_lineOptions.hAxis.maxValue = this.m_pwlDataArray[2][0];
+                
+            }
+            updateSATableData() {
+                var tmp20 = this.m_SASliderValue;
+                this.m_altData.length = 1;
+                var finalScores = this.m_model.getFinalScore(this.m_SAChosenSubElement, this.m_SAChosenElement, this.m_SASliderValue);
+                for (var k = 1; k < finalScores.length - 4; k++) {
+                    this.m_altData[k] = [];
+                    this.m_altData[k][1] = 0;
+                }
+                for (var i = 3; i < finalScores.length - 2; i++) {
+                    this.m_altData[i - 2][0] = finalScores[i][0];
+                    for (var j = 1; j < finalScores[0].length; j++) {
+                        this.m_altData[i - 2][1] += finalScores[i][j];
+                        //var tmp = this.m_altData[i - 2][1];
+                    }
+                }
+            }
+            updateSA() {
+                var pwlData = google.visualization.arrayToDataTable(this.m_pwlDataArray);
+                var alternativeData = google.visualization.arrayToDataTable(this.m_altData);
+
+                this.m_SAScatterChart.draw(pwlData, this.m_lineOptions);
+                this.m_SATableChart.draw(alternativeData, this.m_tableOptions);
+            }
+            setSliderValue() {
+                if (this.m_SAChosenElement.getType() !== 100) {
+                    for (var index in this.m_SAChosenElement.m_swingWeightsArr) {
+                        var tmp22 = this.m_SAChosenElement.m_swingWeightsArr[index][0];
+                        if (this.m_SAChosenSubElement != null) {
+                            var tmp23 = this.m_SAChosenSubElement.getConnections()[0].getID();
+                            if (this.m_SAChosenElement.m_swingWeightsArr[index][0] === this.m_SAChosenSubElement.getConnections()[0].getID()) {
+                                this.m_SASliderValue = this.m_SAChosenElement.m_swingWeightsArr[index][1];
+                                break;
+                            }
+                        }
+                    }
+                }
+                else {
+                    var index2 = 0;
+                    for (var elm of this.m_model.getElementArr()) {
+                        if (elm.getType() === 102) {
+                            if (this.m_SAChosenSubElement.getID() !== elm.getID())
+                                index2++;
+                            else
+                                this.m_SASliderValue = this.m_SAChosenElement.getDataArr()[index2];
+                        }                 
+                    }
+                }
+                $("#sliderControl_div").slider('value', this.m_SASliderValue);
+                $("#sliderValNormDebug").html('' + this.m_SASliderValue); 
+            }
             
         }
     }

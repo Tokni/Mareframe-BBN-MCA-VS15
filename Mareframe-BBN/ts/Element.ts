@@ -40,6 +40,10 @@
             private m_dataMin: number;
             private m_dataBaseLine: number;
 
+            private m_pwlVF: PiecewiseLinear;
+            private m_pwlFlipHorizontal: boolean = false;
+            private m_pwlFlipVertical: boolean = false;
+
             constructor(p_id: string, p_model: Model, p_type: number, p_dstType?: number) {
                 if (p_id.substr(0, 4) == "elmt")
                 { this.m_id = p_id; }
@@ -66,6 +70,24 @@
                     this.m_dstType = 0;
                 this.getChildrenElements = this.getChildrenElements.bind(this);
                 this.m_swingWeightsArr = [];
+            }
+            setPwlVF(p_vf: PiecewiseLinear) {
+                this.m_pwlVF = p_vf;
+            }
+            getPwlVF(): PiecewiseLinear {
+                return this.m_pwlVF;
+            }
+            getFlipVertical(): boolean {
+                return this.m_pwlFlipVertical;
+            }
+            setFlipVertical(p_fVert: boolean) {
+                this.m_pwlFlipVertical = p_fVert;
+            }
+            getFlipHorizontal(): boolean {
+                return this.m_pwlFlipHorizontal;
+            }
+            setFlipHorizontal(p_fHori: boolean) {
+                this.m_pwlFlipHorizontal = p_fHori;
             }
             getDataBaseLine(): number {
                 return this.m_dataBaseLine;
@@ -510,8 +532,12 @@
                     elmtDataUnit: this.m_dataUnit,
                     elmtDataBaseLine: this.m_dataBaseLine
                     }
-                if (this.getMethod() === 2)
+                if (this.getMethod() === 2) {
                     retJson["elmtDataArr"] = this.getDataArr();
+                    retJson["pwl"] = this.m_pwlVF;
+                    retJson["pwlFlipVertical"] = this.m_pwlFlipVertical;
+                    retJson["pwlFlipHorizontal"] = this.m_pwlFlipHorizontal;
+                }
                 if (this.getMethod() === 1 )
                     retJson["elmtData"] = this.m_swingWeightsArr;
                 return retJson;
@@ -549,7 +575,25 @@
                         this.m_dataMax = p_jsonElmt.elmtDataMax;
                         this.m_dataArr = p_jsonElmt.elmtDataArr;
                         this.m_dataUnit = p_jsonElmt.elmtDataUnit;
+                        var vf: PiecewiseLinear = new PiecewiseLinear(this.getDataMin(), 0, this.getDataMax(), 1, 0, 1);
+                        for (var i = 1; i < p_jsonElmt.pwl.points.length - 1; i++) {
+                            vf.addPoint(p_jsonElmt.pwl.points[i].x, p_jsonElmt.pwl.points[i].y);
+                        }
+                        
+                        this.m_pwlVF = vf;
+                        if (p_jsonElmt.pwlFlipVertical == undefined)
+                            this.m_pwlFlipVertical = false;
+                        else 
+                            this.m_pwlFlipVertical = p_jsonElmt.pwlFlipVertical;
+                        if (p_jsonElmt.pwlFlipHorizontal == undefined)
+                            this.m_pwlFlipHorizontal = false;
+                        else
+                            this.m_pwlFlipHorizontal = p_jsonElmt.pwlFlipHorizontal;
+                        this.m_pwlVF.setStartPoint(p_jsonElmt.pwl.points[0].x, p_jsonElmt.pwl.points[0].y);
+                        this.m_pwlVF.setEndPoint(p_jsonElmt.pwl.points[p_jsonElmt.pwl.points.length - 1].x, p_jsonElmt.pwl.points[p_jsonElmt.pwl.points.length - 1].y);
+                        this.m_pwlVF.sortPointsByX();
                         break;
+
                     }
 
                 }
@@ -603,6 +647,26 @@
 
                 return retConnection;
 
+            }
+            getPwlValue(p_num: number) : number{
+                var ret = 0;
+                if (this.getFlipHorizontal()) {
+                    if (this.getFlipVertical()) {                        
+                        ret = 1 - this.getPwlVF().getValue(this.getDataMax() - p_num);
+                    }
+                    else {
+                        ret = 1 - this.getPwlVF().getValue(p_num);
+                    }
+                }
+                else {
+                    if (this.getFlipVertical()) {
+                        ret = this.getPwlVF().getValue(this.getDataMax() - p_num);
+                    }
+                    else {
+                        ret = this.getPwlVF().getValue(p_num);
+                    }
+                }
+                return ret;
             }
         }
     }

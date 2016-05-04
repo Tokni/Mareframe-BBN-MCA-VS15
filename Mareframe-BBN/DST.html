@@ -11,6 +11,7 @@
     <link href="css/footer.css" rel="stylesheet" />
     <link href="css/dialog.css" rel="stylesheet" />
     <link href="css/debug.css" rel="stylesheet" />
+    <link href="css/SA.css" rel="stylesheet" />
 
     <link id="ui_css" href="jQueryUI/jquery-ui_original.css" rel="stylesheet" />
     <link href="css/DST.css" rel="stylesheet" />
@@ -154,8 +155,23 @@
         <div id="finalScore_div" style="display:inline-block"></div>
     </div>
     <div id="saveFile_div"><a id="downloadLink"></a></div>
+    <!--Sensitivity analysis Start   -->
+    <div id="SenAna">
+        <!--<div class="senana" id="sliderControl_div"></div>-->
+        <div class="senana" id="dropdownControl_div">
+            <select id="elementSelect"></select>
+        </div>
+        <div class="senana" id="dropdownControlSub_div">
+            <select id="elementSubSelect"></select>
+        </div>
+        <div class="senana" id="lineChart_div">Line Chart</div>
+        <div class="senana" id="tableChart_div">Table Chart</div>
 
-
+        <div class="senana" id="sliderControl_div"></div>
+        <div class="senana" id="sliderValNormDebug">---</div>
+        <div class="senana" id="sliderValDebug">---</div>
+    </div>
+    <!--Sensitivity analysis End     -->
     <!--Popup Dialog-->
     <div id="detailsDialog" >
         <div  class="info_div dialogDiv" style="width: 30%; overflow: visible;">
@@ -212,6 +228,17 @@
                 </div>
                 <button id="saveToFile">Save to file</button>
                 <button id="deleteAllPoints">Delete all points</button>
+            </div>
+            <div id="selectedPointInfo" style="margin: 30px">
+                <label for="posX">X:</label>
+                <input id="posX" />
+                <label for="posY">Y:</label>
+                <input id="posY" />
+                <button id="deleteButton" style="display: inline">Delete Point</button>
+            </div>
+            <div id="saveFile_div">
+                <span>Filename: </span> <span id="filename">valueFn</span> <span>.data</span>
+                <a id="downloadLinkValueFunction"></a>
             </div>
             <div style="margin: 30px">
                 <button class="not_done" id="showAlternatives">Show Alternatives</button>

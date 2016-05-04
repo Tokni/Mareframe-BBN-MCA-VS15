@@ -1,0 +1,84 @@
+﻿/*#SenAna {
+  height:500px; 
+  width:900px; 
+  border:blue solid 2px;
+} 
+.senana {margin: 5px;border:black solid 1px;position: relative;
+display: inline-block;    
+}  
+#lineChart_div {  
+    height:300px; 
+    width:200px; 
+    display: inline;
+}
+#tableChart_div{ 
+    height: 300px;
+    width: 200px;
+}
+#dropdownControl_div {
+  height: 200px;
+  width: 150px; 
+  //float: left;
+}
+#dropdownControlSub_div {
+  height: 200px;
+  width: 150px;
+}
+#sliderControl_div {
+  height: 25px;
+  width: 200px;
+  float: right;
+}*/
+
+#SenAna {
+  height:900px; 
+  width:1400px; 
+  border:blue solid 2px;
+  position: relative;
+} 
+.senana {margin: 2px;border:black solid 1px;position: absolute;border-radius:3px;
+    
+}  
+#lineChart_div {  
+    height:80%; 
+    width:47%; 
+    left: 22%;
+    top: 2%;
+}
+#tableChart_div{ 
+    height: 80%;
+    width: 27%;
+    top: 2%;
+    left: 71%;
+}
+#dropdownControl_div {
+  height: 38%;
+  width: 18%;
+  top: 2%;
+  left: 2%;
+}
+#dropdownControlSub_div {
+  height: 38%;
+  width: 18%;
+  top: 43%;
+  left: 2%;
+}
+#sliderControl_div {
+  
+  width: 40%;
+  /*height: 10%;*/
+  bottom: 12%;
+    left: 22%;
+}
+#sliderValDebug {
+  height: 5%;
+  width: 10%;
+  bottom: 2%;
+  right: 2%;
+}
+#sliderValNormDebug {
+  height: 5%;
+  width: 10%;
+  bottom: 8%;
+  right: 2%;
+}

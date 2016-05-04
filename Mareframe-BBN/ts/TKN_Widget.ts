@@ -1,25 +1,16 @@
 ﻿module Mareframe {
     export module DST {
         export class TKN_Widget {
-            constructor(canvasID: string, fileIO: FileIO) {
+            constructor(canvasID: string, fileIO: FileIO, gui: GUIHandler) {
                 //creating stage and background
                 this.m_stage = new createjs.Stage(canvasID);
-                this.m_fileIO = fileIO; 
+                this.m_fileIO = fileIO;
+                this.m_guiHandler = gui;
                 //this.m_backGroundGraphics = new createjs.Graphics().beginFill(this.m_backGroundColor).drawRect(0, 0, this.m_width, this.m_height);
                 //this.m_backGround = new createjs.Shape(this.m_backGroundGraphics);
                 //this.m_stage.addChild(this.m_backGround);
                 //this.m_stage.update();
                 
-                //this.handleDoubleClick = this.handleDoubleClick.bind(this);
-                //this.handleMouseDown = this.handleMouseDown.bind(this);
-                //this.handlePressMove = this.handlePressMove.bind(this);
-                //this.handleDeleteButton = this.handleDeleteButton.bind(this);
-                //this.handleFlipHorizontal = this.handleFlipHorizontal.bind(this);
-                //this.handleFlipVeritical = this.handleFlipVeritical.bind(this);
-                //this.handleLinearize = this.handleLinearize.bind(this);
-                //this.handleLoadFromFile = this.handleLoadFromFile.bind(this);
-                //this.handleSaveToFile = this.handleSaveToFile.bind(this);
-                //this.handleDeleteAllPoints = this.handleDeleteAllPoints.bind(this);
                 this.setSize(this.m_width, this.m_height);
                 //this.addPWLToStage = this.addPWLToStage.bind(this);
                 $("#selectedPointInfo").hide();
@@ -35,8 +26,10 @@
                 //$(".not_done").prop("disable", true);
                 //$(".not_done").button("disable");
                 $(".not_done").hide();
+                this.tthis = this;
             };
 
+            private m_guiHandler;
             private m_stage: createjs.Stage;
             private m_fileIO: FileIO;
             private m_backGround: createjs.Shape;
@@ -51,11 +44,19 @@
             private m_selectedPoint: createjs.Shape = null;
             private m_flipHorizontal: boolean = false;
             private m_flipVertical: boolean = false;
+            private m_currentElement: Element;
 
             private m_valueFunction: ValueFunction;
             private m_pwl: PiecewiseLinear;
-
+            private tthis;
             //setters and getters
+            
+            setCurrentElement(p_elment: Element) {
+                this.m_currentElement = p_elment;
+            }
+            getCurrentElement(): Element {
+                return this.m_currentElement;
+            }
             getBackGroundColor(): string {
                 return this.m_backGroundColor;
             }
@@ -101,7 +102,18 @@
                 this.m_unitX = this.m_width / (this.m_pwl.m_endPoint.x - this.m_pwl.m_startPoint.x);
                 this.m_unitY = this.m_height / (this.m_pwl.m_maxValue - this.m_pwl.m_minValue);
             }
-
+            getFlipVertical(): boolean {
+                return this.m_flipVertical;
+            }
+            setFlipVertical(p_fVert: boolean) {
+                this.m_flipVertical = p_fVert;
+            }
+            getFlipHorizontal(): boolean {
+                return this.m_flipHorizontal;
+            }
+            setFlipHorizontal(p_fHori: boolean) {
+                this.m_flipHorizontal = p_fHori;
+            }
             //Event handlers
             handlePressMove() {
                 alert("PressMove");
@@ -147,6 +159,8 @@
                     this.m_selectedPointIndex = null;
                 }
                 this.addPWLToStage();
+                var t = this.m_selectedPointIndex;
+                var t2 = this.m_pwl;
                 console.log("selectedIndex: " + this.m_selectedPointIndex); 
                 this.update();
             }
@@ -182,21 +196,32 @@
                 this.m_selectedPointIndex = null;
                 $("#selectedPointInfo").hide();
                 this.addPWLToStage();
-                this.m_stage.update();
+                this.update();
             }
             handleFlipHorizontal = (e: createjs.MouseEvent) => {
-                if (this.m_flipHorizontal)
+                var t = this;
+                if (this.m_flipHorizontal) {                  
                     this.m_flipHorizontal = false;
-                else
+                    this.m_currentElement.setFlipHorizontal(false);
+                }
+                else {
                     this.m_flipHorizontal = true;
+                    this.m_currentElement.setFlipHorizontal(true);
+                }
                 this.addPWLToStage();
+                this.update();
             }
             handleFlipVertical = (e: createjs.MouseEvent) => {
-                if (this.m_flipVertical)
+                if (this.m_flipVertical) {
                     this.m_flipVertical = false;
-                else
+                    this.m_currentElement.setFlipVertical(false);
+                }
+                else {
                     this.m_flipVertical = true;
+                    this.m_currentElement.setFlipVertical(true);
+                }
                 this.addPWLToStage();
+                this.update();
             }
             handleLinearize = (e: createjs.MouseEvent) => {
                 var a = (this.m_pwl.getPoints()[this.m_pwl.getPoints().length-1].y - this.m_pwl.getPoints()[0].y) / (this.m_pwl.getPoints()[this.m_pwl.getPoints().length-1].x - this.m_pwl.getPoints()[0].x);
@@ -206,11 +231,12 @@
                 }
             
                 this.addPWLToStage();
+                this.update();
             }
             handleLoadFromFile = (e: createjs.MouseEvent) => {
                 console.log("not done yet, no not yet");
                 this.m_fileIO.loadPWLFromFile(this.m_pwl, this.addPWLToStage);
-                
+                this.update();
             }
             handleSaveToFile = (e: createjs.MouseEvent) => {
                 console.log("not done yet");
@@ -250,12 +276,18 @@
                 console.log("not done yet");
                 this.m_pwl.getPoints().splice(1, this.m_pwl.getPoints().length - 2);
                 this.addPWLToStage();
+                this.update();
             }
             handleShowAlternatives = (e: createjs.MouseEvent) => {
                 console.log("not done yet");
             }
             update() {
                 this.m_stage.update();
+                this.m_guiHandler.updateFinalScores();
+                var tm1 = this.m_currentElement;
+                this.m_guiHandler.updateChartData(this.m_guiHandler.m_SAChosenElement);
+                this.m_guiHandler.updateSATableData();
+                this.m_guiHandler.updateSA();
             }
             addValueFunctionToStage() {
                 //for (var i = 1; i < this.m_valueFunction.
@@ -319,7 +351,7 @@
                 var ret = 0;
                 if (this.m_flipHorizontal) {
                     if (this.m_flipVertical) {
-                        var t = this.m_pwl.getPoints().length - 1 - p_index
+                        //var t = this.m_pwl.getPoints().length - 1 - p_index
                         ret = this.m_pwl.getPoints()[this.m_pwl.getPoints().length - 1 - p_index].y * this.m_unitY;
                     }
                     else {

@@ -76,24 +76,57 @@ var Mareframe;
                 }
                 return true;
             };
-            Tools.getWeights = function (p_elmt, p_model) {
+            //static getWeights(p_elmt: Element, p_model: Model, p_connectionReplace?: Connection, p_elementIgnoreValue?: number): any[][] {
+            Tools.getWeights = function (p_elmt, p_model, p_element1Replace, p_element2Replace, p_elementIgnoreValue) {
                 var weightsArr = [];
+                var connRepIndex = null;
+                var index = 0;
+                for (var _i = 0, _a = p_elmt.getConnections(); _i < _a.length; _i++) {
+                    var conn = _a[_i];
+                }
                 if (p_elmt.getType() != 100 && p_elmt.getType() != 102) {
                     var total = 0.0;
                     //p_elmt.getData(1).forEach(function (val: number) { total += val; });
                     for (var i = 0; i < p_elmt.m_swingWeightsArr.length; i++) {
-                        total += p_elmt.m_swingWeightsArr[i][1];
+                        //if (p_connectionReplace != undefined) {
+                        //    if (p_connectionReplace.getID() === p_elmt.m_swingWeightsArr[i][0])
+                        if (p_element1Replace != undefined && p_element2Replace != undefined) {
+                            if (p_element1Replace.getType() !== 100) {
+                                var conn = p_element2Replace.getConnectionFrom(p_element1Replace);
+                                if (conn.getID() === p_elmt.m_swingWeightsArr[i][0])
+                                    total += p_elementIgnoreValue;
+                                else
+                                    total += p_elmt.m_swingWeightsArr[i][1];
+                            }
+                            else {
+                                total += p_elmt.m_swingWeightsArr[i][1];
+                            }
+                        }
+                        else
+                            total += p_elmt.m_swingWeightsArr[i][1];
                     }
+                    var tmp = total;
                     for (var k = 0; k < p_elmt.m_swingWeightsArr.length; k++) {
-                        var childWeights = this.getWeights(p_model.getConnection(p_elmt.m_swingWeightsArr[k][0]).getInputElement(), p_model);
+                        var childWeights = this.getWeights(p_model.getConnection(p_elmt.m_swingWeightsArr[k][0]).getInputElement(), p_model, p_element1Replace, p_element2Replace, p_elementIgnoreValue);
                         for (var j = 0; j < childWeights.length; j++) {
-                            childWeights[j][1] *= (p_elmt.m_swingWeightsArr[k][1] / total);
+                            if (p_element1Replace != undefined && p_element2Replace != undefined && p_element1Replace.getType() !== 100 && p_element1Replace.getType() !== 102) {
+                                if (p_element2Replace.getConnectionFrom(p_element1Replace).getID() === p_elmt.m_swingWeightsArr[k][0]) {
+                                    childWeights[j][1] *= (p_elementIgnoreValue / total);
+                                }
+                                else
+                                    childWeights[j][1] *= (p_elmt.m_swingWeightsArr[k][1] / total);
+                            }
+                            else
+                                childWeights[j][1] *= (p_elmt.m_swingWeightsArr[k][1] / total);
                         }
                         weightsArr = weightsArr.concat(childWeights);
                     }
+                    var tmp2 = weightsArr;
                 }
                 else {
-                    weightsArr.push([p_elmt.getDataArr[0], 1]);
+                    //var tmp = p_elmt.getDataArr[0];
+                    //weightsArr.push([p_elmt.getDataArr[0], 1]);
+                    weightsArr.push([p_elmt.getID(), 1]);
                 }
                 return weightsArr;
             };

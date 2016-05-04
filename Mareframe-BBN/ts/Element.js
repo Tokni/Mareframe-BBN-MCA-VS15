@@ -20,6 +20,8 @@ var Mareframe;
                 //private m_swingWeightsArr: number[] = [];
                 this.m_swingWeightsArr = [];
                 this.m_dataArr = [];
+                this.m_pwlFlipHorizontal = false;
+                this.m_pwlFlipVertical = false;
                 if (p_id.substr(0, 4) == "elmt") {
                     this.m_id = p_id;
                 }
@@ -51,6 +53,24 @@ var Mareframe;
                 this.getChildrenElements = this.getChildrenElements.bind(this);
                 this.m_swingWeightsArr = [];
             }
+            Element.prototype.setPwlVF = function (p_vf) {
+                this.m_pwlVF = p_vf;
+            };
+            Element.prototype.getPwlVF = function () {
+                return this.m_pwlVF;
+            };
+            Element.prototype.getFlipVertical = function () {
+                return this.m_pwlFlipVertical;
+            };
+            Element.prototype.setFlipVertical = function (p_fVert) {
+                this.m_pwlFlipVertical = p_fVert;
+            };
+            Element.prototype.getFlipHorizontal = function () {
+                return this.m_pwlFlipHorizontal;
+            };
+            Element.prototype.setFlipHorizontal = function (p_fHori) {
+                this.m_pwlFlipHorizontal = p_fHori;
+            };
             Element.prototype.getDataBaseLine = function () {
                 return this.m_dataBaseLine;
             };
@@ -489,8 +509,12 @@ var Mareframe;
                     elmtDataUnit: this.m_dataUnit,
                     elmtDataBaseLine: this.m_dataBaseLine
                 };
-                if (this.getMethod() === 2)
+                if (this.getMethod() === 2) {
                     retJson["elmtDataArr"] = this.getDataArr();
+                    retJson["pwl"] = this.m_pwlVF;
+                    retJson["pwlFlipVertical"] = this.m_pwlFlipVertical;
+                    retJson["pwlFlipHorizontal"] = this.m_pwlFlipHorizontal;
+                }
                 if (this.getMethod() === 1)
                     retJson["elmtData"] = this.m_swingWeightsArr;
                 return retJson;
@@ -528,6 +552,22 @@ var Mareframe;
                         this.m_dataMax = p_jsonElmt.elmtDataMax;
                         this.m_dataArr = p_jsonElmt.elmtDataArr;
                         this.m_dataUnit = p_jsonElmt.elmtDataUnit;
+                        var vf = new DST.PiecewiseLinear(this.getDataMin(), 0, this.getDataMax(), 1, 0, 1);
+                        for (var i = 1; i < p_jsonElmt.pwl.points.length - 1; i++) {
+                            vf.addPoint(p_jsonElmt.pwl.points[i].x, p_jsonElmt.pwl.points[i].y);
+                        }
+                        this.m_pwlVF = vf;
+                        if (p_jsonElmt.pwlFlipVertical == undefined)
+                            this.m_pwlFlipVertical = false;
+                        else
+                            this.m_pwlFlipVertical = p_jsonElmt.pwlFlipVertical;
+                        if (p_jsonElmt.pwlFlipHorizontal == undefined)
+                            this.m_pwlFlipHorizontal = false;
+                        else
+                            this.m_pwlFlipHorizontal = p_jsonElmt.pwlFlipHorizontal;
+                        this.m_pwlVF.setStartPoint(p_jsonElmt.pwl.points[0].x, p_jsonElmt.pwl.points[0].y);
+                        this.m_pwlVF.setEndPoint(p_jsonElmt.pwl.points[p_jsonElmt.pwl.points.length - 1].x, p_jsonElmt.pwl.points[p_jsonElmt.pwl.points.length - 1].y);
+                        this.m_pwlVF.sortPointsByX();
                         break;
                     }
                 }
@@ -572,6 +612,26 @@ var Mareframe;
                     }
                 }
                 return retConnection;
+            };
+            Element.prototype.getPwlValue = function (p_num) {
+                var ret = 0;
+                if (this.getFlipHorizontal()) {
+                    if (this.getFlipVertical()) {
+                        ret = 1 - this.getPwlVF().getValue(this.getDataMax() - p_num);
+                    }
+                    else {
+                        ret = 1 - this.getPwlVF().getValue(p_num);
+                    }
+                }
+                else {
+                    if (this.getFlipVertical()) {
+                        ret = this.getPwlVF().getValue(this.getDataMax() - p_num);
+                    }
+                    else {
+                        ret = this.getPwlVF().getValue(p_num);
+                    }
+                }
+                return ret;
             };
             return Element;
         })();
