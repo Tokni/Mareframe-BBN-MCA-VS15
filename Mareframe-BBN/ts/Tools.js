@@ -589,7 +589,7 @@ var Mareframe;
                             }
                             var parentValuesMatrix = Tools.getMatrixWithoutHeader(elmt.getValues());
                             // console.log("current element: " + element.getName());
-                            //console.log("parent: " + elmt.getName());
+                            console.log("parent: " + elmt.getName());
                             //console.log("new values: " + newValues);
                             var temp = Tools.createSubMatrices(element, newValues, elmt, dataHeaders);
                             //console.log("newValues: " + newValues);
@@ -602,7 +602,8 @@ var Mareframe;
                             var decRows = [];
                             var newRow = [];
                             //If parent has dec in values table these are added to dataHeaders or parent submatrices are created
-                            //console.log("parent values: " + elmt.getValues());
+                            console.log("parent values: " + elmt.getValues());
+                            console.log("number of header rows: " + Tools.numOfHeaderRows(elmt.getValues()));
                             //For each dec in parent
                             for (var i = 0; i < Tools.numOfHeaderRows(elmt.getValues()); i++) {
                                 //console.log("i:" + i + " decInParent: " + Tools.numOfHeaderRows(elmt.getValues()));
@@ -887,7 +888,7 @@ var Mareframe;
                 }
             };
             Tools.updateConcerningDecisions = function (element) {
-                //console.log("updating concerning decisions " + element.getName());
+                console.log("updating concerning decisions " + element.getName());
                 var rowsToDelete = [];
                 //console.log("all ancestors for " + element.getName() +": "  + element.getAllAncestors());
                 element.getAllAncestors().forEach(function (elmt) {
@@ -895,24 +896,30 @@ var Mareframe;
                         //console.log("checking: " + elmt.getName());
                         var values = element.getValues();
                         var decision = elmt.getData()[elmt.getDecision()][0];
-                        //console.log("choice is made: " + decision + " in elemnent " + elmt.getName());
+                        console.log("choice is made: " + decision + " in elemnent " + elmt.getName());
                         // console.log("values: " + values + " size: " + math.size(values));
                         var newValues = [];
                         var rowNumber = Tools.getRowNumber(element.getValues(), elmt);
-                        //  console.log("rownumber: " + rowNumber);
+                        console.log("rownumber: " + rowNumber);
                         for (var i = 0; i < values.length; i++) {
                             var newRow = [];
                             for (var j = 0; j < values[0].length; j++) {
-                                if (values[rowNumber][j] === decision || j === 0)
+                                console.log("checking if " + values[rowNumber][j] + " matches " + decision);
+                                if (values[rowNumber][j] === decision || j === 0) {
+                                    console.log("adding " + (values[i][j]));
                                     newRow.push(values[i][j]);
+                                    console.log("new row: " + newRow);
+                                }
                             }
+                            console.log("adding row: " + newRow);
                             newValues.push(newRow);
                         }
                         rowsToDelete.push(rowNumber);
+                        console.log("setting values to: " + newValues);
                         element.setValues(newValues);
                     }
                 });
-                //console.log("done updating element concerning decisions");
+                console.log("done updating element concerning decisions");
                 //element.setValues(Tools.deleteRows(element.getValues(), rowsToDelete)); //This will delete the headerrows that have been decided
             };
             Tools.strengthOfInfluence = function (p_table, p_dims) {
@@ -1173,8 +1180,8 @@ var Mareframe;
                 return valid;
             };
             Tools.calcValueWithEvidence = function (p_model) {
-                console.log("calculating values with evidence");
-                var numberOfRuns = 100;
+                //console.log("calculating values with evidence");
+                var numberOfRuns = 1000;
                 var table = []; //contains all cases
                 var evidenceElmts = p_model.getElmtsWithEvidence();
                 for (var n = 0; n < numberOfRuns; n++) {
@@ -1193,11 +1200,11 @@ var Mareframe;
                     table.push([aCase, w]);
                 }
                 var weightSum = 0;
-                for (var i = 0; i < table.length; i++) {
-                    console.log("weight: " + table[i][1]);
+                /*for (var i = 0; i < table.length; i++) {
+                    //console.log("weight: " + table[i][1]);
                     weightSum += table[i][1];
-                }
-                console.log("weightSum " + weightSum);
+                }*/
+                //console.log("weightSum " + weightSum);
                 p_model.getElementArr().forEach(function (e) {
                     if (e.getType() === 0) {
                         var data = e.getData();
@@ -1212,46 +1219,58 @@ var Mareframe;
                             valRow.push(data[i][0]); //push name of value
                             for (var col = 1; col < oldValues[0].length; col++) {
                                 var value = 0;
-                                console.log("calculating for " + data[i][0] + " column: " + col + " in " + e.getName());
+                                //console.log("calculating for " + data[i][0] + " column: " + col + " in " + e.getName());
+                                weightSum = 0; //Calculate a new weight sum for each column
                                 for (var j = 0; j < table.length; j++) {
-                                    console.log("case: " + JSON.stringify(table[j][0]));
+                                    //console.log("case: " + JSON.stringify(table[j][0]));
                                     var matchingCase = true;
+                                    var matchingValue = true;
                                     if (table[j][0][e.getID()] !== data[i][0]) {
-                                        console.log("value does not match");
-                                        matchingCase = false;
+                                        //console.log("value does not match");
+                                        matchingValue = false;
                                     }
                                     for (var headerRow = 0; headerRow < Tools.numOfHeaderRows(oldValues, e); headerRow++) {
                                         var headerElmt = oldValues[headerRow][0];
-                                        console.log("checking if case includes " + p_model.getElement(headerElmt).getName() + " : " + oldValues[headerRow][col]);
+                                        //console.log("checking if case includes " + p_model.getElement(headerElmt).getName() + " : " + oldValues[headerRow][col]); 
                                         if (table[j][0][headerElmt] !== oldValues[headerRow][col]) {
-                                            console.log("does not match");
+                                            //console.log("does not match");
                                             matchingCase = false;
                                         }
                                     }
                                     if (matchingCase) {
-                                        console.log("matching case");
+                                        weightSum += table[j][1];
+                                    }
+                                    if (matchingValue && matchingCase) {
+                                        //console.log("matching case and value");
                                         value += table[j][1]; //Add the weight
-                                        console.log("value = " + value);
                                     }
                                     else {
-                                        console.log("does not match");
                                     }
                                 }
-                                valRow.push(value / weightSum);
+                                value /= weightSum;
+                                if (isNaN(value)) {
+                                    value = 0;
+                                }
+                                valRow.push(value);
                             }
                             values.push(valRow);
                         }
+                        //console.log("new values: ");
+                        //console.log(values);
+                        console.log("setting values for " + e.getName() + " + to: " + values);
                         e.setValues(values);
                     }
                     else {
                         Tools.calculateValues(p_model, e);
                         e.setUpdated(true);
+                        if (e.getType() === 2 || e.getType() === 3) {
+                        }
                     }
                 });
             };
             Tools.sample = function (p_sampledElmts, p_evindeceElmts, p_case, p_weight, p_elmt, p_model) {
                 var oldValues = p_elmt.getValues();
-                console.log("\nsampling " + p_elmt.getName());
+                //console.log("\nsampling " + p_elmt.getName());
                 p_elmt.getParentElements().forEach(function (parent) {
                     if (p_sampledElmts.indexOf(parent) < 0 && parent.getType() !== 2) {
                         var result = Tools.sample(p_sampledElmts, p_evindeceElmts, p_case, p_weight, parent, p_model);
@@ -1262,17 +1281,17 @@ var Mareframe;
                     }
                 });
                 if (p_evindeceElmts.indexOf(p_elmt) > -1) {
-                    console.log("this is evindece elmt");
+                    //console.log("this is evindece elmt");
                     p_weight = p_weight * Tools.getValueFromParentSamples(p_elmt, p_case, p_model);
-                    console.log("weight updated to " + p_weight);
+                    //console.log("weight updated to " + p_weight);
                     var row = Number(p_elmt.getEvidence()) + Tools.numOfHeaderRows(p_elmt.getData());
                     //console.log("row: " + row);
                     p_case[p_elmt.getID()] = p_elmt.getData()[row][0];
                 }
                 else {
-                    console.log("not evidence");
+                    // console.log("not evidence");
                     var sample = Tools.getWeightedSample(p_elmt, p_case);
-                    console.log("sampled: " + sample);
+                    //console.log("sampled: " + sample);
                     p_case[p_elmt.getID()] = sample;
                 }
                 return [p_case, p_weight, p_sampledElmts];
@@ -1291,7 +1310,7 @@ var Mareframe;
                 var data = p_elmt.getData();
                 var columnNumbers = Tools.getColumnFromCase(p_case, p_elmt);
                 var sum = 0;
-                console.log("columnnumbers: " + columnNumbers);
+                // console.log("columnnumbers: " + columnNumbers);
                 for (var i = Tools.numOfHeaderRows(data, p_elmt); i < data.length; i++) {
                     var columnSum = 0;
                     if (p_elmt.getType() === 0) {
@@ -1354,7 +1373,7 @@ var Mareframe;
             };
             Tools.getValueFromParentSamples = function (p_elmt, p_case, p_model) {
                 var columns = Tools.getColumnFromCase(p_case, p_elmt);
-                console.log("col: " + columns);
+                // console.log("col: " + columns);
                 var averageLikelihood = 0;
                 for (var i = 0; i < columns.length; i++) {
                     var row = Number(p_elmt.getEvidence()) + Tools.numOfHeaderRows(p_elmt.getData());

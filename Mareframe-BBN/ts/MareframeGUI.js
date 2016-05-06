@@ -22,7 +22,7 @@ var Mareframe;
                 this.m_googleColors = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac", "#b77322", "#16d620", "#b91383", "#f4359e", "#9c5935", "#a9c413", "#2a778d", "#668d1c", "#bea413", "#0c5922", "#743411"];
                 this.m_mcaBackground = new createjs.Shape(new createjs.Graphics().beginFill("white").drawRect(0, 0, this.m_mcaSizeX, this.m_mcaSizeY));
                 this.m_valFnBackground = new createjs.Shape(new createjs.Graphics().beginFill("#ffffff").drawRect(0, 0, this.m_valueFnSize, this.m_valueFnSize));
-                this.m_updateMCAStage = true;
+                this.m_updateStage = true;
                 this.m_chartsLoaded = false;
                 this.m_oldX = 0;
                 this.m_oldY = 0;
@@ -314,7 +314,7 @@ var Mareframe;
                 else {
                     this.updateMiniTables(elmts);
                 }
-                this.m_updateMCAStage = true;
+                this.m_updateStage = true;
                 this.repositionModel();
                 this.updateSize();
                 //this.m_handler.getFileIO().quickSave(this.m_model); //This is commented out the because it was preventing reset from working properly
@@ -328,7 +328,7 @@ var Mareframe;
                 $("#mTarget").html("Target: " + p_evt.target.name);
                 //var tmp: any = this.m_mcaContainer.getObjectUnderPoint(p_evt.stageX, p_evt.stageY, 0).name;
                 //$("#mTarget").html("Target: " + tmp );
-                this.m_updateMCAStage = true;
+                this.m_updateStage = true;
             };
             GUIHandler.prototype.pressUp = function (p_evt) {
             };
@@ -393,14 +393,16 @@ var Mareframe;
                     }
                     else {
                         for (var i = DST.Tools.numOfHeaderRows(elmt.getValues()); i < elmt.getValues().length; i++) {
-                            var backgroundColor;
-                            if (elmt.getDecision() == i && elmt.getType() == 1) {
-                                backgroundColor = "#CCFFCC";
+                            var barBackgroundColor = backgroundColors[i % 2];
+                            var nameBackgroundColor;
+                            if (elmt.getType() === 1 && elmt.getDecision() === i - DST.Tools.numOfHeaderRows(elmt.getValues())
+                                || elmt.getType() === 0 && elmt.getEvidence() === i - DST.Tools.numOfHeaderRows(elmt.getValues())) {
+                                nameBackgroundColor = "#CCFFCC";
                             }
                             else {
-                                backgroundColor = backgroundColors[i % 2];
+                                nameBackgroundColor = backgroundColors[i % 2];
                             }
-                            var decisRect = new createjs.Shape(new createjs.Graphics().f(backgroundColor).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
+                            var decisRect = new createjs.Shape(new createjs.Graphics().f(nameBackgroundColor).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
                             //   console.log("" + elmt.getValues());
                             //console.log("substring 0-12: " + elmt.getValues()[i][0]);
                             var decisName = new createjs.Text(elmt.getValues()[i][0].substr(0, 12), "0.8em trebuchet", "#303030");
@@ -414,7 +416,7 @@ var Mareframe;
                             if (valueData == -Infinity) {
                                 valueData = 0;
                             }
-                            var decisBarBackgr = new createjs.Shape(new createjs.Graphics().f(backgroundColor).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
+                            var decisBarBackgr = new createjs.Shape(new createjs.Graphics().f(barBackgroundColor).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
                             if (elmt.getType() === 0) {
                                 var decisBar = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
                                 var decisPercVal = new createjs.Text(Math.round(valueData * 100) + "%", "0.8em trebuchet", "#303030");
@@ -452,7 +454,7 @@ var Mareframe;
                     if (elmt.getType() == 2) {
                         decisionCont.visible = false;
                     }
-                    this.m_updateMCAStage = true;
+                    this.m_updateStage = true;
                 }
                 //}
             };
@@ -460,7 +462,8 @@ var Mareframe;
                 if (!this.m_editorMode && this.m_noOfDialogsOpen == 0) {
                     //console.log("clicked a decision");
                     //console.log(p_evt);
-                    this.m_model.setDecision(p_evt.currentTarget.name, Math.floor(p_evt.localY / 12));
+                    var elmt = this.m_model.getElement(p_evt.currentTarget.name);
+                    this.m_model.setDecision(elmt, Math.floor(p_evt.localY / 12) - DST.Tools.numOfHeaderRows(elmt.getValues(), elmt));
                     this.updateModel();
                 }
             };
@@ -468,7 +471,8 @@ var Mareframe;
                 if (!this.m_editorMode && this.m_noOfDialogsOpen == 0) {
                     //console.log("clicked a decision");
                     //console.log(p_evt);
-                    this.m_model.setEvidence(p_evt.currentTarget.name, Math.floor(p_evt.localY / 12));
+                    var elmt = this.m_model.getElement(p_evt.currentTarget.name);
+                    this.m_model.setEvidence(elmt, Math.floor(p_evt.localY / 12) - DST.Tools.numOfHeaderRows(elmt.getValues(), elmt));
                     this.updateModel();
                 }
             };
@@ -534,10 +538,10 @@ var Mareframe;
                             elementArr[i].m_easelElmt.addEventListener("pressmove", this.pressMove);
                             elementArr[i].m_easelElmt.addEventListener("pressup", this.pressUp);
                             if (elementArr[i].getType() === 1) {
-                                this.m_model.setDecision(elementArr[i].getID(), elementArr[i].getDecision()); //Unsets all decisions
+                                this.m_model.setDecision(elementArr[i], elementArr[i].getDecision()); //Unsets all decisions
                             }
                             if (elementArr[i].getType() === 0) {
-                                this.m_model.setEvidence(elementArr[i].getID(), elementArr[i].getEvidence()); //Unset all evidence
+                                this.m_model.setEvidence(elementArr[i], elementArr[i].getEvidence()); //Unset all evidence
                             }
                         }
                         else {
@@ -589,7 +593,7 @@ var Mareframe;
                 //json = JSON.parse(sessionStorage.getItem(modelIdent));
                 //model.fromJSON(json);
                 // this.importStage(); 
-                this.m_updateMCAStage = true;
+                this.m_updateStage = true;
             };
             //Moves all elements to a reasonable position
             GUIHandler.prototype.repositionModel = function () {
@@ -626,7 +630,7 @@ var Mareframe;
                 // console.log("lowest element: " + lowestElement);
                 // console.log("rightmost element: " + rightmostElement);
                 //console.log("leftmost element: " + leftmostElement);
-                this.m_updateMCAStage = true;
+                this.m_updateStage = true;
                 this.setSize(Math.max($(window).width(), rightmostElement), Math.max($(window).height(), lowestElement)); //Sets size 
             };
             GUIHandler.prototype.getModelSize = function () {
@@ -738,7 +742,7 @@ var Mareframe;
                 //alert("before update");
                 //this.m_mcaStage.update();
                 //alert("after update");
-                this.m_updateMCAStage = true;
+                this.m_updateStage = true;
                 //console.log(this.m_model.getConnectionArr());
                 //console.log(this.m_model.getElementArr());
                 this.importStage();
@@ -771,7 +775,7 @@ var Mareframe;
                 p_elmt.m_easelElmt.mouseChildren = false;
                 p_elmt.m_easelElmt.name = p_elmt.getID();
                 this.m_mcaContainer.addChild(p_elmt.m_easelElmt);
-                this.m_updateMCAStage = true;
+                this.m_updateStage = true;
             };
             GUIHandler.prototype.dblClick = function (p_evt) {
                 ////console.log(this);
@@ -784,7 +788,7 @@ var Mareframe;
                 var gui = this;
                 $(".decCell_" + p_elmt.getID()).click(function () {
                     console.log("decision cell clicked");
-                    gui.m_model.setDecision(p_elmt.getID(), Number(this.id));
+                    gui.m_model.setDecision(p_elmt, Number(this.id));
                     gui.updateModel();
                     //Create the table again
                     $("#defTable_div_" + p_elmt.getID()).empty();
@@ -800,7 +804,7 @@ var Mareframe;
                 var gui = this;
                 $(".evidenceCell_" + p_elmt.getID()).click(function () {
                     console.log("evidence cell clicked");
-                    gui.m_model.setEvidence(p_elmt.getID(), Number(this.id.substring(0, 1)));
+                    gui.m_model.setEvidence(p_elmt, Number(this.id.substring(0, 1)));
                     gui.updateModel();
                     //Create the table again
                     $("#defTable_div_" + p_elmt.getID()).empty();
@@ -1587,11 +1591,15 @@ var Mareframe;
                 var newRow = [];
                 elmt.setName($("#info_name_" + id).text());
                 //console.log(this);
+                //Add the header rows
+                for (var i = 0; i < DST.Tools.numOfHeaderRows(oldData, elmt); i++) {
+                    newTable.push(oldData[i]);
+                }
                 table.find("tr").each(function () {
                     console.log("row");
-                    $(this).find("th,td,input").each(function () {
+                    $(this).find("input").each(function () {
                         //console.log("td or th");
-                        console.log("text to be added: " + $(this).val());
+                        console.log("text to be added: " + $(this).text());
                         if ($(this).val().length > 0) {
                             //console.log("does it exsist: " + $.inArray($(this).text(), newRow) === -1)
                             var value = $(this).val();
@@ -1843,7 +1851,7 @@ var Mareframe;
                 this.m_oldX = p_evt.stageX;
                 this.m_oldY = p_evt.stageY;
                 // console.log("this.m_mcaSizeX " + this.m_mcaSizeX);
-                this.m_updateMCAStage = true;
+                this.m_updateStage = true;
             };
             GUIHandler.prototype.scrollWindow = function (p_evt) {
                 //console.log("x: " + p_evt.rawX + " y: " + p_evt.rawY);
@@ -1929,8 +1937,8 @@ var Mareframe;
                 return highestElement - 30 + yMovement < 0 || leftmostElement - 80 + xMovement < 0 || lowestElement + yMovement - 30 > this.m_mcaStageCanvas.height || rightmostElement - 80 + xMovement > this.m_mcaStageCanvas.width;
             };
             GUIHandler.prototype.tick = function () {
-                if (this.m_updateMCAStage) {
-                    this.m_updateMCAStage = false;
+                if (this.m_updateStage) {
+                    this.m_updateStage = false;
                     this.m_mcaStage.update();
                     this.m_valueFnStage.update();
                     this.m_selectionBox.graphics.clear();
@@ -1938,7 +1946,7 @@ var Mareframe;
             };
             GUIHandler.prototype.clear = function () {
                 this.m_mcaContainer.removeAllChildren();
-                this.m_updateMCAStage = true;
+                this.m_updateStage = true;
             };
             GUIHandler.prototype.disconnectFrom = function (p_evt) {
             };
@@ -2044,7 +2052,7 @@ var Mareframe;
                 }
                 this.m_mcaContainer.addChildAt(cont, 0);
                 p_connection.m_easelElmt = cont;
-                this.m_updateMCAStage = true;
+                this.m_updateStage = true;
             };
             GUIHandler.prototype.updateConnection = function (p_connection) {
                 //stage.removeChild(c.easelElmt);
@@ -2097,7 +2105,7 @@ var Mareframe;
                         default:
                             break;
                     }
-                    this.m_updateMCAStage = true;
+                    this.m_updateStage = true;
                 }
                 else if (this.m_model.m_bbnMode && this.m_selectedItems.indexOf(p_easelElmt) !== -1 && p_easelElmt.name.substr(0, 4) === "elmt") {
                     //console.log("selected: " + this.m_selectedItems);
@@ -2142,7 +2150,7 @@ var Mareframe;
                         default:
                             break;
                     }
-                    this.m_updateMCAStage = true;
+                    this.m_updateStage = true;
                 }
                 //for (var index in this.m_selectedItems) {
                 //    console.log("selected: " + this.m_selectedItems[index]);
@@ -2193,7 +2201,7 @@ var Mareframe;
                     }
                 }
                 this.m_selectedItems = [];
-                this.m_updateMCAStage = true;
+                this.m_updateStage = true;
             };
             GUIHandler.prototype.addDataRowClick = function (p_evt) {
                 console.log("adding data row");

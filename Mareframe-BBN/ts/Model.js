@@ -106,9 +106,6 @@ var Mareframe;
                         p_elmt.update();
                     }
                 });
-                this.m_elementArr.forEach(function (p_elmt) {
-                    DST.Tools.updateConcerningDecisions(p_elmt);
-                });
                 if (this.getElmtsWithEvidence().length > 0) {
                     this.getElementArr().forEach(function (e) {
                         if (e.getType() !== 0) {
@@ -117,6 +114,9 @@ var Mareframe;
                     });
                     DST.Tools.calcValueWithEvidence(this);
                 }
+                this.m_elementArr.forEach(function (p_elmt) {
+                    DST.Tools.updateConcerningDecisions(p_elmt);
+                });
             };
             Model.prototype.getIdent = function () {
                 return this.m_modelIdent;
@@ -496,14 +496,13 @@ var Mareframe;
                 this.m_ConnCounter++;
                 return c;
             };
-            Model.prototype.setDecision = function (p_elmtIdent, p_decisNumb) {
-                var elmt = this.getElement(p_elmtIdent);
-                if (elmt.getDecision() == p_decisNumb) {
+            Model.prototype.setDecision = function (p_elmt, p_decisNumb) {
+                if (p_elmt.getDecision() == p_decisNumb) {
                     //console.log("unsetting decision");
-                    elmt.setDecision(undefined);
+                    p_elmt.setDecision(undefined);
                 }
                 else {
-                    elmt.setDecision(p_decisNumb);
+                    p_elmt.setDecision(p_decisNumb);
                 }
                 this.getElementArr().forEach(function (e) {
                     e.setUpdated(false);
@@ -517,15 +516,14 @@ var Mareframe;
                 });*/
                 //console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
             };
-            Model.prototype.setEvidence = function (p_elmtIdent, p_evidenceNumber) {
-                var elmt = this.getElement(p_elmtIdent);
-                console.log("setting evidence no. " + p_evidenceNumber + " previous evidence: " + elmt.getEvidence());
-                if (elmt.getEvidence() == p_evidenceNumber) {
-                    console.log("unsetting decision");
-                    elmt.setEvidence(undefined);
+            Model.prototype.setEvidence = function (p_elmt, p_evidenceNumber) {
+                console.log("setting evidence no. " + p_evidenceNumber + " previous evidence: " + p_elmt.getEvidence());
+                if (p_elmt.getEvidence() == p_evidenceNumber) {
+                    console.log("unsetting evidence");
+                    p_elmt.setEvidence(undefined);
                 }
                 else {
-                    elmt.setEvidence(p_evidenceNumber);
+                    p_elmt.setEvidence(p_evidenceNumber);
                 }
                 this.getElementArr().forEach(function (e) {
                     e.setUpdated(false);

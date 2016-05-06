@@ -120,9 +120,6 @@
                     }
 
                 });
-                this.m_elementArr.forEach(function (p_elmt: Element) {
-                    Tools.updateConcerningDecisions(p_elmt);
-                });
                 if (this.getElmtsWithEvidence().length > 0) {
                     this.getElementArr().forEach(function (e) {//This is needed to make sure values and decisions are updated in the right order
                         if (e.getType() !== 0) {
@@ -131,6 +128,9 @@
                     });
                     Tools.calcValueWithEvidence(this);
                 }
+                this.m_elementArr.forEach(function (p_elmt: Element) {
+                    Tools.updateConcerningDecisions(p_elmt);
+                });
             }
             getIdent(): string {
                 return this.m_modelIdent;
@@ -561,14 +561,13 @@
 
             }
 
-            setDecision(p_elmtIdent: string, p_decisNumb: number): void {
-                var elmt: Element = this.getElement(p_elmtIdent);
-                if (elmt.getDecision() == p_decisNumb) {
+            setDecision(p_elmt: Element, p_decisNumb: number): void {
+                if (p_elmt.getDecision() == p_decisNumb) {
                     //console.log("unsetting decision");
-                    elmt.setDecision(undefined)
+                    p_elmt.setDecision(undefined)
                 }
                 else {
-                    elmt.setDecision(p_decisNumb);
+                    p_elmt.setDecision(p_decisNumb);
                 }
                 this.getElementArr().forEach(function (e) {
                     e.setUpdated(false);
@@ -582,15 +581,14 @@
                 });*/
                 //console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
             }
-            setEvidence(p_elmtIdent: string, p_evidenceNumber: number): void {
-                var elmt: Element = this.getElement(p_elmtIdent);
-                console.log("setting evidence no. " + p_evidenceNumber + " previous evidence: " + elmt.getEvidence());
-                if (elmt.getEvidence() == p_evidenceNumber) {
-                    console.log("unsetting decision");
-                    elmt.setEvidence(undefined)
+            setEvidence(p_elmt: Element, p_evidenceNumber: number): void {
+                console.log("setting evidence no. " + p_evidenceNumber + " previous evidence: " + p_elmt.getEvidence());
+                if (p_elmt.getEvidence() == p_evidenceNumber) {
+                    console.log("unsetting evidence");
+                    p_elmt.setEvidence(undefined)
                 }
                 else {
-                    elmt.setEvidence(p_evidenceNumber);
+                    p_elmt.setEvidence(p_evidenceNumber);
                 }
                 this.getElementArr().forEach(function (e) {
                     e.setUpdated(false);
