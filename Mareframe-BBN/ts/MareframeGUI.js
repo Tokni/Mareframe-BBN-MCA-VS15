@@ -996,6 +996,7 @@ var Mareframe;
                 $("#detailsDialog_" + id).data("isOpen", false);
                 $("#submit_" + id).click({ param1: p_elmt }, this.saveChanges);
                 $("#values_" + id).click({ param1: p_elmt, param2: this }, this.showValues);
+                $("#values_" + id).hover(({ param1: p_elmt, param2: this }, this.showValueErrorMessage), this.removeValueErrorMessage);
                 $("#addDataRow_" + id).click({ param1: p_elmt }, this.addDataRowClick);
                 $("#showDescription_" + id).click({ param1: p_elmt }, this.setShowDescription);
                 return newDialog.id;
@@ -1576,6 +1577,8 @@ var Mareframe;
                 //$("#valuesTable_div_" + id).html(Tools.htmlTableFromArray2("Values", elmt, $("#detailsDialog_" + id).data("model"), this.m_editorMode));
                 $("#valuesTable_div_" + id).show();
                 $("#values_" + id).hide();
+            };
+            GUIHandler.prototype.showValueErrorMessage = function (p_evt) {
             };
             GUIHandler.prototype.saveChanges = function (p_evt) {
                 var elmt = p_evt.data.param1;

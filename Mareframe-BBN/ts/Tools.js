@@ -1182,7 +1182,7 @@ var Mareframe;
             };
             Tools.calcValueWithEvidence = function (p_model) {
                 //console.log("calculating values with evidence");
-                var numberOfRuns = 1000;
+                var numberOfRuns = 3000;
                 var table = []; //contains all cases
                 var evidenceElmts = p_model.getElmtsWithEvidence();
                 for (var n = 0; n < numberOfRuns; n++) {

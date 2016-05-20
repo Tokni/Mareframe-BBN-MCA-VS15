@@ -1244,7 +1244,7 @@
 
             static calcValueWithEvidence(p_model: Model) {
                 //console.log("calculating values with evidence");
-                var numberOfRuns = 1000;
+                var numberOfRuns = 3000;
                 var table = [];//contains all cases
                 var evidenceElmts: Element[] = p_model.getElmtsWithEvidence();
                 for (var n = 0; n < numberOfRuns; n++) {

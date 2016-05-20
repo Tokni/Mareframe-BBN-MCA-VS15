@@ -140,14 +140,14 @@
                     }
 
                 });
-                if (this.getElmtsWithEvidence().length > 0) {
+               // if (this.getElmtsWithEvidence().length > 0) {
                     this.getElementArr().forEach(function (e) {//This is needed to make sure values and decisions are updated in the right order
                         if (e.getType() !== 0) {
                             e.setUpdated(false);
                         }
                     });
                     Tools.calcValueWithEvidence(this);
-                }
+               // }
                 this.m_elementArr.forEach(function (p_elmt: Element) {
                     Tools.updateConcerningDecisions(p_elmt);
                 });

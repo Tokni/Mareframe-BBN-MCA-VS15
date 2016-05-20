@@ -1103,7 +1103,8 @@ module Mareframe {
                 });
                 $("#detailsDialog_" + id).data("isOpen", false);
                 $("#submit_" + id).click({ param1: p_elmt }, this.saveChanges);
-                $("#values_" + id).click({ param1: p_elmt param2: this}, this.showValues);
+                $("#values_" + id).click({ param1: p_elmt, param2: this }, this.showValues);
+                $("#values_" + id).hover(({ param1: p_elmt param2: this },this.showValueErrorMessage), this.removeValueErrorMessage);
                 $("#addDataRow_" + id).click({ param1: p_elmt }, this.addDataRowClick);
                 $("#showDescription_" + id).click({ param1: p_elmt }, this.setShowDescription);
                 return newDialog.id;
@@ -1713,6 +1714,10 @@ module Mareframe {
                 //$("#valuesTable_div_" + id).html(Tools.htmlTableFromArray2("Values", elmt, $("#detailsDialog_" + id).data("model"), this.m_editorMode));
                 $("#valuesTable_div_" + id).show();
                 $("#values_" + id).hide();
+            }
+
+            private showValueErrorMessage(p_evt: Event) {
+               
             }
             private saveChanges(p_evt: Event) {
                 var elmt: Element = p_evt.data.param1;

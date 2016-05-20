@@ -115,13 +115,6 @@ var Mareframe;
                 return JSON.stringify(this);
             };
             Model.prototype.closeDown = function () {
-                console.log("CLOSE DOWN");
-                /* this.m_elementArr.forEach(function (e: Element) {
-                     if (e.getDialog() != null) {
-                         e.getDialog().pa
-                         e.setDialog(null);
-                     }
-                 });*/
                 $(".removebleDialog").remove(); //Removes all created dialogs
             };
             Model.prototype.update = function () {
@@ -133,14 +126,14 @@ var Mareframe;
                         p_elmt.update();
                     }
                 });
-                if (this.getElmtsWithEvidence().length > 0) {
-                    this.getElementArr().forEach(function (e) {
-                        if (e.getType() !== 0) {
-                            e.setUpdated(false);
-                        }
-                    });
-                    DST.Tools.calcValueWithEvidence(this);
-                }
+                // if (this.getElmtsWithEvidence().length > 0) {
+                this.getElementArr().forEach(function (e) {
+                    if (e.getType() !== 0) {
+                        e.setUpdated(false);
+                    }
+                });
+                DST.Tools.calcValueWithEvidence(this);
+                // }
                 this.m_elementArr.forEach(function (p_elmt) {
                     DST.Tools.updateConcerningDecisions(p_elmt);
                 });
