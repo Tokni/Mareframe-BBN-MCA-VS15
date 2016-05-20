@@ -120,7 +120,7 @@
                 //console.log("number of headerrows in " + p_valuesArray);
                 var counter = 0;
                 Tools.makeSureItsAnArray(p_valuesArray);
-                if (p_elmt !== undefined && p_elmt.getType() === 3) {//In super value nodes headerrows are not defined the same way as in other nodes
+               /* if (p_elmt !== undefined && p_elmt.getType() === 3) {//In super value nodes headerrows are not defined the same way as in other nodes
                     //  console.log("super value node");
                     var rows: number = math.size(p_valuesArray)[0];
                     if (p_valuesArray[rows - 1][0] === "Value") {//If the value row is part of the table then number of header rows is no. of rows minus 1
@@ -131,7 +131,7 @@
                         counter = rows;
                     }
                 }
-                else {
+                else*/ {
                     //console.log("p_valuesArray.length: " + p_valuesArray.length);
                     //console.log(p_valuesArray);
                     for (var i = 0; i < p_valuesArray.length; i++) {

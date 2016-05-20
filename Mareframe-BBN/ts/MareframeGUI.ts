@@ -236,10 +236,12 @@ module Mareframe {
                 }
             }
             private selectModel(p_evt: Event) {
+                this.m_model.closeDown();
                 this.clearSelection();
                 this.m_handler.getFileIO().loadModel($("#selectModel").val(), this.m_model, this.importStage);
             }
             private loadModel(p_evt: Event) {
+                this.m_model.closeDown();
                 console.log("load model");
                 this.m_handler.getFileIO().loadfromGenie(this.m_model, this.importStage);
                 this.updateSize();
@@ -897,6 +899,7 @@ module Mareframe {
                 var id: string = p_elmt.getID();
                 var newDialog = document.createElement("div");
                 newDialog.setAttribute("id", "detailsDialog_" + id);
+                newDialog.setAttribute("class", "removebleDialog");
 
                 var info_div = document.createElement("div");
                 info_div.setAttribute("class", "info_div");
@@ -1109,6 +1112,7 @@ module Mareframe {
 
                 var id: String = p_elmt.getID();
                 if (p_elmt.getDialog() == null) {
+                    console.log("creating new dialog");
                     var dialogID: String = "#" + this.createDetailsDialog(p_elmt);
                     var dialog = $(dialogID).dialog(opt);
                     p_elmt.setDialog(dialog);
@@ -1728,11 +1732,13 @@ module Mareframe {
                 var newRow = [];
                 elmt.setName($("#info_name_" + id).text());
                 //console.log(this);
+                console.log("number of header rows: " + Tools.numOfHeaderRows(oldData, elmt));
                 //Add the header rows
                 for (var i = 0; i < Tools.numOfHeaderRows(oldData, elmt); i++) {
                     newTable.push(oldData[i]);
                 }
-
+                console.log(newTable);
+                var rowNumber = -1; //We start at minus 1 because the first row, that just says "Definition" is not used
                 table.find("tr").each(function () {
                     console.log("row");
                     $(this).find("input").each(function () {
@@ -1749,7 +1755,12 @@ module Mareframe {
                                     value = Number(value);
                                 }
                                 console.log("pushing " + value);
-                                newRow.push(value);
+                                console.log("row number " + rowNumber);
+                                if (elmt.getType() === 3) {
+                                    newRow.push(oldData[rowNumber][0]);//if this is a super value the element must be pushed first in the row
+                                }
+                                    newRow.push(value);
+                                
                             }
                         }
                     });
@@ -1759,6 +1770,7 @@ module Mareframe {
                         newTable.push(newRow);
                         newRow = [];
                     }
+                    rowNumber++;
                 });
                 console.log("new table: "+ newTable);
                 //Remove header row with the title "Definition"

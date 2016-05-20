@@ -36,7 +36,6 @@
                 
                 return dataStream;
             }
-
             private getBBNDataStream(): string {
                 var dataStream: string = '<?xml version="1.0" encoding="ISO-8859-1"?>\n<smile version="1.0" id="' + this.m_modelIdent + '" numsamples="1000">\n<nodes>\n';
 
@@ -79,16 +78,35 @@
                                 elmt.getParentElements().forEach(function (parElmt) {
                                     dataStream = dataStream.substring(0, dataStream.lastIndexOf(">") + 1) + parElmt.getID() + ' ' + dataStream.substring(dataStream.lastIndexOf(">") + 1);
                                 });
-                                dataStream = dataStream.slice(0, dataStream.length-1) + '</parents>\n';
+                                dataStream = dataStream.slice(0, dataStream.length - 1) + '</parents>\n';
                             }
                             dataStream += '<utilities>'
                             for (var i = 1; i < elmt.getData(1).length; i++) {
 
                                 dataStream += elmt.getData(elmt.getData().length - 1, i) + ' ';
                             }
-                            dataStream = dataStream.slice(0, dataStream.length-1) + '</utilities>\n';
+                            dataStream = dataStream.slice(0, dataStream.length - 1) + '</utilities>\n';
 
                             dataStream += '</utility>\n';
+                            break;
+                        case 3:
+                            dataStream += '<superValue id="' + elmt.getID() + '">\n';
+                            if (elmt.getParentElements().length > 0) {
+                                dataStream += '<parents>'
+                                elmt.getParentElements().forEach(function (parElmt) {
+                                    dataStream = dataStream.substring(0, dataStream.lastIndexOf(">") + 1) + parElmt.getID() + ' ' + dataStream.substring(dataStream.lastIndexOf(">") + 1);
+                                });
+                                dataStream = dataStream.slice(0, dataStream.length - 1) + '</parents>\n';
+                            }
+                            dataStream += '<utilities>'
+                            for (var i = 1; i < elmt.getData(0).length; i++) {
+
+                                dataStream += elmt.getData(elmt.getData().length - 1, i) + ' ';
+                            }
+                            dataStream = dataStream.slice(0, dataStream.length - 1) + '</utilities>\n';
+
+                            dataStream += '</superValue>\n';
+                            break;
                     }
                     
                 });
@@ -109,7 +127,9 @@
             private getMCADataStream(): string {
                 return JSON.stringify(this);
             }
-
+            closeDown() {
+               $(".removebleDialog").remove(); //Removes all created dialogs
+            }
             update() {
                 var m: Model = this;
                 console.log("updating model");

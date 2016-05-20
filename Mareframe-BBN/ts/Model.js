@@ -80,6 +80,23 @@ var Mareframe;
                             }
                             dataStream = dataStream.slice(0, dataStream.length - 1) + '</utilities>\n';
                             dataStream += '</utility>\n';
+                            break;
+                        case 3:
+                            dataStream += '<superValue id="' + elmt.getID() + '">\n';
+                            if (elmt.getParentElements().length > 0) {
+                                dataStream += '<parents>';
+                                elmt.getParentElements().forEach(function (parElmt) {
+                                    dataStream = dataStream.substring(0, dataStream.lastIndexOf(">") + 1) + parElmt.getID() + ' ' + dataStream.substring(dataStream.lastIndexOf(">") + 1);
+                                });
+                                dataStream = dataStream.slice(0, dataStream.length - 1) + '</parents>\n';
+                            }
+                            dataStream += '<utilities>';
+                            for (var i = 1; i < elmt.getData(0).length; i++) {
+                                dataStream += elmt.getData(elmt.getData().length - 1, i) + ' ';
+                            }
+                            dataStream = dataStream.slice(0, dataStream.length - 1) + '</utilities>\n';
+                            dataStream += '</superValue>\n';
+                            break;
                     }
                 });
                 dataStream += '</nodes>\n<extensions>\n<genie version="1.0" name="' + this.getName() + '" faultnameformat="nodestate"><comment></comment>\n';
@@ -96,6 +113,16 @@ var Mareframe;
             };
             Model.prototype.getMCADataStream = function () {
                 return JSON.stringify(this);
+            };
+            Model.prototype.closeDown = function () {
+                console.log("CLOSE DOWN");
+                /* this.m_elementArr.forEach(function (e: Element) {
+                     if (e.getDialog() != null) {
+                         e.getDialog().pa
+                         e.setDialog(null);
+                     }
+                 });*/
+                $(".removebleDialog").remove(); //Removes all created dialogs
             };
             Model.prototype.update = function () {
                 var m = this;

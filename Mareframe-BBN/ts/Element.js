@@ -205,8 +205,8 @@ var Mareframe;
                 }
             };
             Element.prototype.updateHeaderRows = function (p_originalData) {
-                //console.log("updating header rows in " + this.getName())
-                //console.log("data: " + p_originalData);
+                console.log("updating header rows in " + this.getName());
+                console.log("data: " + p_originalData);
                 var data = [];
                 var parents = this.getParentElements();
                 if (this.m_type === 3) {

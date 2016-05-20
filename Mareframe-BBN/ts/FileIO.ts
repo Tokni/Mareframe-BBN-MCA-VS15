@@ -83,6 +83,9 @@
                                         case "utility":
                                             elmt.elmtType = 2;
                                             break;
+                                        case "superValue":
+                                            elmt.elmtType = 3;
+                                            break;
                                         default:
                                             alert("file contains unsupported node types");
                                     }
