@@ -770,6 +770,7 @@ var Mareframe;
                     }
                 }
                 //     console.log("decisions end");
+                console.log("new values: " + values);
                 p_elmt.setValues(values);
             };
             Tools.isOneDimensional = function (p_array) {
@@ -1180,9 +1181,40 @@ var Mareframe;
                 console.log("valid connection between " + inputElmt.getType() + " and  " + outputElmt.getType() + ": " + valid);
                 return valid;
             };
+            //This method only works of no evidence is set and there is no decision element influencing the chance node
+            Tools.calcValueOfInformation = function (decisionNode, chanceNode, p_model) {
+                var valueWithNoInfo = Number.MIN_VALUE;
+                var decValueTable = decisionNode.getValues();
+                for (var i = Tools.numOfHeaderRows(decValueTable); i < decValueTable.length; i++) {
+                    valueWithNoInfo = Math.max(decValueTable[i][1], valueWithNoInfo);
+                }
+                var valueWithInfo = Number.MIN_VALUE;
+                var bestState;
+                var chanceValues = chanceNode.getValues();
+                for (var state = 0; state < chanceValues.length - Tools.numOfHeaderRows(chanceValues); state++) {
+                    console.log("setting evidence: " + state);
+                    p_model.setEvidence(chanceNode, state);
+                    p_model.update(); //Calculating all values again
+                    decValueTable = decisionNode.getValues();
+                    var highestValueBefore = valueWithInfo; //This is needed to check if this state results in the highest value
+                    for (var i = Tools.numOfHeaderRows(decValueTable); i < decValueTable.length; i++) {
+                        valueWithInfo = Math.max(decValueTable[i][1], valueWithInfo);
+                    }
+                    if (highestValueBefore < valueWithInfo) {
+                        bestState = state;
+                    }
+                    p_model.setEvidence(chanceNode, state); //Unset evidence
+                }
+                p_model.update(); //Calculate all values back to original
+                //console.log("valueWithNoInfo: " + valueWithNoInfo);
+                // console.log("valueWithInfo: " + valueWithInfo);
+                //console.log("best state: " + bestState);
+                var valueOfInformation = (valueWithInfo - valueWithNoInfo) * chanceNode.getValues()[bestState - Tools.numOfHeaderRows(chanceValues)][1];
+                console.log("Value of Information: " + valueOfInformation);
+            };
             Tools.calcValueWithEvidence = function (p_model) {
                 //console.log("calculating values with evidence");
-                var numberOfRuns = 3000;
+                var numberOfRuns = 30000;
                 var table = []; //contains all cases
                 var evidenceElmts = p_model.getElmtsWithEvidence();
                 for (var n = 0; n < numberOfRuns; n++) {
@@ -1262,10 +1294,12 @@ var Mareframe;
                         e.setValues(values);
                     }
                     else {
+                    }
+                });
+                p_model.getElementArr().forEach(function (e) {
+                    if (e.getType() !== 0) {
                         Tools.calculateValues(p_model, e);
                         e.setUpdated(true);
-                        if (e.getType() === 2 || e.getType() === 3) {
-                        }
                     }
                 });
             };

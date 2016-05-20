@@ -796,6 +796,7 @@
                     }
                 }
                 //     console.log("decisions end");
+                console.log("new values: " + values);
                 p_elmt.setValues(values);
 
             }
@@ -1242,9 +1243,42 @@
                 return valid;
             }
 
+            //This method only works of no evidence is set and there is no decision element influencing the chance node
+            static calcValueOfInformation(decisionNode: Element, chanceNode: Element, p_model: Model) {
+                var valueWithNoInfo: number = Number.MIN_VALUE;
+                var decValueTable: any[][] = decisionNode.getValues();
+                for (var i = Tools.numOfHeaderRows(decValueTable); i < decValueTable.length; i++) {
+                    valueWithNoInfo = Math.max(decValueTable[i][1], valueWithNoInfo);
+                }
+                var valueWithInfo: number = Number.MIN_VALUE;
+                var bestState: number;
+                var chanceValues: any[][] = chanceNode.getValues();
+
+                for (var state = 0; state < chanceValues.length - Tools.numOfHeaderRows(chanceValues); state++) {//For each state in chance
+                    console.log("setting evidence: " + state);
+                    p_model.setEvidence(chanceNode, state);
+                    p_model.update();//Calculating all values again
+                    decValueTable = decisionNode.getValues();
+                    var highestValueBefore: number = valueWithInfo; //This is needed to check if this state results in the highest value
+                    for (var i = Tools.numOfHeaderRows(decValueTable); i < decValueTable.length; i++) {
+                        valueWithInfo = Math.max(decValueTable[i][1], valueWithInfo);
+                    }
+                    if (highestValueBefore < valueWithInfo) {//If the value has increased
+                        bestState = state;
+                    }
+                    p_model.setEvidence(chanceNode, state);//Unset evidence
+                }
+                p_model.update(); //Calculate all values back to original
+
+                //console.log("valueWithNoInfo: " + valueWithNoInfo);
+               // console.log("valueWithInfo: " + valueWithInfo);
+                //console.log("best state: " + bestState);
+                var valueOfInformation = (valueWithInfo - valueWithNoInfo) * chanceNode.getValues()[bestState - Tools.numOfHeaderRows(chanceValues)][1];
+                console.log("Value of Information: " + valueOfInformation);
+            }
             static calcValueWithEvidence(p_model: Model) {
                 //console.log("calculating values with evidence");
-                var numberOfRuns = 3000;
+                var numberOfRuns = 30000;
                 var table = [];//contains all cases
                 var evidenceElmts: Element[] = p_model.getElmtsWithEvidence();
                 for (var n = 0; n < numberOfRuns; n++) {
@@ -1268,6 +1302,7 @@
                     weightSum += table[i][1];
                 }*/
                 //console.log("weightSum " + weightSum);
+
                 p_model.getElementArr().forEach(function (e) {
                     if (e.getType() === 0) {
                         var data = e.getData();
@@ -1331,11 +1366,17 @@
                         e.setValues(values);
                     }
                     else {
-                        Tools.calculateValues(p_model, e);
+                       /* Tools.calculateValues(p_model, e);
                         e.setUpdated(true);
                         if (e.getType() === 2 || e.getType() === 3) {//This is needed to remove columns that are not part of set choice 
                             //Tools.updateConcerningDecisions(e);
-                        }
+                        }*/
+                    }
+                });
+                p_model.getElementArr().forEach(function (e) {//This calculates all values of nonchance elements
+                    if (e.getType() !== 0) {
+                        Tools.calculateValues(p_model, e);
+                        e.setUpdated(true);
                     }
                 });
             }

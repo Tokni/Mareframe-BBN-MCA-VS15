@@ -807,7 +807,9 @@ var Mareframe;
                 $(".evidenceCell_" + p_elmt.getID()).click(function () {
                     console.log("evidence cell clicked");
                     gui.m_model.setEvidence(p_elmt, Number(this.id.substring(0, 1)));
-                    gui.updateModel();
+                    if (gui.m_model.getAutoUpdate()) {
+                        gui.updateModel();
+                    }
                     //Create the table again
                     $("#defTable_div_" + p_elmt.getID()).empty();
                     document.getElementById("defTable_div_" + p_elmt.getID()).appendChild(gui.htmlTableFromArray("Definition", p_elmt, gui.m_model, gui.m_editorMode));
@@ -1002,6 +1004,7 @@ var Mareframe;
                 return newDialog.id;
             };
             GUIHandler.prototype.populateElmtDetails2 = function (p_elmt) {
+                //Tools.calcValueOfInformation(this.m_model.getElement("elmtDecsion"), p_elmt, this.m_model); //This is just a test for VOI
                 var id = p_elmt.getID();
                 if (p_elmt.getDialog() == null) {
                     console.log("creating new dialog");
@@ -2029,7 +2032,7 @@ var Mareframe;
                     }
                 }
                 if (this.m_model.getAutoUpdate()) {
-                    this.m_model.update();
+                    this.updateModel();
                 }
                 if (!connected) {
                     this.select(p_evt);
