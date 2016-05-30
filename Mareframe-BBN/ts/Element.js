@@ -96,7 +96,7 @@ var Mareframe;
                         break;
                     }
                 }
-                console.log(" Is Parent Of: " + retBool);
+                // console.log(" Is Parent Of: " + retBool);
                 return retBool;
             };
             Element.prototype.isChildOf = function (p_elmt) {
@@ -108,7 +108,7 @@ var Mareframe;
                         break;
                     }
                 }
-                console.log(" Is Child Of: " + retBool);
+                //console.log(" Is Child Of: " + retBool );
                 return retBool;
             };
             Element.prototype.getChildrenElements = function () {
@@ -205,8 +205,8 @@ var Mareframe;
                 }
             };
             Element.prototype.updateHeaderRows = function (p_originalData) {
-                console.log("updating header rows in " + this.getName());
-                console.log("data: " + p_originalData);
+                //console.log("updating header rows in " + this.getName())
+                //console.log("data: " + p_originalData);
                 var data = [];
                 var parents = this.getParentElements();
                 if (this.m_type === 3) {
@@ -354,21 +354,19 @@ var Mareframe;
                         return true;
                     }
                 });
-                console.log("Key: " + key + "  Lengthm_conn: " + this.m_connections.length);
+                //console.log("Key: " + key + "  Lengthm_conn: " + this.m_connections.length) ;
                 if (key >= this.m_connections.length)
                     return false;
                 else {
                     for (var index in this.m_connections) {
-                        console.log(this.m_name + "  EBefore: " + this.m_connections[index].getID());
                     }
                     this.m_connections.splice(key, 1);
-                    console.log("m_conn Length: " + this.m_connections.length);
+                    //console.log("m_conn Length: " + this.m_connections.length);
                     for (var index in this.m_connections) {
-                        console.log(this.m_name + "  EAfter: " + this.m_connections[index].getID());
                     }
-                    console.log("Total conections: " + this.m_model.getConnectionArr().length);
+                    //console.log("Total conections: " + this.m_model.getConnectionArr().length);
                     this.m_model.deleteConnection(p_connID);
-                    console.log("Total conections: " + this.m_model.getConnectionArr().length);
+                    //console.log("Total conections: " + this.m_model.getConnectionArr().length);
                     return true;
                 }
             };

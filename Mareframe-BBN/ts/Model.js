@@ -14,7 +14,7 @@ var Mareframe;
                 this.m_modelPath = "./";
                 this.m_modelChanged = true;
                 this.m_dataMatrix = [];
-                this.m_autoUpdate = true; //auto update is on by default
+                this.m_autoUpdate = false; //auto update is off by default
                 this.m_bbnMode = p_bbnMode;
                 //this.m_bbnMode = true;
                 this.createNewElement = this.createNewElement.bind(this);
@@ -126,6 +126,7 @@ var Mareframe;
                         p_elmt.update();
                     }
                 });
+                console.log("done updating first round");
                 // if (this.getElmtsWithEvidence().length > 0) {
                 this.getElementArr().forEach(function (e) {
                     if (e.getType() !== 0) {
@@ -134,9 +135,11 @@ var Mareframe;
                 });
                 DST.Tools.calcValueWithEvidence(this);
                 // }
+                console.log("done updating with evidence");
                 this.m_elementArr.forEach(function (p_elmt) {
                     DST.Tools.updateConcerningDecisions(p_elmt);
                 });
+                console.log("done updating concerning decisions");
             };
             Model.prototype.getIdent = function () {
                 return this.m_modelIdent;

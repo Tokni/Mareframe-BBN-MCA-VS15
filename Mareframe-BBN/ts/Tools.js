@@ -557,7 +557,7 @@ var Mareframe;
             Tools.calculateValues = function (p_model, p_element) {
                 var model = p_model;
                 var element = p_element;
-                console.log("calculate values for " + p_element.getName());
+                //console.log("calculate values for " + p_element.getName());
                 var dataHeaders = []; //the header rows from data
                 var data = element.getData();
                 var newValues;
@@ -590,7 +590,7 @@ var Mareframe;
                             }
                             var parentValuesMatrix = Tools.getMatrixWithoutHeader(elmt.getValues());
                             // console.log("current element: " + element.getName());
-                            console.log("parent: " + elmt.getName());
+                            //console.log("parent: " + elmt.getName());
                             //console.log("new values: " + newValues);
                             var temp = Tools.createSubMatrices(element, newValues, elmt, dataHeaders);
                             //console.log("newValues: " + newValues);
@@ -603,8 +603,8 @@ var Mareframe;
                             var decRows = [];
                             var newRow = [];
                             //If parent has dec in values table these are added to dataHeaders or parent submatrices are created
-                            console.log("parent values: " + elmt.getValues());
-                            console.log("number of header rows: " + Tools.numOfHeaderRows(elmt.getValues()));
+                            // console.log("parent values: " + elmt.getValues());
+                            // console.log("number of header rows: " + Tools.numOfHeaderRows(elmt.getValues());
                             //For each dec in parent
                             for (var i = 0; i < Tools.numOfHeaderRows(elmt.getValues()); i++) {
                                 //console.log("i:" + i + " decInParent: " + Tools.numOfHeaderRows(elmt.getValues()));
@@ -732,7 +732,7 @@ var Mareframe;
                 if (p_elmt.getType() !== 1) {
                     throw "ERROR Trying to use calculateDecisionValues on non decision element";
                 }
-                console.log("decisions node begin");
+                //console.log("decisions node begin");
                 p_elmt.setValues(Tools.fillEmptySpaces((p_elmt.copyDefArray())));
                 var values = p_elmt.getValues();
                 //Number of header rows is equal to number of rows in values minus number of rows in definition
@@ -770,7 +770,7 @@ var Mareframe;
                     }
                 }
                 //     console.log("decisions end");
-                console.log("new values: " + values);
+                //console.log("new values: " + values);
                 p_elmt.setValues(values);
             };
             Tools.isOneDimensional = function (p_array) {
@@ -890,7 +890,7 @@ var Mareframe;
                 }
             };
             Tools.updateConcerningDecisions = function (element) {
-                console.log("updating concerning decisions " + element.getName());
+                //console.log("updating concerning decisions " + element.getName());
                 var rowsToDelete = [];
                 //console.log("all ancestors for " + element.getName() +": "  + element.getAllAncestors());
                 element.getAllAncestors().forEach(function (elmt) {
@@ -898,30 +898,29 @@ var Mareframe;
                         //console.log("checking: " + elmt.getName());
                         var values = element.getValues();
                         var decision = elmt.getData()[elmt.getDecision()][0];
-                        console.log("choice is made: " + decision + " in elemnent " + elmt.getName());
+                        //console.log("choice is made: " + decision + " in elemnent " + elmt.getName());
                         // console.log("values: " + values + " size: " + math.size(values));
                         var newValues = [];
                         var rowNumber = Tools.getRowNumber(element.getValues(), elmt);
-                        console.log("rownumber: " + rowNumber);
+                        //console.log("rownumber: " + rowNumber);
                         for (var i = 0; i < values.length; i++) {
                             var newRow = [];
                             for (var j = 0; j < values[0].length; j++) {
-                                console.log("checking if " + values[rowNumber][j] + " matches " + decision);
+                                //console.log("checking if " + values[rowNumber][j] + " matches " + decision);
                                 if (values[rowNumber][j] === decision || j === 0) {
-                                    console.log("adding " + (values[i][j]));
+                                    //console.log("adding " + (values[i][j]));
                                     newRow.push(values[i][j]);
-                                    console.log("new row: " + newRow);
                                 }
                             }
-                            console.log("adding row: " + newRow);
+                            //console.log("adding row: " + newRow);
                             newValues.push(newRow);
                         }
                         rowsToDelete.push(rowNumber);
-                        console.log("setting values to: " + newValues);
+                        //console.log("setting values to: " + newValues);
                         element.setValues(newValues);
                     }
                 });
-                console.log("done updating element concerning decisions");
+                //console.log("done updating element concerning decisions");
                 //element.setValues(Tools.deleteRows(element.getValues(), rowsToDelete)); //This will delete the headerrows that have been decided
             };
             Tools.strengthOfInfluence = function (p_table, p_dims) {
@@ -1013,8 +1012,8 @@ var Mareframe;
                 //var newData: Array<Array<any>> = [];
                 var newData = [];
                 var numHeaderRows = this.numOfHeaderRows(p_oldData, p_elmt);
-                console.log(p_oldData);
-                console.log("numHeaderRows: " + numHeaderRows);
+                //console.log(p_oldData);
+                // console.log("numHeaderRows: " + numHeaderRows);
                 var dims = [];
                 var underDim = [];
                 var overDim = [];
@@ -1040,7 +1039,7 @@ var Mareframe;
                 for (var i = 1; i < numHeaderRows; i++) {
                     dims[i - 1] /= dims[i];
                 }
-                console.log("cumula Dims: " + dims);
+                // console.log("cumula Dims: " + dims);
                 for (var init = 0; init < numHeaderRows; init++) {
                     underDim[init] = 1;
                     overDim[init] = 1;
@@ -1069,7 +1068,7 @@ var Mareframe;
                 //console.log("num Header  rows: " + this.numOfHeaderRows(p_oldData));
                 var found = false;
                 for (var i = 0; i < numHeaderRows; i++) {
-                    console.log("checking " + p_oldData[i][0] + " and " + p_rowName + " : " + (p_rowName == p_oldData[i][0]));
+                    //console.log("checking " + p_oldData[i][0] + " and " + p_rowName + " : " + (p_rowName == p_oldData[i][0]));
                     if (p_rowName == p_oldData[i][0]) {
                         //console.log("newDatatable constrict");
                         //console.log("Before splice p_dims: " + p_dims);
@@ -1290,14 +1289,14 @@ var Mareframe;
                         }
                         //console.log("new values: ");
                         //console.log(values);
-                        console.log("setting values for " + e.getName() + " + to: " + values);
+                        //console.log("setting values for " + e.getName()+ " + to: "+ values);
                         e.setValues(values);
                     }
                     else {
                     }
                 });
                 p_model.getElementArr().forEach(function (e) {
-                    if (e.getType() !== 0) {
+                    if (e.getType() !== 0 && !e.isUpdated()) {
                         Tools.calculateValues(p_model, e);
                         e.setUpdated(true);
                     }

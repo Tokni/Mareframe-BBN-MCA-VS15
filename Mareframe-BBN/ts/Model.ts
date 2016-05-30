@@ -12,7 +12,7 @@
             private m_modelChanged: boolean = true;
             private m_dataMatrix: any[][] = [];
             private m_mainObjective: Element;
-            private m_autoUpdate: boolean = true; //auto update is on by default
+            private m_autoUpdate: boolean = false; //auto update is off by default
             constructor(p_bbnMode: boolean) {
                 this.m_bbnMode = p_bbnMode;
                 //this.m_bbnMode = true;
@@ -140,6 +140,7 @@
                     }
 
                 });
+                console.log("done updating first round");
                // if (this.getElmtsWithEvidence().length > 0) {
                     this.getElementArr().forEach(function (e) {//This is needed to make sure values and decisions are updated in the right order
                         if (e.getType() !== 0) {
@@ -148,9 +149,11 @@
                     });
                     Tools.calcValueWithEvidence(this);
                // }
+                    console.log("done updating with evidence");
                 this.m_elementArr.forEach(function (p_elmt: Element) {
                     Tools.updateConcerningDecisions(p_elmt);
-                });
+                    });
+                console.log("done updating concerning decisions");
             }
             getIdent(): string {
                 return this.m_modelIdent;
