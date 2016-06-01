@@ -21,7 +21,7 @@
                 this.deleteElement = this.deleteElement.bind(this);
                 console.log("model loaded")
                 ////console.log(this);
-
+                this.m_modelName = "untitled";
             };
 
             getmumOfIteraions(): number {
@@ -494,6 +494,9 @@
             }
             getName(): string {
                 return this.m_modelName;
+            }
+            setNumOfIterations(n: number): void {
+                this.m_numOfIteraions = n;
             }
             addConnection(p_connection: Connection): boolean {
                 var validConn = true;

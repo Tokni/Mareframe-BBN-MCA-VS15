@@ -22,6 +22,7 @@ var Mareframe;
                 this.deleteElement = this.deleteElement.bind(this);
                 console.log("model loaded");
                 ////console.log(this);
+                this.m_modelName = "untitled";
             }
             ;
             Model.prototype.getmumOfIteraions = function () {
@@ -446,6 +447,9 @@ var Mareframe;
             };
             Model.prototype.getName = function () {
                 return this.m_modelName;
+            };
+            Model.prototype.setNumOfIterations = function (n) {
+                this.m_numOfIteraions = n;
             };
             Model.prototype.addConnection = function (p_connection) {
                 var validConn = true;
