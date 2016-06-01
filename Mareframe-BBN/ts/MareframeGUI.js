@@ -2423,6 +2423,7 @@ var Mareframe;
                         rowPlaceholder = table.insertRow(-1);
                         if (p_editorMode && p_header === "Definition" && (p_elmt.getType() === 0 || p_elmt.getType() === 1)) {
                             var emptyCell = document.createElement("th");
+                            emptyCell.style.minWidth = "10px";
                             rowPlaceholder.appendChild(emptyCell);
                         }
                         for (var j = 0; j < (data[0].length); j++) {

@@ -7,6 +7,7 @@
 	
 .defTable_div td, th {
     border: 1px solid #000000; 
+    padding: 3px;
 }
 
 .defTable_div th {
@@ -22,6 +23,7 @@
 
 .valuesTable_div td, th {
     border: 1px solid #000000; 
+    padding: 3px;
 }
 
 .valuesTable_div th {
@@ -41,6 +43,14 @@
 }
 .editableTable .editable input[type=text]{
      
+}
+input {
+    width: 100%;
+    padding: 1px;
+    margin: 0px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
 }
 .info_div {
     font-weight: bold;

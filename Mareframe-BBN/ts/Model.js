@@ -509,16 +509,12 @@ var Mareframe;
                 }
                 if (!this.m_bbnMode)
                     this.m_mainObjective = this.getElement(p_jsonObject.mainObj);
-                /* for (var i = 0; i < p_jsonObject.elements.length; i++) {
-                     if (this.m_bbnMode)
-                         //console.log("from json: " + elmt.getName());
-                         //console.log(this.m_elementArr);
-                         //elmt.update();
-                         
-                         this.m_elementArr[i].update();
-                 }*/
-                if (this.m_bbnMode) {
-                    this.update();
+                for (var i = 0; i < p_jsonObject.elements.length; i++) {
+                    if (this.m_bbnMode)
+                        //console.log("from json: " + elmt.getName());
+                        //console.log(this.m_elementArr);
+                        //elmt.update();
+                        this.m_elementArr[i].updateData();
                 }
                 //h.gui.setSize(maxX + 80, maxY + 20);
                 //h.gui.updateTable(this.dataMatrix);
