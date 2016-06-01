@@ -1,11 +1,11 @@
 {
   "elements": [
     {
-      "posX": 560,
-      "posY": 31,
-      "elmtID": "elmt_management",
+      "posX": 645.5,
+      "posY": 41.5,
+      "elmtID": "elmtmanagement",
       "elmtName": "management",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 1,
       "elmtData": [
         [ "BAU" ],
@@ -14,11 +14,11 @@
       ]
     },
     {
-      "posX": 548,
-      "posY": 693,
-      "elmtID": "elmt_year",
+      "posX": 160,
+      "posY": 349,
+      "elmtID": "elmtyear",
       "elmtName": "year",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 0,
       "elmtData": [
         [ "Year0", 0.5001 ],
@@ -26,24 +26,24 @@
       ]
     },
     {
-      "posX": 555,
-      "posY": 292,
-      "elmtID": "elmt_effort",
+      "posX": 473.5,
+      "posY": 225,
+      "elmtID": "elmteffort",
       "elmtName": "effort",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 0,
       "elmtData": [
-        [ "Low", 0.0001, 0.9941005800589943, 0.038935042 ],
-        [ "Moderate", 0.9191, 0.005799419942005801, 0.717445701 ],
-        [ "High", 0.0808, 0.00009999999900000002, 0.243619257 ]
+        [ "Low", 0.0001, 0.99410059, 0.038935042 ],
+        [ "Moderate", 0.9191, 0.00579942, 0.717445701 ],
+        [ "High", 0.0808, 0.0001, 0.243619257 ]
       ]
     },
     {
-      "posX": 552,
-      "posY": 517,
-      "elmtID": "elmt_SSB",
+      "posX": 542.5,
+      "posY": 417.5,
+      "elmtID": "elmtSSB",
       "elmtName": "SSB",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 0,
       "elmtData": [
         [ "Below500", 0.0978, 0.126, 0.230938563, 0.0851, 0.1164, 0.215021502 ],
@@ -53,11 +53,11 @@
       ]
     },
     {
-      "posX": 973,
-      "posY": 333,
-      "elmtID": "elmt_regime",
+      "posX": 894.5,
+      "posY": 238,
+      "elmtID": "elmtregime",
       "elmtName": "regime",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 0,
       "elmtData": [
         [ "Typical", 0.85 ],
@@ -65,11 +65,11 @@
       ]
     },
     {
-      "posX": 930,
-      "posY": 619,
-      "elmtID": "elmt_T",
+      "posX": 842.5,
+      "posY": 410,
+      "elmtID": "elmtT",
       "elmtName": "T",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 0,
       "elmtData": [
         [ "Below3", 0.976, 0.0001 ],
@@ -78,11 +78,11 @@
       ]
     },
     {
-      "posX": 777,
-      "posY": 438,
-      "elmtID": "elmt_R",
+      "posX": 620.5,
+      "posY": 282,
+      "elmtID": "elmtR",
       "elmtName": "R",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 0,
       "elmtData": [
         [ "Below1million", 1, 0.7621, 0.3174, 0.8038, 0.0069, 0, 0.749, 0, 0, 0.9968, 0.7596, 0.3157 ],
@@ -91,11 +91,11 @@
       ]
     },
     {
-      "posX": 162,
-      "posY": 564,
-      "elmtID": "elmt_catch",
+      "posX": 251.5,
+      "posY": 295,
+      "elmtID": "elmtcatch",
       "elmtName": "catch",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 0,
       "elmtData": [
         [ "Below200", 0.999501682, 0.731533046, 0.289006731, 0.847672332, 0.0392, 0.000100271, 0.527769159, 0.0001, 0.000158655, 0.247441483, 0.000125392, 0.00140647, 0.999300504, 0.762549715, 0.288166958, 0.877242579, 0.052, 0.000100241, 0.548071871, 0.0001, 0.000156715, 0.2590127, 0.000125581, 0.001414427 ],
@@ -105,11 +105,11 @@
       ]
     },
     {
-      "posX": 161,
-      "posY": 343,
-      "elmtID": "elmt_profit",
+      "posX": 161.5,
+      "posY": 116,
+      "elmtID": "elmtprofit",
       "elmtName": "Profit NPV",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 0,
       "elmtData": [
         [ "Negative", 0.4475, 0.9966, 1, 0, 0.4343, 0.9987, 0, 0, 0.7792, 0, 0, 0.1107 ],
@@ -119,121 +119,121 @@
       ]
     },
     {
-      "posX": 161,
-      "posY": 134,
-      "elmtID": "elmt_Monetary_utility",
+      "posX": 222,
+      "posY": 52,
+      "elmtID": "elmtMonetary_utility",
       "elmtName": "Monetary utility",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 2,
       "elmtData": [ [ "Value", 0, 0.5, 0.8, 1 ] ]
     },
     {
-      "posX": 803,
-      "posY": 231,
-      "elmtID": "elmt_Recruitment_risk",
+      "posX": 893.5,
+      "posY": 172,
+      "elmtID": "elmtRecruitment_risk",
       "elmtName": "Recruitment risk",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 2,
       "elmtData": [ [ "Value", 0, 1.4, 1 ] ]
     },
     {
-      "posX": 802,
-      "posY": 99,
-      "elmtID": "elmt_Sea_bottom_integrity",
+      "posX": 874.5,
+      "posY": 91,
+      "elmtID": "elmtSea_bottom_integrity",
       "elmtName": "Sea bottom integrity",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 2,
       "elmtData": [ [ "Value", 1, 0.7, 0 ] ]
     },
     {
-      "posX": 297,
-      "posY": 56,
-      "elmtID": "elmt_employment",
+      "posX": 399.5,
+      "posY": 52,
+      "elmtID": "elmtemployment",
       "elmtName": "employment",
-      "elmtDesc": "",
+      "elmtDesc": "Element description",
       "elmtType": 2,
       "elmtData": [ [ "Value", 0.2, 0.5, 1 ] ]
     }
   ],
   "connections": [
     {
-      "connInput": "elmt_effort",
-      "connOutput": "elmt_employment",
+      "connInput": "elmteffort",
+      "connOutput": "elmtemployment",
       "connID": "conn15"
     },
     {
-      "connInput": "elmt_effort",
-      "connOutput": "elmt_Sea_bottom_integrity",
+      "connInput": "elmteffort",
+      "connOutput": "elmtSea_bottom_integrity",
       "connID": "conn14"
     },
     {
-      "connInput": "elmt_R",
-      "connOutput": "elmt_Recruitment_risk",
+      "connInput": "elmtR",
+      "connOutput": "elmtRecruitment_risk",
       "connID": "conn13"
     },
     {
-      "connInput": "elmt_profit",
-      "connOutput": "elmt_Monetary_utility",
+      "connInput": "elmtprofit",
+      "connOutput": "elmtMonetary_utility",
       "connID": "conn12"
     },
     {
-      "connInput": "elmt_catch",
-      "connOutput": "elmt_profit",
+      "connInput": "elmteffort",
+      "connOutput": "elmtprofit",
       "connID": "conn11"
     },
     {
-      "connInput": "elmt_effort",
-      "connOutput": "elmt_profit",
+      "connInput": "elmtcatch",
+      "connOutput": "elmtprofit",
       "connID": "conn10"
     },
     {
-      "connInput": "elmt_year",
-      "connOutput": "elmt_catch",
+      "connInput": "elmteffort",
+      "connOutput": "elmtcatch",
       "connID": "conn9"
     },
     {
-      "connInput": "elmt_SSB",
-      "connOutput": "elmt_catch",
+      "connInput": "elmtSSB",
+      "connOutput": "elmtcatch",
       "connID": "conn8"
     },
     {
-      "connInput": "elmt_effort",
-      "connOutput": "elmt_catch",
+      "connInput": "elmtyear",
+      "connOutput": "elmtcatch",
       "connID": "conn7"
     },
     {
-      "connInput": "elmt_SSB",
-      "connOutput": "elmt_R",
+      "connInput": "elmtT",
+      "connOutput": "elmtR",
       "connID": "conn6"
     },
     {
-      "connInput": "elmt_T",
-      "connOutput": "elmt_R",
+      "connInput": "elmtSSB",
+      "connOutput": "elmtR",
       "connID": "conn5"
     },
     {
-      "connInput": "elmt_regime",
-      "connOutput": "elmt_T",
+      "connInput": "elmtregime",
+      "connOutput": "elmtT",
       "connID": "conn4"
     },
     {
-      "connInput": "elmt_year",
-      "connOutput": "elmt_SSB",
+      "connInput": "elmteffort",
+      "connOutput": "elmtSSB",
       "connID": "conn3"
     },
     {
-      "connInput": "elmt_effort",
-      "connOutput": "elmt_SSB",
+      "connInput": "elmtyear",
+      "connOutput": "elmtSSB",
       "connID": "conn2"
     },
     {
-      "connInput": "elmt_management",
-      "connOutput": "elmt_effort",
+      "connInput": "elmtmanagement",
+      "connOutput": "elmteffort",
       "connID": "conn1"
     }
   ],
-  "mdlName": "Network2 discretized",
+  "mdlName": "The Baltic Sea",
   "dataMat": [ ],
-  "mdlIdent": "Unnamed",
+  "mdlIdent": "elmtUnnamed",
   "mdlDesc": ""
 }

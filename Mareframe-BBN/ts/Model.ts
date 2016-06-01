@@ -1,6 +1,7 @@
 ﻿module Mareframe {
     export module DST {
         export class Model {
+            private m_numOfIteraions:number = 10000;
             public m_bbnMode: boolean = false;
             private m_modelIdent: string = "temp";
             private m_elmtCounter: number = 0;
@@ -23,7 +24,9 @@
 
             };
 
-
+            getmumOfIteraions(): number {
+                return this.m_numOfIteraions;
+            }
             saveModel(): string {
                 var dataStream: string = "";
 
@@ -146,8 +149,8 @@
                         if (e.getType() !== 0) {
                             e.setUpdated(false);
                         }
-                    });
-                    Tools.calcValueWithEvidence(this);
+                });
+                Tools.calcValueWithEvidence(this, this.m_numOfIteraions);
                // }
                     console.log("done updating with evidence");
                 this.m_elementArr.forEach(function (p_elmt: Element) {

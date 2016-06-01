@@ -27,7 +27,7 @@ var Mareframe;
                 //Tools.removeHeaderRow("name3", table3conn);
                 //Tools.removeHeaderRow("name1", table1conn);
                 console.log("handler started");
-                this.m_mareframeMode = false; //This sets the layout to Tokni mode
+                this.m_mareframeMode = false; //False sets the layout to Tokni mode
                 this.m_fileHandler = new DST.FileIO(this);
                 this.m_activeModel = this.addNewModel();
                 this.m_gui = new DST.GUIHandler(this.m_activeModel, this);

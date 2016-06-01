@@ -4,6 +4,7 @@ var Mareframe;
     (function (DST) {
         var Model = (function () {
             function Model(p_bbnMode) {
+                this.m_numOfIteraions = 10000;
                 this.m_bbnMode = false;
                 this.m_modelIdent = "temp";
                 this.m_elmtCounter = 0;
@@ -23,6 +24,9 @@ var Mareframe;
                 ////console.log(this);
             }
             ;
+            Model.prototype.getmumOfIteraions = function () {
+                return this.m_numOfIteraions;
+            };
             Model.prototype.saveModel = function () {
                 var dataStream = "";
                 if (this.m_bbnMode) {
@@ -133,7 +137,7 @@ var Mareframe;
                         e.setUpdated(false);
                     }
                 });
-                DST.Tools.calcValueWithEvidence(this);
+                DST.Tools.calcValueWithEvidence(this, this.m_numOfIteraions);
                 // }
                 console.log("done updating with evidence");
                 this.m_elementArr.forEach(function (p_elmt) {

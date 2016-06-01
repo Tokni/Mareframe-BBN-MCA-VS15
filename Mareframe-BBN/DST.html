@@ -78,15 +78,15 @@
 
             <div class="LoadFileBtn" id="lodDcmtDiv">
                 <input class="advButton upload" type="file" id="lodDcmt" />
-                <span class="advButton">Open Document</span>
+                <span class="advButton">Open Model</span>
             </div>
 
-            <button class="advButton" id="savDcmt">Save Document</button>
+            <button class="advButton" id="savDcmt">Save Model</button>
             <button class="advButton" id="resetDcmt">Reset</button>
             <button class="advButton" id="newElmt">New Element</button>
             <button class="advButton" id="newChance">New Chance</button>
             <button class="advButton" id="newDec">New Decision</button>
-            <button class="advButton" id="newValue">New Value</button>
+            <button class="advButton" id="newValue">New Utility</button>
             <button class="advButton" id="deleteElmt">Delete Element</button>
             <button class="advButton" id="selectAllElmt">Select All</button>
             <input class="advButton" type="checkbox" id="cnctTool">
@@ -101,6 +101,7 @@
                 <input class="button advButton" type="checkbox" id="autoUpdate">
                 <label for="autoUpdate" class="button" >Update Automatically</label>
                 <button class="button advButton" id="updateMdl">Update</button>
+                <button class="button advButton" id="settings">Settings</button>
             </div>
         </div>
 
@@ -139,11 +140,7 @@
 
 
     <!--Popup Dialog-->
-    <div id="detailsDialogs">
-
-
-
-    </div>
+    <div id="detailsDialogs"></div>
     <!-- Text box to show messages next to mouse pointer-->
     <div id="messageBox" style="display: none"></div>
 
@@ -165,10 +162,11 @@
         $("#newChance").button({ icons: { primary: "ui-icon-plus" } });
         $("#newValue").button({ icons: { primary: "ui-icon-plus" } });
         $("#deleteElmt").button({ icons: { primary: "ui-icon-trash" } });
-        $("#cnctTool").button({ icons: { primary: "ui-icon-link" } }, cnctPress);
+        $("#cnctTool").button({ icons: { primary: "ui-icon-arrow-1-ne" } }, cnctPress);
         $("#fullscreen").button({ icons: { primary: "ui-icon-zoomin" } });
-        $("#editorMode").button({ icons: { primary: "ui-icon-link" } });
+        $("#editorMode").button({ icons: { primary: "ui-icon-pencil" } });
         $("#autoUpdate").button({ icons: { primary: "ui-icon-refresh" } });
+        $("#settings").button({ icons: { primary: "ui-icon-gear" } });
         $("#updateMdl").button({ icons: { primary: "ui-icon-refresh" } });
         $("#fitToModel").button({ icons: { primary: "ui-icon-arrow-4-diag" } });
         $("#resetDcmt").button({ icons: { primary: "ui-icon-arrowreturnthick-1-w" } })

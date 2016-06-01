@@ -80,7 +80,7 @@ var Mareframe;
                     $("#logo").attr("style", "height:80px");
                     $("#webpage").attr("href", "http://www.tokni.com");
                     $(".europe-map-back").hide();
-                    $("#model_description").text("This is the BBN tool. Red nodes represent decision nodes, blue nodes represent chance nodes, and yellow nodes represent value nodes. You may doubleclick on each node below, to access the properties tables for that node. To set a decision click on a choice in the table next to decision nodes.");
+                    $("#model_description").text("This is the BBN tool. Red nodes represent decision nodes, blue nodes represent chance nodes, and yellow nodes represent utility nodes. You may doubleclick on each node below, to access the properties tables for that node. To set a decision click on a choice in the table next to decision nodes.");
                     $(".europe-map-zoom").hide();
                     $(".col-md-2").hide();
                     $(".col-md-6").hide();
@@ -131,6 +131,8 @@ var Mareframe;
                 this.deleteSelected = this.deleteSelected.bind(this);
                 this.resetDcmt = this.resetDcmt.bind(this);
                 this.updateModel = this.updateModel.bind(this);
+                this.addLoadingCursor = this.addLoadingCursor.bind(this);
+                this.openSettings = this.openSettings.bind(this);
                 this.mouseUp = this.mouseUp.bind(this);
                 this.selectAll = this.selectAll.bind(this);
                 this.saveModel = this.saveModel.bind(this);
@@ -168,7 +170,9 @@ var Mareframe;
                 $("#editorMode").on("click", this.setEditorMode);
                 $("#autoUpdate").on("click", this.setAutoUpdate);
                 $("#resetDcmt").on("click", this.resetDcmt);
-                $("#updateMdl").on("click", this.updateModel);
+                $("#updateMdl").on("mouseup", this.updateModel);
+                //$("#updateMdl").on("mousedown", this.addLoadingCursor);//This does not work
+                $("#settings").on("click", this.openSettings);
                 $("#fitToModel").on("click", this.fitToModel);
                 $("#selectAllElmt").on("click", this.selectAll);
                 $("#savDcmt").on("click", this.saveModel);
@@ -195,6 +199,7 @@ var Mareframe;
                 if (this.m_model.getAutoUpdate()) {
                     $("#updateMdl").hide();
                 }
+                $("#settings").show();
             }
             GUIHandler.prototype.optionTypeChange = function (p_evt) {
                 //console.log("Element name: " + p_evt.target.id);
@@ -237,6 +242,7 @@ var Mareframe;
                 this.m_handler.getFileIO().loadModel($("#selectModel").val(), this.m_model, this.importStage);
             };
             GUIHandler.prototype.loadModel = function (p_evt) {
+                $("#selectModel").prop("selectedIndex", -1);
                 this.m_model.closeDown();
                 console.log("load model");
                 this.m_handler.getFileIO().loadfromGenie(this.m_model, this.importStage);
@@ -252,9 +258,19 @@ var Mareframe;
                     this.addToSelection(this.m_model.getElementArr()[i].m_easelElmt);
                 }
             };
+            GUIHandler.prototype.addLoadingCursor = function () {
+                console.log("changing to progress");
+                document.getElementsByTagName("body")[0].style.cursor = "progress";
+            };
             GUIHandler.prototype.updateModel = function () {
                 //console.log("model: " + this.m_model.getName());
                 this.m_model.update();
+                this.updateMiniTables(this.m_model.getElementArr());
+                this.updateOpenDialogs();
+                console.log("changing back to auto");
+                document.getElementsByTagName("body")[0].style.cursor = "auto";
+            };
+            GUIHandler.prototype.updateDecAndEvidenceVisually = function () {
                 this.updateMiniTables(this.m_model.getElementArr());
                 this.updateOpenDialogs();
             };
@@ -294,6 +310,7 @@ var Mareframe;
                         this.m_handler.getFileIO().loadModel(loadModel, this.m_handler.getActiveModel(), this.importStage);
                     }
                 }
+                this.m_model.closeDown();
             };
             GUIHandler.prototype.importStage = function () {
                 //console.log("importing stage");
@@ -317,8 +334,8 @@ var Mareframe;
                     this.updateMiniTables(elmts);
                 }
                 this.m_updateStage = true;
-                this.repositionModel();
-                this.updateSize();
+                //this.repositionModel();
+                //this.updateSize();
                 //this.m_handler.getFileIO().quickSave(this.m_model); //This is commented out the because it was preventing reset from working properly
             };
             ;
@@ -378,23 +395,23 @@ var Mareframe;
                 }
             };
             GUIHandler.prototype.updateMiniTables = function (p_elmtArr) {
-                console.log("updating minitable");
+                //console.log("updating minitable");
                 for (var j = 0; j < p_elmtArr.length; j++) {
                     var elmt = p_elmtArr[j];
-                    console.log(elmt.getName() + " minitable is being updated");
+                    //console.log(elmt.getName() + " minitable is being updated");
                     var backgroundColors = ["#c6c6c6", "#bfbfe0"];
                     var decisionCont = elmt.m_minitableEaselElmt;
                     decisionCont.removeAllChildren();
-                    if (!(elmt.isUpdated())) {
-                        var decisTextBox = new createjs.Text("Update model to show values", "0.8em trebuchet", "#303030");
+                    /*if (!(elmt.isUpdated())) {
+                        var decisTextBox: createjs.Text = new createjs.Text("Update model to show values", "0.8em trebuchet", "#303030");
                         decisionCont.addChild(decisTextBox);
                     }
                     else if (elmt.getValues()[0].length > 2) {
-                        var decisTextBox = new createjs.Text("Values is multidimensional", "0.8em trebuchet", "#303030");
+                        var decisTextBox: createjs.Text = new createjs.Text("Values is multidimensional", "0.8em trebuchet", "#303030");
                         decisionCont.addChild(decisTextBox);
                     }
-                    else {
-                        for (var i = DST.Tools.numOfHeaderRows(elmt.getValues()); i < elmt.getValues().length; i++) {
+                    else*/ {
+                        for (var i = 0; i < elmt.getData().length - DST.Tools.numOfHeaderRows(elmt.getData()); i++) {
                             var barBackgroundColor = backgroundColors[i % 2];
                             var nameBackgroundColor;
                             if (elmt.getType() === 1 && elmt.getDecision() === i - DST.Tools.numOfHeaderRows(elmt.getValues())
@@ -407,38 +424,61 @@ var Mareframe;
                             var decisRect = new createjs.Shape(new createjs.Graphics().f(nameBackgroundColor).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
                             //   console.log("" + elmt.getValues());
                             //console.log("substring 0-12: " + elmt.getValues()[i][0]);
-                            var decisName = new createjs.Text(elmt.getValues()[i][0].substr(0, 12), "0.8em trebuchet", "#303030");
+                            //Choice or state name
+                            var decisName = new createjs.Text(elmt.getData()[i + DST.Tools.numOfHeaderRows(elmt.getData())][0].substr(0, 12), "0.8em trebuchet", "#303030");
                             decisName.textBaseline = "middle";
                             decisName.maxWidth = 68;
                             decisName.x = 2;
                             decisName.y = 6 + (i * 12);
                             decisionCont.addChild(decisRect);
                             decisionCont.addChild(decisName);
-                            var valueData = elmt.getValues()[i][1];
-                            if (valueData == -Infinity) {
-                                valueData = 0;
+                            if (elmt.isUpdated() && elmt.getValues()[0].length <= 2) {
+                                var valueData = elmt.getValues()[i + DST.Tools.numOfHeaderRows(elmt.getValues())][1];
+                                if (valueData == -Infinity) {
+                                    valueData = 0;
+                                }
+                                var decisBarBackgr = new createjs.Shape(new createjs.Graphics().f(barBackgroundColor).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
+                                if (elmt.getType() === 0) {
+                                    var decisBar = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
+                                    var decisPercVal = new createjs.Text(Math.round(valueData * 100) + "%", "0.8em trebuchet", "#303030");
+                                    decisPercVal.maxWidth = 22;
+                                }
+                                else if (elmt.getType() === 1 || elmt.getType() === 2) {
+                                    var decisPercVal = new createjs.Text("" + DST.Tools.round(valueData), "0.8em trebuchet", "#303030");
+                                    decisPercVal.maxWidth = 68;
+                                }
+                                decisPercVal.textBaseline = "middle";
+                                decisPercVal.x = 71;
+                                decisPercVal.y = 6 + (i * 12);
+                                decisionCont.addChild(decisBarBackgr);
+                                decisionCont.addChild(decisPercVal);
+                                if (elmt.getType() === 0) {
+                                    decisionCont.addChild(decisBar);
+                                }
                             }
-                            var decisBarBackgr = new createjs.Shape(new createjs.Graphics().f(barBackgroundColor).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
-                            if (elmt.getType() === 0) {
-                                var decisBar = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
-                                var decisPercVal = new createjs.Text(Math.round(valueData * 100) + "%", "0.8em trebuchet", "#303030");
-                            }
-                            else if (elmt.getType() === 1) {
-                                //NB decisBar not working with negative values
-                                var decisBar = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * Math.abs(valueData / elmt.getSumOfValues()), 10));
-                                decisBar.visible = false;
-                                var decisPercVal = new createjs.Text("" + DST.Tools.round(valueData), "0.8em trebuchet", "#303030");
-                            }
-                            else {
-                                var decisBar = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
-                                var decisPercVal = new createjs.Text(Math.floor(valueData * 100) + "%", "0.8em trebuchet", "#303030");
-                            }
+                        }
+                        if (!elmt.isUpdated()) {
+                            var height = elmt.getValues().length - DST.Tools.numOfHeaderRows(elmt.getValues());
+                            //Set text box to show "Update to show values" if element is not updated
+                            //var decisBarBackgr: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(barBackgroundColor).s("#303030").ss(0.5).r(70, 12 * Tools.numOfHeaderRows(elmt.getValues()), 60, 12 * height));
+                            var decisPercVal = new createjs.Text("Update to\nshow\nvalues", "0.8em trebuchet", "#303030");
+                            decisPercVal.maxWidth = 68;
                             decisPercVal.textBaseline = "middle";
-                            decisPercVal.maxWidth = 22;
-                            decisPercVal.x = 71;
-                            decisPercVal.y = 6 + (i * 12);
-                            decisionCont.addChild(decisBarBackgr);
-                            decisionCont.addChild(decisBar);
+                            decisPercVal.textAlign = "center";
+                            decisPercVal.x = 100;
+                            decisPercVal.y = 8;
+                            //decisionCont.addChild(decisBarBackgr);
+                            decisionCont.addChild(decisPercVal);
+                        }
+                        else if (elmt.getValues()[0].length > 2) {
+                            var height = elmt.getValues().length - DST.Tools.numOfHeaderRows(elmt.getValues());
+                            //Set text box to show "Values are multi-dimensional" if element is not updated
+                            var decisPercVal = new createjs.Text("Values\nare multi-\ndimensional", "0.8em trebuchet", "#303030");
+                            decisPercVal.maxWidth = 68;
+                            decisPercVal.textBaseline = "middle";
+                            decisPercVal.textAlign = "center";
+                            decisPercVal.x = 100;
+                            decisPercVal.y = 8;
                             decisionCont.addChild(decisPercVal);
                         }
                     }
@@ -453,9 +493,6 @@ var Mareframe;
                     decisionCont.name = elmt.getID();
                     elmt.m_minitableEaselElmt = decisionCont;
                     this.m_mcaContainer.addChild(decisionCont);
-                    if (elmt.getType() == 2) {
-                        decisionCont.visible = false;
-                    }
                     this.m_updateStage = true;
                 }
                 //}
@@ -466,16 +503,20 @@ var Mareframe;
                     //console.log(p_evt);
                     var elmt = this.m_model.getElement(p_evt.currentTarget.name);
                     this.m_model.setDecision(elmt, Math.floor(p_evt.localY / 12) - DST.Tools.numOfHeaderRows(elmt.getValues(), elmt));
-                    this.updateModel();
+                    if (this.m_model.getAutoUpdate()) {
+                        this.updateModel();
+                    }
+                    this.updateDecAndEvidenceVisually();
                 }
             };
             GUIHandler.prototype.clickedEvidence = function (p_evt) {
                 if (!this.m_editorMode && this.m_noOfDialogsOpen == 0) {
-                    //console.log("clicked a decision");
-                    //console.log(p_evt);
                     var elmt = this.m_model.getElement(p_evt.currentTarget.name);
                     this.m_model.setEvidence(elmt, Math.floor(p_evt.localY / 12) - DST.Tools.numOfHeaderRows(elmt.getValues(), elmt));
-                    this.updateModel();
+                    if (this.m_model.getAutoUpdate()) {
+                        this.updateModel();
+                    }
+                    this.updateDecAndEvidenceVisually();
                 }
             };
             GUIHandler.prototype.updateEditorMode = function () {
@@ -505,6 +546,7 @@ var Mareframe;
                 }
                 else {
                     $(".advButton").hide();
+                    $(".button").show();
                     $("#lodDcmtDiv").hide();
                     $("#cnctTool").prop("checked", false);
                     if (!this.m_model.getAutoUpdate()) {
@@ -744,7 +786,6 @@ var Mareframe;
                 //alert("before update");
                 //this.m_mcaStage.update();
                 //alert("after update");
-                this.m_updateStage = true;
                 //console.log(this.m_model.getConnectionArr());
                 //console.log(this.m_model.getElementArr());
                 this.importStage();
@@ -813,11 +854,92 @@ var Mareframe;
                     //Create the table again
                     $("#defTable_div_" + p_elmt.getID()).empty();
                     document.getElementById("defTable_div_" + p_elmt.getID()).appendChild(gui.htmlTableFromArray("Definition", p_elmt, gui.m_model, gui.m_editorMode));
-                    //var s = Tools.htmlTableFromArray("Definition", p_elmt, gui.m_model, gui.m_editorMode);
-                    //$("#defTable_div_" + p_elmt.getID()).html(s);
+                    //Hide values table
+                    $("#valuesTable_div_" + p_elmt.getID()).hide();
+                    $("#values_" + p_elmt.getID()).show();
+                    if (!p_elmt.isUpdated()) {
+                        $("#values_" + p_elmt.getID()).prop("disabled", true);
+                    }
                     //Add the edit functions again
                     gui.addEditFunction(p_elmt, gui.m_editorMode);
                 });
+            };
+            GUIHandler.prototype.createSettingsDiv = function () {
+                console.log("creating settings dialog");
+                var settingsDiv = document.createElement("div");
+                settingsDiv.setAttribute("id", "settingsDiv");
+                var numOfIterations_div = document.createElement("div");
+                numOfIterations_div.style.overflow = "hidden";
+                var numOfIterations_label = document.createElement("div");
+                numOfIterations_label.style.width = "250px";
+                numOfIterations_label.style.cssFloat = "left";
+                numOfIterations_label.innerHTML = "Number of iterations in calculation:";
+                numOfIterations_div.appendChild(numOfIterations_label);
+                var numOfIterations = document.createElement("input");
+                numOfIterations.setAttribute("id", "numberOfIterations");
+                numOfIterations.style.marginLeft = "10px";
+                numOfIterations.style.width = "100px";
+                numOfIterations.type = "number";
+                numOfIterations.max = "50000";
+                numOfIterations.min = "100";
+                numOfIterations.step = "100";
+                numOfIterations.value = this.m_model.getmumOfIteraions() + "";
+                numOfIterations_div.appendChild(numOfIterations);
+                settingsDiv.appendChild(numOfIterations_div);
+                /*var autoUpdateForm = document.createElement("form");
+                var radioDiv = document.createElement("div");
+                radioDiv.setAttribute("class", "advButton button");
+                radioDiv.setAttribute("id", "autoUpdateRadio");
+                var updateOn = document.createElement("input");
+                updateOn.type = "radio";
+                updateOn.setAttribute("id", "autoUpdateOn");
+                updateOn.name = "radio";
+                var label1 = document.createElement("label");
+                label1.setAttribute("class", "advButton button");
+                label1.innerHTML = "On:";
+                label1.htmlFor = "autoUpdateOn";
+                radioDiv.appendChild(label1);
+                radioDiv.appendChild(updateOn);
+                autoUpdateForm.appendChild(radioDiv);
+                
+                settingsDiv.appendChild(autoUpdateForm);*/
+                $("#success").dialog({
+                    modal: true,
+                    title: 'Payment success',
+                    width: 400,
+                    buttons: {
+                        Ok: function () {
+                            $(this).dialog("close"); //closing on Ok click
+                        }
+                    },
+                });
+                $('body').append(settingsDiv);
+                return settingsDiv.id;
+            };
+            GUIHandler.prototype.openSettings = function () {
+                var gui = this;
+                if (this.m_settingsDiv === undefined) {
+                    var settingsID = "#" + this.createSettingsDiv();
+                    this.m_settingsDiv = $(settingsID).dialog(opt);
+                }
+                console.log(this.m_settingsDiv);
+                this.m_settingsDiv.dialog("open");
+                this.m_settingsDiv.dialog({
+                    width: 500,
+                    height: 200,
+                    buttons: {
+                        Ok: function () {
+                            gui.m_numOfIteraions = $("#numberOfIterations").val();
+                            $(this).dialog("close"); //closing and saving settings when clicking ok
+                        },
+                        cancel: function () {
+                            $(this).dialog("close");
+                        }
+                    },
+                });
+                var opt = {
+                    title: "Settings",
+                };
             };
             GUIHandler.prototype.createDetailsDialog = function (p_elmt) {
                 console.log("creating dialog for " + p_elmt.getName());
@@ -1025,9 +1147,16 @@ var Mareframe;
                     var opt = {
                         title: p_elmt.getName()
                     };
+                    var width = p_elmt.getData()[0].length * 70 + 50;
+                    if (width < 400) {
+                        width = 400;
+                    }
+                    if (width > 1100) {
+                        width = 1100;
+                    }
                     dialog.dialog("open");
                     dialog.dialog({
-                        width: 600,
+                        width: width,
                         height: 500
                     });
                     $("#submit_" + id).hide();
@@ -1687,7 +1816,7 @@ var Mareframe;
                     $("#detailsDialog_" + id).data("unsavedChanges", false);
                     $("#submit_" + id).hide();
                     this.updateOpenDialogs();
-                    this.updateMiniTables([elmt]);
+                    this.updateMiniTables([elmt].concat(elmt.getAllDescendants()).concat(elmt.getAllDecisionAncestors()));
                 }
                 //this.m_updateMCAStage = true;
                 //this.m_mcaContainer.removeChild(elmt.m_easelElmt);
@@ -1801,13 +1930,15 @@ var Mareframe;
                 }
                 else if (p_evt.target.name.substr(0, 4) === "conn") {
                     console.log("connection pressed");
+                    var connection = this.m_model.getConnection(p_evt.target.name);
+                    connection.m_easelElmt;
                 }
                 else {
                     this.clearSelection();
                 }
             };
             GUIHandler.prototype.select = function (p_evt) {
-                //////console.log("ctrl key: " + e.nativeEvent.ctrlKey);
+                //console.log("ctrl key: " + e.nativeEvent.ctrlKey);
                 if (!p_evt.nativeEvent.ctrlKey && this.m_selectedItems.indexOf(p_evt.target) === -1) {
                     this.clearSelection();
                 }
@@ -1880,7 +2011,7 @@ var Mareframe;
                 var screenWidth = $(parent.window).width();
                 var userScreenHeight = $(parent.window).height();
                 if (y > ((userScreenHeight + pxFromTop - 30))) {
-                    console.log("scroll");
+                    //console.log("scroll");
                     if (pxFromTop > 0) {
                         parent.window.scrollBy(0, (userScreenHeight / 50));
                     }
@@ -1890,7 +2021,7 @@ var Mareframe;
                 }
                 //console.log(p_evt.rawY, y, pxFromTop, userScreenHeight);
                 if (x > ((screenWidth + pxFromLeft - 130))) {
-                    console.log("scroll");
+                    //console.log("scroll");
                     parent.window.scrollBy((screenWidth / 50), 0);
                 }
                 else if (x < (pxFromLeft + 30)) {

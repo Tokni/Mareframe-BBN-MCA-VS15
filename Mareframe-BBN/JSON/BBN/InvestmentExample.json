@@ -1,17 +1,17 @@
 {
   "elements": [
     {
-      "posX": 705,
-      "posY": 376,
+      "posX": 762,
+      "posY": 325,
       "elmtID": "elmtFinancialGain",
       "elmtName": "Financial Gain",
       "elmtDesc": "",
       "elmtType": 2,
-      "elmtData": [ [ "Value", 1000, -500, 500, 500 ] ]
+      "elmtData": [ [ "Value", 10000, -5000, 500, 500 ] ]
     },
     {
-      "posX": 442,
-      "posY": 102,
+      "posX": 635,
+      "posY": 50,
       "elmtID": "elmtDecsion",
       "elmtName": "Investment Decision",
       "elmtDesc": "",
@@ -22,35 +22,35 @@
       ]
     },
     {
-      "posX": 840,
-      "posY": 223,
+      "posX": 1098,
+      "posY": 110,
       "elmtID": "elmtVenture",
       "elmtName": "Succes of Venture",
       "elmtDesc": "",
       "elmtType": 0,
       "elmtData": [
-        [ "Succes", 0.75, 0.35, 0.1 ],
-        [ "Failure", 0.25, 0.65, 0.9 ]
+        [ "Succes", 0.2 ],
+        [ "Failure", 0.8 ]
       ]
     },
     {
-      "posX": 838,
-      "posY": 98,
+      "posX": 1090,
+      "posY": 317,
       "elmtID": "elmtForecast",
       "elmtName": "Expert Forecast",
       "elmtDesc": "",
       "elmtType": 0,
       "elmtData": [
-        [ " Good", 0.2 ],
-        [ " Moderate", 0.4 ],
-        [ " Poor", 0.4 ]
+        [ "Good", 0.4, 0.1 ],
+        [ "Moderate", 0.4, 0.3 ],
+        [ "Poor", 0.2, 0.6 ]
       ]
     }
   ],
   "connections": [
     {
-      "connInput": "elmtForecast",
-      "connOutput": "elmtVenture",
+      "connInput": "elmtVenture",
+      "connOutput": "elmtForecast",
       "connID": "conn3"
     },
     {

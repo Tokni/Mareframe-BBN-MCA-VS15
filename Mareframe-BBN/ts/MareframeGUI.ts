@@ -3,6 +3,8 @@
 module Mareframe {
     export module DST {
         export class GUIHandler {
+            private m_settingsDiv;
+            
             private m_noOfDialogsOpen: number = 0;
             private m_windowResizable: boolean = false;
             private m_editorMode: boolean = false;
@@ -54,14 +56,12 @@ module Mareframe {
                     $("#logo").attr("style", "height:80px");
                     $("#webpage").attr("href", "http://www.tokni.com");
                     $(".europe-map-back").hide();
-                    $("#model_description").text("This is the BBN tool. Red nodes represent decision nodes, blue nodes represent chance nodes, and yellow nodes represent value nodes. You may doubleclick on each node below, to access the properties tables for that node. To set a decision click on a choice in the table next to decision nodes.");
+                    $("#model_description").text("This is the BBN tool. Red nodes represent decision nodes, blue nodes represent chance nodes, and yellow nodes represent utility nodes. You may doubleclick on each node below, to access the properties tables for that node. To set a decision click on a choice in the table next to decision nodes.");
                     $(".europe-map-zoom").hide();
                     $(".col-md-2").hide();
                     $(".col-md-6").hide();
                     $("#ui_css").attr("href", "jQueryUI/jquery-ui_light.css");
                     $("#dialog_css").attr("href", "css/dialog_tokni.css");
-
-
                 }
                 else {
                     $("#selectModel").hide();
@@ -70,18 +70,11 @@ module Mareframe {
 
                 var mareframeGUI = this;
                 if (p_model.m_bbnMode) {
-
-
-
-
-
                     this.setEditorMode = this.setEditorMode.bind(this);
                     this.setAutoUpdate = this.setAutoUpdate.bind(this);
                     $("#MCADataTable").hide();
                     $("#addDataRow").hide();
                     this.m_mcaStageCanvas.width = $(window).width();
-
-
                 }
                 else {
                     $("#model_description").text("This is the Mareframe MCA tool. Data has been loaded into the table on the right. You may doubleclick on each element below, to access the properties panel for that element. If you doubleclick on one of the red or green elements, you may adjust the weights of it's child elements, and thus the data it points to. In the chart at the bottom, you will see the result of the analysis, with the tallest column being the highest scoring one.");
@@ -117,7 +110,9 @@ module Mareframe {
                 this.createNewElement = this.createNewElement.bind(this);
                 this.deleteSelected = this.deleteSelected.bind(this);
                 this.resetDcmt = this.resetDcmt.bind(this);
-                this.updateModel = this.updateModel.bind(this);
+                this.updateModel = this.updateModel.bind(this); 
+                this.addLoadingCursor = this.addLoadingCursor.bind(this);
+                this.openSettings = this.openSettings.bind(this);
                 this.mouseUp = this.mouseUp.bind(this);
                 this.selectAll = this.selectAll.bind(this);
                 this.saveModel = this.saveModel.bind(this);
@@ -161,7 +156,9 @@ module Mareframe {
 
                 $("#autoUpdate").on("click", this.setAutoUpdate);
                 $("#resetDcmt").on("click", this.resetDcmt);
-                $("#updateMdl").on("click", this.updateModel);
+                $("#updateMdl").on("mouseup", this.updateModel);
+                //$("#updateMdl").on("mousedown", this.addLoadingCursor);//This does not work
+                $("#settings").on("click", this.openSettings);
                 $("#fitToModel").on("click", this.fitToModel);
                 $("#selectAllElmt").on("click", this.selectAll);
                 $("#savDcmt").on("click", this.saveModel);
@@ -192,6 +189,7 @@ module Mareframe {
                 if (this.m_model.getAutoUpdate()) {
                     $("#updateMdl").hide();
                 }
+                $("#settings").show();
 
             }
             private optionTypeChange(p_evt: Event) {
@@ -241,6 +239,7 @@ module Mareframe {
                 this.m_handler.getFileIO().loadModel($("#selectModel").val(), this.m_model, this.importStage);
             }
             private loadModel(p_evt: Event) {
+                $("#selectModel").prop("selectedIndex", -1);
                 this.m_model.closeDown();
                 console.log("load model");
                 this.m_handler.getFileIO().loadfromGenie(this.m_model, this.importStage);
@@ -256,9 +255,20 @@ module Mareframe {
                     this.addToSelection(this.m_model.getElementArr()[i].m_easelElmt);
                 }
             }
+            private addLoadingCursor() {
+                console.log("changing to progress");
+                document.getElementsByTagName("body")[0].style.cursor = "progress";
+            }
             private updateModel() {
+                
                 //console.log("model: " + this.m_model.getName());
                 this.m_model.update();
+                this.updateMiniTables(this.m_model.getElementArr());
+                this.updateOpenDialogs();
+                console.log("changing back to auto");
+                document.getElementsByTagName("body")[0].style.cursor = "auto";
+            }
+            private updateDecAndEvidenceVisually() {
                 this.updateMiniTables(this.m_model.getElementArr());
                 this.updateOpenDialogs();
             }
@@ -298,6 +308,7 @@ module Mareframe {
                         this.m_handler.getFileIO().loadModel(loadModel, this.m_handler.getActiveModel(), this.importStage);
                     }
                 }
+                this.m_model.closeDown();
             }
             importStage(): void {
                 //console.log("importing stage");
@@ -321,8 +332,8 @@ module Mareframe {
                     this.updateMiniTables(elmts);
                 }
                 this.m_updateStage = true
-                this.repositionModel();
-                this.updateSize();
+                //this.repositionModel();
+                //this.updateSize();
                 //this.m_handler.getFileIO().quickSave(this.m_model); //This is commented out the because it was preventing reset from working properly
             };
             private mouseUp(p_evt: createjs.MouseEvent) {
@@ -391,16 +402,15 @@ module Mareframe {
                 }
             }
             updateMiniTables(p_elmtArr: Element[]) {
-                console.log("updating minitable");
-                
+                //console.log("updating minitable");
                 for (var j = 0; j < p_elmtArr.length; j++) {
                     var elmt = p_elmtArr[j];
-                      console.log(elmt.getName() + " minitable is being updated");
+                      //console.log(elmt.getName() + " minitable is being updated");
                     var backgroundColors = ["#c6c6c6", "#bfbfe0"]
                     var decisionCont: createjs.Container = elmt.m_minitableEaselElmt;
 
                     decisionCont.removeAllChildren();
-                    if (!(elmt.isUpdated())) {
+                    /*if (!(elmt.isUpdated())) {
                         var decisTextBox: createjs.Text = new createjs.Text("Update model to show values", "0.8em trebuchet", "#303030");
                         decisionCont.addChild(decisTextBox);
                     }
@@ -408,8 +418,8 @@ module Mareframe {
                         var decisTextBox: createjs.Text = new createjs.Text("Values is multidimensional", "0.8em trebuchet", "#303030");
                         decisionCont.addChild(decisTextBox);
                     }
-                    else {
-                        for (var i = Tools.numOfHeaderRows(elmt.getValues()); i < elmt.getValues().length; i++) {
+                    else*/ {
+                        for (var i = 0; i < elmt.getData().length-Tools.numOfHeaderRows(elmt.getData()); i++) {
 
                             var barBackgroundColor: string = backgroundColors[i % 2];
                             var nameBackgroundColor: string;
@@ -424,7 +434,9 @@ module Mareframe {
 
                             //   console.log("" + elmt.getValues());
                             //console.log("substring 0-12: " + elmt.getValues()[i][0]);
-                            var decisName: createjs.Text = new createjs.Text(elmt.getValues()[i][0].substr(0, 12), "0.8em trebuchet", "#303030");
+
+                            //Choice or state name
+                            var decisName: createjs.Text = new createjs.Text(elmt.getData()[i+Tools.numOfHeaderRows(elmt.getData())][0].substr(0, 12), "0.8em trebuchet", "#303030");
                             decisName.textBaseline = "middle";
                             decisName.maxWidth = 68;
                             decisName.x = 2;
@@ -433,34 +445,57 @@ module Mareframe {
                             decisionCont.addChild(decisRect);
                             decisionCont.addChild(decisName);
 
-                            var valueData: number = elmt.getValues()[i][1];
+                            if (elmt.isUpdated() && elmt.getValues()[0].length <= 2) {
+                                var valueData: number = elmt.getValues()[i + Tools.numOfHeaderRows(elmt.getValues())][1];
                             if (valueData == -Infinity) {
                                 valueData = 0;
                             }
                             var decisBarBackgr: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(barBackgroundColor).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
                             
+                                if (elmt.getType() === 0) {//Chance
+                                    var decisBar: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
+                                    var decisPercVal: createjs.Text = new createjs.Text(Math.round(valueData * 100) + "%", "0.8em trebuchet", "#303030");
 
-                            if (elmt.getType() === 0) {//Chance
-                                var decisBar: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
-                                var decisPercVal: createjs.Text = new createjs.Text(Math.round(valueData * 100) + "%", "0.8em trebuchet", "#303030");
-                            } else if (elmt.getType() === 1) {//Decision
-                                //NB decisBar not working with negative values
-                                var decisBar: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * Math.abs(valueData / elmt.getSumOfValues()), 10));
-                                decisBar.visible = false;
-                                var decisPercVal: createjs.Text = new createjs.Text("" + Tools.round(valueData), "0.8em trebuchet", "#303030");
+                                    decisPercVal.maxWidth = 22;
+                                } else if (elmt.getType() === 1 || elmt.getType() === 2) {//Decision or value
+                                    var decisPercVal: createjs.Text = new createjs.Text("" + Tools.round(valueData), "0.8em trebuchet", "#303030");
+                                    decisPercVal.maxWidth = 68;
+                                }
+                                decisPercVal.textBaseline = "middle";
+                                decisPercVal.x = 71;
+                                decisPercVal.y = 6 + (i * 12);
+
+                                decisionCont.addChild(decisBarBackgr);
+                                decisionCont.addChild(decisPercVal);
+                                if (elmt.getType() === 0) {
+                                    decisionCont.addChild(decisBar);
+                                }
                             }
-                            else {
-                                var decisBar: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
-                                var decisPercVal: createjs.Text = new createjs.Text(Math.floor(valueData * 100) + "%", "0.8em trebuchet", "#303030");
-                            }
+                        }
+                        if (!elmt.isUpdated()) {
+                            var height: number = elmt.getValues().length - Tools.numOfHeaderRows(elmt.getValues());
+                            //Set text box to show "Update to show values" if element is not updated
+                            //var decisBarBackgr: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(barBackgroundColor).s("#303030").ss(0.5).r(70, 12 * Tools.numOfHeaderRows(elmt.getValues()), 60, 12 * height));
+                            var decisPercVal: createjs.Text = new createjs.Text("Update to\nshow\nvalues", "0.8em trebuchet", "#303030");
+                            decisPercVal.maxWidth = 68;
                             decisPercVal.textBaseline = "middle";
-                            decisPercVal.maxWidth = 22;
-                            decisPercVal.x = 71;
-                            decisPercVal.y = 6 + (i * 12);
-
-                            decisionCont.addChild(decisBarBackgr);
-                            decisionCont.addChild(decisBar);
+                            decisPercVal.textAlign = "center";
+                            decisPercVal.x = 100;
+                            decisPercVal.y =  8;
+                            //decisionCont.addChild(decisBarBackgr);
                             decisionCont.addChild(decisPercVal);
+                        }
+                        else if (elmt.getValues()[0].length > 2) {
+                            var height: number = elmt.getValues().length - Tools.numOfHeaderRows(elmt.getValues());
+                            //Set text box to show "Values are multi-dimensional" if element is not updated
+                             var decisPercVal: createjs.Text = new createjs.Text("Values\nare multi-\ndimensional", "0.8em trebuchet", "#303030");
+                            decisPercVal.maxWidth = 68;
+                            decisPercVal.textBaseline = "middle";
+                            decisPercVal.textAlign = "center";
+                            decisPercVal.x = 100;
+                            decisPercVal.y = 8;
+                            decisionCont.addChild(decisPercVal);
+
                         }
                     }
                     if (elmt.getType() === 1) {
@@ -476,10 +511,6 @@ module Mareframe {
                     elmt.m_minitableEaselElmt = decisionCont;
                     this.m_mcaContainer.addChild(decisionCont);
 
-                    if (elmt.getType() == 2) {
-                        decisionCont.visible = false;
-                    }
-
                     this.m_updateStage = true;
                 }
                 //}
@@ -490,16 +521,20 @@ module Mareframe {
                     //console.log(p_evt);
                     var elmt: Element = this.m_model.getElement(p_evt.currentTarget.name);
                     this.m_model.setDecision(elmt, Math.floor(p_evt.localY / 12)- Tools.numOfHeaderRows(elmt.getValues(), elmt));
-                    this.updateModel();
+                    if (this.m_model.getAutoUpdate()) {
+                        this.updateModel();
+                    }
+                    this.updateDecAndEvidenceVisually();
                 }
             }
             private clickedEvidence(p_evt: createjs.MouseEvent) {
-                if (!this.m_editorMode && this.m_noOfDialogsOpen == 0) {// Setting decision while in editor mode messes with the calculations
-                    //console.log("clicked a decision");
-                    //console.log(p_evt);
+                if (!this.m_editorMode && this.m_noOfDialogsOpen == 0) {// Setting evidence while in editor mode messes with the calculations
                     var elmt: Element = this.m_model.getElement(p_evt.currentTarget.name);
                     this.m_model.setEvidence(elmt, Math.floor(p_evt.localY / 12) - Tools.numOfHeaderRows(elmt.getValues(),elmt));
-                    this.updateModel();
+                    if (this.m_model.getAutoUpdate()) {
+                        this.updateModel();
+                    }
+                    this.updateDecAndEvidenceVisually();
                 }
             }
             private updateEditorMode() {
@@ -528,6 +563,7 @@ module Mareframe {
                     }
                 } else {
                     $(".advButton").hide();
+                    $(".button").show();
                     $("#lodDcmtDiv").hide();
                     $("#cnctTool").prop("checked", false);
                     if (!this.m_model.getAutoUpdate()) {
@@ -812,7 +848,6 @@ module Mareframe {
                 //alert("before update");
                 //this.m_mcaStage.update();
                 //alert("after update");
-                this.m_updateStage = true;
                 //console.log(this.m_model.getConnectionArr());
                 //console.log(this.m_model.getElementArr());
                 this.importStage();
@@ -886,15 +921,103 @@ module Mareframe {
                     //Create the table again
                     $("#defTable_div_" + p_elmt.getID()).empty();
                     document.getElementById("defTable_div_" + p_elmt.getID()).appendChild(gui.htmlTableFromArray("Definition", p_elmt, gui.m_model, gui.m_editorMode));
-                    //var s = Tools.htmlTableFromArray("Definition", p_elmt, gui.m_model, gui.m_editorMode);
-                    //$("#defTable_div_" + p_elmt.getID()).html(s);
+                    //Hide values table
+                    $("#valuesTable_div_" + p_elmt.getID()).hide();
+                    $("#values_" + p_elmt.getID()).show();
+                    if (!p_elmt.isUpdated()) {
+                        $("#values_" + p_elmt.getID()).prop("disabled", true);
+                    }
                     //Add the edit functions again
                     gui.addEditFunction(p_elmt, gui.m_editorMode);
                 });
 
             }
 
-            
+            private createSettingsDiv() {
+                console.log("creating settings dialog");
+                var settingsDiv = document.createElement("div");
+                settingsDiv.setAttribute("id", "settingsDiv");
+                
+                var numOfIterations_div = document.createElement("div");
+                numOfIterations_div.style.overflow = "hidden";
+
+                var numOfIterations_label = document.createElement("div");
+                numOfIterations_label.style.width = "250px";
+                numOfIterations_label.style.cssFloat = "left";
+                numOfIterations_label.innerHTML = "Number of iterations in calculation:";
+                numOfIterations_div.appendChild(numOfIterations_label);
+
+                var numOfIterations = document.createElement("input");
+                numOfIterations.setAttribute("id", "numberOfIterations");
+                numOfIterations.style.marginLeft = "10px";
+                numOfIterations.style.width = "100px";
+                numOfIterations.type = "number";
+                numOfIterations.max = "50000";
+                numOfIterations.min = "100";
+                numOfIterations.step = "100";
+                numOfIterations.value = this.m_model.getmumOfIteraions()+"";
+                numOfIterations_div.appendChild(numOfIterations);
+                settingsDiv.appendChild(numOfIterations_div);
+
+                /*var autoUpdateForm = document.createElement("form");
+                var radioDiv = document.createElement("div");
+                radioDiv.setAttribute("class", "advButton button");
+                radioDiv.setAttribute("id", "autoUpdateRadio");
+                var updateOn = document.createElement("input");
+                updateOn.type = "radio";
+                updateOn.setAttribute("id", "autoUpdateOn");
+                updateOn.name = "radio";
+                var label1 = document.createElement("label");
+                label1.setAttribute("class", "advButton button");
+                label1.innerHTML = "On:";
+                label1.htmlFor = "autoUpdateOn";
+                radioDiv.appendChild(label1);
+                radioDiv.appendChild(updateOn);
+                autoUpdateForm.appendChild(radioDiv);
+                
+                settingsDiv.appendChild(autoUpdateForm);*/
+                $("#success").dialog({
+                    modal: true,
+                    title: 'Payment success',
+                    width: 400,
+                    buttons: {
+                        Ok: function () {
+                            $(this).dialog("close"); //closing on Ok click
+                        }
+                    },
+
+                });
+
+                $('body').append(settingsDiv);
+                               
+                return settingsDiv.id;
+            }
+            private openSettings() {
+                var gui = this;
+                if (this.m_settingsDiv === undefined) {
+                    var settingsID: String = "#" + this.createSettingsDiv();
+                    this.m_settingsDiv = $(settingsID).dialog(opt);
+                }
+                console.log(this.m_settingsDiv);
+                this.m_settingsDiv.dialog("open");
+                this.m_settingsDiv.dialog({
+                    width: 500,
+                    height: 200,
+                    buttons: {
+                        Ok: function () {
+                            gui.m_numOfIteraions = $("#numberOfIterations").val();
+                            $(this).dialog("close"); //closing and saving settings when clicking ok
+                        },
+                        cancel: function () {
+                            $(this).dialog("close");
+                        }
+                    },
+                });
+                var opt = {
+                    title: "Settings",
+                     
+                }
+            }
             private createDetailsDialog(p_elmt: Element): String {
                 console.log("creating dialog for " + p_elmt.getName());
                 var mareframeGUI = this; 
@@ -1134,9 +1257,16 @@ module Mareframe {
                     var opt = {
                         title: p_elmt.getName()
                     }
+                    var width = p_elmt.getData()[0].length * 70 + 50;
+                    if (width < 400) {
+                        width = 400
+                    }
+                    if (width > 1100) {
+                        width = 1100;
+                    }
                     dialog.dialog("open");
                     dialog.dialog({
-                        width: 600,
+                        width: width,
                         height: 500
                     });
                     $("#submit_" + id).hide();
@@ -1828,7 +1958,7 @@ module Mareframe {
                     $("#detailsDialog_" + id).data("unsavedChanges", false);
                     $("#submit_" + id).hide();
                     this.updateOpenDialogs();
-                    this.updateMiniTables([elmt]);
+                    this.updateMiniTables([elmt].concat(elmt.getAllDescendants()).concat(elmt.getAllDecisionAncestors()));
                 }
                 //this.m_updateMCAStage = true;
                 //this.m_mcaContainer.removeChild(elmt.m_easelElmt);
@@ -1953,6 +2083,8 @@ module Mareframe {
                     }
                 } else if (p_evt.target.name.substr(0, 4) === "conn") {
                     console.log("connection pressed");
+                    var connection: Connection = this.m_model.getConnection(p_evt.target.name);
+                    connection.m_easelElmt
 
                 }
                 else {
@@ -1960,7 +2092,7 @@ module Mareframe {
                 }
             }
             private select(p_evt: createjs.MouseEvent): void {
-                //////console.log("ctrl key: " + e.nativeEvent.ctrlKey);
+                //console.log("ctrl key: " + e.nativeEvent.ctrlKey);
                 if (!p_evt.nativeEvent.ctrlKey && this.m_selectedItems.indexOf(p_evt.target) === -1) {
                     this.clearSelection();
                 }
@@ -2047,7 +2179,7 @@ module Mareframe {
                 var screenWidth: number = $(parent.window).width();
                 var userScreenHeight: number = $(parent.window).height();
                 if (y > ((userScreenHeight + pxFromTop - 30))) {
-                    console.log("scroll");
+                    //console.log("scroll");
                     if (pxFromTop > 0) {
                         parent.window.scrollBy(0, (userScreenHeight / 50));
                     }
@@ -2060,7 +2192,7 @@ module Mareframe {
                 //console.log(p_evt.rawY, y, pxFromTop, userScreenHeight);
 
                 if (x > ((screenWidth + pxFromLeft - 130))) {
-                    console.log("scroll");
+                    //console.log("scroll");
                     parent.window.scrollBy((screenWidth / 50), 0);
                 }
                 else if (x < (pxFromLeft + 30)) {
@@ -2734,6 +2866,7 @@ module Mareframe {
                     alert("Please submit changes in " + elementWithUnsavedChanges.getName() + " before editing this data table");
                 }
             }
+
             
         }
     }
