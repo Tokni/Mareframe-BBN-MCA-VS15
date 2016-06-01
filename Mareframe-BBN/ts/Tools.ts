@@ -150,6 +150,11 @@
                 return Number(Math.round(numb * 1000) / 1000);
             }
 
+            static round2(numb: number) {
+                //return numb.toFixed(2);
+                return Number(Math.round(numb * 100) / 100);
+            }
+
             static getColumn(p_matrix: any[][], index: number) {
                 //console.log("get column " + index + " from " + p_matrix + " size " + math.size(p_matrix));
                 var rows = math.size(p_matrix).valueOf()[0];

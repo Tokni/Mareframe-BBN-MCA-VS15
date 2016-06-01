@@ -139,6 +139,10 @@ var Mareframe;
                 //return numb.toFixed(2);
                 return Number(Math.round(numb * 1000) / 1000);
             };
+            Tools.round2 = function (numb) {
+                //return numb.toFixed(2);
+                return Number(Math.round(numb * 100) / 100);
+            };
             Tools.getColumn = function (p_matrix, index) {
                 //console.log("get column " + index + " from " + p_matrix + " size " + math.size(p_matrix));
                 var rows = math.size(p_matrix).valueOf()[0];

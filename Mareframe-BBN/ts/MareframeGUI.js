@@ -344,7 +344,7 @@ var Mareframe;
                 this.m_updateStage = true;
                 $("#modelHeader").html(this.m_model.getName());
                 //this.repositionModel();
-                //this.updateSize();
+                this.updateSize();
                 //this.m_handler.getFileIO().quickSave(this.m_model); //This is commented out the because it was preventing reset from working properly
             };
             ;
@@ -411,85 +411,75 @@ var Mareframe;
                     var backgroundColors = ["#c6c6c6", "#bfbfe0"];
                     var decisionCont = elmt.m_minitableEaselElmt;
                     decisionCont.removeAllChildren();
-                    /*if (!(elmt.isUpdated())) {
-                        var decisTextBox: createjs.Text = new createjs.Text("Update model to show values", "0.8em trebuchet", "#303030");
-                        decisionCont.addChild(decisTextBox);
+                    for (var i = 0; i < elmt.getData().length - DST.Tools.numOfHeaderRows(elmt.getData()); i++) {
+                        var barBackgroundColor = backgroundColors[i % 2];
+                        var nameBackgroundColor;
+                        if (elmt.getType() === 1 && elmt.getDecision() === i - DST.Tools.numOfHeaderRows(elmt.getValues())
+                            || elmt.getType() === 0 && elmt.getEvidence() === i - DST.Tools.numOfHeaderRows(elmt.getValues())) {
+                            nameBackgroundColor = "#CCFFCC";
+                        }
+                        else {
+                            nameBackgroundColor = backgroundColors[i % 2];
+                        }
+                        var decisRect = new createjs.Shape(new createjs.Graphics().f(nameBackgroundColor).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
+                        //   console.log("" + elmt.getValues());
+                        //console.log("substring 0-12: " + elmt.getValues()[i][0]);
+                        //Choice or state name
+                        var decisName = new createjs.Text(elmt.getData()[i + DST.Tools.numOfHeaderRows(elmt.getData())][0].substr(0, 12), "0.8em trebuchet", "#303030");
+                        decisName.textBaseline = "middle";
+                        decisName.maxWidth = 68;
+                        decisName.x = 2;
+                        decisName.y = 6 + (i * 12);
+                        decisionCont.addChild(decisRect);
+                        decisionCont.addChild(decisName);
+                        if (elmt.isUpdated() && elmt.getValues()[0].length <= 2) {
+                            var valueData = elmt.getValues()[i + DST.Tools.numOfHeaderRows(elmt.getValues())][1];
+                            if (valueData == -Infinity) {
+                                valueData = 0;
+                            }
+                            var decisBarBackgr = new createjs.Shape(new createjs.Graphics().f(barBackgroundColor).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
+                            if (elmt.getType() === 0) {
+                                var decisBar = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
+                                var decisPercVal = new createjs.Text(Math.round(valueData * 100) + "%", "0.8em trebuchet", "#303030");
+                                decisPercVal.maxWidth = 22;
+                            }
+                            else if (elmt.getType() === 1 || elmt.getType() === 2) {
+                                var decisPercVal = new createjs.Text("" + DST.Tools.round2(valueData), "0.8em trebuchet", "#303030");
+                                decisPercVal.maxWidth = 68;
+                            }
+                            decisPercVal.textBaseline = "middle";
+                            decisPercVal.x = 71;
+                            decisPercVal.y = 6 + (i * 12);
+                            decisionCont.addChild(decisBarBackgr);
+                            decisionCont.addChild(decisPercVal);
+                            if (elmt.getType() === 0) {
+                                decisionCont.addChild(decisBar);
+                            }
+                        }
+                    }
+                    if (!elmt.isUpdated()) {
+                        var height = elmt.getValues().length - DST.Tools.numOfHeaderRows(elmt.getValues());
+                        //Set text box to show "Update to show values" if element is not updated
+                        //var decisBarBackgr: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(barBackgroundColor).s("#303030").ss(0.5).r(70, 12 * Tools.numOfHeaderRows(elmt.getValues()), 60, 12 * height));
+                        var decisPercVal = new createjs.Text("Update to\nshow\nvalues", "0.8em trebuchet", "#303030");
+                        decisPercVal.maxWidth = 68;
+                        decisPercVal.textBaseline = "middle";
+                        decisPercVal.textAlign = "center";
+                        decisPercVal.x = 100;
+                        decisPercVal.y = 8;
+                        //decisionCont.addChild(decisBarBackgr);
+                        decisionCont.addChild(decisPercVal);
                     }
                     else if (elmt.getValues()[0].length > 2) {
-                        var decisTextBox: createjs.Text = new createjs.Text("Values is multidimensional", "0.8em trebuchet", "#303030");
-                        decisionCont.addChild(decisTextBox);
-                    }
-                    else*/ {
-                        for (var i = 0; i < elmt.getData().length - DST.Tools.numOfHeaderRows(elmt.getData()); i++) {
-                            var barBackgroundColor = backgroundColors[i % 2];
-                            var nameBackgroundColor;
-                            if (elmt.getType() === 1 && elmt.getDecision() === i - DST.Tools.numOfHeaderRows(elmt.getValues())
-                                || elmt.getType() === 0 && elmt.getEvidence() === i - DST.Tools.numOfHeaderRows(elmt.getValues())) {
-                                nameBackgroundColor = "#CCFFCC";
-                            }
-                            else {
-                                nameBackgroundColor = backgroundColors[i % 2];
-                            }
-                            var decisRect = new createjs.Shape(new createjs.Graphics().f(nameBackgroundColor).s("#303030").ss(0.5).r(0, i * 12, 70, 12));
-                            //   console.log("" + elmt.getValues());
-                            //console.log("substring 0-12: " + elmt.getValues()[i][0]);
-                            //Choice or state name
-                            var decisName = new createjs.Text(elmt.getData()[i + DST.Tools.numOfHeaderRows(elmt.getData())][0].substr(0, 12), "0.8em trebuchet", "#303030");
-                            decisName.textBaseline = "middle";
-                            decisName.maxWidth = 68;
-                            decisName.x = 2;
-                            decisName.y = 6 + (i * 12);
-                            decisionCont.addChild(decisRect);
-                            decisionCont.addChild(decisName);
-                            if (elmt.isUpdated() && elmt.getValues()[0].length <= 2) {
-                                var valueData = elmt.getValues()[i + DST.Tools.numOfHeaderRows(elmt.getValues())][1];
-                                if (valueData == -Infinity) {
-                                    valueData = 0;
-                                }
-                                var decisBarBackgr = new createjs.Shape(new createjs.Graphics().f(barBackgroundColor).s("#303030").ss(0.5).r(70, i * 12, 60, 12));
-                                if (elmt.getType() === 0) {
-                                    var decisBar = new createjs.Shape(new createjs.Graphics().f(this.m_googleColors[i % this.m_googleColors.length]).r(96, 1 + (i * 12), 35 * valueData, 10));
-                                    var decisPercVal = new createjs.Text(Math.round(valueData * 100) + "%", "0.8em trebuchet", "#303030");
-                                    decisPercVal.maxWidth = 22;
-                                }
-                                else if (elmt.getType() === 1 || elmt.getType() === 2) {
-                                    var decisPercVal = new createjs.Text("" + DST.Tools.round(valueData), "0.8em trebuchet", "#303030");
-                                    decisPercVal.maxWidth = 68;
-                                }
-                                decisPercVal.textBaseline = "middle";
-                                decisPercVal.x = 71;
-                                decisPercVal.y = 6 + (i * 12);
-                                decisionCont.addChild(decisBarBackgr);
-                                decisionCont.addChild(decisPercVal);
-                                if (elmt.getType() === 0) {
-                                    decisionCont.addChild(decisBar);
-                                }
-                            }
-                        }
-                        if (!elmt.isUpdated()) {
-                            var height = elmt.getValues().length - DST.Tools.numOfHeaderRows(elmt.getValues());
-                            //Set text box to show "Update to show values" if element is not updated
-                            //var decisBarBackgr: createjs.Shape = new createjs.Shape(new createjs.Graphics().f(barBackgroundColor).s("#303030").ss(0.5).r(70, 12 * Tools.numOfHeaderRows(elmt.getValues()), 60, 12 * height));
-                            var decisPercVal = new createjs.Text("Update to\nshow\nvalues", "0.8em trebuchet", "#303030");
-                            decisPercVal.maxWidth = 68;
-                            decisPercVal.textBaseline = "middle";
-                            decisPercVal.textAlign = "center";
-                            decisPercVal.x = 100;
-                            decisPercVal.y = 8;
-                            //decisionCont.addChild(decisBarBackgr);
-                            decisionCont.addChild(decisPercVal);
-                        }
-                        else if (elmt.getValues()[0].length > 2) {
-                            var height = elmt.getValues().length - DST.Tools.numOfHeaderRows(elmt.getValues());
-                            //Set text box to show "Values are multi-dimensional" if element is not updated
-                            var decisPercVal = new createjs.Text("Values\nare multi-\ndimensional", "0.8em trebuchet", "#303030");
-                            decisPercVal.maxWidth = 68;
-                            decisPercVal.textBaseline = "middle";
-                            decisPercVal.textAlign = "center";
-                            decisPercVal.x = 100;
-                            decisPercVal.y = 8;
-                            decisionCont.addChild(decisPercVal);
-                        }
+                        var height = elmt.getValues().length - DST.Tools.numOfHeaderRows(elmt.getValues());
+                        //Set text box to show "Values are multi-dimensional" if element is not updated
+                        var decisPercVal = new createjs.Text("Values\nare multi-\ndimensional", "0.8em trebuchet", "#303030");
+                        decisPercVal.maxWidth = 68;
+                        decisPercVal.textBaseline = "middle";
+                        decisPercVal.textAlign = "center";
+                        decisPercVal.x = 100;
+                        decisPercVal.y = 8;
+                        decisionCont.addChild(decisPercVal);
                     }
                     if (elmt.getType() === 1) {
                         decisionCont.addEventListener("click", this.clickedDecision);
@@ -844,8 +834,6 @@ var Mareframe;
                     //Create the table again
                     $("#defTable_div_" + p_elmt.getID()).empty();
                     document.getElementById("defTable_div_" + p_elmt.getID()).appendChild(gui.htmlTableFromArray("Definition", p_elmt, gui.m_model, gui.m_editorMode));
-                    //var s = Tools.htmlTableFromArray("Definition", p_elmt, gui.m_model, gui.m_editorMode);
-                    //$("#defTable_div_" + p_elmt.getID()).html(s);
                     //Add the edit functions again
                     gui.addEditFunction(p_elmt, gui.m_editorMode);
                 });

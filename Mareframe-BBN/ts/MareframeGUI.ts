@@ -342,7 +342,7 @@ module Mareframe {
                 this.m_updateStage = true
                 $("#modelHeader").html(this.m_model.getName());
                 //this.repositionModel();
-                //this.updateSize();
+                this.updateSize();
                 //this.m_handler.getFileIO().quickSave(this.m_model); //This is commented out the because it was preventing reset from working properly
             };
             private mouseUp(p_evt: createjs.MouseEvent) {
@@ -419,15 +419,6 @@ module Mareframe {
                     var decisionCont: createjs.Container = elmt.m_minitableEaselElmt;
 
                     decisionCont.removeAllChildren();
-                    /*if (!(elmt.isUpdated())) {
-                        var decisTextBox: createjs.Text = new createjs.Text("Update model to show values", "0.8em trebuchet", "#303030");
-                        decisionCont.addChild(decisTextBox);
-                    }
-                    else if (elmt.getValues()[0].length > 2) {
-                        var decisTextBox: createjs.Text = new createjs.Text("Values is multidimensional", "0.8em trebuchet", "#303030");
-                        decisionCont.addChild(decisTextBox);
-                    }
-                    else*/ {
                         for (var i = 0; i < elmt.getData().length-Tools.numOfHeaderRows(elmt.getData()); i++) {
 
                             var barBackgroundColor: string = backgroundColors[i % 2];
@@ -467,7 +458,7 @@ module Mareframe {
 
                                     decisPercVal.maxWidth = 22;
                                 } else if (elmt.getType() === 1 || elmt.getType() === 2) {//Decision or value
-                                    var decisPercVal: createjs.Text = new createjs.Text("" + Tools.round(valueData), "0.8em trebuchet", "#303030");
+                                    var decisPercVal: createjs.Text = new createjs.Text("" + Tools.round2(valueData), "0.8em trebuchet", "#303030");
                                     decisPercVal.maxWidth = 68;
                                 }
                                 decisPercVal.textBaseline = "middle";
@@ -506,7 +497,7 @@ module Mareframe {
                             decisionCont.addChild(decisPercVal);
 
                         }
-                    }
+                    
                     if (elmt.getType() === 1) {
 
                         decisionCont.addEventListener("click", this.clickedDecision);
@@ -909,8 +900,6 @@ module Mareframe {
                     //Create the table again
                     $("#defTable_div_" + p_elmt.getID()).empty();
                     document.getElementById("defTable_div_" + p_elmt.getID()).appendChild(gui.htmlTableFromArray("Definition", p_elmt, gui.m_model, gui.m_editorMode));
-                    //var s = Tools.htmlTableFromArray("Definition", p_elmt, gui.m_model, gui.m_editorMode);
-                    //$("#defTable_div_" + p_elmt.getID()).html(s);
                     //Add the edit functions again
                     gui.addEditFunction(p_elmt, gui.m_editorMode);
                 });
@@ -2122,7 +2111,7 @@ module Mareframe {
                     }
                 });
             }
-            private resizeWindow(): void {
+             resizeWindow(): void {
                 var maxX: number = 0; // Right edge
                 var maxY: number = 0; //Bottom edge
                 var x: number;
