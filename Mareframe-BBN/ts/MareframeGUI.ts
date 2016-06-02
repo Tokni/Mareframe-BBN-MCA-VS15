@@ -414,7 +414,7 @@ module Mareframe {
                 //console.log("updating minitable");
                 for (var j = 0; j < p_elmtArr.length; j++) {
                     var elmt = p_elmtArr[j];
-                    console.log(elmt.getName() + " minitable is being updated");
+                    //console.log(elmt.getName() + " minitable is being updated");
                     var backgroundColors = ["#c6c6c6", "#bfbfe0"]
                     var decisionCont: createjs.Container = elmt.m_minitableEaselElmt;
 
@@ -455,7 +455,6 @@ module Mareframe {
 
                             if (elmt.isUpdated() && (elmt.getValues()[0].length <= 2 || ((elmt.getType() === 2 || elmt.getType() === 3) && Tools.numOfHeaderRows(elmt.getValues()) === 1))) {
                                 if ((elmt.getType() === 2 || elmt.getType() === 3) && Tools.numOfHeaderRows(elmt.getValues()) === 1) {
-                                    console.log("in here");
                                     var valueData: number = elmt.getValues()[1][1+i]; //Values are shown vertical
                                 }
                                 else {
@@ -1250,6 +1249,9 @@ module Mareframe {
                             console.log("unsaved changes");
                             if (!confirm("You have unsaved changes. Pressing OK will close the window and discard all changes.")) {
                                 return false;
+                            }
+                            else {
+                                $("#detailsDialog_" + p_elmt.getID()).data("unsavedChanges", false);//If ok is pressed, set unsaved changes to false
                             }
                             $("#valuesTable_div_" + id).show();
                         }
@@ -2657,13 +2659,14 @@ module Mareframe {
                         rowPlaceholder = table.insertRow(-1);
                         if (p_editorMode && p_header === "Definition" && (p_elmt.getType() === 0 || p_elmt.getType() === 1)) {//Create empty cell above minus cells
                             var emptyCell = document.createElement("th");
-                            emptyCell.style.minWidth = "10px";
+                           
                             rowPlaceholder.appendChild(emptyCell);
                         }
                         for (var j = 0; j < (data[0].length); j++) {//Create a new header element for each element
                             var headerCell = document.createElement("th");
                             if (j === 0) {
                                 headerCell.innerHTML = p_model.getElement(data[i][j]).getName();
+                                headerCell.style.minWidth = "90px";
                             }
                             else {
                                 headerCell.innerHTML = data[i][j];
