@@ -293,8 +293,8 @@
                 return newMatrix;
             }
 
-            static getValueWithCondition(p_values: any[][], p_elmt: Element, p_conditions: String[]): number[] {
-                //console.log("getting value with condition " + p_conditions + " from " + p_values);
+            static getValueWithCondition(p_values: any[][], p_elmt: Element, p_condition: String): number[] {
+                //console.log("getting value with condition " + p_condition +" elmt: "+ p_elmt.getName()+ " from " + p_values);
                 var values: any[][] = Tools.makeSureItsTwoDimensional(p_values);
                 // //console.log("values table : \n " + values);
                 var valuesFound = [];
@@ -303,13 +303,15 @@
                 var columns: number = size[1];
                 //Find the right row
                 for (var i = 0; i < rows; i++) {
-                    if (values[i][0] === p_elmt.getID()) {
+                    if (values[i][0] === p_elmt.getID() || i === rows-1) {//If the element matches or if this is the last row (then the element might not be in this table)
                         //Find the correct column
+                        //console.log("correct row");
                         for (var j = 1; j < columns; j++) {
-                            if (values[i][j] === p_conditions) {
+                            if (values[i][j] === p_condition || i === rows - 1) {//if this is the last row then the element might not be in this table and we should just take every value
                                 valuesFound.push(values[rows - 1][j]);
                             }
                         }
+                        return valuesFound;
                     }
                 }
                 //console.log("returned " + valuesFound);
@@ -791,7 +793,7 @@
                                 }
                                 //Sum values that meet the condition
                                 var valueArray = Tools.getValueWithCondition(elmt.getValues(), p_elmt, condition);
-                               // console.log("value array: " + valueArray);
+                                console.log("value array: " + valueArray);
                                 //If there are several values that meet the condition, use the highest
                                 value += Tools.getHighest(valueArray);
                             }
@@ -1512,7 +1514,6 @@
                         conditions.push([e.getID(), p_case[e.getID()]]);
                     
                 });
-                //console.log("conditions: " + conditions);
                 //Find the right column in data table
                 var data = p_elmt.getData();
                 var columnNumbers = [];

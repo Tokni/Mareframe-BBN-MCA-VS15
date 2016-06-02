@@ -29,6 +29,7 @@
                 this.m_model = p_model;
                 this.getChildrenElements = this.getChildrenElements.bind(this);
             }
+
             getDialog(): JQuery {
                 return this.m_dialog;
             }

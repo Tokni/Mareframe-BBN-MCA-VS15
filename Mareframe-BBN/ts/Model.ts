@@ -343,14 +343,17 @@
                     case 0:
                         e.setData([["state0", 0.5], ["state1", 0.5]]);
                         e.setValues(e.getData());
+                        e.setName("Chance" + this.m_elmtCounter);
                         break;
                     case 1:
                         e.setData([["choice0"], ["choice1"]]);
-                        e.setValues([["choice0",0], ["choice1",0]]);
+                        e.setValues([["choice0", 0], ["choice1", 0]]);
+                        e.setName("Decision" + this.m_elmtCounter);
                         break;
                     case 2:
                         e.setData([["Value", 0]]);
                         e.setValues([["Value", 0]]);
+                        e.setName("Utility" + this.m_elmtCounter);
                         break;
                     case 3:
                         e.setData([]);

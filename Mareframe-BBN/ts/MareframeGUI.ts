@@ -43,7 +43,7 @@ module Mareframe {
                 focusTarget: 'category'
 
             };
-            private m_elementColors: string[][] = [["#efefff", "#15729b", "#dfdfff", ], ["#ffefef", "#c42f33", "#ffdfdf"], ["#fff6e0", "#f6a604", "#fef4c6"], ["#fff6e0", "#f6a604", "#fef4c6"], ["#efffef", "#2fc433", "#dfffdf"]];
+            private m_elementColors: string[][] = [["#efefff", "#15729b", "#dfdfff", ], ["#fff6e0", "#f6a604", "#fef4c6"], ["#ffefef", "#c42f33", "#ffdfdf"], ["#ffefef", "#c42f33", "#ffdfdf"], ["#efffef", "#2fc433", "#dfffdf"]];
             private m_model: Model;
             private m_trashBin: Element[] = [];
 
@@ -414,17 +414,20 @@ module Mareframe {
                 //console.log("updating minitable");
                 for (var j = 0; j < p_elmtArr.length; j++) {
                     var elmt = p_elmtArr[j];
-                      //console.log(elmt.getName() + " minitable is being updated");
+                    console.log(elmt.getName() + " minitable is being updated");
                     var backgroundColors = ["#c6c6c6", "#bfbfe0"]
                     var decisionCont: createjs.Container = elmt.m_minitableEaselElmt;
 
                     decisionCont.removeAllChildren();
-                        for (var i = 0; i < elmt.getData().length-Tools.numOfHeaderRows(elmt.getData()); i++) {
-
+                    var max = elmt.getData().length - Tools.numOfHeaderRows(elmt.getData());
+                    if ((elmt.getType() === 2 || elmt.getType() === 3) && Tools.numOfHeaderRows(elmt.getValues()) === 1) {// Values can be shown vertically in utility nodes with only one headerrow
+                        max = elmt.getValues()[0].length-1;
+                    }
+                    for (var i = 0; i < max; i++) {
                             var barBackgroundColor: string = backgroundColors[i % 2];
                             var nameBackgroundColor: string;
-                            if (elmt.getType() === 1 && elmt.getDecision() === i - Tools.numOfHeaderRows(elmt.getValues())
-                                || elmt.getType() === 0 && elmt.getEvidence() === i - Tools.numOfHeaderRows(elmt.getValues())) {//Color set decision or evidence
+                            if (elmt.getType() === 1 && elmt.getDecision() === i
+                                || elmt.getType() === 0 && elmt.getEvidence() === i) {//Color set decision or evidence
                                 nameBackgroundColor = "#CCFFCC";
                             }
                             else {
@@ -436,7 +439,12 @@ module Mareframe {
                             //console.log("substring 0-12: " + elmt.getValues()[i][0]);
 
                             //Choice or state name
-                            var decisName: createjs.Text = new createjs.Text(elmt.getData()[i+Tools.numOfHeaderRows(elmt.getData())][0].substr(0, 12), "0.8em trebuchet", "#303030");
+                            if ((elmt.getType() === 2 || elmt.getType() === 3) && Tools.numOfHeaderRows(elmt.getValues()) === 1) {
+                                var decisName: createjs.Text = new createjs.Text(elmt.getValues()[0][i+1].substr(0, 12), "0.8em trebuchet", "#303030");
+                            }
+                            else {
+                                var decisName: createjs.Text = new createjs.Text(elmt.getData()[i+Tools.numOfHeaderRows(elmt.getData())][0].substr(0, 12), "0.8em trebuchet", "#303030");
+                            }
                             decisName.textBaseline = "middle";
                             decisName.maxWidth = 68;
                             decisName.x = 2;
@@ -445,8 +453,14 @@ module Mareframe {
                             decisionCont.addChild(decisRect);
                             decisionCont.addChild(decisName);
 
-                            if (elmt.isUpdated() && elmt.getValues()[0].length <= 2) {
-                                var valueData: number = elmt.getValues()[i + Tools.numOfHeaderRows(elmt.getValues())][1];
+                            if (elmt.isUpdated() && (elmt.getValues()[0].length <= 2 || ((elmt.getType() === 2 || elmt.getType() === 3) && Tools.numOfHeaderRows(elmt.getValues()) === 1))) {
+                                if ((elmt.getType() === 2 || elmt.getType() === 3) && Tools.numOfHeaderRows(elmt.getValues()) === 1) {
+                                    console.log("in here");
+                                    var valueData: number = elmt.getValues()[1][1+i]; //Values are shown vertical
+                                }
+                                else {
+                                    var valueData: number = elmt.getValues()[i + Tools.numOfHeaderRows(elmt.getValues())][1];
+                                }
                             if (valueData == -Infinity) {
                                 valueData = 0;
                             }
@@ -457,7 +471,7 @@ module Mareframe {
                                     var decisPercVal: createjs.Text = new createjs.Text(Math.round(valueData * 100) + "%", "0.8em trebuchet", "#303030");
 
                                     decisPercVal.maxWidth = 22;
-                                } else if (elmt.getType() === 1 || elmt.getType() === 2) {//Decision or value
+                                } else  {//Decision or value
                                     var decisPercVal: createjs.Text = new createjs.Text("" + Tools.round2(valueData), "0.8em trebuchet", "#303030");
                                     decisPercVal.maxWidth = 68;
                                 }
@@ -485,7 +499,7 @@ module Mareframe {
                             //decisionCont.addChild(decisBarBackgr);
                             decisionCont.addChild(decisPercVal);
                         }
-                        else if (elmt.getValues()[0].length > 2) {
+                        else if (elmt.getValues()[0].length > 2 && (elmt.getType() !== 2 && elmt.getType() !== 3)) {
                             var height: number = elmt.getValues().length - Tools.numOfHeaderRows(elmt.getValues());
                             //Set text box to show "Values are multi-dimensional" if element is not updated
                              var decisPercVal: createjs.Text = new createjs.Text("Values\nare multi-\ndimensional", "0.8em trebuchet", "#303030");
@@ -530,7 +544,8 @@ module Mareframe {
             private clickedEvidence(p_evt: createjs.MouseEvent) {
                 if (!this.m_editorMode && this.m_noOfDialogsOpen == 0) {// Setting evidence while in editor mode messes with the calculations
                     var elmt: Element = this.m_model.getElement(p_evt.currentTarget.name);
-                    this.m_model.setEvidence(elmt, Math.floor(p_evt.localY / 12) - Tools.numOfHeaderRows(elmt.getValues(),elmt));
+                    console.log("Local: " + p_evt.localY / 12 + " header rows: " + Tools.numOfHeaderRows(elmt.getValues(), elmt));
+                    this.m_model.setEvidence(elmt, Math.floor(p_evt.localY / 12));// - Tools.numOfHeaderRows(elmt.getValues(),elmt));
                     if (this.m_model.getAutoUpdate()) {
                         this.updateModel();
                     }
@@ -542,7 +557,8 @@ module Mareframe {
                 var mareframe = this;
                 if (this.m_editorMode) {
                     $(".advButton").show();
-                    $("#reset").show();
+                    $("#resetDcmt").hide();
+                    $("#selectAllElmt").hide();
                     if (this.m_model.m_bbnMode) {
                         $("#lodDcmtDiv").css("display", "inline-block"); //cannot use show here, because in firefox it adds the attribute "block" and the button is not inline
                         $("#newElmt").hide();
@@ -896,7 +912,12 @@ module Mareframe {
                 $(".decCell_" + p_elmt.getID()).click(function () {
                     console.log("decision cell clicked");
                     gui.m_model.setDecision(p_elmt, Number(this.id));
-                    gui.updateModel();
+                    if (gui.m_model.getAutoUpdate()) {
+                        gui.updateModel();
+                    }
+                    else {
+                        gui.updateMiniTables([p_elmt]);
+                    }
                     //Create the table again
                     $("#defTable_div_" + p_elmt.getID()).empty();
                     document.getElementById("defTable_div_" + p_elmt.getID()).appendChild(gui.htmlTableFromArray("Definition", p_elmt, gui.m_model, gui.m_editorMode));
@@ -914,6 +935,9 @@ module Mareframe {
                     gui.m_model.setEvidence(p_elmt, Number(this.id.substring(0, 1)));
                     if (gui.m_model.getAutoUpdate()) {
                         gui.updateModel();
+                    }
+                    else {
+                        gui.updateMiniTables([p_elmt]);
                     }
                     //Create the table again
                     $("#defTable_div_" + p_elmt.getID()).empty();
