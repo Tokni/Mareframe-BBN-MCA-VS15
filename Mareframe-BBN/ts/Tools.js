@@ -107,6 +107,7 @@ var Mareframe;
                     }
                     var tmp = total;
                     for (var k = 0; k < p_elmt.m_swingWeightsArr.length; k++) {
+                        var tmp1 = p_model.getConnection(p_elmt.m_swingWeightsArr[k][0]).getInputElement();
                         var childWeights = this.getWeights(p_model.getConnection(p_elmt.m_swingWeightsArr[k][0]).getInputElement(), p_model, p_element1Replace, p_element2Replace, p_elementIgnoreValue);
                         for (var j = 0; j < childWeights.length; j++) {
                             if (p_element1Replace != undefined && p_element2Replace != undefined && p_element1Replace.getType() !== 100 && p_element1Replace.getType() !== 102) {

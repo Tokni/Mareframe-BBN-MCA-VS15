@@ -252,7 +252,8 @@
                     return decisions;
             }
             isAncestorOf(elmt): boolean {
-              //  console.log("checking if " + this.getName() + " is an ancestor of " + elmt.getName() + ": " + (this.getAllAncestors().indexOf(elmt) > -1));
+                //console.log("checking if " + this.getName() + " is an ancestor of " + elmt.getName() + ": " + (this.getAllAncestors().indexOf(elmt) > -1));
+                //console.log(this.getAllAncestors());
                 return (this.getAllAncestors().indexOf(elmt) > -1);
             }
             getAllDescendants(): Element[]{

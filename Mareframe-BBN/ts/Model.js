@@ -297,17 +297,17 @@ var Mareframe;
                 if (p_addHeader) {
                     tempMatrix.push(['string', 'number']);
                 }
-                console.log("DataMatrixx  --------  -------- : " + dm);
+                //console.log("DataMatrixx  --------  -------- : " + dm);
                 switch (p_elmt.getType()) {
                     case 102:
                         break;
                     case 100:
-                        console.log("Type 0, attibute");
+                        //console.log("Type 0, attibute");
                         //set minimum and maximum values
                         var maxVal = p_elmt.getDataMax();
                         var minVal = p_elmt.getDataMin();
                         //calculate weights according to valueFn or sliders
-                        console.log("Method num: " + p_elmt.getMethod());
+                        //console.log("Method num: " + p_elmt.getMethod()); 
                         if (p_elmt.getMethod() == 2) {
                             for (var i = 3; i < this.getDataMatrix().length - 2; i++) {
                                 var toAdd = [this.m_elementArr[this.m_altIndex[i - 3]].getName(), p_elmt.getDataArrAtIndex(i - 3)];
@@ -319,7 +319,7 @@ var Mareframe;
                                     var frac = p_elmt.getPwlValue(p_elmt.getDataArrAtIndex(i - 3));
                                     toAdd.push(frac);
                                 }
-                                console.log("toAdd2: " + toAdd);
+                                //console.log("toAdd2: " + toAdd);
                                 tempMatrix.push(toAdd);
                             }
                         }
@@ -329,7 +329,7 @@ var Mareframe;
                                 if (!p_addHeader) {
                                     toAdd.push("ss");
                                 }
-                                console.log("toAdd4: " + toAdd);
+                                //console.log("toAdd4: " + toAdd);
                                 tempMatrix.push(toAdd);
                             }
                         }
@@ -359,7 +359,7 @@ var Mareframe;
                 //tempMatrix = [["a", "b", "d"], ["c", 50, 100]];
                 //tempMatrix = [["a", 15, 45], ["c", 50, 100]];
                 //tempMatrix = [10, 20, 30, 50];
-                console.log("WeigthedData: " + tempMatrix);
+                //console.log("WeigthedData: " + tempMatrix);
                 return tempMatrix;
             };
             Model.prototype.createNewElement = function (p_type) {
@@ -390,8 +390,8 @@ var Mareframe;
                         //e.setData([this.m_elementArr.length-2, 50, 50, 0, 50, 50]);
                         break;
                 }
-                console.log("New elements Array length: " + this.m_elementArr.length);
-                console.log("Data: " + e.getDataOld());
+                //console.log("New elements Array length: " + this.m_elementArr.length);
+                //console.log("Data: " + e.getDataOld());
                 return e;
             };
             Model.prototype.getElement = function (p_elmtStringId) {
@@ -461,6 +461,8 @@ var Mareframe;
                 if (key >= this.m_elementArr.length)
                     return false;
                 else {
+                    if (this.m_elementArr[key].getType() === 103)
+                        this.m_mainObjective = undefined;
                     this.m_elementArr.splice(key, 1);
                     return true;
                 }
@@ -618,6 +620,10 @@ var Mareframe;
                     var inpt = this.getElement(conn.connInput);
                     var c = this.createNewConnection(inpt, this.getElement(conn.connOutput));
                     c.fromJSON(conn);
+                    var tmp3 = c.getID().substr(4);
+                    var tmp4 = parseInt(c.getID().substr(4));
+                    if (parseInt(c.getID().substr(4)) !== NaN && parseInt(c.getID().substr(4)) > this.m_counter)
+                        this.m_counter = parseInt(c.getID().substr(4)) + 1;
                     this.addConnection(c);
                 }
                 if (!this.m_bbnMode)

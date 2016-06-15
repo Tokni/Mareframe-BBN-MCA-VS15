@@ -230,7 +230,8 @@ var Mareframe;
                 return decisions;
             };
             Element.prototype.isAncestorOf = function (elmt) {
-                //  console.log("checking if " + this.getName() + " is an ancestor of " + elmt.getName() + ": " + (this.getAllAncestors().indexOf(elmt) > -1));
+                //console.log("checking if " + this.getName() + " is an ancestor of " + elmt.getName() + ": " + (this.getAllAncestors().indexOf(elmt) > -1));
+                //console.log(this.getAllAncestors());
                 return (this.getAllAncestors().indexOf(elmt) > -1);
             };
             Element.prototype.getAllDescendants = function () {

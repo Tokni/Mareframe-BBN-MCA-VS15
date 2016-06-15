@@ -319,19 +319,19 @@
                 if (p_addHeader) {
                     tempMatrix.push(['string', 'number' ]);
                 }
-                console.log("DataMatrixx  --------  -------- : " + dm);
+                //console.log("DataMatrixx  --------  -------- : " + dm);
                 switch (p_elmt.getType()) {
                     case 102: //scenario
                         
                         break;
                     case 100: //attribute
-                        console.log("Type 0, attibute");
+                        //console.log("Type 0, attibute");
                         //set minimum and maximum values
                         var maxVal = p_elmt.getDataMax();
                         var minVal = p_elmt.getDataMin();
 
                         //calculate weights according to valueFn or sliders
-                        console.log("Method num: " + p_elmt.getMethod()); 
+                        //console.log("Method num: " + p_elmt.getMethod()); 
                         if (p_elmt.getMethod() == 2) {
                             for (var i = 3; i < this.getDataMatrix().length - 2; i++) {
                                 var toAdd = [this.m_elementArr[this.m_altIndex[i - 3]].getName(), p_elmt.getDataArrAtIndex(i - 3)];
@@ -345,7 +345,7 @@
                                     toAdd.push(frac);
                                     //toAdd.push(Mareframe.DST.Tools.getValueFn(Math.abs(p_elmt.m_valueFunctionFlip - (p_elmt.getDataArrAtIndex(i - 3) - minVal) / (maxVal - minVal)), Math.abs(p_elmt.m_valueFunctionFlip - p_elmt.m_valueFunctionX / 100), 1 - p_elmt.m_valueFunctionY / 100));
                                 }
-                                console.log("toAdd2: " + toAdd);
+                                //console.log("toAdd2: " + toAdd);
                                 tempMatrix.push(toAdd);
                             }
                         } else if (p_elmt.getMethod() === 4) {
@@ -355,7 +355,7 @@
                                     
                                     toAdd.push("ss");
                                 }
-                                console.log("toAdd4: " + toAdd);
+                                //console.log("toAdd4: " + toAdd);
                                 tempMatrix.push(toAdd);
                             }
                         } else {
@@ -391,7 +391,7 @@
                 //tempMatrix = [["a", "b", "d"], ["c", 50, 100]];
                 //tempMatrix = [["a", 15, 45], ["c", 50, 100]];
                 //tempMatrix = [10, 20, 30, 50];
-                console.log("WeigthedData: " + tempMatrix);
+                //console.log("WeigthedData: " + tempMatrix);
                 return tempMatrix;
             }
             createNewElement(p_type: number): Element {
@@ -422,8 +422,8 @@
 
                         break;
                 }
-                console.log("New elements Array length: " + this.m_elementArr.length);
-                console.log("Data: " + e.getDataOld());
+                //console.log("New elements Array length: " + this.m_elementArr.length);
+                //console.log("Data: " + e.getDataOld());
                 return e;
 
             }
@@ -495,7 +495,8 @@
                 if (key >= this.m_elementArr.length)
                     return false;
                 else {
-                    this.m_elementArr.splice(key, 1);
+                    if (this.m_elementArr[key].getType() === 103) this.m_mainObjective = undefined;
+                    this.m_elementArr.splice(key, 1);                  
                     return true;
                 }
             }
@@ -519,30 +520,30 @@
                         var states: number = this.m_connectionArr[key].getInputElement().getDataOld().length;
                         var data = this.m_connectionArr[key].getOutputElement().getDataOld();
                         var dataIn = this.m_connectionArr[key].getInputElement().getDataOld();
-                    var removeHeader = this.m_connectionArr[key].getInputElement().getID();
-                    console.log("Remove header: " + removeHeader);
-                    console.log("Original Data Out: " + data);
-                    console.log("Original Data In: " + dataIn);
+                        var removeHeader = this.m_connectionArr[key].getInputElement().getID();
+                        console.log("Remove header: " + removeHeader);
+                        console.log("Original Data Out: " + data);
+                        console.log("Original Data In: " + dataIn);
                     
-                    var dims: number[] = [0, 0, 0];
-                    data = Tools.removeHeaderRow(removeHeader, data);
-                    //var splicePos = 1 + Math.floor((data[data.length - 1].length / states));
-                    //console.log("states: " + states);
-                    //console.log("splicepos: " + splicePos);
-                    //for (var row = 0; row < data.length;row++) {
-                    //    if(data[row].length-1 > splicePos)
-                    //        data[row].splice(splicePos);
-                    //}
-                    //console.log("New data: " + data);
-                    //console.log("ConnectionArr: " + this.m_connectionArr[key]);
-                    this.m_connectionArr[key].getOutputElement().setData(data);
+                        var dims: number[] = [0, 0, 0];
+                        data = Tools.removeHeaderRow(removeHeader, data);
+                        //var splicePos = 1 + Math.floor((data[data.length - 1].length / states));
+                        //console.log("states: " + states);
+                        //console.log("splicepos: " + splicePos);
+                        //for (var row = 0; row < data.length;row++) {
+                        //    if(data[row].length-1 > splicePos)
+                        //        data[row].splice(splicePos);
+                        //}
+                        //console.log("New data: " + data);
+                        //console.log("ConnectionArr: " + this.m_connectionArr[key]);
+                        this.m_connectionArr[key].getOutputElement().setData(data);
 
-                    this.m_connectionArr.splice(key, 1);
+                        this.m_connectionArr.splice(key, 1);
 
-                    //console.log(this.m_elementArr);
-                    return true;
-                }
-                    else {
+                        //console.log(this.m_elementArr);
+                        return true;
+                    }
+                    else { // MCA
                         //updates the data of the element connected to the deletetee
                         var elmtOut = this.m_connectionArr[key].getOutputElement();
                         var elmtIn = this.m_connectionArr[key].getInputElement();
@@ -670,6 +671,10 @@
                     var inpt = this.getElement(conn.connInput);
                     var c = this.createNewConnection(inpt, this.getElement(conn.connOutput));
                     c.fromJSON(conn);
+                    var tmp3 = c.getID().substr(4);
+                    var tmp4 = parseInt(c.getID().substr(4));
+                    if (parseInt(c.getID().substr(4)) !== NaN && parseInt(c.getID().substr(4)) > this.m_counter)
+                        this.m_counter = parseInt(c.getID().substr(4))+1;
                     this.addConnection(c);
                 }
                 if (!this.m_bbnMode)

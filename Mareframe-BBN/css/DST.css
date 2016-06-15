@@ -42,3 +42,41 @@ input[type="checkbox"] + label span {
     display : block;
 
 }
+
+#MCATool {
+     overflow-x: auto;
+    overflow-y: auto;
+    width: 48%;
+    height: 50%;
+    position: absolute;
+    /*top: 0%;*/
+    left: 0%;
+    
+}
+
+#finalScore_div {
+     overflow-x: auto;
+    overflow-y: auto;
+    width: 48%;
+    height: 50%;
+    position: absolute;
+    left: 50%;
+}
+
+#MCADataTable {
+    overflow-x: auto;
+    overflow-y: auto;
+    width: 48%;
+    height: 50%;
+    position: absolute;
+    top: 50%;
+}
+
+#MCAContainer {
+    width: 1800px;
+    height: 800px;
+    margin: 2px;
+    border:red solid 3px;
+    position: relative;
+    border-radius:3px;
+}

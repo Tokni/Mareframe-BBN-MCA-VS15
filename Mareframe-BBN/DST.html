@@ -131,11 +131,11 @@
 
         <!--MCA Tool canvas-->
         <!--<canvas id="MCATool" width="800" height="600" style="display:inline-block; min-height: 400px; min-width: 600px" ></canvas>-->
-        <canvas id="MCATool" width="800" height="600" style="display:inline-block;"></canvas>
+        <canvas id="MCATool" width="1200" height="500"  style="display:inline-block;"></canvas>
 
         <!--Data Table-->
         <div id="finalScore_div" style="display:inline-block"></div>
-        <div id="MCADataTable" class="table-editable" style="display:inline-block ; vertical-align:central">
+        <div id="MCADataTable" class="table-editable" style="display:inline-block">
             <table id="editableDataTable" class="table" style="border: 2px solid #ffffff;border-collapse:collapse;">
                 <tr id="table_header">
                     <th style="border: 1px solid black">UnDef</th>
@@ -152,26 +152,26 @@
             </table>
         </div>
 
-        <div id="finalScore_div" style="display:inline-block"></div>
-    </div>
-    <div id="saveFile_div"><a id="downloadLink"></a></div>
-    <!--Sensitivity analysis Start   -->
-    <div id="SenAna">
-        <!--<div class="senana" id="sliderControl_div"></div>-->
-        <div class="senana" id="dropdownControl_div">
-            <select id="elementSelect"></select>
-        </div>
-        <div class="senana" id="dropdownControlSub_div">
-            <select id="elementSubSelect"></select>
-        </div>
-        <div class="senana" id="lineChart_div">Line Chart</div>
-        <div class="senana" id="tableChart_div">Table Chart</div>
+        <!--Sensitivity analysis Start   -->
+        <div id="SenAna">
+            <!--<div class="senana" id="sliderControl_div"></div>-->
+            <div class="senana" id="dropdownControl_div">
+                <select id="elementSelect"></select>
+            </div>
+            <div class="senana" id="dropdownControlSub_div">
+                <select id="elementSubSelect"></select>
+            </div>
+            <div class="senana" id="lineChart_div">Line Chart</div>
+            <div class="senana" id="tableChart_div">Table Chart</div>
 
-        <div class="senana" id="sliderControl_div"></div>
-        <div class="senana" id="sliderValNormDebug">---</div>
-        <div class="senana" id="sliderValDebug">---</div>
-    </div>
-    <!--Sensitivity analysis End     -->
+            <div class="senana" id="sliderControl_div"></div>
+            <div class="senana" id="sliderValNormDebug">---</div>
+            <div class="senana" id="sliderValDebug">---</div>
+        </div>
+        <!--Sensitivity analysis End     -->
+    </div> <!--MCAContainer End-->
+    <div id="saveFile_div"><a id="downloadLink"></a></div>
+    
     <!--Popup Dialog-->
     <div id="detailsDialog" >
         <div  class="info_div dialogDiv" style="width: 30%; overflow: visible;">

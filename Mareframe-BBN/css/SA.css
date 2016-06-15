@@ -31,12 +31,22 @@ display: inline-block;
 }*/
 
 #SenAna {
-  height:900px; 
-  width:1400px; 
+  overflow-x: auto;
+    overflow-y: auto;
+    width: 48%;
+    height: 50%;
   border:blue solid 2px;
-  position: relative;
+  position: absolute;
+  top : 50%;
+  left : 50%;
+  display: inline-block;
+  
 } 
-.senana {margin: 2px;border:black solid 1px;position: absolute;border-radius:3px;
+.senana {
+    margin: 2px;
+    border:black solid 1px;
+    border-radius:3px;
+    position: absolute;
     
 }  
 #lineChart_div {  

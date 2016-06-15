@@ -283,11 +283,13 @@
             }
             update() {
                 this.m_stage.update();
-                this.m_guiHandler.updateFinalScores();
-                var tm1 = this.m_currentElement;
-                this.m_guiHandler.updateChartData(this.m_guiHandler.m_SAChosenElement);
-                this.m_guiHandler.updateSATableData();
-                this.m_guiHandler.updateSA();
+                if (this.m_guiHandler.m_readyForSA) {
+                    this.m_guiHandler.updateFinalScores();
+                    var tm1 = this.m_currentElement;
+                    this.m_guiHandler.updateChartData(this.m_guiHandler.m_SAChosenElement);
+                    this.m_guiHandler.updateSATableData();
+                    this.m_guiHandler.updateSA();
+                }
             }
             addValueFunctionToStage() {
                 //for (var i = 1; i < this.m_valueFunction.
