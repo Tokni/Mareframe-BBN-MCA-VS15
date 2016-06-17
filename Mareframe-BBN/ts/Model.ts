@@ -397,13 +397,15 @@
             createNewElement(p_type: number): Element {
                 ////console.log(this.m_counter);
                 //console.log("Current elements Array length: " + this.m_elementArr.length);
+                this.m_counter++;
                 if (this.m_bbnMode === false) {
                     var e = new Element("elmt" + this.m_counter, this, p_type, 1);
                 } else {
                 var e = new Element("elmt" + this.m_counter, this, p_type);
                 }
                 //var e = new Element("elmt" + this.m_counter, this, p_type);
-                this.m_counter++;
+                
+                
                 this.m_elementArr.push(e);
                 switch (p_type) {
                     case 0:
@@ -697,10 +699,12 @@
                 //h.gui.updateTable(this.dataMatrix);
                 ////console.log("model.fromJSON()");
                 ////console.log(this);
+                var tmp = this.m_counter;
             }
             createNewConnection(p_inputElmt: Element, p_outputElmt: Element): Connection {
-                var c = new Connection(p_inputElmt, p_outputElmt, this.m_bbnMode, "conn" + this.m_counter);
                 this.m_counter++;
+                var c = new Connection(p_inputElmt, p_outputElmt, this.m_bbnMode, "conn" + this.m_counter);
+                
                 return c;
 
 

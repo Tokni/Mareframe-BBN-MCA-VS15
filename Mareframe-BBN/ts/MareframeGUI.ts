@@ -47,17 +47,19 @@ module Mareframe {
                     title: 'Cumulative Value'
                 },
                 title: '',
+                chartArea: { left: '5%', top: '15%', width: '65%', height: '60%' }, 
                 lineWidth: 1,
-                height: 300,
-                width: 300
+                explorer: {}
+                //height: 200,
+                //width: 100
             }
             private m_tableOptions = {
-                height: 400,
+                //height: 400,
                 width: 400
             }
             private m_finalScoreChartOptions: Object = {
-                width: 800,
-                height: 400,
+                //width: 200,
+                //height: 100,
                 vAxis: { minValue: 0 },
                 legend: { position: 'top', maxLines: 3 },
                 bar: { groupWidth: '75%' },
@@ -66,7 +68,7 @@ module Mareframe {
                 focusTarget: 'category'
 
             };
-            private m_elementColors: string[][] = [["#efefff", "#15729b", "#dfdfff"], ["#ffefef", "#c42f33", "#ffdfdf"], ["#fff6e0", "#f6a604", "#fef4c6"], ["#efffef", "#2fc433", "#dfffdf"]];
+            private m_elementColors: string[][] = [["#efefff", "#15729b", "#dfdfff", "#000000"], ["#ffefef", "#c42f33", "#ffdfdf", "#000000"], ["#fff6e0", "#f6a604", "#fef4c6", "#000000"], ["#efffef", "#2fc433", "#dfffdf", "#000000"]];
             private m_model: Model;
             private m_trashBin: Element[] = [];
             private m_hasGoal: boolean = false;
@@ -81,6 +83,7 @@ module Mareframe {
             public m_readyForSA: boolean = false;
             private m_idCounter = 0;
             private m_originalName: any;
+            private m_trafficLightsON: boolean = false;
 
             constructor(p_model: Model, p_handler: Handler) {
                 this.m_handler = p_handler;
@@ -325,8 +328,13 @@ module Mareframe {
             private se() { console.log("res"); }
             private updateAlternativeCount() {
                 this.m_alternativCount = 0;
-                for (var i in this.m_model.getElementArr()) {
-                    if (this.m_model.getElementArr()[i].getType() === 102)
+                var tmp120: any = this.m_model;
+                var tmp121: any = this.m_model.getElementArr();
+                //for (var i in this.m_model.getElementArr()) {
+                for (var i of this.m_model.getElementArr()) {
+                    
+                    //if (this.m_model.getElementArr()[i].getType() === 102)
+                    if (i.getType() === 102)
                         this.m_alternativCount++;
                 }
             }
@@ -598,7 +606,13 @@ module Mareframe {
 
                 switch ($("#MCAWeightingMethod").val()) {
                     case "1":
-                        elmt.getConnectionArr();
+                        //elmt.getConnectionArr();
+                        var dataMatrix = this.m_model.getDataMatrix();
+                        for (var i = 0; i < this.m_alternativCount; i++) {
+                            elmt.m_swingWeightsArr[i] = [];
+                            elmt.m_swingWeightsArr[i][0] = dataMatrix[i + 3][0];
+                            elmt.m_swingWeightsArr[i][1] = 50;
+                        }
                         elmt.setData({});
                         break;
                     case "2":
@@ -784,6 +798,7 @@ module Mareframe {
                 this.m_readyForSA = false;
                 if (this.m_model.getMainObjective() != undefined) {
                     var tmp2 = this.m_SAChosenElement;
+                    this.updateAlternativeCount();
                     this.m_readyForSA = this.isReadyForSA();
                     if (this.m_SAChosenElement == undefined) {
                         this.m_SAChosenElement = this.m_model.getMainObjective();
@@ -805,7 +820,8 @@ module Mareframe {
                 for (var i = 0; i < conns.length; i++) {
                     this.addConnectionToStage(conns[i]);
                 }
-                
+               
+                this.m_readyForSA = this.isReadyForSA();
                 if (this.m_readyForSA) {
                     $("#SenAna").show();
                     $("#finalScore_div").show();
@@ -836,6 +852,8 @@ module Mareframe {
                 this.updateSATableData();
                 this.updateSA();
 
+                this.m_idCounter = this.m_model.getElementArr().length;
+                
                 //this.m_handler.getFileIO().quickSave(this.m_model); //This is commented out the because it was preventing reset from working properly
             };
             private mouseUp(p_evt: createjs.MouseEvent) {
@@ -897,9 +915,9 @@ module Mareframe {
                 }
 
                 if (p_elmt.m_dstType === 1) {
-                    var label = new createjs.Text(p_elmt.getName().substr(0, 24), "1em trebuchet", this.m_elementColors[p_elmt.getType()-100][1]);
+                    var label = new createjs.Text(p_elmt.getName().substr(0, 24), "1.2em Helvetica", this.m_elementColors[p_elmt.getType()-100][3]);
                 } else {
-                var label = new createjs.Text(p_elmt.getName().substr(0, 24), "1em trebuchet", this.m_elementColors[p_elmt.getType()][1]);
+                var label = new createjs.Text(p_elmt.getName().substr(0, 24), "1em trebuchet", this.m_elementColors[p_elmt.getType()][3]);
                 }
                 //var label = new createjs.Text(p_elmt.getName().substr(0, 24), "1em trebuchet", this.m_elementColors[p_elmt.getType()][1]);
                 label.textAlign = "center";
@@ -1024,7 +1042,7 @@ module Mareframe {
                     }
                 } else {
                     $(".advButton").hide();
-                    $("#lodDcmtDiv").hide();
+                    //$("#lodDcmtDiv").hide();
                     $("#cnctTool").prop("checked", false);
                 }
                 var elementArr = this.m_model.getElementArr();
@@ -1221,6 +1239,7 @@ module Mareframe {
 
                 var elmt = this.m_model.createNewElement(undefined)
                 elmt.setName("Objective " + ++this.m_idCounter);
+                console.log("**New Element id: " + elmt.getID() + "   Name: " + elmt.getName());
                 this.addElementToStage(elmt);
                 if (this.m_model.getElementArr().length === 1) {
                     this.m_SAChosenElement = elmt;
@@ -1323,6 +1342,7 @@ module Mareframe {
                 $(".dialogDiv ").hide();
             }
             private populateElmtDetails(p_elmt: Element): void {
+                console.log("opening: " + p_elmt.getID());
                 this.m_unsavedChanges = false;
                 this.eraseElmtDetails(p_elmt);
                 var type = p_elmt.getType();
@@ -1442,12 +1462,13 @@ module Mareframe {
                             
                             break;
                     }
-                    switch (p_elmt.getMethod()) {
-                        case 0://direct or undefined
+                    var tmp3 = p_elmt.getMethod().toString();
+                    switch (p_elmt.getMethod().toString()) {
+                        case '0'://direct or undefined
                             //console.log("WeigthMethodDirect");
                             //console.log("Weigthed data: " + this.m_model.getWeightedData(p_elmt, false));
                             break;
-                        case 1://swing
+                        case '1'://swing
                             //console.log("WeigthMethodSwing");
                             var sliderHtml = "";
                             $("#sliders_div").empty();
@@ -1455,8 +1476,12 @@ module Mareframe {
                            // for (var i = 0; i < p_elmt.getDataArr.length; i++) {
                             for (var i = 0; i < p_elmt.m_swingWeightsArr.length; i++) {
                                 if (p_elmt.m_swingWeightsArr.length != 1) {
+                                    var tmp4 = this.m_altData;
+                                    var tmp5 = this.m_attributeIndex;
+                                    var tmp6 = this.m_model.getDataMatrix();
                                     var childEl = this.m_model.getConnection(p_elmt.m_swingWeightsArr[i][0]).getInputElement();
-
+                                    //var childEl = this.m_model.getElement(this.m_model.getDataMatrix()[i + 3][0]);
+                                    
                                     sliderHtml = "<div><p>" + childEl.getName() + ":<input id=\"inp_" + childEl.getID() + "\"type=\"number\" min=\"0\" max=\"100\"></p><div style=\"margin-top:5px ;margin-bottom:10px\"class =\"slider\"id=\"slid_" + childEl.getID() + "\"></div></div>";
                                     $("#sliders_div").append(sliderHtml);
                                     function makeSlider(count, id, _this1) {
@@ -1557,7 +1582,7 @@ module Mareframe {
                             $("#sliders_div").show();
 
                             break;
-                        case 2://valueFn
+                        case '2'://valueFn
                             //$("#valueFn_div").show();
                             $("#pwl_div").show();
                             //console.log("WeigthMethodValueFn");
@@ -1630,8 +1655,8 @@ module Mareframe {
                             this.m_pwWidget.addPWLToStage();
                             this.m_pwWidget.update();
                             break;
-                        case 3://ahp
-                        case 4: {
+                        case '3'://ahp
+                        case '4': {
                             $("#pwl_div").show();
                             this.m_pwWidget.addPWLToStage();
                             this.m_pwWidget.update();
@@ -1733,17 +1758,7 @@ module Mareframe {
                                             mareframeGUI.m_unsavedChanges = true;
                                         }
                                         originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
-
-                                        if (this.m_readyForSA) {
-                                            this.updateSADropdown();
-                                            mareframeGUI.updateTable(mareframeGUI.m_model.getDataMatrix(true));
-                                            mareframeGUI.updateFinalScores();
-                                            if (this.m_SAChosenElement != null && this.m_SAChosenSubElement != 0) {
-                                                mareframeGUI.updateChartData(mareframeGUI.m_SAChosenElement);
-                                                mareframeGUI.updateSA();
-                                                
-                                            }
-                                        }
+                                        
                                     }
                                     $(this).parent().removeClass("editable");
                                 });
@@ -1938,7 +1953,18 @@ module Mareframe {
                                         mareframeGUI.addElementToStage(p_elmt);//repaints the element
                                     }
                                     originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
-                                    mareframeGUI.updateSADropdown();
+                                    mareframeGUI.updateTable(mareframeGUI.m_model.getDataMatrix(true));
+                                    if (mareframeGUI.m_readyForSA) {
+                                        mareframeGUI.updateSADropdown();
+
+                                        mareframeGUI.updateFinalScores();
+                                        if (mareframeGUI.m_SAChosenElement != null && mareframeGUI.m_SAChosenSubElement != null) {
+                                            mareframeGUI.updateChartData(mareframeGUI.m_SAChosenElement);
+                                            mareframeGUI.updateSA();
+
+                                        }
+                                    }
+                                    //mareframeGUI.updateSADropdown();
                                 }
                                 $(this).parent().removeClass("editable");
                             });
@@ -1956,7 +1982,17 @@ module Mareframe {
                                 }
                                 originalName = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
                                 $(this).parent().removeClass("editable");
-                                mareframeGUI.updateSADropdown();
+                                mareframeGUI.updateTable(mareframeGUI.m_model.getDataMatrix(true));
+                                if (mareframeGUI.m_readyForSA) {
+                                    mareframeGUI.updateSADropdown();
+
+                                    mareframeGUI.updateFinalScores();
+                                    if (mareframeGUI.m_SAChosenElement != null && mareframeGUI.m_SAChosenSubElement != null) {
+                                        mareframeGUI.updateChartData(mareframeGUI.m_SAChosenElement);
+                                        mareframeGUI.updateSA();
+
+                                    }
+                                }
                         });
 
                     });
@@ -2181,15 +2217,17 @@ module Mareframe {
                             }
                             if (i !== 0 && j !== 0) {
                                 var t = " ;color:black; ";
-                                if (j > 2 && j < p_matrix.length - 2) {
-                                    if (row[i] / p_matrix[2][i] > 1.15) {
-                                        t = " ;color:red; "
-                                    }
-                                    else if (row[i] / p_matrix[2][i] < 0.85) {
-                                        var t = " ;color:blue; ";
-                                    }
-                                    else {
-                                        var t = " ;color:lightgrey; ";
+                                if (this.m_trafficLightsON) {
+                                    if (j > 2 && j < p_matrix.length - 2) {
+                                        if (row[i] / p_matrix[2][i] > 1.15) {
+                                            t = " ;color:red; "
+                                        }
+                                        else if (row[i] / p_matrix[2][i] < 0.85) {
+                                            var t = " ;color:blue; ";
+                                        }
+                                        else {
+                                            var t = " ;color:lightgrey; ";
+                                        }
                                     }
                                 }
                                 tableHTML = tableHTML + "<td style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle" + t + "\" id='dataTable" + i + "x" + j + "' class='tableEdit' >" + row[i] + "</td>";

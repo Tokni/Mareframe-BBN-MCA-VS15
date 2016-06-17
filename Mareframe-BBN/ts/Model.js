@@ -365,6 +365,7 @@ var Mareframe;
             Model.prototype.createNewElement = function (p_type) {
                 ////console.log(this.m_counter);
                 //console.log("Current elements Array length: " + this.m_elementArr.length);
+                this.m_counter++;
                 if (this.m_bbnMode === false) {
                     var e = new DST.Element("elmt" + this.m_counter, this, p_type, 1);
                 }
@@ -372,7 +373,6 @@ var Mareframe;
                     var e = new DST.Element("elmt" + this.m_counter, this, p_type);
                 }
                 //var e = new Element("elmt" + this.m_counter, this, p_type);
-                this.m_counter++;
                 this.m_elementArr.push(e);
                 switch (p_type) {
                     case 0:
@@ -643,10 +643,11 @@ var Mareframe;
                 //h.gui.updateTable(this.dataMatrix);
                 ////console.log("model.fromJSON()");
                 ////console.log(this);
+                var tmp = this.m_counter;
             };
             Model.prototype.createNewConnection = function (p_inputElmt, p_outputElmt) {
-                var c = new DST.Connection(p_inputElmt, p_outputElmt, this.m_bbnMode, "conn" + this.m_counter);
                 this.m_counter++;
+                var c = new DST.Connection(p_inputElmt, p_outputElmt, this.m_bbnMode, "conn" + this.m_counter);
                 return c;
             };
             Model.prototype.setDecision = function (p_elmtIdent, p_decisNumb) {

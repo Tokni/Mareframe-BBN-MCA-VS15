@@ -34,10 +34,10 @@ display: inline-block;
   overflow-x: auto;
     overflow-y: auto;
     width: 48%;
-    height: 50%;
+    height: 30%;
   border:blue solid 2px;
   position: absolute;
-  top : 50%;
+  top : 66%;
   left : 50%;
   display: inline-block;
   
@@ -51,44 +51,44 @@ display: inline-block;
 }  
 #lineChart_div {  
     height:80%; 
-    width:47%; 
-    left: 22%;
+    width:49%; 
+    left: 17%;
     top: 2%;
 }
 #tableChart_div{ 
     height: 80%;
     width: 27%;
     top: 2%;
-    left: 71%;
+    left: 67%;
 }
 #dropdownControl_div {
   height: 38%;
-  width: 18%;
+  width: 14%;
   top: 2%;
   left: 2%;
 }
 #dropdownControlSub_div {
   height: 38%;
-  width: 18%;
+  width: 14%;
   top: 43%;
   left: 2%;
 }
 #sliderControl_div {
   
-  width: 40%;
+  width: 35%;
   /*height: 10%;*/
-  bottom: 12%;
-    left: 22%;
+  bottom: 8%;
+    left: 24%;
 }
 #sliderValDebug {
-  height: 5%;
+  height: 10%;
   width: 10%;
   bottom: 2%;
-  right: 2%;
+  right: 14%;
 }
 #sliderValNormDebug {
-  height: 5%;
+  height: 10%;
   width: 10%;
-  bottom: 8%;
+  bottom: 2%;
   right: 2%;
 }
