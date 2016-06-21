@@ -218,21 +218,15 @@
             setDataMatrix(p_matrix: any[][]): void {
                 this.m_dataMatrix = p_matrix;
             }
-            //getFinalScore(p_connectionReplace?: Connection, p_elementIgnoreValue?: number): number[][] {
             getFinalScore(p_element1Replace?: Element, p_element2Replace?: Element, p_elementIgnoreValue?: number): number[][] {
-                //console.log("Datamatrix: " + this.getDataMatrix());
                 var tempMatrix = JSON.parse(JSON.stringify(this.getDataMatrix()));
-                //console.log("tempmatrix---***: " + tempMatrix);
-                //console.log("MainObj: " + this.m_mainObjective);
-
+               
                 if (this.m_mainObjective != null) {
 
                     var weightsArr = Tools.getWeights(this.m_mainObjective, this, p_element2Replace, p_element1Replace, p_elementIgnoreValue);
-                    //var weightsArr = Tools.getWeights(this.m_mainObjective, this);
-                    //console.log("______:::::*******************************************Weigths:  " + weightsArr);
                     var sortedWeights: any[] = [];
 
-
+                    //sortedWeigths matches tempMatrix
                     for (var i = 0; i < weightsArr.length; i++) {
                         for (var j = 1; j < tempMatrix[0].length; j++) {
                             tmp = tempMatrix[0][j];
@@ -246,8 +240,6 @@
                 for (var i = 0; i < weightsArr.length; i++) {
                         var tmp = tempMatrix[0][i + 1];
                         var elmt = this.getElement(tempMatrix[0][i + 1]);
-                        
-
                         var maxVal = elmt.getDataMax();
                         var minVal = elmt.getDataMin();
                         var flip = elmt.m_valueFunctionFlip;
@@ -259,14 +251,12 @@
                             maxVal = tempMatrix[j][i + 1];
                         }
                     }
-
                     for (var j = 1; j < tempMatrix.length - 1; j++) {
                         if (tempMatrix[j][i + 1] < minVal) {
                             minVal = tempMatrix[j][i + 1];
                         }
                     }
                     for (var j = 3; j < tempMatrix.length - 2; j++) {                                       
-                            //tempMatrix[j][i + 1] = Mareframe.DST.Tools.getValueFn(Math.abs(flip - ((tempMatrix[j][i + 1] - minVal) / (maxVal - minVal))), Math.abs(flip - ((x / 100))), 1 - (y / 100));
                             var tmp5 = tempMatrix[j][i + 1] ;
                             var tmp6 = elmt.getPwlVF().getValue(tempMatrix[j][i + 1]);
                             var tmp7 = weightsArr[i][1];
@@ -274,21 +264,41 @@
                             if (p_element1Replace != undefined) {
                                 var tmp7b = p_element2Replace.getID();
                                 if (p_element2Replace.getID() === tempMatrix[0][i + 1] && p_element1Replace.getID() === tempMatrix[j][0]) {
-                                    //tempMatrix[j][i + 1] = elmt.getPwlVF().getValue(p_elementIgnoreValue);
-
-                                    tempMatrix[j][i + 1] = elmt.getPwlValue(p_elementIgnoreValue);
+                                    if (elmt.getMethod() == 1) {
+                                        var total = 0;
+                                        for (var k = 0; k < elmt.m_swingWeightsArr.length; k++) {
+                                            total += elmt.m_swingWeightsArr[k][1];
+                                        }
+                                        tempMatrix[j][i + 1] = elmt.m_swingWeightsArr[j-3][1] / total;
+                                    }
+                                    else
+                                        tempMatrix[j][i + 1] = elmt.getPwlValue(p_elementIgnoreValue);
                                     var tmp7c = tempMatrix[j][i + 1];
                                 }
                                 else {
-                                    //tempMatrix[j][i + 1] = elmt.getPwlVF().getValue(tempMatrix[j][i + 1]);
+                                    if (elmt.getMethod() == 1) {
+                                        var total = 0;
+                                        for (var k = 0; k < elmt.m_swingWeightsArr.length; k++) {
+                                            total += elmt.m_swingWeightsArr[k][1];
+                                        }
+                                        tempMatrix[j][i + 1] = elmt.m_swingWeightsArr[j-3][1] / total;
+                                    }
+                                    else
                                     tempMatrix[j][i + 1] = elmt.getPwlValue(tempMatrix[j][i + 1]);
                                 }
                             }
                             else {
-                                //tempMatrix[j][i + 1] = elmt.getPwlVF().getValue(tempMatrix[j][i + 1]);
+                                if (elmt.getMethod() == 1) {
+                                    var total = 0;
+                                    for (var k = 0; k < elmt.m_swingWeightsArr.length; k++) {
+                                        total += elmt.m_swingWeightsArr[k][1];
+                                    }
+                                    tempMatrix[j][i + 1] = elmt.m_swingWeightsArr[j-3][1] / total;
+                                }
+                                else
                                 tempMatrix[j][i + 1] = elmt.getPwlValue(tempMatrix[j][i + 1]);
                             }
-                        //tempMatrix[j][i + 1] *= weightsArr[i][1];
+                            var tmp7c = tempMatrix[j][i + 1];
                             tempMatrix[j][i + 1] *= sortedWeights[i];
                         tempMatrix[j][i + 1] = (Math.round(10000 * tempMatrix[j][i + 1])) / 10000;
                         var tmp8 = tempMatrix[j][i + 1];
@@ -303,13 +313,6 @@
                 else {
                     console.log("There is no main objective yet.");
                 }
-                //for (var i = 2; i < tempMatrix.length - 2; i++) {
-                //    //console.log("tmpMat" + tempMatrix);
-                //    tempMatrix[i][0] = this.getElement(tempMatrix[i][0]).getName();
-                //}
-                //tempMatrix = [["1", "1"," 1", "1"], [0.2, 0.4, 0.6, 0.8]];
-
-                //console.log("FinalScore: " + tempMatrix);
                 return tempMatrix;
             }
             //this should be in elment
@@ -332,7 +335,21 @@
 
                         //calculate weights according to valueFn or sliders
                         //console.log("Method num: " + p_elmt.getMethod()); 
-                        if (p_elmt.getMethod() == 2) {
+                        if (p_elmt.getMethod() == 1) {
+                            var total = 0;
+                            for (var i = 0; i < p_elmt.m_swingWeightsArr.length; i++) {
+                                total += p_elmt.m_swingWeightsArr[i][1];
+                            }
+                            
+                            for (var i = 0; i < p_elmt.m_swingWeightsArr.length; i++) {
+                                var toAdd = [this.getElement(p_elmt.m_swingWeightsArr[i][0]).getName(), p_elmt.getDataArrAtIndex(i)];
+                                if (!p_addHeader) {
+                                    toAdd.push(p_elmt.m_swingWeightsArr[i][1] / total);
+                                }
+                                tempMatrix.push(toAdd);
+                            }
+                        }
+                        else if (p_elmt.getMethod() == 2) {
                             for (var i = 3; i < this.getDataMatrix().length - 2; i++) {
                                 var toAdd = [this.m_elementArr[this.m_altIndex[i - 3]].getName(), p_elmt.getDataArrAtIndex(i - 3)];
                                 if (!p_addHeader) {

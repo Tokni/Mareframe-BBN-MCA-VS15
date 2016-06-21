@@ -157,6 +157,13 @@ module Mareframe {
                     $("#selectModelDiv").hide();
                     $("#submit").hide();
                     $("#showDescriptionButtonLabel").hide();
+                    $("label[for='fullscreen']").hide();
+                    //$("#fullscreen").hide();
+                    $("#autoUpdate").hide();
+                    $("label[for='autoUpdate']").hide();
+                    $("#updateMdl").hide();
+                    
+                    
                     //$("#MCAelmtType").selectmenu();
                     //$("#MCAWeightingMethod").selectmenu();
                     $("#weightingMethodSelector").hide();
@@ -171,8 +178,8 @@ module Mareframe {
                     $("#sliderControl_div").slider().css( 'position', 'absolute' );
                     
                     this.updateSADropdown();
-                    $("#lineChart_div").draggable();
-                    $("#tableChart_div").draggable();
+                    //$("#lineChart_div").draggable();
+                    //$("#tableChart_div").draggable();
                     //$("#sliderControl_div").draggable();
                     //$("#sliderValDebug").hide();
                     //$("#elementSelect").selectmenu();
@@ -624,10 +631,19 @@ module Mareframe {
                         }
                     default:
                         console.log("You done goofed" + $("#MCAWeightingMethod").val() );
-            }
-                
+                }
+                this.m_readyForSA = this.isReadyForSA();
+                this.updateTable(this.m_model.getDataMatrix(true));
+                if (!this.m_model.m_bbnMode && this.m_readyForSA) {
+                    this.updateFinalScores();
+                    this.updateSADropdown();
+                    this.updateSA();
+
+
+                }
                 this.populateElmtDetails(elmt);
                 this.m_updateMCAStage = true;
+
             }
             private allConnectionstoConsole(p_evt: Event) {
                 for (var i = 0; i < this.m_model.getConnectionArr().length; i++) {
@@ -713,7 +729,10 @@ module Mareframe {
                     //console.log("DC filname");
                 
                     var $filename = $("#filename");
-                    var oldText = $filename.html();
+                    var oldText = $filename.attr("value");
+                    if (oldText === undefined)
+                        oldText = $filename.html();
+                   
                     $filename.html("<input type='text' value= '" + oldText + "'>");
                     $filename.children().first().focus();
                     $filename.children().first().keypress(function (e) {
@@ -730,12 +749,18 @@ module Mareframe {
                             var saveName = oldText + ".xdsl";
                             console.log("saveName: " + saveName);
                             handler.getFileIO().saveModel(model, saveName);
+                            console.log("filenamehtml: " + $filename.html());
                         }
                       
                     });
                     
-                 });
-                var saveName = $("#filename").html() + ".xdsl"; 
+                });
+                var saveName;
+                var fileAttr = $("#filename").attr('value');
+                if (fileAttr === undefined)
+                    saveName = "model" + ".xdsl"; 
+                else 
+                    saveName = fileAttr + ".xdsl"; 
                 console.log("saveNmae: " + saveName);
                 this.m_handler.getFileIO().saveModel(this.m_model, saveName);
                 
@@ -1030,7 +1055,7 @@ module Mareframe {
                         /*$("#newChance").hide();
                         $("#newDec").hide();
                         $("#newValue").hide();
-                        $("#cnctTool").hide();*/
+                        $("#cnctTool").hide();*/                      
                     }
                     else {
                         $("#newChance").hide();
@@ -1439,20 +1464,15 @@ module Mareframe {
 
                         case 100:  //Attribute
                             //show: valueFn,direct(sliders),ahp
-                            //$("#weightingMethodSelector").show();
+                            $("#weightingMethodSelector").show();
                             $("#datatable_div").show();
                             $("#chart_div").show();
                             // Create the data table.
                             // Instantiate and draw our chart, passing in some options.
-                            //alert("1");
-                            //console.log("WeightedDataT: " + this.m_model.getWeightedData(p_elmt, true));
-                            //console.log("WeightedDataF: " + this.m_model.getWeightedData(p_elmt, false));
+                            
                             var chartData = google.visualization.arrayToDataTable(this.m_model.getWeightedData(p_elmt, true));
-                            //alert("2");
                             var chart = new google.visualization.ColumnChart($("#chart_div").get(0));
-                            //alert("3");
                             chart.draw(chartData, chartOptions);
-                            //alert("4");
 
                             break;
                         case 103:  //Goal
@@ -1479,7 +1499,13 @@ module Mareframe {
                                     var tmp4 = this.m_altData;
                                     var tmp5 = this.m_attributeIndex;
                                     var tmp6 = this.m_model.getDataMatrix();
-                                    var childEl = this.m_model.getConnection(p_elmt.m_swingWeightsArr[i][0]).getInputElement();
+                                    var childEl: any;
+                                    if (p_elmt.getType() !== 100) {
+                                        childEl = this.m_model.getConnection(p_elmt.m_swingWeightsArr[i][0]).getInputElement();
+                                    }
+                                    else {
+                                        childEl = this.m_model.getElement(p_elmt.m_swingWeightsArr[i][0]);
+                                    }
                                     //var childEl = this.m_model.getElement(this.m_model.getDataMatrix()[i + 3][0]);
                                     
                                     sliderHtml = "<div><p>" + childEl.getName() + ":<input id=\"inp_" + childEl.getID() + "\"type=\"number\" min=\"0\" max=\"100\"></p><div style=\"margin-top:5px ;margin-bottom:10px\"class =\"slider\"id=\"slid_" + childEl.getID() + "\"></div></div>";
@@ -1580,6 +1606,8 @@ module Mareframe {
                                 }
                             }
                             $("#sliders_div").show();
+                            if (p_elmt.getType() == 100)
+                                this.updateDataTableDiv(p_elmt);
 
                             break;
                         case '2'://valueFn

@@ -35,7 +35,7 @@ display: inline-block;
     overflow-y: auto;
     width: 48%;
     height: 30%;
-  border:blue solid 2px;
+  border:black solid 2px;
   position: absolute;
   top : 66%;
   left : 50%;
