@@ -793,7 +793,7 @@
                                 }
                                 //Sum values that meet the condition
                                 var valueArray = Tools.getValueWithCondition(elmt.getValues(), p_elmt, condition);
-                                console.log("value array: " + valueArray);
+                                //console.log("value array: " + valueArray);
                                 //If there are several values that meet the condition, use the highest
                                 value += Tools.getHighest(valueArray);
                             }
@@ -1227,26 +1227,27 @@
                 return newData;
             }
             static validConnection(inputElmt: Element, outputElmt: Element): boolean {
+                //console.log("checking connection from " + inputElmt.getID() + " to " + outputElmt.getID());
                 var valid: boolean = true;
                 if (inputElmt.isAncestorOf(outputElmt)) { //Cannot connect to its ancestor. This would create a cycle
                     valid = false;
-                    alert("Can not create a cycle");
+                   // alert("Can not create a cycle");
 
                 }
                 //Value cannot connect to value if output cannot be converted to super value
                 else if (inputElmt.getType() === 2 && (outputElmt.getType() === 1 || outputElmt.getType() === 0 || (outputElmt.getType() === 2 && outputElmt.getParentElements().length > 0))) {
                     valid = false;
-                    alert("Value nodes cannot have children");
+                   // alert("Value nodes cannot have children");
                 }
                 else if (inputElmt.getType() === 0 && outputElmt.getType() === 1) {
                     valid = false;
-                    alert("Chance nodes can not have decsion node children");
+                  //  alert("Chance nodes can not have decsion node children");
                 }
                 else if (outputElmt.getType() === 3 && inputElmt.getType() !== 2) {//Super value nodes can only have value children
                     valid = false;
-                    alert("Super value nodes can only have value children");
+                   // alert("Super value nodes can only have value children");
                 }
-                console.log("valid connection between " + inputElmt.getType() + " and  " + outputElmt.getType() + ": " + valid);
+               // console.log("valid connection between " + inputElmt.getType() + " and  " + outputElmt.getType() + ": " + valid);
                 return valid;
             }
 

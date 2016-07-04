@@ -84,7 +84,7 @@
                                 dataStream = dataStream.slice(0, dataStream.length - 1) + '</parents>\n';
                             }
                             dataStream += '<utilities>'
-                            for (var i = 1; i < elmt.getData(1).length; i++) {
+                            for (var i = 1; i < elmt.getData(0).length; i++) {//Was there a reason for elmt.getData(1) instead of elmt.getData(0)?
 
                                 dataStream += elmt.getData(elmt.getData().length - 1, i) + ' ';
                             }
@@ -410,7 +410,11 @@
                         selection.push(elmt.m_easelElmt);
                     }
                 });
-
+                this.getConnectionArr().forEach(function (c: Connection) {
+                    if (selection.indexOf(c.getInputElement().m_easelElmt) !== -1 && selection.indexOf(c.getOutputElement().m_easelElmt) !== -1) {
+                        selection.push(c.m_easelElmt);
+                    }
+                        });
                 return selection;
             }
 

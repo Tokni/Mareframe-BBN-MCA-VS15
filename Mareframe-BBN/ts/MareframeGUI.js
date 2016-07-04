@@ -19,6 +19,7 @@ var Mareframe;
                 this.m_mcaSizeX = $(window).width();
                 this.m_mcaSizeY = $(window).height();
                 this.m_mcaContainer = new createjs.Container();
+                this.m_drawingCont = new createjs.Container();
                 this.m_googleColors = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac", "#b77322", "#16d620", "#b91383", "#f4359e", "#9c5935", "#a9c413", "#2a778d", "#668d1c", "#bea413", "#0c5922", "#743411"];
                 this.m_mcaBackground = new createjs.Shape(new createjs.Graphics().beginFill("white").drawRect(0, 0, this.m_mcaSizeX, this.m_mcaSizeY));
                 this.m_valFnBackground = new createjs.Shape(new createjs.Graphics().beginFill("#ffffff").drawRect(0, 0, this.m_valueFnSize, this.m_valueFnSize));
@@ -29,6 +30,7 @@ var Mareframe;
                 this.m_originalPressX = 0;
                 this.m_originalPressY = 0;
                 this.m_selectedItems = [];
+                this.m_selectedConnections = [];
                 this.m_finalScoreChart = new google.visualization.ColumnChart($("#finalScore_div").get(0));
                 this.m_finalScoreChartOptions = {
                     width: 1024,
@@ -80,7 +82,7 @@ var Mareframe;
                     $("#logo").attr("style", "height:80px");
                     $("#webpage").attr("href", "http://www.tokni.com");
                     $(".europe-map-back").hide();
-                    $("#model_description").text("This is the BBN tool. Red nodes represent decision nodes, blue nodes represent chance nodes, and yellow nodes represent utility nodes. You may doubleclick on each node below, to access the properties tables for that node. To set a decision click on a choice in the table next to decision nodes.");
+                    $("#model_description").text("This is the BBN tool. Yellow nodes represent decision nodes, blue nodes represent chance nodes, and red nodes represent utility nodes. You may doubleclick on each node below, to access the properties tables for that node. To set a decision click on a choice in the table next to decision nodes.");
                     $(".europe-map-zoom").hide();
                     $(".col-md-2").hide();
                     $(".col-md-6").hide();
@@ -113,6 +115,7 @@ var Mareframe;
                 this.pressUp = this.pressUp.bind(this);
                 this.mouseDown = this.mouseDown.bind(this);
                 this.dblClick = this.dblClick.bind(this);
+                this.mouseEnter = this.mouseEnter.bind(this);
                 this.clearSelection = this.clearSelection.bind(this);
                 this.tick = this.tick.bind(this);
                 this.importStage = this.importStage.bind(this);
@@ -122,7 +125,6 @@ var Mareframe;
                 this.flipValFn = this.flipValFn.bind(this);
                 this.linearizeValFn = this.linearizeValFn.bind(this);
                 this.updateTable = this.updateTable.bind(this);
-                this.connectTo = this.connectTo.bind(this);
                 this.updateConnection = this.updateConnection.bind(this);
                 this.createNewChance = this.createNewChance.bind(this);
                 this.createNewDec = this.createNewDec.bind(this);
@@ -141,6 +143,7 @@ var Mareframe;
                 this.selectModel = this.selectModel.bind(this);
                 this.clickedDecision = this.clickedDecision.bind(this);
                 this.clickedEvidence = this.clickedEvidence.bind(this);
+                this.inputChanged = this.inputChanged.bind(this);
                 this.fullscreen = this.fullscreen.bind(this);
                 this.cnctStatus = this.cnctStatus.bind(this);
                 this.optionTypeChange = this.optionTypeChange.bind(this);
@@ -189,6 +192,7 @@ var Mareframe;
                     this.value = null;
                 });
                 this.m_mcaStage.addChild(this.m_mcaBackground);
+                this.m_mcaStage.enableMouseOver(20); //Enable mouse over
                 this.m_mcaStage.addChild(this.m_mcaContainer);
                 this.m_valueFnStage.addChild(this.m_valFnBackground);
                 this.m_valueFnStage.addChild(this.m_valueFnLineCont);
@@ -202,6 +206,7 @@ var Mareframe;
                     $("#updateMdl").hide();
                 }
                 $("#settings").show();
+                this.m_mcaContainer.addChild(this.m_drawingCont);
             }
             GUIHandler.prototype.optionTypeChange = function (p_evt) {
                 //console.log("Element name: " + p_evt.target.id);
@@ -233,9 +238,11 @@ var Mareframe;
             GUIHandler.prototype.cnctStatus = function (p_evt) {
                 if ($("#cnctTool").prop("checked")) {
                     $("#modeStatus").html("Connect Mode");
+                    document.body.style.cursor = "alias";
                 }
                 else {
                     $("#modeStatus").html("Editor Mode");
+                    document.body.style.cursor = "default";
                 }
             };
             GUIHandler.prototype.selectModel = function (p_evt) {
@@ -349,7 +356,7 @@ var Mareframe;
             };
             ;
             GUIHandler.prototype.mouseUp = function (p_evt) {
-                //console.log("mouse up");
+                // console.log("mouse up");
                 $("#mX").html("X: " + p_evt.stageX);
                 $("#mY").html("Y: " + p_evt.stageY);
                 $("#mAction").html("Action: mouseUp");
@@ -359,6 +366,33 @@ var Mareframe;
                 this.m_updateStage = true;
             };
             GUIHandler.prototype.pressUp = function (p_evt) {
+                console.log("target: " + p_evt.target.name);
+                console.log("x: " + p_evt.rawX + " y " + p_evt.rawY);
+                if (this.m_mcaContainer.getChildByName("drawCont") !== null) {
+                    //If we are in the processes of connecting
+                    if (this.m_mcaContainer.getObjectUnderPoint(p_evt.stageX, p_evt.stageY, 0) !== null
+                        && this.m_mcaContainer.getObjectUnderPoint(p_evt.stageX, p_evt.stageY, 0).parent.name.substr(0, 4) === "elmt") {
+                        console.log("element");
+                        //If the mouse is being released over an element
+                        var outputElmt = this.m_model.getElement(this.m_mcaContainer.getObjectUnderPoint(p_evt.stageX, p_evt.stageY, 0).parent.name);
+                        var inputElmt = this.m_model.getElement(p_evt.target.name);
+                        this.connect(inputElmt, outputElmt);
+                        this.m_mcaContainer.removeChild(this.m_mcaContainer.getChildByName("drawCont"));
+                    }
+                    else {
+                        //If mouse is released anywhere else
+                        console.log("not element");
+                        this.m_mcaContainer.removeChild(this.m_mcaContainer.getChildByName("drawCont"));
+                    }
+                    var gui = this;
+                    //Resets the visually selected elements
+                    this.m_model.getElementArr().forEach(function (e) {
+                        if (e.getVisuallySelected()) {
+                            gui.drawElementNotSelected(e);
+                        }
+                    });
+                    this.m_updateStage = true;
+                }
             };
             GUIHandler.prototype.mouseMove = function (p_evt) {
                 if ($("cnctTool").prop("checked")) {
@@ -383,11 +417,13 @@ var Mareframe;
                         break;
                     case 2:
                         //Value
-                        shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
+                        this.drawPolygon(shape, this.m_elementColors[elmtShapeType][1]);
+                        //shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
                         break;
                     case 3:
                         //Super Value
-                        shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
+                        this.drawPolygon(shape, this.m_elementColors[elmtShapeType][1]);
+                        //shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
                         break;
                     default:
                         break;
@@ -617,10 +653,12 @@ var Mareframe;
                 if ($("#detailsDialog_" + id).data("showDescription")) {
                     $("#description_div_" + id).show();
                     $("#showDescription_" + id).html("Hide description");
+                    $("#showDescription_" + id).prop("title", "Click to hide the description of the element");
                 }
                 else {
                     $("#description_div_" + id).hide();
                     $("#showDescription_" + id).html("Show description");
+                    $("#showDescription_" + id).prop("title", "Click to show a description of the element");
                 }
             };
             GUIHandler.prototype.fullscreen = function (p_evt) {
@@ -784,17 +822,31 @@ var Mareframe;
                             var conn = elmt.getConnections()[j];
                             console.log("deleting connection " + conn.getID());
                             if (conn.getOutputElement().getID() === elmt.getID()) {
-                                conn.getInputElement().deleteConnection(conn.getID());
+                                if (conn.getInputElement().deleteConnection(conn.getID())) {
+                                    this.addToTrash(conn);
+                                }
                             }
                             else {
-                                conn.getOutputElement().deleteConnection(conn.getID());
+                                if (conn.getOutputElement().deleteConnection(conn.getID())) {
+                                    this.addToTrash(conn);
+                                }
                             }
                         }
                     }
                 }
+                var gui = this;
+                this.m_selectedConnections.forEach(function (c) {
+                    gui.addToTrash(gui.m_model.getConnection(c.name));
+                });
                 this.clearSelection();
                 for (var i = 0; i < this.m_trashBin.length; i++) {
-                    this.m_model.deleteElement(this.m_trashBin[i].getID());
+                    var itemID = this.m_trashBin[i].getID();
+                    if (itemID.substr(0, 4) == "elmt") {
+                        this.m_model.deleteElement(itemID);
+                    }
+                    else if (itemID.substr(0, 4) === "conn") {
+                        this.m_model.deleteConnection(itemID);
+                    }
                 }
                 this.m_trashBin = []; // empty trashbin
                 //alert("before update");
@@ -828,6 +880,7 @@ var Mareframe;
                     p_elmt.m_easelElmt.addEventListener("pressup", this.pressUp);
                 }
                 p_elmt.m_easelElmt.addEventListener("mousedown", this.mouseDown);
+                p_elmt.m_easelElmt.addEventListener("mouseover", this.mouseEnter);
                 p_elmt.m_easelElmt.on("dblclick", this.dblClick);
                 p_elmt.m_easelElmt.mouseChildren = false;
                 p_elmt.m_easelElmt.name = p_elmt.getID();
@@ -838,6 +891,13 @@ var Mareframe;
                 ////console.log(this);
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
                     this.populateElmtDetails(this.m_model.getElement(p_evt.target.name));
+                }
+            };
+            //Does not work because pointer is not updated until released
+            GUIHandler.prototype.mouseEnter = function (p_evt) {
+                console.log("entering element");
+                if (this.m_mcaContainer.getChildByName("drawCont") !== null) {
+                    console.log("entering illegal");
                 }
             };
             GUIHandler.prototype.addSetDecFunction = function (p_elmt) {
@@ -878,7 +938,7 @@ var Mareframe;
                     $("#valuesTable_div_" + p_elmt.getID()).hide();
                     $("#values_" + p_elmt.getID()).show();
                     if (!p_elmt.isUpdated()) {
-                        $("#values_" + p_elmt.getID()).prop("disabled", true);
+                        gui.updateValueButton(true, p_elmt.getID());
                     }
                     //Add the edit functions again
                     gui.addEditFunction(p_elmt, gui.m_editorMode);
@@ -1098,6 +1158,7 @@ var Mareframe;
                 showDescription.setAttribute("class", "dialogButton");
                 showDescription.setAttribute("id", "showDescription_" + id);
                 showDescription.innerHTML = "Hide descrition";
+                showDescription.title = "Click to hide the description of the element";
                 newDialog.appendChild(showDescription);
                 var defTable_div_outer = document.createElement("div");
                 defTable_div_outer.setAttribute("class", "editable defTable_div");
@@ -1110,17 +1171,20 @@ var Mareframe;
                 addDataRow.setAttribute("class", "dialogButton");
                 addDataRow.setAttribute("id", "addDataRow_" + id);
                 addDataRow.innerHTML = "Add Data Row";
+                addDataRow.title = "Click to add a new data row to the table";
                 newDialog.appendChild(addDataRow);
                 var submit = document.createElement("button");
                 submit.setAttribute("class", "dialogButton");
                 submit.setAttribute("id", "submit_" + id);
                 submit.innerHTML = "Submit Changes";
+                submit.title = "Click to save all changes made in the element";
                 newDialog.appendChild(submit);
                 var values = document.createElement("button");
                 values.setAttribute("class", "dialogButton");
                 values.style.marginBottom = "20px";
                 values.setAttribute("id", "values_" + id);
                 values.innerHTML = "Show Values";
+                values.title = "Click to show the values table";
                 newDialog.appendChild(values);
                 var valuesTable_div = document.createElement("div");
                 valuesTable_div.setAttribute("id", "valuesTable_div_" + id);
@@ -1159,7 +1223,7 @@ var Mareframe;
                 $("#detailsDialog_" + id).data("isOpen", false);
                 $("#submit_" + id).click({ param1: p_elmt }, this.saveChanges);
                 $("#values_" + id).click({ param1: p_elmt, param2: this }, this.showValues);
-                $("#values_" + id).hover(({ param1: p_elmt, param2: this }, this.showValueErrorMessage), this.removeValueErrorMessage);
+                //$("#values_" + id).hover(({ param1: p_elmt, param2: this },this.showValueErrorMessage), this.removeValueErrorMessage);
                 $("#addDataRow_" + id).click({ param1: p_elmt }, this.addDataRowClick);
                 $("#showDescription_" + id).click({ param1: p_elmt }, this.setShowDescription);
                 return newDialog.id;
@@ -1262,12 +1326,7 @@ var Mareframe;
                             document.getElementById("userDescription_div_" + id).innerHTML = p_elmt.getUserDescription();
                         }
                         $("#userDescription_div_" + id).show();
-                        if (p_elmt.isUpdated()) {
-                            $("#values_" + id).prop('disabled', false);
-                        }
-                        else {
-                            $("#values_" + id).prop('disabled', true);
-                        }
+                        this.updateValueButton(!p_elmt.isUpdated(), id);
                         this.addEditFunction(p_elmt, this.m_editorMode);
                     }
                     else {
@@ -1422,6 +1481,7 @@ var Mareframe;
                 p_field.parent().text(p_newValue);
                 if (p_newValue !== p_originalValue) {
                     $("#detailsDialog_" + p_elmt.getID()).data("unsavedChanges", true);
+                    this.updateUpdateButton(true);
                 }
                 p_originalValue = p_newValue; //This is needed if the user wants to change the value multiple times without saving inbetween
                 p_field.parent().removeClass("editable");
@@ -1446,6 +1506,26 @@ var Mareframe;
                      p_originalValue = mareframeGUI.updateValue(p_elmt, p_div, p_field, p_originalValue, newText);
                  });
              }*/
+            GUIHandler.prototype.updateValueButton = function (disable, id) {
+                if (disable) {
+                    $("#values_" + id).prop("disabled", true);
+                    $("#values_" + id).prop("title", "Disabled because model is not updated");
+                }
+                else {
+                    $("#values_" + id).prop("disabled", false);
+                    $("#values_" + id).prop("title", "Click to show the values table");
+                }
+            };
+            GUIHandler.prototype.updateUpdateButton = function (disable) {
+                if (disable) {
+                    $("#updateMdl").prop("disabled", true);
+                    $("#updateMdl").prop("title", "Disabled because there are unsaved changes");
+                }
+                else {
+                    $("#updateMdl").prop("disabled", false);
+                    $("#updateMdl").prop("title", "Click to update model");
+                }
+            };
             GUIHandler.prototype.addEditFunction = function (p_elmt, p_editorMode) {
                 console.log("adding edit function");
                 if (!(p_editorMode)) {
@@ -1493,14 +1573,16 @@ var Mareframe;
                                 elementWithUnsavedChanges = mareframeGUI.getElementWithUnsavedChanges();
                                 if (elementWithUnsavedChanges === null || elementWithUnsavedChanges === p_elmt) {
                                     $("#valuesTable_div_" + id).hide();
+                                    mareframeGUI.updateUpdateButton(true);
                                     var row = this.id;
-                                    mareframeGUI.removeRowVisually(p_elmt, row);
-                                    //Add the edit function again
-                                    mareframeGUI.addEditFunction(p_elmt, p_editorMode);
-                                    $("#detailsDialog_" + p_elmt.getID()).data("unsavedChanges", true);
-                                    $("#values_" + id).prop("disabled", true);
-                                    $("#values_" + id).show();
-                                    $("#submit_" + id).show();
+                                    if (mareframeGUI.removeRowVisually(p_elmt, row)) {
+                                        //Add the edit function again
+                                        mareframeGUI.addEditFunction(p_elmt, p_editorMode);
+                                        $("#detailsDialog_" + p_elmt.getID()).data("unsavedChanges", true);
+                                        mareframeGUI.updateValueButton(true, id);
+                                        $("#values_" + id).show();
+                                        $("#submit_" + id).show();
+                                    }
                                 }
                                 else {
                                     alert("Please submit changes in " + elementWithUnsavedChanges.getName() + " before editing this data table");
@@ -1721,7 +1803,7 @@ var Mareframe;
                     });
                     if (model.getAutoUpdate()) {
                         this.updateModel();
-                        $("#values_" + id).prop("disabled", false); //Make the value button clickable again
+                        this.updateValueButton(false, id); //Make the value button clickable again
                         console.log("auto update is on");
                     }
                     //console.log("new table after submit:");
@@ -1731,6 +1813,7 @@ var Mareframe;
                     $("#detailsDialog_" + id).data("newStates", []);
                     $("#detailsDialog_" + id).data("unsavedChanges", false);
                     $("#submit_" + id).hide();
+                    this.updateUpdateButton(false);
                     this.updateOpenDialogs();
                     this.updateMiniTables([elmt].concat(elmt.getAllDescendants()).concat(elmt.getAllDecisionAncestors()));
                 }
@@ -1829,28 +1912,20 @@ var Mareframe;
                 this.m_originalPressX = p_evt.stageX;
                 this.m_originalPressY = p_evt.stageY;
                 //console.log("cnctool options: "+$("#cnctTool").button("option","checked"));
-                if (p_evt.target.name.substr(0, 4) === "elmt") {
-                    var cnctChkbox = document.getElementById("cnctTool"); // What the hell no jQuery
-                    if (cnctChkbox.checked) {
-                        ////console.log("cnctTool enabled");
-                        if (!this.connectionExist(p_evt)) {
-                            this.connectTo(p_evt);
-                        }
-                        else {
-                            this.disconnectFrom(p_evt);
-                        }
-                    }
-                    else {
+                if (!$("#cnctTool").prop("checked")) {
+                    //If connect tool is not enabled
+                    if (p_evt.target.name.substr(0, 4) === "elmt") {
                         this.select(p_evt);
                     }
-                }
-                else if (p_evt.target.name.substr(0, 4) === "conn") {
-                    console.log("connection pressed");
-                    var connection = this.m_model.getConnection(p_evt.target.name);
-                    connection.m_easelElmt;
-                }
-                else {
-                    this.clearSelection();
+                    else if (p_evt.target.name.substr(0, 4) === "conn") {
+                        console.log("connection pressed");
+                        var connection = this.m_model.getConnection(p_evt.target.name);
+                        //this.addConnectionToStage(connection, true);
+                        this.selectConnection(p_evt);
+                    }
+                    else {
+                        this.clearSelection();
+                    }
                 }
             };
             GUIHandler.prototype.select = function (p_evt) {
@@ -1858,6 +1933,18 @@ var Mareframe;
                 if (!p_evt.nativeEvent.ctrlKey && this.m_selectedItems.indexOf(p_evt.target) === -1) {
                     this.clearSelection();
                 }
+                console.log("adding to selection " + p_evt.target);
+                this.addToSelection(p_evt.target);
+            };
+            GUIHandler.prototype.selectConnection = function (p_evt) {
+                console.log(this.m_selectedConnections);
+                console.log(p_evt.target);
+                console.log("checking " + this.m_selectedConnections[0] + " against " + p_evt.target + ": " + (this.m_selectedConnections[0] == p_evt.target));
+                if (!p_evt.nativeEvent.ctrlKey && this.m_selectedConnections.indexOf(p_evt.target) === -1) {
+                    console.log("clearing");
+                    this.clearSelection();
+                }
+                console.log("adding to selection " + p_evt.target);
                 this.addToSelection(p_evt.target);
             };
             GUIHandler.prototype.pressMove = function (p_evt) {
@@ -1889,7 +1976,45 @@ var Mareframe;
                 else if (p_evt.target.name.substr(0, 4) === "elmt") {
                     var connectTool = $("#cnctTool").prop("checked");
                     if (connectTool) {
-                        //alert("connecting shit");
+                        //If we are in the process of connecting
+                        var element = this.m_model.getElement(p_evt.target.name);
+                        //this.m_drawingCont.removeAllChildren();
+                        //Resets the visually selected elements
+                        this.m_model.getElementArr().forEach(function (e) {
+                            if (e.getVisuallySelected()) {
+                                gui.drawElementNotSelected(e);
+                            }
+                        });
+                        this.m_mcaContainer.removeChild(this.m_mcaContainer.getChildByName("drawCont"));
+                        this.drawElementSelected(element); //Draws the input element as selected
+                        var line = new createjs.Graphics().beginStroke("black").mt(element.m_easelElmt.x, element.m_easelElmt.y).lt(p_evt.stageX, p_evt.stageY);
+                        var conn = new createjs.Shape(line);
+                        var arrow = new createjs.Graphics().beginFill("black").mt(-5, 0).lt(5, 5).lt(5, -5).cp();
+                        var arrowCont = new createjs.Shape(arrow);
+                        var cont = new createjs.Container();
+                        arrowCont.x = ((element.m_easelElmt.x - p_evt.stageX) / 2) + p_evt.stageX;
+                        arrowCont.y = ((element.m_easelElmt.y - p_evt.stageY) / 2) + p_evt.stageY;
+                        arrowCont.rotation = (180 / Math.PI) * Math.atan((element.m_easelElmt.y - p_evt.stageY) / (element.m_easelElmt.x - p_evt.stageX));
+                        if (element.m_easelElmt.x < p_evt.stageX) {
+                            arrowCont.rotation = 180 + arrowCont.rotation;
+                        }
+                        cont.name = "drawCont";
+                        cont.addChild(conn);
+                        cont.addChild(arrowCont);
+                        this.m_mcaContainer.addChildAt(cont, 0);
+                        var gui = this;
+                        if (this.m_mcaContainer.getObjectUnderPoint(p_evt.stageX, p_evt.stageY, 0) !== null
+                            && this.m_mcaContainer.getObjectUnderPoint(p_evt.stageX, p_evt.stageY, 0).parent.name.substr(0, 4) === "elmt") {
+                            console.log("over element");
+                            //If the mouse is over an element
+                            var outputElmt = this.m_model.getElement(this.m_mcaContainer.getObjectUnderPoint(p_evt.stageX, p_evt.stageY, 0).parent.name);
+                            if (DST.Tools.validConnection(element, outputElmt)) {
+                                this.drawElementSelected(outputElmt);
+                            }
+                            else {
+                            }
+                        }
+                        // }
                         $("#mAction").html("connecting");
                     }
                     else {
@@ -2020,76 +2145,57 @@ var Mareframe;
                 for (var i = 0; i < this.m_selectedItems.length; i += 2) {
                     var e = this.m_selectedItems[i];
                     var first = this.m_model.getElement(e.name);
-                    console.log("element: " + first);
                     first.isChildOf(this.m_model.getElement(p_evt.target.name));
                     first.isParentOf(this.m_model.getElement(p_evt.target.name));
                 }
                 return false;
             };
-            GUIHandler.prototype.connectTo = function (p_evt) {
-                var elmtIdent = p_evt.target.name;
-                var connected = false;
-                //console.log("attempting connection "+elmtIdent);
-                //console.log("selected length: " + this.m_selectedItems.length);
-                for (var i = 0; i < this.m_selectedItems.length; i += 2) {
-                    var e = this.m_selectedItems[i];
-                    if (e.name.substr(0, 4) === "elmt" && e.name !== elmtIdent) {
-                        var outputElmt = this.m_model.getElement(elmtIdent);
-                        var inputElmt = this.m_model.getElement(e.name);
-                        if (inputElmt.isChildOf(outputElmt)) {
-                            //alert("Parent");
-                            var conn = outputElmt.getConnectionFrom(inputElmt);
-                            console.log("deleting connection: " + conn.getID() + "  From: " + outputElmt.getName() + "  To: " + inputElmt.getName());
-                            console.log("connection from " + outputElmt.getName() + " to " + inputElmt.getName() + " named " + inputElmt.getConnectionFrom(outputElmt));
-                            console.log("connection from " + inputElmt.getName() + " to " + outputElmt.getName() + " named " + outputElmt.getConnectionFrom(inputElmt).getID());
-                            inputElmt.deleteConnection(outputElmt.getConnectionFrom(inputElmt).getID());
-                            outputElmt.deleteConnection(outputElmt.getConnectionFrom(inputElmt).getID());
-                            inputElmt.setUpdated(false);
-                            inputElmt.getAllDescendants().forEach(function (e) {
+            GUIHandler.prototype.connect = function (inputElmt, outputElmt) {
+                var successfull = false;
+                //console.log("attempting connection " + outputElmt.getID());
+                if (inputElmt.getID() !== outputElmt.getID()) {
+                    //console.log("outputElmt: " + outputElmt.getID() + " inputElmt: " + inputElmt.getID());
+                    if (DST.Tools.validConnection(inputElmt, outputElmt)) {
+                        if ((inputElmt.getType() === 2 || inputElmt.getType() === 3) && outputElmt.getType() === 2) {
+                            outputElmt.convertToSuperValue();
+                        }
+                        var c = this.m_model.createNewConnection(inputElmt, outputElmt);
+                        console.log("connection: " + c);
+                        if (this.m_model.addConnection(c)) {
+                            this.addConnectionToStage(c);
+                            successfull = true;
+                        }
+                        if (this.m_model.m_bbnMode) {
+                            if (outputElmt.getType() !== 1) {
+                                outputElmt.updateData();
+                            }
+                            outputElmt.setUpdated(false);
+                            outputElmt.getAllDescendants().forEach(function (e) {
                                 e.setUpdated(false);
                             });
-                            this.m_model.update();
-                            this.importStage();
-                            this.m_mcaStage.update();
-                        }
-                        else {
-                            if (DST.Tools.validConnection(inputElmt, outputElmt)) {
-                                if ((inputElmt.getType() === 2 || inputElmt.getType() === 3) && outputElmt.getType() === 2) {
-                                    outputElmt.convertToSuperValue();
-                                }
-                                var c = this.m_model.createNewConnection(inputElmt, outputElmt);
-                                //console.log("connection: " + c);
-                                if (this.m_model.addConnection(c)) {
-                                    this.addConnectionToStage(c);
-                                    connected = true;
-                                }
-                                if (this.m_model.m_bbnMode) {
-                                    if (outputElmt.getType() !== 1) {
-                                        outputElmt.updateData();
-                                    }
-                                    outputElmt.setUpdated(false);
-                                    outputElmt.getAllDescendants().forEach(function (e) {
-                                        e.setUpdated(false);
-                                    });
-                                    inputElmt.setUpdated(false);
-                                    console.log("connection created from " + outputElmt.getID() + " to " + inputElmt.getID());
-                                }
-                            }
+                            inputElmt.setUpdated(false);
+                            console.log("connection created from " + outputElmt.getID() + " to " + inputElmt.getID());
                         }
                     }
                 }
+                this.clearSelection();
                 if (this.m_model.getAutoUpdate()) {
                     this.updateModel();
                 }
-                if (!connected) {
+                /*if (!successfull) {
                     this.select(p_evt);
-                }
+                }*/
                 //this.m_mcaStage.update();
                 //alert("connection is done");
                 //this.select(elmtIdent);
             };
-            GUIHandler.prototype.addConnectionToStage = function (p_connection) {
-                var line = new createjs.Graphics().beginStroke(p_connection.getColor()).mt(p_connection.getInputElement().m_easelElmt.x, p_connection.getInputElement().m_easelElmt.y).lt(p_connection.getOutputElement().m_easelElmt.x, p_connection.getOutputElement().m_easelElmt.y);
+            GUIHandler.prototype.addConnectionToStage = function (p_connection, selected) {
+                if (selected) {
+                    var line = new createjs.Graphics().setStrokeStyle(3).beginStroke(p_connection.getColor()).mt(p_connection.getInputElement().m_easelElmt.x, p_connection.getInputElement().m_easelElmt.y).lt(p_connection.getOutputElement().m_easelElmt.x, p_connection.getOutputElement().m_easelElmt.y);
+                }
+                else {
+                    var line = new createjs.Graphics().beginStroke(p_connection.getColor()).mt(p_connection.getInputElement().m_easelElmt.x, p_connection.getInputElement().m_easelElmt.y).lt(p_connection.getOutputElement().m_easelElmt.x, p_connection.getOutputElement().m_easelElmt.y);
+                }
                 var conn = new createjs.Shape(line);
                 var arrow = new createjs.Graphics().beginFill(p_connection.getColor()).mt(-5, 0).lt(5, 5).lt(5, -5).cp();
                 var arrowCont = new createjs.Shape(arrow);
@@ -2119,10 +2225,14 @@ var Mareframe;
                 p_connection.m_easelElmt = cont;
                 this.m_updateStage = true;
             };
-            GUIHandler.prototype.updateConnection = function (p_connection) {
+            GUIHandler.prototype.updateConnection = function (p_connection, selected) {
                 //stage.removeChild(c.easelElmt);
                 var temp = p_connection.m_easelElmt.getChildAt(1);
-                temp.graphics.clear().beginStroke(p_connection.getColor()).mt(p_connection.getInputElement().m_easelElmt.x, p_connection.getInputElement().m_easelElmt.y).lt(p_connection.getOutputElement().m_easelElmt.x, p_connection.getOutputElement().m_easelElmt.y);
+                temp.graphics.clear();
+                if (selected) {
+                    temp.graphics.setStrokeStyle(3);
+                }
+                temp.graphics.beginStroke(p_connection.getColor()).mt(p_connection.getInputElement().m_easelElmt.x, p_connection.getInputElement().m_easelElmt.y).lt(p_connection.getOutputElement().m_easelElmt.x, p_connection.getOutputElement().m_easelElmt.y);
                 p_connection.m_easelElmt.getChildAt(0).x = ((p_connection.getInputElement().m_easelElmt.x - p_connection.getOutputElement().m_easelElmt.x) / 2) + p_connection.getOutputElement().m_easelElmt.x;
                 p_connection.m_easelElmt.getChildAt(0).y = ((p_connection.getInputElement().m_easelElmt.y - p_connection.getOutputElement().m_easelElmt.y) / 2) + p_connection.getOutputElement().m_easelElmt.y;
                 p_connection.m_easelElmt.getChildAt(0).rotation = (180 / Math.PI) * Math.atan((p_connection.getInputElement().m_easelElmt.y - p_connection.getOutputElement().m_easelElmt.y) / (p_connection.getInputElement().m_easelElmt.x - p_connection.getOutputElement().m_easelElmt.x));
@@ -2131,6 +2241,70 @@ var Mareframe;
                 }
                 //stage.addChildAt(c.easelElmt, 0);
                 //update = true;
+            };
+            GUIHandler.prototype.drawElementSelected = function (elmt) {
+                elmt.setVisuallySelected(true);
+                var elmtType = elmt.getType();
+                //////console.log(e);
+                var shape = elmt.m_easelElmt.getChildAt(0);
+                shape.graphics.clear().f(this.m_elementColors[elmtType][2]).s(this.m_elementColors[elmtType][1]).setStrokeStyle(2.5);
+                var elmtShapeType = 2;
+                if (this.m_model.m_bbnMode)
+                    elmtShapeType = elmtType;
+                switch (elmtShapeType) {
+                    case 0:
+                        //chance
+                        shape.graphics.drawEllipse(0, 0, 150, 30);
+                        break;
+                    case 1:
+                        //decision
+                        shape.graphics.drawRect(0, 0, 150, 30);
+                        break;
+                    case 2:
+                        //Value
+                        this.drawPolygon(shape, this.m_elementColors[elmtType][1]);
+                        //shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
+                        break;
+                    case 3:
+                        //Super value
+                        this.drawPolygon(shape, this.m_elementColors[elmtType][1]);
+                        //shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
+                        break;
+                    default:
+                        break;
+                }
+            };
+            GUIHandler.prototype.drawElementNotSelected = function (elmt) {
+                elmt.setVisuallySelected(false);
+                var easelElmt = elmt.m_easelElmt;
+                var elmtType = elmt.getType();
+                var shape = easelElmt.getChildAt(0);
+                shape.graphics.clear().f(this.m_elementColors[elmtType][0]).s(this.m_elementColors[elmtType][1]);
+                var elmtShapeType = 2;
+                if (this.m_model.m_bbnMode)
+                    elmtShapeType = elmtType;
+                switch (elmtShapeType) {
+                    case 0:
+                        //chance
+                        shape.graphics.drawEllipse(0, 0, 150, 30);
+                        break;
+                    case 1:
+                        //decision
+                        shape.graphics.drawRect(0, 0, 150, 30);
+                        break;
+                    case 2:
+                        //Value
+                        this.drawPolygon(shape, this.m_elementColors[elmtType][1]);
+                        //shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
+                        break;
+                    case 3:
+                        //Super Value
+                        this.drawPolygon(shape, this.m_elementColors[elmtType][1]);
+                        //shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
+                        break;
+                    default:
+                        break;
+                }
             };
             GUIHandler.prototype.addToSelection = function (p_easelElmt) {
                 //console.log("selected: " + this.m_selectedItems);
@@ -2143,33 +2317,7 @@ var Mareframe;
                     if (this.m_model.m_bbnMode) {
                         this.m_selectedItems.push(elmt.m_minitableEaselElmt);
                     }
-                    var elmtType = elmt.getType();
-                    //////console.log(e);
-                    var shape = p_easelElmt.getChildAt(0);
-                    shape.graphics.clear().f(this.m_elementColors[elmtType][2]).s(this.m_elementColors[elmtType][1]);
-                    var elmtShapeType = 2;
-                    if (this.m_model.m_bbnMode)
-                        elmtShapeType = elmtType;
-                    switch (elmtShapeType) {
-                        case 0:
-                            //chance
-                            shape.graphics.drawEllipse(0, 0, 150, 30);
-                            break;
-                        case 1:
-                            //decision
-                            shape.graphics.drawRect(0, 0, 150, 30);
-                            break;
-                        case 2:
-                            //Value
-                            shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
-                            break;
-                        case 3:
-                            //Super value
-                            shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
-                            break;
-                        default:
-                            break;
-                    }
+                    this.drawElementSelected(elmt);
                     this.m_updateStage = true;
                 }
                 else if (this.m_model.m_bbnMode && this.m_selectedItems.indexOf(p_easelElmt) !== -1 && p_easelElmt.name.substr(0, 4) === "elmt") {
@@ -2188,52 +2336,51 @@ var Mareframe;
                     });
                     this.m_selectedItems = newSelected;
                     //console.log("new selected: " + this.m_selectedItems);
-                    var easelElmt = p_easelElmt;
-                    var elmtType = this.m_model.getElement(easelElmt.name).getType();
-                    var shape = easelElmt.getChildAt(0);
-                    shape.graphics.clear().f(this.m_elementColors[elmtType][0]).s(this.m_elementColors[elmtType][1]);
-                    var elmtShapeType = 2;
-                    if (this.m_model.m_bbnMode)
-                        elmtShapeType = elmtType;
-                    switch (elmtShapeType) {
-                        case 0:
-                            //chance
-                            shape.graphics.drawEllipse(0, 0, 150, 30);
-                            break;
-                        case 1:
-                            //decision
-                            shape.graphics.drawRect(0, 0, 150, 30);
-                            break;
-                        case 2:
-                            //Value
-                            shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
-                            break;
-                        case 3:
-                            //Super Value
-                            shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
-                            break;
-                        default:
-                            break;
-                    }
-                    this.m_updateStage = true;
+                    this.drawElementNotSelected(this.m_model.getElement(p_easelElmt.name));
                 }
-                //for (var index in this.m_selectedItems) {
-                //    console.log("selected: " + this.m_selectedItems[index]);
-                //    for (var ind in this.m_selectedItems[index].
-                //}
+                else if (this.m_selectedConnections.indexOf(p_easelElmt) === -1 && p_easelElmt.name.substr(0, 4) === "conn") {
+                    console.log(this.m_selectedConnections);
+                    this.m_selectedConnections.push(p_easelElmt);
+                    console.log(this.m_selectedConnections);
+                    this.updateConnection(this.m_model.getConnection(p_easelElmt.name), true);
+                }
+                else if (this.m_model.m_bbnMode && this.m_selectedConnections.indexOf(p_easelElmt) !== -1 && p_easelElmt.name.substr(0, 4) === "conn") {
+                    console.log("already selected");
+                    console.log("checking " + this.m_selectedConnections[0] + " against " + p_easelElmt + ": " + (this.m_selectedConnections[0] == p_easelElmt));
+                    var newSelected = [];
+                    this.m_selectedConnections.forEach(function (c) {
+                        //console.log("checking " + e + " against " + p_easelElmt);
+                        if (c.toString() !== p_easelElmt.toString()) {
+                            //console.log("not a match");
+                            newSelected.push(c);
+                        }
+                        else {
+                        }
+                    });
+                    this.m_selectedConnections = newSelected;
+                    this.updateConnection(this.m_model.getConnection(p_easelElmt.name));
+                }
+                this.m_updateStage = true;
             };
-            GUIHandler.prototype.setSelection = function (p_easelElmt) {
+            GUIHandler.prototype.drawPolygon = function (shape, color) {
+                var heigth = 30;
+                var length = 150;
+                shape.graphics.beginStroke(color);
+                shape.graphics.moveTo(length / 10, 0).lineTo(length - (length / 10), 0).lineTo(length, heigth / 2);
+                shape.graphics.lineTo(length - (length / 10), heigth).lineTo(length / 10, heigth).lineTo(0, heigth / 2).lineTo(length / 10, 0);
+            };
+            GUIHandler.prototype.setSelection = function (p_easelElmts) {
                 this.clearSelection();
                 ////console.log(p_easelElmt);
-                for (var i = 0; i < p_easelElmt.length; i++) {
-                    this.addToSelection(p_easelElmt[i]);
+                for (var i = 0; i < p_easelElmts.length; i++) {
+                    this.addToSelection(p_easelElmts[i]);
                 }
             };
             GUIHandler.prototype.getSelected = function () {
                 return this.m_selectedItems;
             };
             GUIHandler.prototype.clearSelection = function () {
-                //console.log("clear");
+                console.log("clear");
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
                     var easelElmt = this.m_selectedItems[i];
                     if (easelElmt.id != this.m_model.getElement(easelElmt.name).m_minitableEaselElmt.id) {
@@ -2254,18 +2401,25 @@ var Mareframe;
                                 break;
                             case 2:
                                 //Value
-                                shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
+                                this.drawPolygon(shape, this.m_elementColors[elmtType][1]);
+                                //shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
                                 break;
                             case 3:
                                 //Super Value
-                                shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
+                                this.drawPolygon(shape, this.m_elementColors[elmtType][1]);
+                                //shape.graphics.drawRoundRect(0, 0, 150, 30, 10);
                                 break;
                             default:
                                 break;
                         }
                     }
                 }
+                for (var i = 0; i < this.m_selectedConnections.length; i++) {
+                    this.updateConnection(this.m_model.getConnection(this.m_selectedConnections[i].name));
+                }
                 this.m_selectedItems = [];
+                this.m_selectedConnections = [];
+                this.m_selectedConnections = [];
                 this.m_updateStage = true;
             };
             GUIHandler.prototype.addDataRowClick = function (p_evt) {
@@ -2273,7 +2427,7 @@ var Mareframe;
                 var elmt = p_evt.data.param1;
                 var id = elmt.getID();
                 $("#valuesTable_div_" + id).hide(); //Hides the value table
-                $("#values_" + id).prop("disabled", true); //Disables the show values button until element is updated
+                this.updateValueButton(true, id); //Disables the show values button until element is updated
                 //console.log("add row");
                 $("#detailsDialog_" + id).data("defTable", DST.Tools.addDataRow(elmt, $("#detailsDialog_" + id).data("defTable")));
                 var newState = $("#detailsDialog_" + id).data("defTable")[$("#detailsDialog_" + id).data("defTable").length - 1][0];
@@ -2288,6 +2442,7 @@ var Mareframe;
                 //$("#defTable_div_" + id).html(s);
                 this.addEditFunction(elmt, this.m_editorMode);
                 $("#detailsDialog_" + id).data("unsavedChanges", true);
+                this.updateUpdateButton(true);
                 $("#values_" + id).show();
                 $("#submit_" + id).show();
             };
@@ -2306,12 +2461,13 @@ var Mareframe;
             };
             GUIHandler.prototype.removeRowVisually = function (p_element, p_row) {
                 var id = p_element.getID();
-                var rowToDelete = $("#detailsDialog_" + id).data("defTable")[p_row];
                 //console.log("delete row: " + rowToDelete);
                 if ($("#detailsDialog_" + id).data("defTable").length - DST.Tools.numOfHeaderRows($("#detailsDialog_" + id).data("defTable")) < 3) {
                     alert("Must be at least two outcomes");
+                    return false;
                 }
                 else {
+                    var rowToDelete = $("#detailsDialog_" + id).data("defTable")[p_row];
                     $("#detailsDialog_" + id).data("defTable", DST.Tools.removeRow($("#detailsDialog_" + id).data("defTable"), p_row));
                     var statesToAdd = $("#detailsDialog_" + id).data("newStates");
                     var deletedRowState = rowToDelete[0];
@@ -2334,6 +2490,9 @@ var Mareframe;
                     //create the html table again
                     $("#defTable_div_" + id).empty();
                     document.getElementById("defTable_div_" + id).appendChild(this.htmlTableFromArray("Definition", p_element, this.m_model, this.m_editorMode, $("#detailsDialog_" + id).data("defTable")));
+                    //var s = Tools.htmlTableFromArray("Definition", p_element, this.m_model, this.m_editorMode, $("#detailsDialog_" + id).data("defTable"));
+                    //$("#defTable_div_" + id).html(s);
+                    return true;
                 }
             };
             GUIHandler.prototype.disableButtons = function (b) {
@@ -2361,11 +2520,11 @@ var Mareframe;
                     if (e.getDialog() !== undefined && e.getDialog().data("isOpen")) {
                         console.log("updating tables for: " + e.getName());
                         if (!(e.isUpdated())) {
-                            $("#values_" + e.getID()).prop("disabled", true);
+                            mareframGUI.updateValueButton(true, e.getID());
                             $("#values_" + e.getID()).show();
                         }
                         else {
-                            $("#values_" + e.getID()).prop("disabled", false);
+                            mareframGUI.updateValueButton(false, e.getID());
                         }
                         mareframGUI.updateTablesVisually(e);
                     }
@@ -2472,6 +2631,7 @@ var Mareframe;
                             var button = document.createElement("button");
                             button.setAttribute("class", "minus minus_" + p_elmt.getID());
                             button.setAttribute("id", i + "");
+                            button.title = "Click to delete this row";
                             minusCell.appendChild(button);
                             rowPlaceholder.appendChild(minusCell);
                         }
@@ -2569,8 +2729,9 @@ var Mareframe;
                     $("#values_" + id).show();
                     $("#submit_" + id).show();
                     $("#detailsDialog_" + elmt.getID()).data("unsavedChanges", true);
+                    this.updateUpdateButton(true);
                     console.log("setting unsaved changes = true in " + elmt.getID());
-                    $("#values_" + id).prop("disabled", true);
+                    this.updateValueButton(true, id);
                     $(field).data("originalValue", newText);
                     $("#detailsDialog_" + id).data("defTable", gui.updateDefTable(elmt)); //This saves the temporary data table
                 }

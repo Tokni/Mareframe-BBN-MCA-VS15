@@ -17,6 +17,7 @@ var Mareframe;
                 this.m_updated = false;
                 this.m_easelElmt = new createjs.Container();
                 this.m_minitableEaselElmt = new createjs.Container();
+                this.m_visuallySelected = false;
                 if (p_id.substr(0, 4) == "elmt") {
                     this.m_id = p_id;
                 }
@@ -29,6 +30,12 @@ var Mareframe;
                 this.m_model = p_model;
                 this.getChildrenElements = this.getChildrenElements.bind(this);
             }
+            Element.prototype.getVisuallySelected = function () {
+                return this.m_visuallySelected;
+            };
+            Element.prototype.setVisuallySelected = function (bool) {
+                this.m_visuallySelected = bool;
+            };
             Element.prototype.getDialog = function () {
                 return this.m_dialog;
             };
@@ -365,7 +372,7 @@ var Mareframe;
                     for (var index in this.m_connections) {
                     }
                     //console.log("Total conections: " + this.m_model.getConnectionArr().length);
-                    this.m_model.deleteConnection(p_connID);
+                    //this.m_model.deleteConnection(p_connID);
                     //console.log("Total conections: " + this.m_model.getConnectionArr().length);
                     return true;
                 }

@@ -1,8 +1,8 @@
 ﻿module Mareframe {
-    export module DST{
+    export module DST {
         export class Element {
             private m_data: any[][] = [];
-            private m_dateDim: number[] =[]; 
+            private m_dateDim: number[] = [];
             private m_id: string = "elmtbroken"
             private m_name: string = "Element";
             private m_description: string = "write description here";
@@ -18,18 +18,25 @@
             private m_decision: number; //undefined if no decision is sat
             private m_dialog: JQuery;
             private m_evidence: number;
+            private m_visuallySelected = false;
 
             constructor(p_id: string, p_model: Model, p_type: number) {
                 if (p_id.substr(0, 4) == "elmt")
                 { this.m_id = p_id; }
                 else { this.m_id = "elmt" + p_id; }
                 if (p_type != undefined) {
-                    this.m_type = p_type; 
+                    this.m_type = p_type;
                 }
                 this.m_model = p_model;
                 this.getChildrenElements = this.getChildrenElements.bind(this);
             }
 
+            getVisuallySelected() {
+                return this.m_visuallySelected;
+            }
+            setVisuallySelected(bool: boolean) {
+                this.m_visuallySelected = bool;
+            }
             getDialog(): JQuery {
                 return this.m_dialog;
             }
@@ -69,7 +76,7 @@
             update(): void {
                 //console.log("Updating element " + this.getName() );
                 if (this.m_type !== 1) {
-                 //   console.log("This is not a decision node");
+                    //   console.log("This is not a decision node");
                     //Definition table in decision nodes does not rely on parents
                     this.updateData();
                 }
@@ -92,26 +99,26 @@
 
             isParentOf(p_elmt: Element): boolean {
                 var retBool: boolean = false;
-                
-                for (var e in this.getChildrenElements() ) {
+
+                for (var e in this.getChildrenElements()) {
                     //console.log("Element: " + p_elmt.getID() + "   ChildElement: " + this.getChildrenElements()[e].getID());
                     if (this.getChildrenElements()[e].getID() == p_elmt.getID()) {
-                        
+
                         retBool = true;
                         break;
                     }
                 }
-               // console.log(" Is Parent Of: " + retBool);
+                // console.log(" Is Parent Of: " + retBool);
                 return retBool;
             }
 
             isChildOf(p_elmt: Element): boolean {
                 var retBool: boolean = false;
 
-                for (var e in this.getParentElements() ) {
+                for (var e in this.getParentElements()) {
                     //console.log("Element: " + p_elmt.getID() + "   ParentElement: " + this.getParentElements()[e].getID());
                     if (this.getParentElements()[e].getID() == p_elmt.getID()) {
-                        
+
                         retBool = true;
                         break;
                     }
@@ -124,29 +131,29 @@
             getChildrenElements(): Element[] {
                 var children: Element[] = [];
                 var elmt = this;
-               // console.log(this.m_connections);
+                // console.log(this.m_connections);
                 this.m_connections.forEach(function (c) {
                     //console.log("OutputElement: " + c.getOutputElement().getID());
                     //console.log("this Element id: " + elmt.getID());
-                    if (c.getInputElement().getID() === elmt.getID() ) {
+                    if (c.getInputElement().getID() === elmt.getID()) {
                         children.push(c.getOutputElement());
                     }
                 })
-             //   console.log(this.getName() + " chilxxdren: " + children);
+                //   console.log(this.getName() + " chilxxdren: " + children);
                 return children;
             }
             getAllAncestors(): Element[] {
-              //  console.log("getting ancestors for: " + this.getName());
-                var ancestors: Element[] =[];
+                //  console.log("getting ancestors for: " + this.getName());
+                var ancestors: Element[] = [];
                 var parents: Element[] = this.getParentElements();
                 if (parents.length === 0) {
-                  //  console.log("ancestors: " + ancestors);
+                    //  console.log("ancestors: " + ancestors);
                     return ancestors;
                 }
                 else {
                     parents.forEach(function (e) {
                         if (ancestors.indexOf(e) === -1) {
-                         //   console.log("pushing " + e.getName());
+                            //   console.log("pushing " + e.getName());
                             ancestors.push(e);
                             ancestors = ancestors.concat(e.getAllAncestors());
                         }
@@ -162,19 +169,19 @@
                         decisions.push(e);
                     }
                 });
-                    return decisions;
+                return decisions;
             }
 
             isAncestorOf(elmt): boolean {
-              //  console.log("checking if " + this.getName() + " is an ancestor of " + elmt.getName() + ": " + (this.getAllAncestors().indexOf(elmt) > -1));
+                //  console.log("checking if " + this.getName() + " is an ancestor of " + elmt.getName() + ": " + (this.getAllAncestors().indexOf(elmt) > -1));
                 return (this.getAllAncestors().indexOf(elmt) > -1);
             }
-            getAllDescendants(): Element[]{
-               //console.log("get all decendants for " + this.getName());
+            getAllDescendants(): Element[] {
+                //console.log("get all decendants for " + this.getName());
                 var descendants: Element[] = [];
                 var children: Element[] = this.getChildrenElements();
                 if (children.length === 0) {
-                 //   console.log("returned: " + decendants);
+                    //   console.log("returned: " + decendants);
                     return descendants;
                 }
                 else {
@@ -186,7 +193,7 @@
                         }
                     });
                 }
-               // console.log("returned: " + descendants);
+                // console.log("returned: " + descendants);
                 return descendants;
             }
 
@@ -238,9 +245,9 @@
                 else {
                     for (var i = 0; i < parents.length; i++) {
                         var elmt: Element = parents[i];
-                         //console.log("Parent: " + elmt.getName());
+                        //console.log("Parent: " + elmt.getName());
                         data = Tools.addNewHeaderRow(elmt.getMainValues(), data);
-                       // console.log(data);
+                        // console.log(data);
                     }
                     //console.log("number of header rows : " + Tools.numOfHeaderRows(this.m_data));
                     //Add original values to the table
@@ -253,10 +260,10 @@
                 // console.log(data);
                 return data;
             }
-            
-            addDefaultDataInEmptyCells(p_originalData: any[][], p_editedElmt: Element, p_addedState: String): any[][]{
-               // console.log("adding default values in " + this.getName() + " for the new state " + p_addedState + " in element: "+ p_editedElmt.getName());
-                var data:any[][] = Tools.makeSureItsTwoDimensional(p_originalData);
+
+            addDefaultDataInEmptyCells(p_originalData: any[][], p_editedElmt: Element, p_addedState: String): any[][] {
+                // console.log("adding default values in " + this.getName() + " for the new state " + p_addedState + " in element: "+ p_editedElmt.getName());
+                var data: any[][] = Tools.makeSureItsTwoDimensional(p_originalData);
                 var rows: number = data.length;
                 var columns: number = data[0].length;
                 //console.log("original data: " + p_originalData);
@@ -264,7 +271,7 @@
                     if (data[i][0] === p_editedElmt.getID()) {//This is the right row
                         //console.log("found row");
                         for (var j = 0; j < columns; j++) { 
-                           // console.log("comparing " + (data[i][j] + " and " + p_addedState);
+                            // console.log("comparing " + (data[i][j] + " and " + p_addedState);
                             if (data[i][j].trim() === p_addedState.trim()) {//This is the right column
                                 //console.log("found column");
                                 for (var n = Tools.numOfHeaderRows(data); n < rows; n++) { //For each row in this column add a default value
@@ -277,8 +284,8 @@
                 }
                 return data;
             }
-	        //returns the different variables (conditions or choices) that belong to the element
-            getMainValues(): string[]{
+            //returns the different variables (conditions or choices) that belong to the element
+            getMainValues(): string[] {
                 //console.log("getting main values from " + this.getName());
                 //console.log(this.m_data);
                 var row = [];
@@ -293,7 +300,7 @@
                         //console.log("push data " + data[i][0]);
                     }
                 }
-               //console.log("new row: " + row);
+                //console.log("new row: " + row);
                 return row;
             }
 
@@ -390,7 +397,7 @@
                         //console.log(this.m_name + "  EAfter: " + this.m_connections[index].getID());
                     }
                     //console.log("Total conections: " + this.m_model.getConnectionArr().length);
-                    this.m_model.deleteConnection(p_connID);
+                    //this.m_model.deleteConnection(p_connID);
                     //console.log("Total conections: " + this.m_model.getConnectionArr().length);
 
                     return true;
@@ -414,7 +421,7 @@
             }
 
             fromJSON(p_jsonElmt: any): void {
-               // console.log("element.fromJSON()");
+                // console.log("element.fromJSON()");
                 //console.log(p_jsonElmt);
                 this.m_easelElmt.x = p_jsonElmt.posX;
                 this.m_easelElmt.y = p_jsonElmt.posY;
@@ -426,7 +433,7 @@
                 this.m_data = p_jsonElmt.elmtData;
                 //console.log("FromJSONdata: " + this.m_data);
                 this.m_weightingMethod = p_jsonElmt.elmtWghtMthd;
-                
+
             }
 
             getConnectionFrom(p_elmt: Element): Connection {
@@ -437,7 +444,7 @@
                         retConnection = this.m_connections[index];
                         break;
                     }
-                } 
+                }
 
                 return retConnection;
 
@@ -467,7 +474,7 @@
                 else {
                     throw "Get max value was called on element of type not decision";
                 }
-                return [min,max];
+                return [min, max];
             }
             getSumOfValues(): number {//Only works for decision nodes 
                 var sum: number = 0;
@@ -477,5 +484,7 @@
                 return sum;
 
             }
+        }
     }
 }
+
