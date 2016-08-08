@@ -84,7 +84,7 @@ var Mareframe;
                 return this.m_mareframeMode;
             };
             return Handler;
-        })();
+        }());
         DST.Handler = Handler;
     })(DST = Mareframe.DST || (Mareframe.DST = {}));
 })(Mareframe || (Mareframe = {}));

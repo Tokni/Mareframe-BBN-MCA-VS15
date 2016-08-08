@@ -578,7 +578,7 @@ var Mareframe;
                 return elements;
             };
             return Model;
-        })();
+        }());
         DST.Model = Model;
     })(DST = Mareframe.DST || (Mareframe.DST = {}));
 })(Mareframe || (Mareframe = {}));

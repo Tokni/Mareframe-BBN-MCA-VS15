@@ -588,6 +588,66 @@
                 //console.log("returned: " + tempTable);
                 return tempTable;
             }
+            static updateValuesHeaders(p_model: Model, p_elmt: Element): void {
+                var headerRows: any[] = [];
+                if (p_elmt.getType() === 0) {//If this is a chance node 
+                    p_elmt.getAllAncestors().forEach(function (ancestor) {
+                        if (!(ancestor.isUpdated())) {
+                            Tools.updateValuesHeaders(p_model, ancestor);
+                        }
+                        if (ancestor.getType() === 1) { //If ancestor is a decision 
+                            headerRows = Tools.addNewHeaderRow(ancestor.getMainValues(), headerRows);
+                        }
+                    });
+                    p_elmt.setUpdated(true);
+                }
+                else if (p_elmt.getType() === 1) {//If this is a decision node
+                    p_elmt.getParentElements().forEach(function (parent) {
+                        if (!(parent.isUpdated())) {
+                            Tools.updateValuesHeaders(p_model, parent);
+                        }
+                        headerRows = Tools.addNewHeaderRow(parent.getMainValues(), headerRows);
+                    });
+                    p_elmt.setUpdated(true);
+                }
+                else if (p_elmt.getType() === 2) {//If this is a utility node 
+                    p_elmt.getAllAncestors().forEach(function (ancestor: Element) {
+                        if (!(ancestor.isUpdated())) {
+                            Tools.updateValuesHeaders(p_model, ancestor);
+                        }
+                        if (ancestor.getType() === 0) {//If ancestor is a chance node
+                            var isInformative: boolean = false;
+                            ancestor.getChildrenElements().forEach(function (c) {
+
+                                if (c.getType() === 1) {//If a chance has a decision child it is informative
+                                    isInformative = true;
+                                }
+                            });
+                            if (isInformative) {
+                                headerRows = Tools.addNewHeaderRow(ancestor.getMainValues(), headerRows);
+                            }
+                        }
+                        else if (ancestor.getType() === 1) { //If ancestor is a decision
+                            headerRows = Tools.addNewHeaderRow(ancestor.getMainValues(), headerRows);
+                        }
+                    });
+                    p_elmt.setUpdated(true);
+                }
+                p_elmt.setValues(headerRows);
+                Tools.addMainValues(p_model, p_elmt);
+            }
+            static addMainValues(p_model: Model, p_elmt: Element): void {
+                var valueHeaders: any[] = p_elmt.getValues();
+                p_elmt.getMainValues().forEach(function (value) {
+                    valueHeaders.push([value]);
+                });
+                for (var col = 1; col < Math.max(valueHeaders[0].length,2); col++) {
+                    for (var row = Tools.numOfHeaderRows(valueHeaders); row < valueHeaders.length; row++) {
+                        valueHeaders[row].push(0);
+                    }
+                }
+            }
+
             static calculateValues(p_model: Model, p_element: Element) {
                 var model: Model = p_model;
                 var element: Element = p_element;
@@ -1234,15 +1294,18 @@
                    // alert("Can not create a cycle");
 
                 }
+                else if (inputElmt.isParentOf(outputElmt)) { //Cannot connect if there is already a connection
+                    valid = false;
+                }
                 //Value cannot connect to value if output cannot be converted to super value
                 else if (inputElmt.getType() === 2 && (outputElmt.getType() === 1 || outputElmt.getType() === 0 || (outputElmt.getType() === 2 && outputElmt.getParentElements().length > 0))) {
                     valid = false;
                    // alert("Value nodes cannot have children");
                 }
-                else if (inputElmt.getType() === 0 && outputElmt.getType() === 1) {
+                /*else if (inputElmt.getType() === 0 && outputElmt.getType() === 1) {
                     valid = false;
                   //  alert("Chance nodes can not have decsion node children");
-                }
+                }*/
                 else if (outputElmt.getType() === 3 && inputElmt.getType() !== 2) {//Super value nodes can only have value children
                     valid = false;
                    // alert("Super value nodes can only have value children");
@@ -1261,7 +1324,7 @@
                 var valueWithInfo: number = Number.MIN_VALUE;
                 var bestState: number;
                 var chanceValues: any[][] = chanceNode.getValues();
-
+                
                 for (var state = 0; state < chanceValues.length - Tools.numOfHeaderRows(chanceValues); state++) {//For each state in chance
                     console.log("setting evidence: " + state);
                     p_model.setEvidence(chanceNode, state);
@@ -1277,12 +1340,38 @@
                     p_model.setEvidence(chanceNode, state);//Unset evidence
                 }
                 p_model.update(); //Calculate all values back to original
-
                 //console.log("valueWithNoInfo: " + valueWithNoInfo);
                // console.log("valueWithInfo: " + valueWithInfo);
-                //console.log("best state: " + bestState);
+                console.log("best state: " + bestState);
                 var valueOfInformation = (valueWithInfo - valueWithNoInfo) * chanceNode.getValues()[bestState - Tools.numOfHeaderRows(chanceValues)][1];
                 console.log("Value of Information: " + valueOfInformation);
+            }
+
+            static valueOfInformation(p_model: Model, p_forDecision: Element, p_pov: Element, p_chanceNodes: Element[]): any[] {
+                var tempDecision: Element = p_model.createNewElement(1);
+                p_model.createNewConnection(tempDecision, p_pov);
+                var utilityFound: boolean = false;
+                for (var i = 0; i < p_model.getElementArr().length; i++) {
+                    var elmt: Element = p_model.getElementArr()[i];
+                    if (elmt.getType() === 2) {
+                        p_model.createNewConnection(tempDecision, elmt);
+                        utilityFound = true;
+                    break;
+                    }
+                }
+                if (!utilityFound) {
+                    return [0];
+                }
+                p_model.update();
+                var matrix1 = tempDecision.getValues().slice;
+                p_chanceNodes.forEach(function (e) {
+                    p_model.createNewConnection(e, p_forDecision);
+                });
+                p_model.update();
+                var matrix2 = tempDecision.getValues().slice();
+                var resultMatrix = math.subtract(matrix2, matrix1);
+                console.log(resultMatrix);
+                return resultMatrix;
             }
             static calcValueWithEvidence(p_model: Model, p_numOfIterations: number) {
                 //console.log("calculating values with evidence");
@@ -1294,7 +1383,7 @@
                     var aCase = {};
                     var sampledElmts: Element[] = [];
                     p_model.getElementArr().forEach(function (e) {
-                        if (e.getType() !== 2 && sampledElmts.indexOf(e) < 0) {//If this is a chance and it has not already been sampled. Should it be !==2 ??
+                        if (e.getType() !== 2 && sampledElmts.indexOf(e) < 0) {//If this is a chance or decision and it has not already been sampled. Should it be !==2 ??
                             var result = Tools.sample(sampledElmts, evidenceElmts, aCase, w, e, p_model);
                             aCase = result[0];//Update the case 
                             w = result[1];//Update weight
@@ -1312,6 +1401,7 @@
                 //console.log("weightSum " + weightSum);
 
                 p_model.getElementArr().forEach(function (e) {
+                    console.log("calculating values for " + e.getName());
                     if (e.getType() === 0 || e.getType() === 2) {
                         var data = e.getData();
                         var values = [];
@@ -1390,7 +1480,7 @@
                             }
                             values.push(valRow);
                         }
-                        if (e.getType() === 2) {//If this is a utility node values corresponds to a chance node where the states are the headers of the utility def
+                        if (e.getType() === 2) {//If this is a utility node then values corresponds to a chance node where the states are the headers of the utility def
                             //console.log("values: ");
                             //console.log(values);
                             //console.log("multiplying "+ Tools.getMatrixWithoutHeader(data) + " and " + Tools.getMatrixWithoutHeader(values));
@@ -1421,15 +1511,8 @@
                         e.setValues(values);
                         e.setUpdated(true);
                     }
-                    else {
-                       /* Tools.calculateValues(p_model, e);
-                        e.setUpdated(true);
-                        if (e.getType() === 2 || e.getType() === 3) {//This is needed to remove columns that are not part of set choice 
-                            //Tools.updateConcerningDecisions(e);
-                        }*/
-                    }
                 });
-                p_model.getElementArr().forEach(function (e) {//This recalculates all values of decision and  elements
+                p_model.getElementArr().forEach(function (e) {//This recalculates all values of decision elements
                     if (!e.isUpdated()) {
                         //console.log("calculating for " + e.getName());
                         Tools.calculateValues(p_model, e);
@@ -1449,7 +1532,7 @@
                         p_sampledElmts.push(parent);
                     }
                 });
-                if (p_evindeceElmts.indexOf(p_elmt) > -1) {//If this is a evidence element
+                if (p_evindeceElmts.indexOf(p_elmt) > -1) {//If this is an evidence element
                     //console.log("this is evindece elmt");
                     p_weight = p_weight * Tools.getValueFromParentSamples(p_elmt, p_case, p_model);
                     //console.log("weight updated to " + p_weight);

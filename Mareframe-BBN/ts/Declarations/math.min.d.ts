@@ -9,6 +9,6 @@
     static squeeze(x: any): any;
     static flatten(x: any): any;
     static multiply(x: any, y: any): any;
-    
+    static subtract(x: any, y: any): any;
 
 }

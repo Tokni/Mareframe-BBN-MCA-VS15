@@ -55,7 +55,7 @@ var Mareframe;
                 this.m_id = p_jsonElmt.connID;
             };
             return Connection;
-        })();
+        }());
         DST.Connection = Connection;
     })(DST = Mareframe.DST || (Mareframe.DST = {}));
 })(Mareframe || (Mareframe = {}));

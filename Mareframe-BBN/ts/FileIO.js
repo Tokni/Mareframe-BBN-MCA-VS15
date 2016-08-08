@@ -214,7 +214,7 @@ var Mareframe;
                 });
             };
             return FileIO;
-        })();
+        }());
         DST.FileIO = FileIO;
     })(DST = Mareframe.DST || (Mareframe.DST = {}));
 })(Mareframe || (Mareframe = {}));

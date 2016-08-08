@@ -79,7 +79,8 @@ var Mareframe;
                     //Definition table in decision nodes does not rely on parents
                     this.updateData();
                 }
-                DST.Tools.calculateValues(this.m_model, this);
+                // Tools.calculateValues(this.m_model, this);
+                DST.Tools.updateValuesHeaders(this.m_model, this);
                 //console.log("Updated element " + this.getName());
                 this.m_updated = true;
             };
@@ -449,7 +450,7 @@ var Mareframe;
                 return sum;
             };
             return Element;
-        })();
+        }());
         DST.Element = Element;
     })(DST = Mareframe.DST || (Mareframe.DST = {}));
 })(Mareframe || (Mareframe = {}));

@@ -534,7 +534,8 @@ module Mareframe {
                             //decisionCont.addChild(decisBarBackgr);
                             decisionCont.addChild(decisPercVal);
                         }
-                        else if (elmt.getValues()[0].length > 2 && (elmt.getType() !== 2 && elmt.getType() !== 3)) {
+                        else if ((elmt.getValues()[0].length > 2 && (elmt.getType() !== 2 && elmt.getType() !== 3)) ||
+                            elmt.getValues().length > 2 && elmt.getType() !==0 && elmt.getType() !== 1 ) {
                             var height: number = elmt.getValues().length - Tools.numOfHeaderRows(elmt.getValues());
                             //Set text box to show "Values are multi-dimensional" if element is not updated
                              var decisPercVal: createjs.Text = new createjs.Text("Values\nare multi-\ndimensional", "0.8em trebuchet", "#303030");
@@ -1344,7 +1345,9 @@ module Mareframe {
                 return newDialog.id;
             }
             private populateElmtDetails(p_elmt: Element): void {
-                //Tools.calcValueOfInformation(this.m_model.getElement("elmtDecsion"), p_elmt, this.m_model); //This is just a test for VOI
+              //  Tools.calcValueOfInformation(this.m_model.getElement("elmtDecsion"), p_elmt, this.m_model,10); //This is just a test for VOI
+
+                Tools.valueOfInformation(this.m_model, this.m_model.getElement("elmtDecsion"), this.m_model.getElement("elmtDecsion"), [p_elmt])
                 var id: String = p_elmt.getID();
                 if (p_elmt.getDialog() == null) {
                     console.log("creating new dialog");

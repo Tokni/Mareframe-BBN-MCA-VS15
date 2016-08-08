@@ -559,6 +559,64 @@ var Mareframe;
                 //console.log("returned: " + tempTable);
                 return tempTable;
             };
+            Tools.updateValuesHeaders = function (p_model, p_elmt) {
+                var headerRows = [];
+                if (p_elmt.getType() === 0) {
+                    p_elmt.getAllAncestors().forEach(function (ancestor) {
+                        if (!(ancestor.isUpdated())) {
+                            Tools.updateValuesHeaders(p_model, ancestor);
+                        }
+                        if (ancestor.getType() === 1) {
+                            headerRows = Tools.addNewHeaderRow(ancestor.getMainValues(), headerRows);
+                        }
+                    });
+                    p_elmt.setUpdated(true);
+                }
+                else if (p_elmt.getType() === 1) {
+                    p_elmt.getParentElements().forEach(function (parent) {
+                        if (!(parent.isUpdated())) {
+                            Tools.updateValuesHeaders(p_model, parent);
+                        }
+                        headerRows = Tools.addNewHeaderRow(parent.getMainValues(), headerRows);
+                    });
+                    p_elmt.setUpdated(true);
+                }
+                else if (p_elmt.getType() === 2) {
+                    p_elmt.getAllAncestors().forEach(function (ancestor) {
+                        if (!(ancestor.isUpdated())) {
+                            Tools.updateValuesHeaders(p_model, ancestor);
+                        }
+                        if (ancestor.getType() === 0) {
+                            var isInformative = false;
+                            ancestor.getChildrenElements().forEach(function (c) {
+                                if (c.getType() === 1) {
+                                    isInformative = true;
+                                }
+                            });
+                            if (isInformative) {
+                                headerRows = Tools.addNewHeaderRow(ancestor.getMainValues(), headerRows);
+                            }
+                        }
+                        else if (ancestor.getType() === 1) {
+                            headerRows = Tools.addNewHeaderRow(ancestor.getMainValues(), headerRows);
+                        }
+                    });
+                    p_elmt.setUpdated(true);
+                }
+                p_elmt.setValues(headerRows);
+                Tools.addMainValues(p_model, p_elmt);
+            };
+            Tools.addMainValues = function (p_model, p_elmt) {
+                var valueHeaders = p_elmt.getValues();
+                p_elmt.getMainValues().forEach(function (value) {
+                    valueHeaders.push([value]);
+                });
+                for (var col = 1; col < Math.max(valueHeaders[0].length, 2); col++) {
+                    for (var row = Tools.numOfHeaderRows(valueHeaders); row < valueHeaders.length; row++) {
+                        valueHeaders[row].push(0);
+                    }
+                }
+            };
             Tools.calculateValues = function (p_model, p_element) {
                 var model = p_model;
                 var element = p_element;
@@ -1170,10 +1228,10 @@ var Mareframe;
                 if (inputElmt.isAncestorOf(outputElmt)) {
                     valid = false;
                 }
-                else if (inputElmt.getType() === 2 && (outputElmt.getType() === 1 || outputElmt.getType() === 0 || (outputElmt.getType() === 2 && outputElmt.getParentElements().length > 0))) {
+                else if (inputElmt.isParentOf(outputElmt)) {
                     valid = false;
                 }
-                else if (inputElmt.getType() === 0 && outputElmt.getType() === 1) {
+                else if (inputElmt.getType() === 2 && (outputElmt.getType() === 1 || outputElmt.getType() === 0 || (outputElmt.getType() === 2 && outputElmt.getParentElements().length > 0))) {
                     valid = false;
                 }
                 else if (outputElmt.getType() === 3 && inputElmt.getType() !== 2) {
@@ -1209,9 +1267,35 @@ var Mareframe;
                 p_model.update(); //Calculate all values back to original
                 //console.log("valueWithNoInfo: " + valueWithNoInfo);
                 // console.log("valueWithInfo: " + valueWithInfo);
-                //console.log("best state: " + bestState);
+                console.log("best state: " + bestState);
                 var valueOfInformation = (valueWithInfo - valueWithNoInfo) * chanceNode.getValues()[bestState - Tools.numOfHeaderRows(chanceValues)][1];
                 console.log("Value of Information: " + valueOfInformation);
+            };
+            Tools.valueOfInformation = function (p_model, p_forDecision, p_pov, p_chanceNodes) {
+                var tempDecision = p_model.createNewElement(1);
+                p_model.createNewConnection(tempDecision, p_pov);
+                var utilityFound = false;
+                for (var i = 0; i < p_model.getElementArr().length; i++) {
+                    var elmt = p_model.getElementArr()[i];
+                    if (elmt.getType() === 2) {
+                        p_model.createNewConnection(tempDecision, elmt);
+                        utilityFound = true;
+                        break;
+                    }
+                }
+                if (!utilityFound) {
+                    return [0];
+                }
+                p_model.update();
+                var matrix1 = tempDecision.getValues().slice;
+                p_chanceNodes.forEach(function (e) {
+                    p_model.createNewConnection(e, p_forDecision);
+                });
+                p_model.update();
+                var matrix2 = tempDecision.getValues().slice();
+                var resultMatrix = math.subtract(matrix2, matrix1);
+                console.log(resultMatrix);
+                return resultMatrix;
             };
             Tools.calcValueWithEvidence = function (p_model, p_numOfIterations) {
                 //console.log("calculating values with evidence");
@@ -1240,6 +1324,7 @@ var Mareframe;
                 }*/
                 //console.log("weightSum " + weightSum);
                 p_model.getElementArr().forEach(function (e) {
+                    console.log("calculating values for " + e.getName());
                     if (e.getType() === 0 || e.getType() === 2) {
                         var data = e.getData();
                         var values = [];
@@ -1338,8 +1423,6 @@ var Mareframe;
                         //console.log("setting values for " + e.getName()+ " + to: "+ values);
                         e.setValues(values);
                         e.setUpdated(true);
-                    }
-                    else {
                     }
                 });
                 p_model.getElementArr().forEach(function (e) {
@@ -1466,7 +1549,7 @@ var Mareframe;
                 return averageLikelihood;
             };
             return Tools;
-        })();
+        }());
         DST.Tools = Tools;
     })(DST = Mareframe.DST || (Mareframe.DST = {}));
 })(Mareframe || (Mareframe = {}));

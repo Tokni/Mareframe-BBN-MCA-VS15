@@ -520,7 +520,8 @@ var Mareframe;
                         //decisionCont.addChild(decisBarBackgr);
                         decisionCont.addChild(decisPercVal);
                     }
-                    else if (elmt.getValues()[0].length > 2 && (elmt.getType() !== 2 && elmt.getType() !== 3)) {
+                    else if ((elmt.getValues()[0].length > 2 && (elmt.getType() !== 2 && elmt.getType() !== 3)) ||
+                        elmt.getValues().length > 2 && elmt.getType() !== 0 && elmt.getType() !== 1) {
                         var height = elmt.getValues().length - DST.Tools.numOfHeaderRows(elmt.getValues());
                         //Set text box to show "Values are multi-dimensional" if element is not updated
                         var decisPercVal = new createjs.Text("Values\nare multi-\ndimensional", "0.8em trebuchet", "#303030");
@@ -1229,7 +1230,8 @@ var Mareframe;
                 return newDialog.id;
             };
             GUIHandler.prototype.populateElmtDetails = function (p_elmt) {
-                //Tools.calcValueOfInformation(this.m_model.getElement("elmtDecsion"), p_elmt, this.m_model); //This is just a test for VOI
+                //  Tools.calcValueOfInformation(this.m_model.getElement("elmtDecsion"), p_elmt, this.m_model,10); //This is just a test for VOI
+                DST.Tools.valueOfInformation(this.m_model, this.m_model.getElement("elmtDecsion"), this.m_model.getElement("elmtDecsion"), [p_elmt]);
                 var id = p_elmt.getID();
                 if (p_elmt.getDialog() == null) {
                     console.log("creating new dialog");
@@ -2741,7 +2743,7 @@ var Mareframe;
                 }
             };
             return GUIHandler;
-        })();
+        }());
         DST.GUIHandler = GUIHandler;
     })(DST = Mareframe.DST || (Mareframe.DST = {}));
 })(Mareframe || (Mareframe = {}));
