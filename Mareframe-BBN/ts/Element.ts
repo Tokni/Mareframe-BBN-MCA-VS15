@@ -17,6 +17,8 @@
             private m_model: Model;
             private m_decision: number;
             public m_dstType: number;
+            public m_criteriaLevel;
+            public m_disregard = false;
 
             //private m_swingWeightsArr: number[] = [];
             public m_swingWeightsArr: any[] = [];
@@ -214,10 +216,11 @@
                 var elmt = this;
                // console.log(this.m_connections);
                 this.m_connections.forEach(function (c) {
-                    //console.log("OutputElement: " + c.getOutputElement().getID());
-                    //console.log("this Element id: " + elmt.getID());
-                    if (c.getInputElement().getID() === elmt.getID() ) {
-                        children.push(c.getOutputElement());
+                    var tmp = c.getOutputElement().getID();
+                    var tmp3 = c.getInputElement().getID();
+                    var tmp2 = elmt.getID();
+                    if (c.getOutputElement().getID() === elmt.getID() ) {
+                        children.push(c.getInputElement());
                     }
                 })
              //   console.log(this.getName() + " chilxxdren: " + children);
@@ -445,26 +448,27 @@
             getTypeName(): string {
                 switch (this.getType()) {
                     case 100: return "Attribute";
-                        break;
+                        //break;
                     case 101: return "Objective";
-                        break;
+                        //break;
                     case 102: return "Alternative";
-                        break;
+                        //break;
                     case 103: return "Goal";
                     default: console.log("No such element type name: " + this.getType() );
                 }
             }
             setType(p_type: number): void {
                 this.m_type = p_type;
+                if (p_type === 103) this.m_criteriaLevel = 0;
             }
             getMethod(): number {
                 return this.m_weightingMethod
             }
             getMethodName(): string {
                 switch (this.getMethod()) {
-                    case 0: return "Direct"; break;
-                    case 1: return "Swing / Direct"; break;
-                    case 2: return "Value Function"; break;
+                    case 0: return "Direct"; //break;
+                    case 1: return "Swing / Direct"; //break;
+                    case 2: return "Value Function"; //break;
                 }
             }
             setMethod(p_weightingMethod: number): void {
@@ -508,7 +512,9 @@
                 });
             }
             addConnection(p_conn: Connection): void {
-                this.m_connections.push(p_conn)
+                this.m_connections.push(p_conn);
+                if (p_conn.getInputElement().m_criteriaLevel != null)
+                    p_conn.getOutputElement().setCriteriaLevel( p_conn.getInputElement().m_criteriaLevel + 1 );
             }
             getConnections(): Connection[] {
                 return this.m_connections;
@@ -533,13 +539,13 @@
                     elmtDataUnit: this.m_dataUnit,
                     elmtDataBaseLine: this.m_dataBaseLine
                     }
-                if (this.getMethod() === 2) {
+                
                     retJson["elmtDataArr"] = this.getDataArr();
                     retJson["pwl"] = this.m_pwlVF;
                     retJson["pwlFlipVertical"] = this.m_pwlFlipVertical;
                     retJson["pwlFlipHorizontal"] = this.m_pwlFlipHorizontal;
-                }
-                if (this.getMethod() === 1 )
+                
+                
                     retJson["elmtData"] = this.m_swingWeightsArr;
                 return retJson;
                 }            
@@ -599,25 +605,38 @@
 
                 }
                 
-                switch (this.m_weightingMethod) {
-                    case 0: break;
-                    case 1:
+                //switch (this.m_weightingMethod) {
+                //    case 0: break;
+                //    case 1:
+                //        if (p_jsonElmt.elmtData) {
+                //            for (var i = 0; i < p_jsonElmt.elmtData.length; i++) {
+                //                this.m_swingWeightsArr[i] = p_jsonElmt.elmtData[i];
+                //            }
+                //        }
+                //        break;
+
+                //    case 2:
+                        
+                //        this.m_valueFunctionX = p_jsonElmt.elmtValueFnX;
+                //        this.m_valueFunctionY = p_jsonElmt.elmtValueFnY;
+                //        this.m_valueFunctionFlip = p_jsonElmt.elmtValueFnFlip;
+                       
+                //        break;
+                //    default: console.log("Json Goof");
+                
                         if (p_jsonElmt.elmtData) {
                             for (var i = 0; i < p_jsonElmt.elmtData.length; i++) {
                                 this.m_swingWeightsArr[i] = p_jsonElmt.elmtData[i];
                             }
                         }
-                        break;
-
-                    case 2:
                         
+
                         this.m_valueFunctionX = p_jsonElmt.elmtValueFnX;
                         this.m_valueFunctionY = p_jsonElmt.elmtValueFnY;
                         this.m_valueFunctionFlip = p_jsonElmt.elmtValueFnFlip;
-                       
-                        break;
-                    default: console.log("Json Goof");
-                }
+
+                        
+                
                 console.log("element " + p_jsonElmt.elmtName + " imported from JSON.");
 
             }
@@ -667,6 +686,40 @@
                         ret = this.getPwlVF().getValue(p_num);
                     }
                 }
+                return ret;
+            }
+            setCriteriaLevel(p_level: number): void {
+                this.m_criteriaLevel = p_level;
+                var tmp = this.getChildrenElements();
+                for (var chd of this.getChildrenElements()) {
+                    if (p_level != null)
+                        chd.setCriteriaLevel(p_level + 1);
+                    else    
+                        chd.setCriteriaLevel(null);
+                }                                
+            }
+            getWeightedValues(alt: number): number {
+                var ret: number;
+                switch (this.m_weightingMethod) {
+                    case 0: break;
+                    case 1: { // Swing - direct
+                        var total = 0;
+                        for (var k = 0; k < this.m_swingWeightsArr.length; k++) {
+                            total += this.m_swingWeightsArr[k][1];
+                        }                       
+                        ret = this.m_swingWeightsArr[alt][1] / total;                        
+                        break;
+                    }
+                    case 2: {// utility - value function
+                            ret = this.m_pwlVF.getValue(this.getDataArr[alt]);
+                        break;
+                    }
+                }
+                return ret;
+            }   
+            getScore(): number {
+                var ret;
+
                 return ret;
             }
         }

@@ -17,14 +17,16 @@ module Mareframe {
             constructor() {
                 console.log("handler started");
                 this.m_mareframeMode = true; 
-                var testPage = false; 
-                if (testPage === true) {
+                var testPage = true;
+                    ; 
+                if (testPage === false) {
 
                     //var m = new Model(true);
                     this.m_fileHandler = new FileIO();
+                    //this.m_gui = new GUIHandler( );
                     var w = new TKN_Widget("testCanvas", this.m_fileHandler, this.m_gui);
-
-                    w.setSize(700, 700);
+                    
+                    w.setSize(600, 600);
                     var pw = new Mareframe.DST.PiecewiseLinear(1, 1, 6, 7, 0, 10);
                     //var pw = new PiecewiseLinear(10, 10, 60, 70);
                     pw.addPoint(2, 3);
@@ -36,17 +38,15 @@ module Mareframe {
                     w.setPwl(pw);
                     w.addPWLToStage();
                     pw.savePWL();
+                   
                     this.m_fileHandler.savePiecewiseLinearFunction(pw);
                 } else {
 
                     this.m_mareframeMode = true; //This sets the layout to Tokni mode
 
-                
-
                     this.m_fileHandler = new FileIO();
                     this.m_activeModel = this.addNewModel();
                     this.m_gui = new GUIHandler(this.m_activeModel,this);
-
                 
                     var loadModel: string = Tools.getUrlParameter('model');
                     if (this.m_mareframeMode) {
@@ -57,7 +57,8 @@ module Mareframe {
                     //loadModel = "blackSea";
                     //loadModel = "iceland";
                     //loadModel = "cadiz";
-                    loadModel = "test";
+                        //loadModel = "test";
+                        loadModel = "newCar8";
                     }
                     else {//Tokni mode
                         //loadModel = "resturant";

@@ -1,0 +1,327 @@
+{
+  
+  "elements": [
+    {
+      "posX": 124.10491569570067,
+      "posY": 223.96226300061483,
+      "elmtID": "elmt0",
+      "elmtName": "Buy New Car",
+      "elmtDesc": "write description here",
+      "elmtType": 103,
+      "elmtWghtMthd": 1,
+      "elmtDstType": 1,
+      "elmtData": [
+        [ "conn18", 100 ],
+        [ "conn19", 75 ],
+        [ "conn20", 25 ]
+      ]
+    },
+    {
+      "posX": 317.95753409233924,
+      "posY": 120.02330814667903,
+      "elmtValueFnX": 50,
+      "elmtValueFnY": 50,
+      "elmtValueFnFlip": 0,
+      "elmtID": "elmt1",
+      "elmtName": "Price",
+      "elmtDesc": "write description here",
+      "elmtType": 100,
+      "elmtWghtMthd": 2,
+      "elmtDstType": 1,
+      "elmtDataMin": 0,
+      "elmtDataMax": 400000,
+      "elmtDataUnit": "kr",
+      "elmtDataBaseLine": 200000,
+      "elmtDataArr": [ 150000, 100000, 250000, 50000 ],
+      "pwl": {
+        "points": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 400000,
+            "y": 1
+          }
+        ]
+      },
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": true
+    },
+    {
+      "posX": 301.9550360977711,
+      "posY": 285.8934484723243,
+      "elmtID": "elmt2",
+      "elmtName": "Comfort",
+      "elmtDesc": "write description here",
+      "elmtType": 101,
+      "elmtWghtMthd": 1,
+      "elmtDstType": 1,
+      "elmtData": [
+        [ "conn13", 20 ],
+        [ "conn14", 30 ],
+        [ "conn15", 50 ]
+      ]
+    },
+    {
+      "posX": 314.9458767843539,
+      "posY": 416.74805003351685,
+      "elmtID": "elmt3",
+      "elmtName": "Maintenance",
+      "elmtDesc": "write description here",
+      "elmtType": 101,
+      "elmtWghtMthd": 1,
+      "elmtDstType": 1,
+      "elmtData": [
+        [ "conn16", 60 ],
+        [ "conn17", 20 ]
+      ]
+    },
+    {
+      "posX": 516.7760131537111,
+      "posY": 394.7724680919425,
+      "elmtValueFnX": 50,
+      "elmtValueFnY": 50,
+      "elmtValueFnFlip": 0,
+      "elmtID": "elmt4",
+      "elmtName": "Fuel",
+      "elmtDesc": "write description here",
+      "elmtType": 100,
+      "elmtWghtMthd": 2,
+      "elmtDstType": 1,
+      "elmtDataMin": 20,
+      "elmtDataMax": 40,
+      "elmtDataUnit": "grade",
+      "elmtDataBaseLine": 27,
+      "elmtDataArr": [ 35, 20, 30, 25 ],
+      "pwl": {
+        "points": [
+          {
+            "x": 20,
+            "y": 0
+          },
+          {
+            "x": 40,
+            "y": 1
+          }
+        ]
+      },
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false
+    },
+    {
+      "posX": 514.7776784834234,
+      "posY": 306.87014032564525,
+      "elmtValueFnX": 50,
+      "elmtValueFnY": 50,
+      "elmtValueFnFlip": 0,
+      "elmtID": "elmt5",
+      "elmtName": "Ekstra",
+      "elmtDesc": "write description here",
+      "elmtType": 100,
+      "elmtWghtMthd": 2,
+      "elmtDstType": 1,
+      "elmtDataMin": 0,
+      "elmtDataMax": 10,
+      "elmtDataUnit": "grade",
+      "elmtDataBaseLine": 5,
+      "elmtDataArr": [ 5, 1, 9, 4 ],
+      "pwl": {
+        "points": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 10,
+            "y": 1
+          }
+        ]
+      },
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false
+    },
+    {
+      "posX": 509.7818418077035,
+      "posY": 262.91897644249656,
+      "elmtValueFnX": 50,
+      "elmtValueFnY": 50,
+      "elmtValueFnFlip": 0,
+      "elmtID": "elmt6",
+      "elmtName": "Noise",
+      "elmtDesc": "write description here",
+      "elmtType": 100,
+      "elmtWghtMthd": 2,
+      "elmtDstType": 1,
+      "elmtDataMin": 0,
+      "elmtDataMax": 10,
+      "elmtDataUnit": "grade",
+      "elmtDataBaseLine": 5,
+      "elmtDataArr": [ 4, 3, 8, 1 ],
+      "pwl": {
+        "points": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 10,
+            "y": 1
+          }
+        ]
+      },
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false
+    },
+    {
+      "posX": 513.778511110196,
+      "posY": 220.9655927358546,
+      "elmtValueFnX": 50,
+      "elmtValueFnY": 50,
+      "elmtValueFnFlip": 0,
+      "elmtID": "elmt7",
+      "elmtName": "Seats",
+      "elmtDesc": "write description here",
+      "elmtType": 100,
+      "elmtWghtMthd": 2,
+      "elmtDstType": 1,
+      "elmtDataMin": 0,
+      "elmtDataMax": 10,
+      "elmtDataUnit": "km/l",
+      "elmtDataBaseLine": 5,
+      "elmtDataArr": [ 7, 8, 10, 2 ],
+      "pwl": {
+        "points": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 10,
+            "y": 1
+          }
+        ]
+      },
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false
+    },
+    {
+      "posX": 698.6244681499021,
+      "posY": 156.03773699938512,
+      "elmtID": "elmt8",
+      "elmtName": "Car 1",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1
+    },
+    {
+      "posX": 512.7776785405483,
+      "posY": 447.71364276937163,
+      "elmtValueFnX": 50,
+      "elmtValueFnY": 50,
+      "elmtValueFnFlip": 0,
+      "elmtID": "elmt9",
+      "elmtName": "Repairs",
+      "elmtDesc": "write description here",
+      "elmtType": 100,
+      "elmtWghtMthd": 2,
+      "elmtDstType": 1,
+      "elmtDataMin": 0,
+      "elmtDataMax": 20000,
+      "elmtDataUnit": "kr/year",
+      "elmtDataBaseLine": 8000,
+      "elmtDataArr": [ 5000, 10000, 2000, 20000 ],
+      "pwl": {
+        "points": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 20000,
+            "y": 1
+          }
+        ]
+      },
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": true
+    },
+    {
+      "posX": 709.6153088364853,
+      "posY": 339.8335132380067,
+      "elmtID": "elmt10",
+      "elmtName": "Car 4",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1
+    },
+    {
+      "posX": 697.6253007957165,
+      "posY": 285.8934484723243,
+      "elmtID": "elmt11",
+      "elmtName": "Car 3",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1
+    },
+    {
+      "posX": 696.6261334796144,
+      "posY": 217.96892247109463,
+      "elmtID": "elmt12",
+      "elmtName": "Car2",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1
+    }
+  ],
+  "connections": [
+    {
+      "connInput": "elmt5",
+      "connOutput": "elmt2",
+      "connID": "conn13"
+    },
+    {
+      "connInput": "elmt6",
+      "connOutput": "elmt2",
+      "connID": "conn14"
+    },
+    {
+      "connInput": "elmt7",
+      "connOutput": "elmt2",
+      "connID": "conn15"
+    },
+    {
+      "connInput": "elmt4",
+      "connOutput": "elmt3",
+      "connID": "conn16"
+    },
+    {
+      "connInput": "elmt9",
+      "connOutput": "elmt3",
+      "connID": "conn17"
+    },
+    {
+      "connInput": "elmt1",
+      "connOutput": "elmt0",
+      "connID": "conn18"
+    },
+    {
+      "connInput": "elmt2",
+      "connOutput": "elmt0",
+      "connID": "conn19"
+    },
+    {
+      "connInput": "elmt3",
+      "connOutput": "elmt0",
+      "connID": "conn20"
+    }
+  ],
+  "mdlName": "untitled",
+  "mainObj": "elmt0",
+  "dataMat": [ ],
+  "mdlIdent": "temp"
+}

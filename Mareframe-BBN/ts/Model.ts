@@ -12,7 +12,7 @@
             private m_dataMatrix: any[][] = [];
             private m_mainObjective: Element;
             //private m_autoUpdate: boolean = false;
-            private m_altIndex: number[] = [];
+            private m_altIndex: any[] = [];
 
             private m_autoUpdate: boolean = true; //auto update is on by default
             constructor(p_bbnMode: boolean) {
@@ -41,7 +41,7 @@
                     dataStream = this.getMCADataStream();
                 }
 
-                
+
                 return dataStream;
             }
             private getBBNDataStream(): string {
@@ -97,23 +97,23 @@
 
                             dataStream += '</utility>\n';
                     }
-                    
+
                 });
 
                 dataStream += '</nodes>\n<extensions>\n<genie version="1.0" name="' + this.getName() + '" faultnameformat="nodestate"><comment></comment>\n'
                 this.m_elementArr.forEach(function (elmt: Element) {
                     dataStream += '<node id="' + elmt.getID() + '">\n' +
-                    '<name>' + elmt.getName() + '</name>\n' +
-                    '<interior color="aaaaaa" />\n' +
-                    '<outline color="000080" />\n' +
-                    '<font color="000000" name="Arial" size="8" />\n' +
+                        '<name>' + elmt.getName() + '</name>\n' +
+                        '<interior color="aaaaaa" />\n' +
+                        '<outline color="000080" />\n' +
+                        '<font color="000000" name="Arial" size="8" />\n' +
                         '<position>' + (elmt.m_easelElmt.x - 75) + ' ' + (elmt.m_easelElmt.y - 15) + ' ' + (elmt.m_easelElmt.x + 75) + ' ' + (elmt.m_easelElmt.y + 15) + '</position>\n</node>\n';
                 });
                 dataStream += '</genie>\n</extensions>\n</smile>\n'
                 return dataStream;
             }
             private getMCADataStream(): string {
-                console.log("MCADataStream: " + JSON.stringify(this));
+                //console.log("MCADataStream: " + JSON.stringify(this));
                 var ret = JSON.stringify(this);
                 return JSON.stringify(this);
             }
@@ -169,7 +169,7 @@
                         //retDataMatrix[j++][0] = this.m_elementArr[e].getName();
                         if (p_name)
                             retDataMatrix[j++][0] = this.m_elementArr[e].getName();
-                            else
+                        else
                             retDataMatrix[j++][0] = this.m_elementArr[e].getID();
 
                     }
@@ -189,10 +189,10 @@
                         else
                             retDataMatrix[0][column] = this.m_elementArr[e1].getID();
                         retDataMatrix[1][column] = this.m_elementArr[e1].getDataMin();
-                        retDataMatrix[2][column] = this.m_elementArr[e1].getDataBaseLine();                    
+                        retDataMatrix[2][column] = this.m_elementArr[e1].getDataBaseLine();
                         for (var val in this.m_elementArr) {
-                            if (this.m_elementArr[val].getType() === 102) {                                
-                                retDataMatrix[j][column] = this.m_elementArr[e1].getDataArrAtIndex((j++)-3);
+                            if (this.m_elementArr[val].getType() === 102) {
+                                retDataMatrix[j][column] = this.m_elementArr[e1].getDataArrAtIndex((j++) - 3);
                             }
                         }
                         retDataMatrix[j][column] = this.m_elementArr[e1].m_dataUnit;
@@ -218,62 +218,96 @@
             setDataMatrix(p_matrix: any[][]): void {
                 this.m_dataMatrix = p_matrix;
             }
-            getFinalScore(p_element1Replace?: Element, p_element2Replace?: Element, p_elementIgnoreValue?: number): number[][] {
-                var tempMatrix = JSON.parse(JSON.stringify(this.getDataMatrix()));
-               
-                if (this.m_mainObjective != null) {
+            getScore2(p_element: Element, p_criteria: number): number[][] {
+                var retMatrix: any[] = [];
+                if (p_criteria >= 0) {
+                    for (var c of p_element.getChildrenElements()) {
+                        retMatrix.push(this.getScore2(c, p_criteria - 1));
+                    }
+                }
+                else {
+                    for (var c of p_element.getChildrenElements()) {
+                        retMatrix.push(this.getScore2(c, -1));
+                    }
+                }
 
-                    var weightsArr = Tools.getWeights(this.m_mainObjective, this, p_element2Replace, p_element1Replace, p_elementIgnoreValue);
+                return retMatrix;
+            }
+            getScore(p_element: Element, p_criteria?: number, p_element1Replace?: Element, p_element2Replace?: Element, p_elementIgnoreValue?: number): number[][] {
+                var tempMatrix = JSON.parse(JSON.stringify(this.getDataMatrix()));
+                var retMatrix: any[][] = [];
+
+                if (this.m_mainObjective != null) {
+                    for (var c of p_element.getChildrenElements()) {
+                        var t = c.getID();
+                        //var t2 = this.getScore(c);
+                     }
+
+                    var weightsArr = Tools.getWeights(p_element, this, p_element2Replace, p_element1Replace, p_elementIgnoreValue, p_criteria);
+                    //var weightsArr = Tools.getWeights(p_element, this, p_element2Replace, p_element1Replace, p_elementIgnoreValue);
                     var sortedWeights: any[] = [];
 
                     //sortedWeigths matches tempMatrix
                     for (var i = 0; i < weightsArr.length; i++) {
                         for (var j = 1; j < tempMatrix[0].length; j++) {
-                            tmp = tempMatrix[0][j];
+                            //var tmp = tempMatrix[0][j];
                             var tmp2 = weightsArr[i][0];
                             if (tempMatrix[0][j] === weightsArr[i][0]) {
-                                sortedWeights[j-1] = weightsArr[i][1];
+                                sortedWeights[j - 1] = weightsArr[i][1];
                                 break;
                             }
                         }
-                    }  
-                for (var i = 0; i < weightsArr.length; i++) {
-                        var tmp = tempMatrix[0][i + 1];
-                        var elmt = this.getElement(tempMatrix[0][i + 1]);
-                        var maxVal = elmt.getDataMax();
-                        var minVal = elmt.getDataMin();
-                        var flip = elmt.m_valueFunctionFlip;
-                        var x = elmt.m_valueFunctionX;
-                        var y = elmt.m_valueFunctionY;
-                    //check if data is within min-max values, and expand as necessary
-                    for (var j = 1; j < tempMatrix.length - 1; j++) {
-                        if (tempMatrix[j][i + 1] > maxVal) {
-                            maxVal = tempMatrix[j][i + 1];
-                        }
                     }
-                    for (var j = 1; j < tempMatrix.length - 1; j++) {
-                        if (tempMatrix[j][i + 1] < minVal) {
-                            minVal = tempMatrix[j][i + 1];
-                        }
-                    }
-                    for (var j = 3; j < tempMatrix.length - 2; j++) {                                       
-                            var tmp5 = tempMatrix[j][i + 1] ;
-                            var tmp6 = elmt.getPwlVF().getValue(tempMatrix[j][i + 1]);
-                            var tmp7 = weightsArr[i][1];
-                            var tmp7a = tempMatrix[0][i + 1];
-                            if (p_element1Replace != undefined) {
-                                var tmp7b = p_element2Replace.getID();
-                                if (p_element2Replace.getID() === tempMatrix[0][i + 1] && p_element1Replace.getID() === tempMatrix[j][0]) {
-                                    if (elmt.getMethod() == 1) {
-                                        var total = 0;
-                                        for (var k = 0; k < elmt.m_swingWeightsArr.length; k++) {
-                                            total += elmt.m_swingWeightsArr[k][1];
+                    for (var i = 0; i < weightsArr.length; i++) {
+                        retMatrix[0] = [];
+                        retMatrix[1] = [];
+                        retMatrix[2] = [];
+                        //retMatrix[i][j] = 1;
+                        //var tmp = tempMatrix[0][i + 1];
+                        var index = 0;
+                        retMatrix[0][i+1] = weightsArr[i][0];
+                        var elmt = this.getElement(tempMatrix[0][i+1]); // alternative element
+                        var tmep = weightsArr[0][i];
+                        
+                        for (var j = 3; j < tempMatrix.length - 2; j++) {
+                            if (elmt.m_disregard == false) {
+                                retMatrix[j] = [];
+                                retMatrix[j][0] = tempMatrix[j][0];
+                                //var tmp5 = tempMatrix[j][i + 1];
+                                //var tmp6 = elmt.getPwlVF().getValue(tempMatrix[j][i + 1]);
+                                var tmp7 = weightsArr[i][1];
+                                //var tmp7a = tempMatrix[0][i + 1];
+                                if (p_element1Replace != undefined) {
+                                    var tmp7b = p_element2Replace.getID();
+                                    if (p_element2Replace.getID() === tempMatrix[0][i + 1] && p_element1Replace.getID() === tempMatrix[j][0]) {
+                                        if (elmt.getMethod() == 1) {
+                                            var total = 0;
+                                            for (var k = 0; k < elmt.m_swingWeightsArr.length; k++) {
+                                                total += elmt.m_swingWeightsArr[k][1];
+                                            }
+                                            retMatrix[j][i + 1] = elmt.m_swingWeightsArr[j - 3][1] / total;
+                                            //tempMatrix[j][i + 1] = elmt.m_swingWeightsArr[j - 3][1] / total;
                                         }
-                                        tempMatrix[j][i + 1] = elmt.m_swingWeightsArr[j-3][1] / total;
+                                        else
+                                            //tempMatrix[j][i + 1] = elmt.getPwlValue(p_elementIgnoreValue);
+                                            retMatrix[j][i + 1] = elmt.getPwlValue(p_elementIgnoreValue);
+                                        //var tmp7c = tempMatrix[j][i + 1];
+
                                     }
-                                    else
-                                        tempMatrix[j][i + 1] = elmt.getPwlValue(p_elementIgnoreValue);
-                                    var tmp7c = tempMatrix[j][i + 1];
+                                    else {
+                                        if (elmt.getMethod() == 1) {
+                                            var total = 0;
+                                            for (var k = 0; k < elmt.m_swingWeightsArr.length; k++) {
+                                                total += elmt.m_swingWeightsArr[k][1];
+                                            }
+                                            //tempMatrix[j][i + 1] = elmt.m_swingWeightsArr[j - 3][1] / total;
+                                            retMatrix[j][i + 1] = elmt.m_swingWeightsArr[j - 3][1] / total;
+
+                                        }
+                                        else
+                                            //tempMatrix[j][i + 1] = elmt.getPwlValue(tempMatrix[j][i + 1]);
+                                            retMatrix[j][i + 1] = elmt.getPwlValue(tempMatrix[j][i + 1]);
+                                    }
                                 }
                                 else {
                                     if (elmt.getMethod() == 1) {
@@ -281,46 +315,37 @@
                                         for (var k = 0; k < elmt.m_swingWeightsArr.length; k++) {
                                             total += elmt.m_swingWeightsArr[k][1];
                                         }
-                                        tempMatrix[j][i + 1] = elmt.m_swingWeightsArr[j-3][1] / total;
+                                        retMatrix[j][i + 1] = elmt.m_swingWeightsArr[j - 3][1] / total;
                                     }
-                                    else
-                                    tempMatrix[j][i + 1] = elmt.getPwlValue(tempMatrix[j][i + 1]);
-                                }
-                            }
-                            else {
-                                if (elmt.getMethod() == 1) {
-                                    var total = 0;
-                                    for (var k = 0; k < elmt.m_swingWeightsArr.length; k++) {
-                                        total += elmt.m_swingWeightsArr[k][1];
+                                    else {
+                                        var tm = tempMatrix[j][i + 1];
+                                        retMatrix[j][i + 1] = elmt.getPwlValue(tempMatrix[j][i + 1]);
                                     }
-                                    tempMatrix[j][i + 1] = elmt.m_swingWeightsArr[j-3][1] / total;
                                 }
-                                else
-                                tempMatrix[j][i + 1] = elmt.getPwlValue(tempMatrix[j][i + 1]);
+                                //var tmp7c = tempMatrix[j][i + 1];
+                                retMatrix[j][i + 1] *= sortedWeights[i];
+                                retMatrix[j][i + 1] = (Math.round(10000 * retMatrix[j-3][i + 1])) / 10000;
+                                //var tmp8 = tempMatrix[j][i + 1];
                             }
-                            var tmp7c = tempMatrix[j][i + 1];
-                            tempMatrix[j][i + 1] *= sortedWeights[i];
-                        tempMatrix[j][i + 1] = (Math.round(10000 * tempMatrix[j][i + 1])) / 10000;
-                        var tmp8 = tempMatrix[j][i + 1];
+                        }
+                        retMatrix[0][i + 1] = elmt.getName(); // change from element ID to element name
                     }
-                    tempMatrix[0][i + 1] = elmt.getName(); // change from element ID to element name
-                }                
-                    for (var j = 3; j < tempMatrix.length - 2; j++) {
-                        elmt = this.getElement(tempMatrix[j][0]);
-                        tempMatrix[j][0] = elmt.getName();
-                }                   
-            }
+                    for (var j = 3; j < retMatrix.length - 2; j++) {
+                        elmt = this.getElement(retMatrix[j][0]);
+                        retMatrix[j][0] = elmt.getName();
+                    }
+                }
                 else {
                     console.log("There is no main objective yet.");
                 }
-                return tempMatrix;
+                return retMatrix;
             }
             //this should be in elment
             getWeightedData(p_elmt: Element, p_addHeader: boolean): any[][] {
                 var tempMatrix = [];
                 var dm = this.getDataMatrix();
                 if (p_addHeader) {
-                    tempMatrix.push(['string', 'number' ]);
+                    tempMatrix.push(['string', 'number']);
                 }
                 //console.log("DataMatrixx  --------  -------- : " + dm);
                 switch (p_elmt.getType()) {
@@ -340,7 +365,7 @@
                             for (var i = 0; i < p_elmt.m_swingWeightsArr.length; i++) {
                                 total += p_elmt.m_swingWeightsArr[i][1];
                             }
-                            
+
                             for (var i = 0; i < p_elmt.m_swingWeightsArr.length; i++) {
                                 var toAdd = [this.getElement(p_elmt.m_swingWeightsArr[i][0]).getName(), p_elmt.getDataArrAtIndex(i)];
                                 if (!p_addHeader) {
@@ -357,8 +382,8 @@
                                     //var nom = p_elmt.getDataArrAtIndex(i - 3) - minVal;
                                     //var denom = (maxVal - minVal);
                                     var frac2 = p_elmt.getPwlVF().getPoints();
-                                    var frac = p_elmt.getPwlValue( p_elmt.getDataArrAtIndex(i - 3) );
-                                    
+                                    var frac = p_elmt.getPwlValue(p_elmt.getDataArrAtIndex(i - 3));
+
                                     toAdd.push(frac);
                                     //toAdd.push(Mareframe.DST.Tools.getValueFn(Math.abs(p_elmt.m_valueFunctionFlip - (p_elmt.getDataArrAtIndex(i - 3) - minVal) / (maxVal - minVal)), Math.abs(p_elmt.m_valueFunctionFlip - p_elmt.m_valueFunctionX / 100), 1 - p_elmt.m_valueFunctionY / 100));
                                 }
@@ -369,7 +394,7 @@
                             for (var i = 3; i < this.getDataMatrix().length - 2; i++) {
                                 var toAdd = [this.m_elementArr[this.m_altIndex[i - 3]].getName(), p_elmt.getDataArrAtIndex(i - 3)];
                                 if (!p_addHeader) {
-                                    
+
                                     toAdd.push("ss");
                                 }
                                 //console.log("toAdd4: " + toAdd);
@@ -418,7 +443,7 @@
                 if (this.m_bbnMode === false) {
                     var e = new Element("elmt" + this.m_counter, this, p_type, 1);
                 } else {
-                var e = new Element("elmt" + this.m_counter, this, p_type);
+                    var e = new Element("elmt" + this.m_counter, this, p_type);
                 }
                 //var e = new Element("elmt" + this.m_counter, this, p_type);
                 
@@ -451,7 +476,7 @@
                 return this.m_elementArr[this.getObjectIndex(p_elmtStringId)];
             }
             private getObjectIndex(p_objectStringId: string): number {
-             //console.log(" get object "  + p_objectStringId + " in list: "+ this.m_elementArr);
+                //console.log(" get object "  + p_objectStringId + " in list: "+ this.m_elementArr);
                 var key = 0;
                 if (p_objectStringId.substr(0, 4) === "elmt") {
                     this.m_elementArr.every(function (p_elmt) {
@@ -515,7 +540,7 @@
                     return false;
                 else {
                     if (this.m_elementArr[key].getType() === 103) this.m_mainObjective = undefined;
-                    this.m_elementArr.splice(key, 1);                  
+                    this.m_elementArr.splice(key, 1);
                     return true;
                 }
             }
@@ -534,15 +559,15 @@
                     return false;
                 else {
                     console.log("Deleting connection: " + p_connID + "   ----------------");
-                    
+
                     if (this.m_bbnMode) {
                         var states: number = this.m_connectionArr[key].getInputElement().getDataOld().length;
                         var data = this.m_connectionArr[key].getOutputElement().getDataOld();
                         var dataIn = this.m_connectionArr[key].getInputElement().getDataOld();
                         var removeHeader = this.m_connectionArr[key].getInputElement().getID();
-                        console.log("Remove header: " + removeHeader);
-                        console.log("Original Data Out: " + data);
-                        console.log("Original Data In: " + dataIn);
+                        //console.log("Remove header: " + removeHeader);
+                        //console.log("Original Data Out: " + data);
+                        //console.log("Original Data In: " + dataIn);
                     
                         var dims: number[] = [0, 0, 0];
                         data = Tools.removeHeaderRow(removeHeader, data);
@@ -576,7 +601,7 @@
                                     var id = this.m_connectionArr[key].getID();
                                     if (elmtOut.m_swingWeightsArr[e][0] === this.m_connectionArr[key].getID()) {
                                         //elmt.m_swingWeightsArr.splice(parseInt(e) , 1);
-                                        elmtOut.m_swingWeightsArr.splice(e, 1);                                       
+                                        elmtOut.m_swingWeightsArr.splice(parseInt(e), 1);
                                     }
                                 }
                                 break;
@@ -587,12 +612,15 @@
                                 for (var e in elmtOut.m_swingWeightsArr) {
                                     if (elmtOut.m_swingWeightsArr[e][0] === this.m_connectionArr[key].getID()) {
                                         //elmt.m_swingWeightsArr.splice(parseInt(e) , 1);
-                                        elmtOut.m_swingWeightsArr.splice(e, 1);
+                                        elmtOut.m_swingWeightsArr.splice(parseInt(e), 1);
 
                                     }
                                 }
                                 break;
                         }
+                        var tmp = elmtOut.m_criteriaLevel;
+                        var tmp2 = elmtIn.m_criteriaLevel;
+                        elmtIn.setCriteriaLevel(null);
                         //removes connection from the conncetions array and the two elements
                         elmtOut.deleteConnection(p_connID);
                         elmtIn.deleteConnection(p_connID);
@@ -640,7 +668,7 @@
                     elements: this.m_elementArr,
                     connections: this.m_connectionArr,
                     mdlName: this.m_modelName,
-                    mainObj: mainObj, 
+                    mainObj: mainObj,
                     dataMat: this.m_dataMatrix,
                     mdlIdent: this.m_modelIdent
                 };
@@ -655,7 +683,7 @@
                     $("#model_header").append(p_jsonObject.mdlName);
                 }
 
-                console.log("jsonObject.elements: " + p_jsonObject.elements); 
+                console.log("jsonObject.elements: " + p_jsonObject.elements);
                 this.m_modelName = p_jsonObject.mdlName;
                 console.log("Model name: " + this.m_modelName);
                 this.m_modelIdent = p_jsonObject.mdlIdent;
@@ -693,12 +721,12 @@
                     var tmp3 = c.getID().substr(4);
                     var tmp4 = parseInt(c.getID().substr(4));
                     if (parseInt(c.getID().substr(4)) !== NaN && parseInt(c.getID().substr(4)) > this.m_counter)
-                        this.m_counter = parseInt(c.getID().substr(4))+1;
+                        this.m_counter = parseInt(c.getID().substr(4)) + 1;
                     this.addConnection(c);
                 }
                 if (!this.m_bbnMode)
                     if (p_jsonObject.mainObj !== "") {
-                    this.m_mainObjective = this.getElement(p_jsonObject.mainObj);
+                        this.m_mainObjective = this.getElement(p_jsonObject.mainObj);
 
                     }
                     else p_jsonObject.mainObj = undefined;
@@ -721,7 +749,7 @@
             createNewConnection(p_inputElmt: Element, p_outputElmt: Element): Connection {
                 this.m_counter++;
                 var c = new Connection(p_inputElmt, p_outputElmt, this.m_bbnMode, "conn" + this.m_counter);
-                
+
                 return c;
 
 
@@ -746,6 +774,23 @@
                     console.log(e.getName() + " not updated");
                 });*/
                 //console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
+            }
+            getCumuluValue(p_element, p_level): number {
+                var retValue = 0;
+                var weights = Tools.getWeights(p_element, undefined, undefined, undefined, undefined, p_level);
+                var lowerLevel = p_level - 1;
+                if (lowerLevel >= 0) {
+                    for (var i of weights) {
+                        retValue += this.getCumuluValue(this.getElement(i[0]), lowerLevel);
+
+                    }
+                }
+                else {
+                     
+                }
+                
+
+                return retValue;
             }
         }
     }

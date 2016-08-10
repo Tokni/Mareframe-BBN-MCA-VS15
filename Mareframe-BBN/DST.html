@@ -39,7 +39,7 @@
     <script src="ts/testHandler.js" type="text/javascript"></script>
     <script src="ts/ElementOO.js" type="text/javascript"></script>
 
-    <canvas id="testCanvas" width="100" height="100"></canvas>
+    <!--<canvas id="testCanvas" width="700" height="700"></canvas>-->
     <div class="container">
         <div class="row">
             <div class="col-lg-8">
@@ -134,7 +134,31 @@
         <canvas id="MCATool" width="1500" height="1000"  style="display:inline-block;"></canvas>
 
         <!--Data Table-->
-        <div id="finalScore_div" style="display:inline-block"></div>
+        <div id="finalScore_div" style="display:inline-block">
+            <div id="finalScoreChart_div">Scores</div>
+            <div id="finalScoreObjective_div">
+                Objective
+                <select id="finalScoreObjective_select">
+                    <option> 1 </option>
+                    <option> 2 </option>
+                </select>
+            </div>
+            <div id="finalScoreSegments_div">
+                Segments
+                <select id="finalScoreSegment_select">
+                    <option> 3 </option>
+                    <option> 4 </option>
+                </select>
+            </div>
+            <div id="finalScoreBars_div">
+                Bars
+                <select id="finalScoreBars_select">
+                    <option> 5 </option>
+                    <option> 6 </option>
+                </select>
+            </div>
+            <button id="finalScoreSetAsText_button">As text</button>
+        </div>
         <div id="MCADataTable" class="table-editable" style="display:inline-block">
             <!--<table id="editableDataTable" class="table" style="border: 2px solid #ffffff;border-collapse:collapse;">-->
             <table id="editableDataTable" class="table">
@@ -198,6 +222,10 @@
                 </fieldset>
             </form>
         </div> <!--end elementType-->
+        <div id="DisregardAlternative">
+            <input id="disAlt_check" type="checkbox"/>
+            <label for="disAlt_check">Exclude Alternatives</label>
+        </div>
         <div id="weightingMethodSelector" class="dialogDiv">
             <form>
                 <fieldset>
@@ -223,18 +251,18 @@
             <div style="margin: 30px">
                 <button id="linearize">Linearize</button>
                 <!--<button id="loadFromFile">Load from file</button>-->
-                <div class="LoadFileBtn advButton" id="loadFromFileDiv">
-                    <input class="advButton upload" type="file" id="loadFromFile" />
-                    <span class="advButton">Load from file</span>
+                <div class="LoadFileBtn" id="loadFromFileDiv">
+                    <input class="upload" type="file" id="loadFromFile" />
+                    <span>Load from file</span>
                 </div>
                 <button id="saveToFile">Save to file</button>
                 <button id="deleteAllPoints">Delete all points</button>
             </div>
             <div id="selectedPointInfo" style="margin: 30px">
                 <label for="posX">X:</label>
-                <input id="posX" />
+                <input type="number" step="0.1" id="posX" />
                 <label for="posY">Y:</label>
-                <input id="posY" />
+                <input type="number" step="0.1" id="posY" />
                 <button id="deleteButton" style="display: inline">Delete Point</button>
             </div>
             <div id="saveFile_div">
@@ -242,7 +270,7 @@
                 <a id="downloadLinkValueFunction"></a>
             </div>
             <div style="margin: 30px">
-                <button class="not_done" id="showAlternatives">Show Alternatives</button>
+                <button id="showAlternatives">Show Alternatives</button>
 
             </div>
         </div>

@@ -93,22 +93,27 @@
             getEndPoint () {
                 return this.m_endPoint;
             };
-            addPoint(p_x, p_y) {
+            //returns true if a point is added and false if a point is replaced
+            addPoint(p_x, p_y): boolean {
+                var ret: boolean = true;;
                 if (this.m_middlepoints.length) {
                     //checks if there already is a point with same x-value
-                    for (var i in this.m_middlepoints) {
-                        if (p_x === this.m_middlepoints[i].x) {
+                    for (var i = 0; i < this.m_middlepoints.length; i++) {
+                        var tmp = this.m_middlepoints[i].x;
+                        if (p_x == this.m_middlepoints[i].x) {
                             this.m_middlepoints[i].setValues(p_x, p_y);
+                            ret = false;
                             break;
                         }
                     }
-                    if (i == this.m_middlepoints.length - 1) {
+                    if (i == this.m_middlepoints.length) {
                         this.m_middlepoints.push(new createjs.Point(p_x, p_y));
                     }
                 }
                 else {
                     this.m_middlepoints.push(new createjs.Point(p_x, p_y));
                 }
+                return ret;
             };
             removePointAtIndex(p_index) {
                 this.m_middlepoints.splice(p_index, 1);
@@ -116,13 +121,17 @@
             removePoint(p_point) {
                 alert("not Implemented");
             };
-            sortPointsByX() {
+            //input: index of point. output: new index of input point
+            sortPointsByX(p_point?: number) : number {
                 var index = 0;
+                var selectedPoint = this.m_middlepoints[p_point];
                 var tmp = this.m_middlepoints.slice();
                 //selection sort
                 while (tmp.length) {
                     var minIndex = tmp.length - 1;
                     for (var p in tmp) {
+                        var tnp = tmp[p].x;
+                        var tnp2 = tmp[minIndex].x;
                         if (tmp[p].x < tmp[minIndex].x)
                             minIndex = p;
                     }
@@ -131,6 +140,17 @@
                 }
                 this.m_startPoint = this.m_middlepoints[0];
                 this.m_endPoint = this.m_middlepoints[this.m_middlepoints.length - 1];
+
+                if (p_point != undefined) {
+                for (var i = 0; i < this.m_middlepoints.length; i++) {                   
+                        var tmp8 = this.m_middlepoints[i].x;
+                        var tmp9: boolean = (tmp8 === selectedPoint.x);
+                        var tmp10: boolean = (this.m_middlepoints[i].x.valueOf() === selectedPoint.x.valueOf());
+                        if (this.m_middlepoints[i].x.valueOf() === selectedPoint.x.valueOf())
+                            return i;                       
+                    }                   
+                }
+                return null;
             }
             toJSON(): any {
                 return { points: this.m_middlepoints };

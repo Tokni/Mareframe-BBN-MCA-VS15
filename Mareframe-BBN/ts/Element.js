@@ -17,6 +17,7 @@ var Mareframe;
                 this.m_updated = false;
                 this.m_easelElmt = new createjs.Container();
                 this.m_minitableEaselElmt = new createjs.Container();
+                this.m_disregard = false;
                 //private m_swingWeightsArr: number[] = [];
                 this.m_swingWeightsArr = [];
                 this.m_dataArr = [];
@@ -192,10 +193,11 @@ var Mareframe;
                 var elmt = this;
                 // console.log(this.m_connections);
                 this.m_connections.forEach(function (c) {
-                    //console.log("OutputElement: " + c.getOutputElement().getID());
-                    //console.log("this Element id: " + elmt.getID());
-                    if (c.getInputElement().getID() === elmt.getID()) {
-                        children.push(c.getOutputElement());
+                    var tmp = c.getOutputElement().getID();
+                    var tmp3 = c.getInputElement().getID();
+                    var tmp2 = elmt.getID();
+                    if (c.getOutputElement().getID() === elmt.getID()) {
+                        children.push(c.getInputElement());
                     }
                 });
                 //   console.log(this.getName() + " chilxxdren: " + children);
@@ -419,36 +421,29 @@ var Mareframe;
             };
             Element.prototype.getTypeName = function () {
                 switch (this.getType()) {
-                    case 100:
-                        return "Attribute";
-                        break;
-                    case 101:
-                        return "Objective";
-                        break;
-                    case 102:
-                        return "Alternative";
-                        break;
+                    case 100: return "Attribute";
+                    //break;
+                    case 101: return "Objective";
+                    //break;
+                    case 102: return "Alternative";
+                    //break;
                     case 103: return "Goal";
                     default: console.log("No such element type name: " + this.getType());
                 }
             };
             Element.prototype.setType = function (p_type) {
                 this.m_type = p_type;
+                if (p_type === 103)
+                    this.m_criteriaLevel = 0;
             };
             Element.prototype.getMethod = function () {
                 return this.m_weightingMethod;
             };
             Element.prototype.getMethodName = function () {
                 switch (this.getMethod()) {
-                    case 0:
-                        return "Direct";
-                        break;
-                    case 1:
-                        return "Swing / Direct";
-                        break;
-                    case 2:
-                        return "Value Function";
-                        break;
+                    case 0: return "Direct"; //break;
+                    case 1: return "Swing / Direct"; //break;
+                    case 2: return "Value Function"; //break;
                 }
             };
             Element.prototype.setMethod = function (p_weightingMethod) {
@@ -488,6 +483,8 @@ var Mareframe;
             };
             Element.prototype.addConnection = function (p_conn) {
                 this.m_connections.push(p_conn);
+                if (p_conn.getInputElement().m_criteriaLevel != null)
+                    p_conn.getOutputElement().setCriteriaLevel(p_conn.getInputElement().m_criteriaLevel + 1);
             };
             Element.prototype.getConnections = function () {
                 return this.m_connections;
@@ -510,14 +507,11 @@ var Mareframe;
                     elmtDataUnit: this.m_dataUnit,
                     elmtDataBaseLine: this.m_dataBaseLine
                 };
-                if (this.getMethod() === 2) {
-                    retJson["elmtDataArr"] = this.getDataArr();
-                    retJson["pwl"] = this.m_pwlVF;
-                    retJson["pwlFlipVertical"] = this.m_pwlFlipVertical;
-                    retJson["pwlFlipHorizontal"] = this.m_pwlFlipHorizontal;
-                }
-                if (this.getMethod() === 1)
-                    retJson["elmtData"] = this.m_swingWeightsArr;
+                retJson["elmtDataArr"] = this.getDataArr();
+                retJson["pwl"] = this.m_pwlVF;
+                retJson["pwlFlipVertical"] = this.m_pwlFlipVertical;
+                retJson["pwlFlipHorizontal"] = this.m_pwlFlipHorizontal;
+                retJson["elmtData"] = this.m_swingWeightsArr;
                 return retJson;
             };
             Element.prototype.toJSONOld = function () {
@@ -572,22 +566,29 @@ var Mareframe;
                         break;
                     }
                 }
-                switch (this.m_weightingMethod) {
-                    case 0: break;
-                    case 1:
-                        if (p_jsonElmt.elmtData) {
-                            for (var i = 0; i < p_jsonElmt.elmtData.length; i++) {
-                                this.m_swingWeightsArr[i] = p_jsonElmt.elmtData[i];
-                            }
-                        }
-                        break;
-                    case 2:
-                        this.m_valueFunctionX = p_jsonElmt.elmtValueFnX;
-                        this.m_valueFunctionY = p_jsonElmt.elmtValueFnY;
-                        this.m_valueFunctionFlip = p_jsonElmt.elmtValueFnFlip;
-                        break;
-                    default: console.log("Json Goof");
+                //switch (this.m_weightingMethod) {
+                //    case 0: break;
+                //    case 1:
+                //        if (p_jsonElmt.elmtData) {
+                //            for (var i = 0; i < p_jsonElmt.elmtData.length; i++) {
+                //                this.m_swingWeightsArr[i] = p_jsonElmt.elmtData[i];
+                //            }
+                //        }
+                //        break;
+                //    case 2:
+                //        this.m_valueFunctionX = p_jsonElmt.elmtValueFnX;
+                //        this.m_valueFunctionY = p_jsonElmt.elmtValueFnY;
+                //        this.m_valueFunctionFlip = p_jsonElmt.elmtValueFnFlip;
+                //        break;
+                //    default: console.log("Json Goof");
+                if (p_jsonElmt.elmtData) {
+                    for (var i = 0; i < p_jsonElmt.elmtData.length; i++) {
+                        this.m_swingWeightsArr[i] = p_jsonElmt.elmtData[i];
+                    }
                 }
+                this.m_valueFunctionX = p_jsonElmt.elmtValueFnX;
+                this.m_valueFunctionY = p_jsonElmt.elmtValueFnY;
+                this.m_valueFunctionFlip = p_jsonElmt.elmtValueFnFlip;
                 console.log("element " + p_jsonElmt.elmtName + " imported from JSON.");
             };
             Element.prototype.fromJSONOld = function (p_jsonElmt) {
@@ -634,8 +635,42 @@ var Mareframe;
                 }
                 return ret;
             };
+            Element.prototype.setCriteriaLevel = function (p_level) {
+                this.m_criteriaLevel = p_level;
+                var tmp = this.getChildrenElements();
+                for (var _i = 0, _a = this.getChildrenElements(); _i < _a.length; _i++) {
+                    var chd = _a[_i];
+                    if (p_level != null)
+                        chd.setCriteriaLevel(p_level + 1);
+                    else
+                        chd.setCriteriaLevel(null);
+                }
+            };
+            Element.prototype.getWeightedValues = function (alt) {
+                var ret;
+                switch (this.m_weightingMethod) {
+                    case 0: break;
+                    case 1: {
+                        var total = 0;
+                        for (var k = 0; k < this.m_swingWeightsArr.length; k++) {
+                            total += this.m_swingWeightsArr[k][1];
+                        }
+                        ret = this.m_swingWeightsArr[alt][1] / total;
+                        break;
+                    }
+                    case 2: {
+                        ret = this.m_pwlVF.getValue(this.getDataArr[alt]);
+                        break;
+                    }
+                }
+                return ret;
+            };
+            Element.prototype.getScore = function () {
+                var ret;
+                return ret;
+            };
             return Element;
-        })();
+        }());
         DST.Element = Element;
     })(DST = Mareframe.DST || (Mareframe.DST = {}));
 })(Mareframe || (Mareframe = {}));

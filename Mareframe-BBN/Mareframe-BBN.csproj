@@ -10,7 +10,7 @@
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <TypeScriptToolsVersion>1.7</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
@@ -33,6 +33,7 @@
     <Content Include="jQueryUI\jquery-ui.css" />
     <Content Include="jQueryUI\jquery-ui.structure.css" />
     <Content Include="jQueryUI\jquery-ui.theme.css" />
+    <Content Include="js\math.js" />
     <Content Include="js\math.min.js" />
     <Content Include="MCA.html" />
     <Content Include="saveFile.php" />
@@ -61,6 +62,7 @@
     <Content Include="JSON\BBN\HappinessExample.json" />
     <Content Include="JSON\BBN\InvestmentExample.json" />
     <Content Include="JSON\BBN\ResturantExample.json" />
+    <Content Include="JSON\MCA\newCar8.json" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

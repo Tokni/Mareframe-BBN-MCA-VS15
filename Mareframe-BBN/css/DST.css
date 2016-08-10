@@ -63,6 +63,47 @@ input[type="checkbox"] + label span {
     left: 50%;
     /*border:red solid 3px;*/
     /*border-radius:13px;*/
+    border: black solid 1px;
+}
+#finalScoreChart_div {
+    width: 80%;
+    height: 100%;
+    position: absolute;
+    left: 20%;
+    border: black solid 1px;
+}
+
+#finalScoreObjective_div {
+    width: 18%;
+    height: 25%;
+    position: absolute;
+    left: 0%;
+    border: black solid 1px;
+}
+
+#finalScoreSegments_div {
+    width: 18%;
+    height: 25%;
+    position: absolute;
+    left: 0%;
+    top:27%;
+    border: black solid 1px;
+}
+#finalScoreBars_div {
+    width: 18%;
+    height: 25%;
+    position: absolute;
+    left: 0%;
+    top: 54%;
+    border: black solid 1px;
+}
+#finalScoreSetAsText_button {
+    width: 12%;
+    height: 12%;
+    position: absolute;
+    left: 3%;
+    bottom :2%;
+    border: black solid 1px;
 }
 
 #MCADataTable {

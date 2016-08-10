@@ -77,14 +77,16 @@ var Mareframe;
                 return true;
             };
             //static getWeights(p_elmt: Element, p_model: Model, p_connectionReplace?: Connection, p_elementIgnoreValue?: number): any[][] {
-            Tools.getWeights = function (p_elmt, p_model, p_element1Replace, p_element2Replace, p_elementIgnoreValue) {
+            Tools.getWeights = function (p_elmt, p_model, p_element1Replace, p_element2Replace, p_elementIgnoreValue, p_criteriaLevel) {
                 var weightsArr = [];
                 var connRepIndex = null;
                 var index = 0;
-                for (var _i = 0, _a = p_elmt.getConnections(); _i < _a.length; _i++) {
-                    var conn = _a[_i];
-                }
-                if (p_elmt.getType() != 100 && p_elmt.getType() != 102) {
+                var level;
+                if (p_criteriaLevel != undefined)
+                    level = p_criteriaLevel;
+                else
+                    level = 10000;
+                if ((p_elmt.getType() != 100 && p_elmt.getType() != 102) && p_elmt.m_criteriaLevel <= level) {
                     var total = 0.0;
                     //p_elmt.getData(1).forEach(function (val: number) { total += val; });
                     for (var i = 0; i < p_elmt.m_swingWeightsArr.length; i++) {
@@ -108,7 +110,8 @@ var Mareframe;
                     var tmp = total;
                     for (var k = 0; k < p_elmt.m_swingWeightsArr.length; k++) {
                         var tmp1 = p_model.getConnection(p_elmt.m_swingWeightsArr[k][0]).getInputElement();
-                        var childWeights = this.getWeights(p_model.getConnection(p_elmt.m_swingWeightsArr[k][0]).getInputElement(), p_model, p_element1Replace, p_element2Replace, p_elementIgnoreValue);
+                        var childWeights = this.getWeights(p_model.getConnection(p_elmt.m_swingWeightsArr[k][0]).getInputElement(), p_model, p_element1Replace, p_element2Replace, p_elementIgnoreValue, p_criteriaLevel - 1);
+                        //var childWeights: number[][] = this.getWeights(p_model.getConnection(p_elmt.m_swingWeightsArr[k][0]).getInputElement(), p_model, p_element1Replace, p_element2Replace, p_elementIgnoreValue );
                         for (var j = 0; j < childWeights.length; j++) {
                             if (p_element1Replace != undefined && p_element2Replace != undefined && p_element1Replace.getType() !== 100 && p_element1Replace.getType() !== 102) {
                                 if (p_element2Replace.getConnectionFrom(p_element1Replace).getID() === p_elmt.m_swingWeightsArr[k][0]) {
@@ -1186,7 +1189,7 @@ var Mareframe;
                 return newData;
             };
             return Tools;
-        })();
+        }());
         DST.Tools = Tools;
     })(DST = Mareframe.DST || (Mareframe.DST = {}));
 })(Mareframe || (Mareframe = {}));

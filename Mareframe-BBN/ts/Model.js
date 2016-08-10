@@ -104,7 +104,7 @@ var Mareframe;
                 return dataStream;
             };
             Model.prototype.getMCADataStream = function () {
-                console.log("MCADataStream: " + JSON.stringify(this));
+                //console.log("MCADataStream: " + JSON.stringify(this));
                 var ret = JSON.stringify(this);
                 return JSON.stringify(this);
             };
@@ -205,15 +205,37 @@ var Mareframe;
             Model.prototype.setDataMatrix = function (p_matrix) {
                 this.m_dataMatrix = p_matrix;
             };
-            Model.prototype.getFinalScore = function (p_element1Replace, p_element2Replace, p_elementIgnoreValue) {
+            Model.prototype.getScore2 = function (p_element, p_criteria) {
+                var retMatrix = [];
+                if (p_criteria >= 0) {
+                    for (var _i = 0, _a = p_element.getChildrenElements(); _i < _a.length; _i++) {
+                        var c = _a[_i];
+                        retMatrix.push(this.getScore2(c, p_criteria - 1));
+                    }
+                }
+                else {
+                    for (var _b = 0, _c = p_element.getChildrenElements(); _b < _c.length; _b++) {
+                        var c = _c[_b];
+                        retMatrix.push(this.getScore2(c, -1));
+                    }
+                }
+                return retMatrix;
+            };
+            Model.prototype.getScore = function (p_element, p_criteria, p_element1Replace, p_element2Replace, p_elementIgnoreValue) {
                 var tempMatrix = JSON.parse(JSON.stringify(this.getDataMatrix()));
+                var retMatrix = [];
                 if (this.m_mainObjective != null) {
-                    var weightsArr = DST.Tools.getWeights(this.m_mainObjective, this, p_element2Replace, p_element1Replace, p_elementIgnoreValue);
+                    for (var _i = 0, _a = p_element.getChildrenElements(); _i < _a.length; _i++) {
+                        var c = _a[_i];
+                        var t = c.getID();
+                    }
+                    var weightsArr = DST.Tools.getWeights(p_element, this, p_element2Replace, p_element1Replace, p_elementIgnoreValue, p_criteria);
+                    //var weightsArr = Tools.getWeights(p_element, this, p_element2Replace, p_element1Replace, p_elementIgnoreValue);
                     var sortedWeights = [];
                     //sortedWeigths matches tempMatrix
                     for (var i = 0; i < weightsArr.length; i++) {
                         for (var j = 1; j < tempMatrix[0].length; j++) {
-                            tmp = tempMatrix[0][j];
+                            //var tmp = tempMatrix[0][j];
                             var tmp2 = weightsArr[i][0];
                             if (tempMatrix[0][j] === weightsArr[i][0]) {
                                 sortedWeights[j - 1] = weightsArr[i][1];
@@ -222,42 +244,50 @@ var Mareframe;
                         }
                     }
                     for (var i = 0; i < weightsArr.length; i++) {
-                        var tmp = tempMatrix[0][i + 1];
-                        var elmt = this.getElement(tempMatrix[0][i + 1]);
-                        var maxVal = elmt.getDataMax();
-                        var minVal = elmt.getDataMin();
-                        var flip = elmt.m_valueFunctionFlip;
-                        var x = elmt.m_valueFunctionX;
-                        var y = elmt.m_valueFunctionY;
-                        //check if data is within min-max values, and expand as necessary
-                        for (var j = 1; j < tempMatrix.length - 1; j++) {
-                            if (tempMatrix[j][i + 1] > maxVal) {
-                                maxVal = tempMatrix[j][i + 1];
-                            }
-                        }
-                        for (var j = 1; j < tempMatrix.length - 1; j++) {
-                            if (tempMatrix[j][i + 1] < minVal) {
-                                minVal = tempMatrix[j][i + 1];
-                            }
-                        }
+                        retMatrix[0] = [];
+                        retMatrix[1] = [];
+                        retMatrix[2] = [];
+                        //retMatrix[i][j] = 1;
+                        //var tmp = tempMatrix[0][i + 1];
+                        var index = 0;
+                        retMatrix[0][i + 1] = weightsArr[i][0];
+                        var elmt = this.getElement(tempMatrix[0][i + 1]); // alternative element
+                        var tmep = weightsArr[0][i];
                         for (var j = 3; j < tempMatrix.length - 2; j++) {
-                            var tmp5 = tempMatrix[j][i + 1];
-                            var tmp6 = elmt.getPwlVF().getValue(tempMatrix[j][i + 1]);
-                            var tmp7 = weightsArr[i][1];
-                            var tmp7a = tempMatrix[0][i + 1];
-                            if (p_element1Replace != undefined) {
-                                var tmp7b = p_element2Replace.getID();
-                                if (p_element2Replace.getID() === tempMatrix[0][i + 1] && p_element1Replace.getID() === tempMatrix[j][0]) {
-                                    if (elmt.getMethod() == 1) {
-                                        var total = 0;
-                                        for (var k = 0; k < elmt.m_swingWeightsArr.length; k++) {
-                                            total += elmt.m_swingWeightsArr[k][1];
+                            if (elmt.m_disregard == false) {
+                                retMatrix[j] = [];
+                                retMatrix[j][0] = tempMatrix[j][0];
+                                //var tmp5 = tempMatrix[j][i + 1];
+                                //var tmp6 = elmt.getPwlVF().getValue(tempMatrix[j][i + 1]);
+                                var tmp7 = weightsArr[i][1];
+                                //var tmp7a = tempMatrix[0][i + 1];
+                                if (p_element1Replace != undefined) {
+                                    var tmp7b = p_element2Replace.getID();
+                                    if (p_element2Replace.getID() === tempMatrix[0][i + 1] && p_element1Replace.getID() === tempMatrix[j][0]) {
+                                        if (elmt.getMethod() == 1) {
+                                            var total = 0;
+                                            for (var k = 0; k < elmt.m_swingWeightsArr.length; k++) {
+                                                total += elmt.m_swingWeightsArr[k][1];
+                                            }
+                                            retMatrix[j][i + 1] = elmt.m_swingWeightsArr[j - 3][1] / total;
                                         }
-                                        tempMatrix[j][i + 1] = elmt.m_swingWeightsArr[j - 3][1] / total;
+                                        else
+                                            //tempMatrix[j][i + 1] = elmt.getPwlValue(p_elementIgnoreValue);
+                                            retMatrix[j][i + 1] = elmt.getPwlValue(p_elementIgnoreValue);
                                     }
-                                    else
-                                        tempMatrix[j][i + 1] = elmt.getPwlValue(p_elementIgnoreValue);
-                                    var tmp7c = tempMatrix[j][i + 1];
+                                    else {
+                                        if (elmt.getMethod() == 1) {
+                                            var total = 0;
+                                            for (var k = 0; k < elmt.m_swingWeightsArr.length; k++) {
+                                                total += elmt.m_swingWeightsArr[k][1];
+                                            }
+                                            //tempMatrix[j][i + 1] = elmt.m_swingWeightsArr[j - 3][1] / total;
+                                            retMatrix[j][i + 1] = elmt.m_swingWeightsArr[j - 3][1] / total;
+                                        }
+                                        else
+                                            //tempMatrix[j][i + 1] = elmt.getPwlValue(tempMatrix[j][i + 1]);
+                                            retMatrix[j][i + 1] = elmt.getPwlValue(tempMatrix[j][i + 1]);
+                                    }
                                 }
                                 else {
                                     if (elmt.getMethod() == 1) {
@@ -265,39 +295,29 @@ var Mareframe;
                                         for (var k = 0; k < elmt.m_swingWeightsArr.length; k++) {
                                             total += elmt.m_swingWeightsArr[k][1];
                                         }
-                                        tempMatrix[j][i + 1] = elmt.m_swingWeightsArr[j - 3][1] / total;
+                                        retMatrix[j][i + 1] = elmt.m_swingWeightsArr[j - 3][1] / total;
                                     }
-                                    else
-                                        tempMatrix[j][i + 1] = elmt.getPwlValue(tempMatrix[j][i + 1]);
-                                }
-                            }
-                            else {
-                                if (elmt.getMethod() == 1) {
-                                    var total = 0;
-                                    for (var k = 0; k < elmt.m_swingWeightsArr.length; k++) {
-                                        total += elmt.m_swingWeightsArr[k][1];
+                                    else {
+                                        var tm = tempMatrix[j][i + 1];
+                                        retMatrix[j][i + 1] = elmt.getPwlValue(tempMatrix[j][i + 1]);
                                     }
-                                    tempMatrix[j][i + 1] = elmt.m_swingWeightsArr[j - 3][1] / total;
                                 }
-                                else
-                                    tempMatrix[j][i + 1] = elmt.getPwlValue(tempMatrix[j][i + 1]);
+                                //var tmp7c = tempMatrix[j][i + 1];
+                                retMatrix[j][i + 1] *= sortedWeights[i];
+                                retMatrix[j][i + 1] = (Math.round(10000 * retMatrix[j - 3][i + 1])) / 10000;
                             }
-                            var tmp7c = tempMatrix[j][i + 1];
-                            tempMatrix[j][i + 1] *= sortedWeights[i];
-                            tempMatrix[j][i + 1] = (Math.round(10000 * tempMatrix[j][i + 1])) / 10000;
-                            var tmp8 = tempMatrix[j][i + 1];
                         }
-                        tempMatrix[0][i + 1] = elmt.getName(); // change from element ID to element name
+                        retMatrix[0][i + 1] = elmt.getName(); // change from element ID to element name
                     }
-                    for (var j = 3; j < tempMatrix.length - 2; j++) {
-                        elmt = this.getElement(tempMatrix[j][0]);
-                        tempMatrix[j][0] = elmt.getName();
+                    for (var j = 3; j < retMatrix.length - 2; j++) {
+                        elmt = this.getElement(retMatrix[j][0]);
+                        retMatrix[j][0] = elmt.getName();
                     }
                 }
                 else {
                     console.log("There is no main objective yet.");
                 }
-                return tempMatrix;
+                return retMatrix;
             };
             //this should be in elment
             Model.prototype.getWeightedData = function (p_elmt, p_addHeader) {
@@ -509,9 +529,9 @@ var Mareframe;
                         var data = this.m_connectionArr[key].getOutputElement().getDataOld();
                         var dataIn = this.m_connectionArr[key].getInputElement().getDataOld();
                         var removeHeader = this.m_connectionArr[key].getInputElement().getID();
-                        console.log("Remove header: " + removeHeader);
-                        console.log("Original Data Out: " + data);
-                        console.log("Original Data In: " + dataIn);
+                        //console.log("Remove header: " + removeHeader);
+                        //console.log("Original Data Out: " + data);
+                        //console.log("Original Data In: " + dataIn);
                         var dims = [0, 0, 0];
                         data = DST.Tools.removeHeaderRow(removeHeader, data);
                         //var splicePos = 1 + Math.floor((data[data.length - 1].length / states));
@@ -542,7 +562,7 @@ var Mareframe;
                                     var id = this.m_connectionArr[key].getID();
                                     if (elmtOut.m_swingWeightsArr[e][0] === this.m_connectionArr[key].getID()) {
                                         //elmt.m_swingWeightsArr.splice(parseInt(e) , 1);
-                                        elmtOut.m_swingWeightsArr.splice(e, 1);
+                                        elmtOut.m_swingWeightsArr.splice(parseInt(e), 1);
                                     }
                                 }
                                 break;
@@ -553,11 +573,14 @@ var Mareframe;
                                 for (var e in elmtOut.m_swingWeightsArr) {
                                     if (elmtOut.m_swingWeightsArr[e][0] === this.m_connectionArr[key].getID()) {
                                         //elmt.m_swingWeightsArr.splice(parseInt(e) , 1);
-                                        elmtOut.m_swingWeightsArr.splice(e, 1);
+                                        elmtOut.m_swingWeightsArr.splice(parseInt(e), 1);
                                     }
                                 }
                                 break;
                         }
+                        var tmp = elmtOut.m_criteriaLevel;
+                        var tmp2 = elmtIn.m_criteriaLevel;
+                        elmtIn.setCriteriaLevel(null);
                         //removes connection from the conncetions array and the two elements
                         elmtOut.deleteConnection(p_connID);
                         elmtIn.deleteConnection(p_connID);
@@ -693,8 +716,22 @@ var Mareframe;
                 });*/
                 //console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
             };
+            Model.prototype.getCumuluValue = function (p_element, p_level) {
+                var retValue = 0;
+                var weights = DST.Tools.getWeights(p_element, undefined, undefined, undefined, undefined, p_level);
+                var lowerLevel = p_level - 1;
+                if (lowerLevel >= 0) {
+                    for (var _i = 0, weights_1 = weights; _i < weights_1.length; _i++) {
+                        var i = weights_1[_i];
+                        retValue += this.getCumuluValue(this.getElement(i[0]), lowerLevel);
+                    }
+                }
+                else {
+                }
+                return retValue;
+            };
             return Model;
-        })();
+        }());
         DST.Model = Model;
     })(DST = Mareframe.DST || (Mareframe.DST = {}));
 })(Mareframe || (Mareframe = {}));

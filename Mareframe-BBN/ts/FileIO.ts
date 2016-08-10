@@ -293,6 +293,9 @@
                     case "test1":
                         path += "test1.json";
                         break;
+                    case "newCar8":
+                        path += "newCar8.json";
+                        break;
                     default:
                         console.log("NO such file exists!!   " + p_modelStringIdent);
                         break;
