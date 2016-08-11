@@ -94,7 +94,7 @@
             <label for="cnctTool" class="advButton" title="Click to enable the connect tool">Connect Tool</label> 
             <button class="advButton" id="fitToModel"title="Click to resize window to fit model">Resize window</button>
             <div style="float:right">
-                
+                <button class="button advButton" id="voi" title="Click to open the Value of Information dialog">Value of Information</button>
                 <input class="button advButton" type="checkbox" id="fullscreen">
                 <label for="fullscreen" class="button" title="Click to to to full screen">Fullscreen</label>
                 <input class="button advButton" type="checkbox" id="editorMode" >
@@ -168,6 +168,7 @@
         $("#editorMode").button({ icons: { primary: "ui-icon-pencil" } });
         $("#autoUpdate").button({ icons: { primary: "ui-icon-refresh" } });
         $("#settings").button({ icons: { primary: "ui-icon-gear" } });
+        $("#voi").button({ icons: { primary: "ui-icon-notice" } });
         $("#updateMdl").button({ icons: { primary: "ui-icon-refresh" } });
         $("#fitToModel").button({ icons: { primary: "ui-icon-arrow-4-diag" } });
         $("#resetDcmt").button({ icons: { primary: "ui-icon-arrowreturnthick-1-w" } })

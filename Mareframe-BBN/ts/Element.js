@@ -152,6 +152,35 @@ var Mareframe;
                 }
                 return ancestors;
             };
+            Element.prototype.getAllInfluencingAncestors = function () {
+                var ancestors = [];
+                var parents = this.getParentElements();
+                if (parents.length === 0) {
+                    return ancestors;
+                }
+                else if (this.getType() === 1) {
+                }
+                else {
+                    parents.forEach(function (e) {
+                        if (ancestors.indexOf(e) === -1) {
+                            //   console.log("pushing " + e.getName());
+                            ancestors.push(e);
+                            ancestors = ancestors.concat(e.getAllInfluencingAncestors());
+                        }
+                    });
+                }
+                return ancestors;
+            };
+            Element.prototype.isInfluencing = function () {
+                var descendants = this.getAllDescendants();
+                for (var i = 0; i < descendants.length; i++) {
+                    var e = descendants[i];
+                    if (e.getType() === 2) {
+                        return true;
+                    }
+                }
+                return false;
+            };
             Element.prototype.getAllDecisionAncestors = function () {
                 var decisions = [];
                 this.getAllAncestors().forEach(function (e) {

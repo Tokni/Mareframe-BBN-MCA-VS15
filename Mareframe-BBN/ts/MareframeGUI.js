@@ -4,6 +4,7 @@ var Mareframe;
     (function (DST) {
         var GUIHandler = (function () {
             function GUIHandler(p_model, p_handler) {
+                var _this = this;
                 this.m_noOfDialogsOpen = 0;
                 this.m_windowResizable = false;
                 this.m_editorMode = false;
@@ -74,6 +75,29 @@ var Mareframe;
                     }
                     //console.log("auto update: " + this.m_model.m_autoUpdate);
                 };
+                this.updateVOI = function (p_evt) {
+                    var pov = _this.m_model.getElement($("#fromPointOfView").val());
+                    var forDec = _this.m_model.getElement($("#forDec").val());
+                    var chanceElmts = [];
+                    _this.m_model.getElementArr().forEach(function (e) {
+                        if (e.getType() === 0 && $("#voiCB_" + e.getID()).is(":checked")) {
+                            chanceElmts.push(e);
+                        }
+                    });
+                    var resultMatrix = DST.Tools.valueOfInformation(_this.m_model, pov, forDec, chanceElmts, _this);
+                    $("#voiTable").empty(); //First remove the previous table
+                    var table = document.createElement("table");
+                    for (var i = 0; i < resultMatrix.length; i++) {
+                        var row = table.insertRow();
+                        for (var j = 0; j < resultMatrix[0].length; j++) {
+                            var cell = row.insertCell();
+                            var div = document.createElement("div");
+                            cell.appendChild(div);
+                            div.innerHTML = resultMatrix[i][j];
+                        }
+                    }
+                    $("#voiTable").append(table);
+                };
                 this.m_handler = p_handler;
                 this.saveChanges = this.saveChanges.bind(this);
                 //Change layout if it is not in marefram mode
@@ -136,6 +160,7 @@ var Mareframe;
                 this.updateModel = this.updateModel.bind(this);
                 this.addLoadingCursor = this.addLoadingCursor.bind(this);
                 this.openSettings = this.openSettings.bind(this);
+                this.openVIO = this.openVIO.bind(this);
                 this.mouseUp = this.mouseUp.bind(this);
                 this.selectAll = this.selectAll.bind(this);
                 this.saveModel = this.saveModel.bind(this);
@@ -178,6 +203,7 @@ var Mareframe;
                 $("#updateMdl").on("mouseup", this.updateModel);
                 //$("#updateMdl").on("mousedown", this.addLoadingCursor);//This does not work
                 $("#settings").on("click", this.openSettings);
+                $("#voi").on("click", this.openVIO);
                 $("#fitToModel").on("click", this.fitToModel);
                 $("#selectAllElmt").on("click", this.selectAll);
                 $("#savDcmt").on("click", this.saveModel);
@@ -648,6 +674,7 @@ var Mareframe;
                 }
             };
             GUIHandler.prototype.setShowDescription = function (p_evt) {
+                console.log("HERE");
                 var id = p_evt.data.param1.getID();
                 $("#detailsDialog_" + id).data("showDescription", !$("#detailsDialog_" + id).data("showDescription"));
                 console.log("show description: " + $("#detailsDialog_" + id).data("showDescription"));
@@ -808,10 +835,21 @@ var Mareframe;
                 // elmt.update();
                 this.updateMiniTables([elmt]);
             };
-            GUIHandler.prototype.deleteSelected = function (p_evt) {
+            GUIHandler.prototype.deleteSelected = function (p_evt, selectedElmts, selectedCon) {
                 console.log("deleting");
-                for (var i = 0; i < this.m_selectedItems.length; i++) {
-                    var elmt = this.m_model.getElement(this.m_selectedItems[i].name);
+                if (selectedElmts) {
+                    var elmts = selectedElmts;
+                }
+                else {
+                    var elmts = this.m_selectedItems;
+                }
+                for (var i = 0; i < elmts.length; i++) {
+                    if (selectedElmts) {
+                        var elmt = selectedElmts[i];
+                    }
+                    else {
+                        var elmt = this.m_model.getElement(this.m_selectedItems[i].name);
+                    }
                     console.log("deleting: " + elmt.getName());
                     //for (var index in elmt.getConnections()) {
                     //    console.log(elmt.getName() + "  Before: " + elmt.getConnections()[index].getID());
@@ -836,9 +874,17 @@ var Mareframe;
                     }
                 }
                 var gui = this;
-                this.m_selectedConnections.forEach(function (c) {
-                    gui.addToTrash(gui.m_model.getConnection(c.name));
-                });
+                if (selectedCon) {
+                    selectedCon.forEach(function (c) {
+                        var conn = gui.m_model.getConnection(c.getID());
+                        gui.addToTrash(conn);
+                    });
+                }
+                else {
+                    this.m_selectedConnections.forEach(function (c) {
+                        gui.addToTrash(gui.m_model.getConnection(c.name));
+                    });
+                }
                 this.clearSelection();
                 for (var i = 0; i < this.m_trashBin.length; i++) {
                     var itemID = this.m_trashBin[i].getID();
@@ -1038,8 +1084,115 @@ var Mareframe;
                     title: "Settings",
                 };
             };
+            GUIHandler.prototype.openVIO = function () {
+                var voiID = "#" + this.createVOIDialog();
+                var voi = $(voiID).dialog(opt);
+                var opt = {
+                    title: "Value of Information",
+                    width: 800,
+                    height: 800
+                };
+            };
+            GUIHandler.prototype.createVOIDialog = function () {
+                var dialog = document.createElement("div");
+                dialog.setAttribute("id", "voiDialog");
+                var table = document.createElement("table");
+                dialog.appendChild(table);
+                var mainRow = table.insertRow();
+                var resultRow = table.insertRow();
+                var buttonRow = table.insertRow();
+                var cell = mainRow.insertCell();
+                var fieldset = document.createElement("fieldset");
+                cell.appendChild(fieldset);
+                var legend = document.createElement("legend");
+                fieldset.appendChild(legend);
+                legend.innerHTML = "Of Chance nodes:";
+                //Create the check boxes for chance elements
+                var table = document.createElement("table");
+                fieldset.appendChild(table);
+                this.m_model.getElementArr().forEach(function (e) {
+                    if (e.getType() === 0) {
+                        var row = table.insertRow();
+                        var cell = row.insertCell();
+                        var input = document.createElement("input");
+                        input.setAttribute("type", "checkbox");
+                        input.setAttribute("id", "voiCB_" + e.getID());
+                        input.setAttribute("name", "voiCB_" + e.getID());
+                        cell.appendChild(input);
+                        cell = row.insertCell();
+                        var label = document.createElement("label");
+                        label.htmlFor = "voiCB_" + e.getID();
+                        label.innerHTML = e.getName();
+                        cell.appendChild(label);
+                    }
+                });
+                var table = document.createElement("table");
+                mainRow.appendChild(table);
+                //Create dropdown for decision nodes
+                var row = table.insertRow();
+                var cell = row.insertCell();
+                var fieldset = document.createElement("fieldset");
+                cell.appendChild(fieldset);
+                var legend = document.createElement("legend");
+                fieldset.appendChild(legend);
+                var label = document.createElement("label");
+                legend.innerHTML = "For decision node:";
+                cell.appendChild(label);
+                label.htmlFor = "forDec";
+                var select = document.createElement("select");
+                select.setAttribute("id", "forDec");
+                fieldset.appendChild(select);
+                this.m_model.getElementArr().forEach(function (e) {
+                    if (e.getType() === 1) {
+                        var option = document.createElement("option");
+                        option.setAttribute("selected", "selected");
+                        option.setAttribute("value", e.getID());
+                        option.innerHTML = e.getName();
+                        select.appendChild(option);
+                    }
+                });
+                //Create dropdown for point of view
+                var row = table.insertRow();
+                var cell = row.insertCell();
+                var fieldset = document.createElement("fieldset");
+                cell.appendChild(fieldset);
+                var legend = document.createElement("legend");
+                fieldset.appendChild(legend);
+                var label = document.createElement("label");
+                label.innerHTML = "From point of View:";
+                legend.appendChild(label);
+                label.htmlFor = "fromPointOfView";
+                var select = document.createElement("select");
+                select.setAttribute("id", "fromPointOfView");
+                fieldset.appendChild(select);
+                this.m_model.getElementArr().forEach(function (e) {
+                    if (e.getType() === 1) {
+                        var option = document.createElement("option");
+                        option.setAttribute("selected", "selected");
+                        option.setAttribute("value", e.getID());
+                        option.innerHTML = e.getName();
+                        select.appendChild(option);
+                    }
+                });
+                //Result table
+                var cell = resultRow.insertCell();
+                var div = document.createElement("div");
+                cell.appendChild(div);
+                div.setAttribute("id", "voiTable");
+                div.innerHTML = "Result Table";
+                //Update button
+                var cell = buttonRow.insertCell();
+                var button = document.createElement("button");
+                cell.appendChild(button);
+                button.setAttribute("id", "voiButton");
+                button.innerHTML = "Value of Information";
+                button.setAttribute("title", "Click to show the value of information for the selected nodes");
+                $('body').append(dialog);
+                $("#voiButton").click(this.updateVOI);
+                return "voiDialog";
+            };
             GUIHandler.prototype.createDetailsDialog = function (p_elmt) {
-                console.log("creating dialog for " + p_elmt.getName());
+                //console.log("creating dialog for " + p_elmt.getName());
                 var mareframeGUI = this;
                 var id = p_elmt.getID();
                 var newDialog = document.createElement("div");
@@ -1231,7 +1384,6 @@ var Mareframe;
             };
             GUIHandler.prototype.populateElmtDetails = function (p_elmt) {
                 //  Tools.calcValueOfInformation(this.m_model.getElement("elmtDecsion"), p_elmt, this.m_model,10); //This is just a test for VOI
-                DST.Tools.valueOfInformation(this.m_model, this.m_model.getElement("elmtDecsion"), this.m_model.getElement("elmtDecsion"), [p_elmt]);
                 var id = p_elmt.getID();
                 if (p_elmt.getDialog() == null) {
                     console.log("creating new dialog");
@@ -2175,8 +2327,12 @@ var Mareframe;
                             outputElmt.getAllDescendants().forEach(function (e) {
                                 e.setUpdated(false);
                             });
+                            outputElmt.getAllAncestors().forEach(function (e) {
+                                e.setUpdated(false);
+                            });
                             inputElmt.setUpdated(false);
                             console.log("connection created from " + outputElmt.getID() + " to " + inputElmt.getID());
+                            this.updateMiniTables(outputElmt.getAllDescendants().concat(outputElmt.getAllAncestors()));
                         }
                     }
                 }

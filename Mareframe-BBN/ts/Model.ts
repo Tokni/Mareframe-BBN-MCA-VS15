@@ -1,7 +1,7 @@
 ﻿module Mareframe {
     export module DST {
         export class Model {
-            private m_numOfIteraions:number = 10000;
+            private m_numOfIteraions:number = 1000;
             public m_bbnMode: boolean = false;
             private m_modelIdent: string = "temp";
             private m_elmtCounter: number = 0;
@@ -150,7 +150,7 @@
                             e.setUpdated(false);
                         }
                 });
-                Tools.calcValueWithEvidence(this, this.m_numOfIteraions);
+                Tools.calcValuesLikelihoodSampling(this, this.m_numOfIteraions);
                // }
                     console.log("done updating with evidence");
                 this.m_elementArr.forEach(function (p_elmt: Element) {
@@ -423,6 +423,7 @@
             }
             getConnection(p_connectionStringId: string): Connection
             {
+
                 return this.m_connectionArr[this.getObjectIndex(p_connectionStringId)];
             }
             getElementArr(): Element[] {
@@ -431,8 +432,31 @@
             deleteElement(p_elementStringId:string): boolean {
                 var key = 0;
                 this.m_elementArr.every(function (p_elmt: Element) {
-                    if (p_elmt.getID() === p_elementStringId)
+                    if (p_elmt.getID() === p_elementStringId) {
+                        if (p_elmt.getType() === 1) {//If this is a decision all descendants need to be updated
+                            p_elmt.getAllDescendants().forEach(function (e) {
+                                e.setUpdated(false);
+                            });
+                        }
+                        else if (p_elmt.getType() === 0) {
+                            var isInformative = false;
+                            p_elmt.getChildrenElements().forEach(function (e) {
+                                if (e.getType() === 1) {
+                                    isInformative = true;
+                                }
+                            });
+                            if (isInformative) {
+                            //If this is an informative chance node all ancestors and descendant need to be updated
+                                p_elmt.getAllAncestors().forEach(function (e) {
+                                    e.setUpdated(false);
+                                });
+                                p_elmt.getAllDescendants().forEach(function (e) {
+                                    e.setUpdated(false);
+                                });
+                            }
+                        }
                         return false;
+                    }
                     else {
                         key++
                         return true;
@@ -459,17 +483,17 @@
                 if (key >= this.m_connectionArr.length)
                     return false;
                 else {
-                    console.log("Deleting connection: " + p_connID + "   ----------------");
                     var inputElmt: Element = this.m_connectionArr[key].getInputElement();
                     var outputElmt: Element = this.m_connectionArr[key].getOutputElement();
+                   // console.log("Deleting connection: " + p_connID + " from " + inputElmt.getName() + " to " + outputElmt.getName());
                     var states:number = this.m_connectionArr[key].getInputElement().getData().length;
                     var data = this.m_connectionArr[key].getOutputElement().getData();
                     var dataIn = this.m_connectionArr[key].getInputElement().getData();
                     var removeHeader = this.m_connectionArr[key].getInputElement().getID();
                     
-                    console.log("Remove header: " + removeHeader);
-                    console.log("Original Data Out: " + data);
-                    console.log("Original Data In: " + dataIn);
+                    //console.log("Remove header: " + removeHeader);
+                    //console.log("Original Data Out: " + data);
+                    //console.log("Original Data In: " + dataIn);
                     
                     var dims: number[] = [0, 0, 0];
                     data = Tools.removeHeaderRow(outputElmt, removeHeader, data);
@@ -483,16 +507,27 @@
                     //console.log("New data: " + data);
                     //console.log("ConnectionArr: " + this.m_connectionArr[key]);
                     this.m_connectionArr[key].getOutputElement().setData(data);
-                    console.log("data : " + outputElmt.getData());
+                    //console.log("data : " + outputElmt.getData());
                     this.m_connectionArr.splice(key, 1);
 
                     //console.log(this.m_elementArr);
                     if (inputElmt.getType() === 1) {//If the input element is a dec all descendants of the output element need to be updated
                         outputElmt.getAllDescendants().forEach(function (e) {
-                            console.log("descendant: " + e.getName());
+                            //console.log("descendant: " + e.getName());
                             e.setUpdated(false);
                         });
                     }
+                    if (inputElmt.getType() === 0 && outputElmt.getType() === 1) {//If a connection from a chance node to a dec node is deleted
+                       //Then all ancestors need to be updated
+                        var temp = inputElmt.getAllAncestors();
+                        inputElmt.getAllAncestors().forEach(function (e) {
+                            e.setUpdated(false);
+                        });
+                    }
+                    //Delete connection from the elements
+                    inputElmt.deleteConnection(p_connID);
+                    outputElmt.deleteConnection(p_connID);
+
                     return true;
                 }
             }

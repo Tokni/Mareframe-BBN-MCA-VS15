@@ -163,6 +163,38 @@
                 return ancestors;
             }
 
+            getAllInfluencingAncestors(): Element[] {
+                var ancestors: Element[] = [];
+                var parents: Element[] = this.getParentElements();
+                if (parents.length === 0) {
+                    return ancestors;
+                }
+                else if (this.getType() === 1) {
+                    //If this is a decision we should only check one more level and only add chance nodes
+                }
+                else {
+                    parents.forEach(function (e) {
+                        if (ancestors.indexOf(e) === -1) {
+                            //   console.log("pushing " + e.getName());
+                            ancestors.push(e);
+                            ancestors = ancestors.concat(e.getAllInfluencingAncestors());
+                        }
+                    });
+                }
+                return ancestors;
+            }
+
+            isInfluencing(): boolean {//An element is influencing if it has a utility descendant
+                var descendants: Element[] = this.getAllDescendants();
+                for (var i = 0; i < descendants.length; i++) {
+                    var e: Element = descendants[i];
+                    if (e.getType() === 2) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
             getAllDecisionAncestors(): Element[] {
                 var decisions: Element[] = [];
                 this.getAllAncestors().forEach(function (e) {

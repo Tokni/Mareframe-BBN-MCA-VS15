@@ -275,7 +275,7 @@ var Mareframe;
                 return newMatrix;
             };
             Tools.getValueWithCondition = function (p_values, p_elmt, p_condition) {
-                //console.log("getting value with condition " + p_condition +" elmt: "+ p_elmt.getName()+ " from " + p_values);
+                console.log("getting value with condition " + p_condition + " elmt: " + p_elmt.getName() + " from " + p_values);
                 var values = Tools.makeSureItsTwoDimensional(p_values);
                 // //console.log("values table : \n " + values);
                 var valuesFound = [];
@@ -303,6 +303,7 @@ var Mareframe;
                 var values = Tools.makeSureItsTwoDimensional(p_values);
                 var rows = math.size(values)[0];
                 var columns = math.size(values)[1];
+                var valuesFound = [];
                 for (var i = 1; i < columns; i++) {
                     var matchingColumn = true;
                     for (var j = 0; j < Tools.numOfHeaderRows(values); j++) {
@@ -315,9 +316,10 @@ var Mareframe;
                     }
                     if (matchingColumn) {
                         // console.log("returned " + values[Tools.numOfHeaderRows(values)][i]);
-                        return values[Tools.numOfHeaderRows(values)][i];
+                        valuesFound.push(values[Tools.numOfHeaderRows(values)][i]);
                     }
                 }
+                return valuesFound;
             };
             Tools.createSubMatrices = function (p_currentElement, p_matrix, p_makeSubmatrixElmt, p_dataHeaders) {
                 if (p_makeSubmatrixElmt !== undefined) {
@@ -561,44 +563,59 @@ var Mareframe;
             };
             Tools.updateValuesHeaders = function (p_model, p_elmt) {
                 var headerRows = [];
-                if (p_elmt.getType() === 0) {
-                    p_elmt.getAllAncestors().forEach(function (ancestor) {
-                        if (!(ancestor.isUpdated())) {
-                            Tools.updateValuesHeaders(p_model, ancestor);
-                        }
-                        if (ancestor.getType() === 1) {
-                            headerRows = Tools.addNewHeaderRow(ancestor.getMainValues(), headerRows);
-                        }
-                    });
-                    p_elmt.setUpdated(true);
-                }
-                else if (p_elmt.getType() === 1) {
+                var added = []; //Used to make sure no element is added twice into headers
+                if (p_elmt.getType() === 1) {
                     p_elmt.getParentElements().forEach(function (parent) {
-                        if (!(parent.isUpdated())) {
-                            Tools.updateValuesHeaders(p_model, parent);
+                        if (parent.isInfluencing()) {
+                            headerRows = Tools.addNewHeaderRow(parent.getMainValues(), headerRows);
                         }
-                        headerRows = Tools.addNewHeaderRow(parent.getMainValues(), headerRows);
                     });
                     p_elmt.setUpdated(true);
                 }
-                else if (p_elmt.getType() === 2) {
-                    p_elmt.getAllAncestors().forEach(function (ancestor) {
-                        if (!(ancestor.isUpdated())) {
-                            Tools.updateValuesHeaders(p_model, ancestor);
-                        }
+                else if (p_elmt.getType() === 2 || p_elmt.getType() === 0) {
+                    p_elmt.getAllInfluencingAncestors().forEach(function (ancestor) {
                         if (ancestor.getType() === 0) {
                             var isInformative = false;
-                            ancestor.getChildrenElements().forEach(function (c) {
-                                if (c.getType() === 1) {
+                            ancestor.getChildrenElements().forEach(function (child) {
+                                if (child.getType() === 1) {
                                     isInformative = true;
                                 }
                             });
-                            if (isInformative) {
+                            if (isInformative && added.indexOf(ancestor.getID()) === -1) {
+                                added.push(ancestor.getID());
                                 headerRows = Tools.addNewHeaderRow(ancestor.getMainValues(), headerRows);
                             }
+                            //If ancestor has an informative decsendant this should be added too
+                            ancestor.getAllDescendants().forEach(function (descendant) {
+                                var isInformative = false;
+                                descendant.getChildrenElements().forEach(function (child) {
+                                    if (child.getType() === 1) {
+                                        isInformative = true;
+                                    }
+                                });
+                                if (isInformative && added.indexOf(descendant.getID()) === -1 && descendant.getID() !== p_elmt.getID()) {
+                                    added.push(descendant.getID());
+                                    headerRows = Tools.addNewHeaderRow(descendant.getMainValues(), headerRows);
+                                }
+                            });
                         }
-                        else if (ancestor.getType() === 1) {
+                        else if (ancestor.getType() === 1 && added.indexOf(ancestor.getID()) === -1) {
                             headerRows = Tools.addNewHeaderRow(ancestor.getMainValues(), headerRows);
+                            added.push(ancestor.getID());
+                        }
+                    });
+                    p_elmt.getAllDescendants().forEach(function (descendant) {
+                        if (descendant.getType() === 0) {
+                            var isInformative = false;
+                            descendant.getChildrenElements().forEach(function (child) {
+                                if (child.getType() === 1) {
+                                    isInformative = true;
+                                }
+                            });
+                            if (isInformative && added.indexOf(descendant.getID()) === -1) {
+                                headerRows = Tools.addNewHeaderRow(descendant.getMainValues(), headerRows);
+                                added.push(descendant.getID());
+                            }
                         }
                     });
                     p_elmt.setUpdated(true);
@@ -608,9 +625,10 @@ var Mareframe;
             };
             Tools.addMainValues = function (p_model, p_elmt) {
                 var valueHeaders = p_elmt.getValues();
-                p_elmt.getMainValues().forEach(function (value) {
-                    valueHeaders.push([value]);
-                });
+                var mainValues = p_elmt.getMainValues();
+                for (var i = 1; i < mainValues.length; i++) {
+                    valueHeaders.push([mainValues[i]]);
+                }
                 for (var col = 1; col < Math.max(valueHeaders[0].length, 2); col++) {
                     for (var row = Tools.numOfHeaderRows(valueHeaders); row < valueHeaders.length; row++) {
                         valueHeaders[row].push(0);
@@ -751,7 +769,7 @@ var Mareframe;
                                 else {
                                     parentMatrix = parent.getValues();
                                 }
-                                valueArray[i - 1] += Tools.getValueWithConditions(parentMatrix, conditionElmts, conditions) * defValue;
+                                valueArray[i - 1] += Tools.getValueWithConditions(parentMatrix, conditionElmts, conditions)[0] * defValue;
                             });
                         }
                         if (headerRows[0][0] === undefined) {
@@ -796,37 +814,41 @@ var Mareframe;
                     throw "ERROR Trying to use calculateDecisionValues on non decision element";
                 }
                 //console.log("decisions node begin");
-                p_elmt.setValues(Tools.fillEmptySpaces((p_elmt.copyDefArray())));
+                //   p_elmt.setValues(Tools.fillEmptySpaces((p_elmt.copyDefArray())));
                 var values = p_elmt.getValues();
                 //Number of header rows is equal to number of rows in values minus number of rows in definition
                 var numOfHeaderRows = values.length - p_elmt.getData().length;
-                //If there are no header rows add an empty column for the values
-                if (numOfHeaderRows === 0) {
-                    for (var i = 0; i < values.length; i++) {
-                        values[i].push([]);
+                //First calculate the utility tables to use
+                var utilityTables = [];
+                p_model.getElementArr().forEach(function (elmt) {
+                    if (elmt.getType() === 2) {
+                        //console.log("value: " + elmt.getName());
+                        //If the node is not updated, update
+                        if (!elmt.isUpdated()) {
+                            elmt.update();
+                        }
+                        var utilityValues = Tools.removeDecisionsFromValues(p_model, elmt, p_elmt);
+                        utilityValues = Tools.removeChancesFromValues(p_model, elmt, utilityValues, p_elmt);
+                        utilityTables.push(utilityValues);
                     }
-                }
+                });
                 //For each value row
                 for (var i = numOfHeaderRows; i < values.length; i++) {
                     //For each values column
                     for (var j = 1; j < values[0].length; j++) {
-                        var condition = values[i][0];
+                        var conditions = [values[i][0]];
+                        conditions = conditions.concat(Tools.convertToArray(math.flatten(Tools.getColumn(values, j))).slice(0, numOfHeaderRows));
+                        var conditionElmts = [p_elmt.getID()];
+                        conditionElmts = conditionElmts.concat(Tools.convertToArray(math.flatten(Tools.getColumn(values, 0))).slice(0, numOfHeaderRows));
                         //console.log("condition: " + condition);
                         var value = 0;
-                        //For each value node in the model
-                        p_model.getElementArr().forEach(function (elmt) {
-                            if (elmt.getType() === 2) {
-                                //console.log("value: " + elmt.getName());
-                                //If the node is not updated, update
-                                if (!elmt.isUpdated()) {
-                                    elmt.update();
-                                }
-                                //Sum values that meet the condition
-                                var valueArray = Tools.getValueWithCondition(elmt.getValues(), p_elmt, condition);
-                                //console.log("value array: " + valueArray);
-                                //If there are several values that meet the condition, use the highest
-                                value += Tools.getHighest(valueArray);
-                            }
+                        //For each utility node in the model
+                        utilityTables.forEach(function (table) {
+                            //Sum values that meet the condition
+                            var valueArray = Tools.getValueWithConditions(table, conditionElmts, conditions);
+                            //console.log("value array: " + valueArray);
+                            //If there are several values that meet the condition, use the highest
+                            value += Tools.getHighest(valueArray);
                         });
                         //console.log("i: " + i + "  j: " + j + "  Value: " + value);
                         values[i][j] = value;
@@ -835,6 +857,64 @@ var Mareframe;
                 //     console.log("decisions end");
                 //console.log("new values: " + values);
                 p_elmt.setValues(values);
+            };
+            //Takes a utility node and a dec node and removes all decisions from the utility value that are not in the dec headers
+            Tools.removeDecisionsFromValues = function (p_model, p_utilityNode, p_decNode) {
+                var decHeaders = math.flatten(Tools.getColumn(p_decNode.getValues(), 0));
+                var values = p_utilityNode.getValues().slice();
+                var valueMatrix = Tools.getMatrixWithoutHeader(values);
+                var valueHeaders = values.slice(0, Tools.numOfHeaderRows(values));
+                for (var row = 0; row < Tools.numOfHeaderRows(values); row++) {
+                    var elmt = p_model.getElement(values[row][0]); //check if this elements needs removing
+                    if (elmt.getType() === 1 && decHeaders.indexOf(values[row][0]) === -1 && elmt.getID() !== p_decNode.getID()) {
+                        var temp = Tools.createSubMatrices(p_utilityNode, math.flatten(valueMatrix), elmt, valueHeaders);
+                        valueHeaders = temp[1];
+                        valueMatrix = [];
+                        temp[0].forEach(function (matrix) {
+                            //Each submatrix represents a free choice
+                            matrix = matrix[0];
+                            var max = matrix[0];
+                            //Find the maximum in each sub matrix
+                            matrix.forEach(function (v) {
+                                max = Math.max(max, v);
+                            });
+                            valueMatrix.push([max]);
+                        });
+                    }
+                }
+                //Put headers and matrix back together
+                valueMatrix.unshift(["value"]);
+                if (valueHeaders[0].length > 0) {
+                    valueHeaders.push(math.flatten(valueMatrix));
+                }
+                else {
+                    //If there are no headers
+                    valueHeaders = [math.flatten(valueMatrix)];
+                }
+                return valueHeaders;
+            };
+            //Takes a value table and a decision node and removes all chances from the value table that are not in the dec nodes headers
+            Tools.removeChancesFromValues = function (p_model, p_utilityNode, utilityValues, p_decNode) {
+                var decHeaders = math.flatten(Tools.getColumn(p_decNode.getValues(), 0));
+                var values = utilityValues.slice();
+                var valueMatrix = Tools.getMatrixWithoutHeader(values);
+                var valueHeaders = values.slice(0, Tools.numOfHeaderRows(values));
+                for (var row = 0; row < Tools.numOfHeaderRows(values); row++) {
+                    var elmt = p_model.getElement(values[row][0]);
+                    if (elmt.getType() === 0 && decHeaders.indexOf(values[row][0]) === -1) {
+                        var temp = Tools.createSubMatrices(p_utilityNode, valueMatrix, elmt, valueHeaders);
+                        valueHeaders = temp[1];
+                        valueMatrix = [];
+                        temp[0].forEach(function (matrix) {
+                            //Multiply each submatrix with probabilities
+                            valueMatrix = valueMatrix.concat(math.multiply(matrix, Tools.getMatrixWithoutHeader(elmt.getValues())));
+                        });
+                    }
+                }
+                //Put headers and matrix back together
+                valueMatrix.unshift(["value"]);
+                valueHeaders.push(math.flatten(valueMatrix));
+                return valueHeaders;
             };
             Tools.isOneDimensional = function (p_array) {
                 //console.log(p_array.length);
@@ -1240,64 +1320,88 @@ var Mareframe;
                 // console.log("valid connection between " + inputElmt.getType() + " and  " + outputElmt.getType() + ": " + valid);
                 return valid;
             };
-            //This method only works of no evidence is set and there is no decision element influencing the chance node
-            Tools.calcValueOfInformation = function (decisionNode, chanceNode, p_model, p_numOfIterations) {
-                var valueWithNoInfo = Number.MIN_VALUE;
-                var decValueTable = decisionNode.getValues();
-                for (var i = Tools.numOfHeaderRows(decValueTable); i < decValueTable.length; i++) {
-                    valueWithNoInfo = Math.max(decValueTable[i][1], valueWithNoInfo);
-                }
-                var valueWithInfo = Number.MIN_VALUE;
-                var bestState;
-                var chanceValues = chanceNode.getValues();
-                for (var state = 0; state < chanceValues.length - Tools.numOfHeaderRows(chanceValues); state++) {
-                    console.log("setting evidence: " + state);
-                    p_model.setEvidence(chanceNode, state);
-                    p_model.update(); //Calculating all values again
-                    decValueTable = decisionNode.getValues();
-                    var highestValueBefore = valueWithInfo; //This is needed to check if this state results in the highest value
-                    for (var i = Tools.numOfHeaderRows(decValueTable); i < decValueTable.length; i++) {
-                        valueWithInfo = Math.max(decValueTable[i][1], valueWithInfo);
-                    }
-                    if (highestValueBefore < valueWithInfo) {
-                        bestState = state;
-                    }
-                    p_model.setEvidence(chanceNode, state); //Unset evidence
-                }
-                p_model.update(); //Calculate all values back to original
-                //console.log("valueWithNoInfo: " + valueWithNoInfo);
-                // console.log("valueWithInfo: " + valueWithInfo);
-                console.log("best state: " + bestState);
-                var valueOfInformation = (valueWithInfo - valueWithNoInfo) * chanceNode.getValues()[bestState - Tools.numOfHeaderRows(chanceValues)][1];
-                console.log("Value of Information: " + valueOfInformation);
-            };
-            Tools.valueOfInformation = function (p_model, p_forDecision, p_pov, p_chanceNodes) {
+            Tools.valueOfInformation = function (p_model, p_pov, p_forDec, p_chanceElmts, p_gui) {
+                console.log("value of information. POV: " + p_pov.getName() + " for dec: " + p_forDec.getName() + " chancenodes: " + p_chanceElmts.length);
+                var tempConnections = [];
+                var isPossible = true;
+                //Create temporary decision
                 var tempDecision = p_model.createNewElement(1);
-                p_model.createNewConnection(tempDecision, p_pov);
+                //Add connection from temp dec to point of interest
+                var c = p_model.createNewConnection(tempDecision, p_pov);
+                if (!p_model.addConnection(c)) {
+                    isPossible = false;
+                }
+                p_pov.setUpdated(false);
+                p_pov.getAllDescendants().forEach(function (e) {
+                    e.setUpdated(false);
+                });
+                p_pov.getAllAncestors().forEach(function (e) {
+                    e.setUpdated(false);
+                });
+                tempDecision.setUpdated(false);
+                //Find a utility node
                 var utilityFound = false;
                 for (var i = 0; i < p_model.getElementArr().length; i++) {
                     var elmt = p_model.getElementArr()[i];
                     if (elmt.getType() === 2) {
-                        p_model.createNewConnection(tempDecision, elmt);
+                        //Add connection from temp dec to utility node
+                        var c = p_model.createNewConnection(tempDecision, elmt);
+                        if (!p_model.addConnection(c)) {
+                            isPossible = false;
+                        }
+                        elmt.setUpdated(false);
+                        elmt.getAllDescendants().forEach(function (e) {
+                            e.setUpdated(false);
+                        });
+                        elmt.getAllAncestors().forEach(function (e) {
+                            e.setUpdated(false);
+                        });
                         utilityFound = true;
                         break;
                     }
                 }
                 if (!utilityFound) {
-                    return [0];
+                    //If there is no utility node in the model it is not possible to calc value of information
+                    isPossible = false;
                 }
+                //Update model and save values of temp dec
                 p_model.update();
-                var matrix1 = tempDecision.getValues().slice;
-                p_chanceNodes.forEach(function (e) {
-                    p_model.createNewConnection(e, p_forDecision);
+                var matrix1 = Tools.getMatrixWithoutHeader(tempDecision.getValues()).slice();
+                //Create connection from each of the selected chance nodes to the selected for decision
+                p_chanceElmts.forEach(function (e) {
+                    var c = p_model.createNewConnection(e, p_forDec);
+                    if (!p_model.addConnection(c)) {
+                        isPossible = false;
+                    }
+                    else {
+                        tempConnections.push(c);
+                    }
+                    p_forDec.setUpdated(false);
+                    p_forDec.getAllDescendants().forEach(function (e) {
+                        e.setUpdated(false);
+                    });
+                    p_forDec.getAllAncestors().forEach(function (e) {
+                        e.setUpdated(false);
+                    });
+                    e.setUpdated(false);
                 });
+                //Update model and save values of temp decision
                 p_model.update();
-                var matrix2 = tempDecision.getValues().slice();
+                var matrix2 = Tools.getMatrixWithoutHeader(tempDecision.getValues()).slice();
+                //Subtract the two saved matrices
                 var resultMatrix = math.subtract(matrix2, matrix1);
-                console.log(resultMatrix);
-                return resultMatrix;
+                //Delete temporary elements and connections
+                debugger;
+                p_gui.deleteSelected(new Event("click"), [tempDecision], tempConnections); //The event is empyt and not used
+                p_gui.updateModel();
+                if (isPossible) {
+                    return resultMatrix;
+                }
+                else {
+                    return [[0], [0]];
+                }
             };
-            Tools.calcValueWithEvidence = function (p_model, p_numOfIterations) {
+            Tools.calcValuesLikelihoodSampling = function (p_model, p_numOfIterations) {
                 //console.log("calculating values with evidence");
                 var numberOfRuns = p_numOfIterations;
                 var table = []; //contains all cases

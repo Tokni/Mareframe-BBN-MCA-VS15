@@ -10,5 +10,5 @@
     static flatten(x: any): any;
     static multiply(x: any, y: any): any;
     static subtract(x: any, y: any): any;
-
+    static transpose(x: any): any;
 }
