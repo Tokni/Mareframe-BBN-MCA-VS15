@@ -212,8 +212,8 @@
                 }
                 else {
                     children.forEach(function (e) {
-                        //If this element is a chance and the child is a decision, the decision is not a real descendant
-                        if (descendants.indexOf(e) === -1 && (elmt.getType() !== 0 || e.getType() !== 1)) {
+                        //If the child is a decision it is not a real descendant
+                        if (descendants.indexOf(e) === -1 && e.getType() !== 1) {
                             
                             //   console.log("pushing " + e.getName());
                             descendants.push(e);

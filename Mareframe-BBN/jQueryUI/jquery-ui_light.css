@@ -903,9 +903,9 @@ body .ui-tooltip {
 .ui-widget-content .ui-state-active,
 .ui-widget-header .ui-state-active {
 	border: 1px solid #fbd850;
-	background: #ffffff url("images/ui-bg_glass_65_ffffff_1x400.png") 50% 50% repeat-x;
+	background: #fceaa9 ;
 	font-weight: bold;
-	color: #eb8f00;
+	color: #d17f00;
 }
 .ui-state-active a,
 .ui-state-active a:link,

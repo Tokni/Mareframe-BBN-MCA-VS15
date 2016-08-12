@@ -199,7 +199,7 @@ module Mareframe {
                     $("#updateMdl").hide();
                 }
                 $("#settings").show();
-
+                $("#modeStatus").hide();
                 this.m_mcaContainer.addChild(this.m_drawingCont);
             }
             private optionTypeChange(p_evt: Event) {
@@ -236,6 +236,7 @@ module Mareframe {
                      
             }
             private cnctStatus(p_evt: Event) {
+                    $(".cnctTool").removeClass("ui-state-focus"); 
                 if ($("#cnctTool").prop("checked")) {
                     $("#modeStatus").html("Connect Mode");
                     document.body.style.cursor = "alias";
@@ -251,13 +252,15 @@ module Mareframe {
                 this.m_handler.getFileIO().loadModel($("#selectModel").val(), this.m_model, this.importStage);
             }
             private loadModel(p_evt: Event) {
-                $("#selectModel").prop("selectedIndex", -1);
+                $("#lodDcmt").removeClass("ui-state-focus");
+                $("#selectModel").prop("selectedIndex", 0);
                 this.m_model.closeDown();
                 console.log("load model");
                 this.m_handler.getFileIO().loadfromGenie(this.m_model, this.importStage);
                 this.updateSize();
             }
             private saveModel(p_evt: Event) {
+                $("#savDcmt").removeClass("ui-state-focus");
                 $("#saveFile_div").show();
                 this.m_handler.getFileIO().saveModel(this.m_model);
             }
@@ -273,6 +276,7 @@ module Mareframe {
                 document.getElementsByTagName("body")[0].style.cursor = "progress";
             }
             public updateModel() {
+                $("#updateMdl").removeClass("ui-state-focus");
                     //console.log("model: " + this.m_model.getName());
                     this.m_model.update();
                     this.updateMiniTables(this.m_model.getElementArr());
@@ -302,6 +306,8 @@ module Mareframe {
                 this.m_mcaStageCanvas.width += p_x;
             }
             private newDcmt() {
+                $("#newDcmt").removeClass("ui-state-focus");
+                $("#selectModel").prop("selectedIndex", 0);
                 console.log("new document clicked");
                 this.m_model = this.m_handler.addNewModel();
                 this.importStage();
@@ -572,7 +578,7 @@ module Mareframe {
                     //console.log("clicked a decision");
                     //console.log(p_evt);
                     var elmt: Element = this.m_model.getElement(p_evt.currentTarget.name);
-                    this.m_model.setDecision(elmt, Math.floor(p_evt.localY / 12)- Tools.numOfHeaderRows(elmt.getValues(), elmt));
+                    this.m_model.setDecision(elmt, Math.floor(p_evt.localY / 12)/*- Tools.numOfHeaderRows(elmt.getValues(), elmt)*/);
                     if (this.m_model.getAutoUpdate()) {
                         this.updateModel();
                     }
@@ -591,6 +597,7 @@ module Mareframe {
                 }
             }
             private updateEditorMode() {
+                $(".editorMode").removeClass("ui-state-focus");
                 console.log("updating editormode");
                 var mareframe = this;
                 if (this.m_editorMode) {
@@ -707,7 +714,7 @@ module Mareframe {
             }
             private setAutoUpdate = function (cb) {
                 //console.log(cb);
-                
+                $(".autoUpdate").removeClass("ui-state-focus");
                 this.m_model.setAutoUpdate(cb.currentTarget.checked);
                 if (cb.currentTarget.checked) {
                     $("#autoUpdateStatus").html("Updating automatically");
@@ -720,6 +727,7 @@ module Mareframe {
                 //console.log("auto update: " + this.m_model.m_autoUpdate);
             }
             private fullscreen(p_evt: Event) {
+                $(".fullscreen").removeClass("ui-state-focus");
                 console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
                 var model: Model = this.m_model;
                 // this.m_handler.getFileIO().quickSave(model);
@@ -844,21 +852,21 @@ module Mareframe {
                 return [lowestElement, highestElement, leftmostElement, rightmostElement];
             }
             private createNewChance(p_evt: Event) {
-
+                $("#newChance").removeClass("ui-state-focus");
                 var elmt = this.m_model.createNewElement(0)
                 this.addElementToStage(elmt);
                 elmt.update();
                 this.updateMiniTables([elmt]);
             }
             private createNewDec(p_evt: Event) {
-
+                $("#newDec").removeClass("ui-state-focus");
                 var elmt = this.m_model.createNewElement(1)
                 this.addElementToStage(elmt);
                 elmt.update();
                 this.updateMiniTables([elmt]);
             }
             private createNewValue(p_evt: Event) {
-
+                $("#newValue").removeClass("ui-state-focus");
                 var elmt = this.m_model.createNewElement(2)
                 this.addElementToStage(elmt);
                 elmt.update();
@@ -872,6 +880,7 @@ module Mareframe {
                 this.updateMiniTables([elmt]);
             }
             public deleteSelected(p_evt: Event, selectedElmts?: Element[], selectedCon?: Connection[]) {
+                $("#deleteElmt").removeClass("ui-state-focus");
                 console.log("deleting");
                 if (selectedElmts) {
                     var elmts: any[] = selectedElmts;
@@ -1246,7 +1255,7 @@ module Mareframe {
                 select.setAttribute("id", "fromPointOfView");
                 fieldset.appendChild(select);
                 this.m_model.getElementArr().forEach(function (e) {
-                    if (e.getType() === 1) {
+                    if (e.getType() === 1 || e.isInformative()) {
                         var option = document.createElement("option");
                         option.setAttribute("selected", "selected");
                         option.setAttribute("value", e.getID());
@@ -1931,6 +1940,7 @@ module Mareframe {
                         else {//If it is a value node
                             $("#addDataRow_" + id).hide();
                         }
+                        //edit name
                         $("#info_name_" + id).dblclick(function () {
                             $("#submit_" + id).show();
                             $(this).addClass("editable");
@@ -1948,7 +1958,7 @@ module Mareframe {
                             });
 
                         });
-                        //    console.log("original value: " + originalDesc);
+                        //edit description
                         $("#description_div_" + id).dblclick(function () {
                             $("#submit_" + id).show();
                             //var originalValue = $(this).text();
@@ -2119,10 +2129,14 @@ module Mareframe {
                 //Remove header row with the title "Definition"
                 //newTable.splice(0, 1);
                 
-                if (elmt.getType() == 0 && !Tools.columnSumsAreValid(newTable, Tools.numOfHeaderRows(newTable))) {
-                    //Should also show which row is unvalid (maybe right after the user has changed the value)
-                    alert("The values in each column must add up to 1");
-                } else {
+                 if (Tools.dataContainsNegative(newTable)) {
+                    alert("Negative values are not allowed");
+                }
+                 else if (elmt.getType() == 0 && !Tools.columnSumsAreValid(newTable, Tools.numOfHeaderRows(newTable))) {
+                     //Should also show which row is unvalid (maybe right after the user has changed the value)
+                     alert("The values in each column must add up to 1");
+                 }
+                    else {
                     if (this.m_editorMode) {
                         //Delete the deleted states from the child elements
                         var rowsToDelete: any[] = $("#detailsDialog_" + id).data("deletedRows");
@@ -2390,13 +2404,13 @@ module Mareframe {
                             if (Tools.validConnection(element, outputElmt)) {
                                 this.drawElementSelected(outputElmt);
                             }
-                            else {/*
-                                ////console.log("illegal connection");
-                                //document.body.style.cursor = "not-allowed";
+                            else {
+                                //console.log("illegal connection");
+                                /*document.body.style.cursor = "not-allowed";
                                 var mouseText = document.createElement("div");
                                 mouseText.innerHTML = "Cannot create connection";
-                                mouseText.style.top = "" + (p_evt.stageY - 10);
-                                mouseText.style.left = "" + p_evt.stageX;
+                                mouseText.style.top =  (p_evt.stageY - 10) +"px";
+                                mouseText.style.left = p_evt.stageX+ "px";
                                 $("#MCAContainer").append(mouseText);*/
                             }
                         }
@@ -2483,7 +2497,8 @@ module Mareframe {
                     }
                 });
             }
-             resizeWindow(): void {
+            resizeWindow(): void {
+                $("#fitToModel").removeClass("ui-state-focus");
                 var maxX: number = 0; // Right edge
                 var maxY: number = 0; //Bottom edge
                 var x: number;
@@ -3170,7 +3185,11 @@ module Mareframe {
                 console.log("input changed");
                 var elementWithUnsavedChanges = gui.getElementWithUnsavedChanges();
                 console.log("elementWithUnsavedChanges: " + elementWithUnsavedChanges);
-                if (elementWithUnsavedChanges === null || elementWithUnsavedChanges === elmt) {
+                if (parseFloat(field.value) < 0) {
+                    field.value = $(field).data("originalValue");
+                    alert("Negative values are not allowed");
+                }
+                else if (elementWithUnsavedChanges === null || elementWithUnsavedChanges === elmt) {
                     var newText = field.value;
                     $("#valuesTable_div_" + id).hide();
                     $("#values_" + id).show();

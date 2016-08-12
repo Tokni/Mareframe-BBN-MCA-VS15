@@ -38,7 +38,9 @@ var Mareframe;
                     loadModel = "baltic";
                 }
                 else {
-                    loadModel = "resturant";
+                    //loadModel = "resturant";
+                    //loadModel = "happiness";
+                    loadModel = "investment";
                 }
                 console.log("using model: " + loadModel);
                 if (loadModel !== null) {

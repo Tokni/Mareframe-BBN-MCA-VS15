@@ -149,10 +149,6 @@ var Mareframe;
                 DST.Tools.calcValuesLikelihoodSampling(this, this.m_numOfIteraions);
                 // }
                 console.log("done updating with evidence");
-                this.m_elementArr.forEach(function (p_elmt) {
-                    DST.Tools.updateConcerningDecisions(p_elmt);
-                });
-                console.log("done updating concerning decisions");
             };
             Model.prototype.getIdent = function () {
                 return this.m_modelIdent;

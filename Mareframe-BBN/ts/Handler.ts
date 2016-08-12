@@ -53,9 +53,9 @@ module Mareframe {
                     //loadModel = "test";
                 }
                 else {//Tokni mode
-                    loadModel = "resturant";
+                    //loadModel = "resturant";
                     //loadModel = "happiness";
-                    //loadModel = "investment";
+                    loadModel = "investment";
                 }
 
                 console.log("using model: " + loadModel);

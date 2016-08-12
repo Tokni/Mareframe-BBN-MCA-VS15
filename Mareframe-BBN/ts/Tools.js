@@ -56,17 +56,26 @@ var Mareframe;
                     }
                 }
             }; //borrowed code
+            Tools.dataContainsNegative = function (p_data) {
+                for (var i = 1; i < p_data[p_data.length - 1].length; i++) {
+                    for (var j = Tools.numOfHeaderRows(p_data); j < p_data.length; j++) {
+                        if (parseFloat(p_data[j][i]) < 0) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            };
             Tools.columnSumsAreValid = function (data, numOfHeaderRows) {
-                console.log("Checking if sum is valid");
-                console.log("numOfHeaderRows: " + numOfHeaderRows);
-                console.log("data: " + data);
+                //console.log("Checking if sum is valid");
+                //console.log("numOfHeaderRows: " + numOfHeaderRows);
+                //console.log("data: " + data);
                 var sum = 0;
                 for (var i = 1; i < data[data.length - 1].length; i++) {
                     for (var j = numOfHeaderRows; j < data.length; j++) {
                         sum += parseFloat(data[j][i]);
-                        console.log("number: " + parseFloat(data[j][i]));
                     }
-                    console.log("sum: " + sum);
+                    //console.log("sum: " + sum);
                     if (sum < 0.999 || sum > 1.01) {
                         console.log("invalid sum");
                         return false;
@@ -570,6 +579,14 @@ var Mareframe;
                             headerRows = Tools.addNewHeaderRow(parent.getMainValues(), headerRows);
                         }
                     });
+                    p_elmt.getAllAncestors().forEach(function (ancestor) {
+                        ancestor.getParentElements().forEach(function (parent) {
+                            //If one of the ancestor has a influencing chance parent, this should be added too
+                            if (parent.getType() === 0 && parent.isInfluencing()) {
+                                headerRows = Tools.addNewHeaderRow(parent.getMainValues(), headerRows);
+                            }
+                        });
+                    });
                     p_elmt.setUpdated(true);
                 }
                 else if (p_elmt.getType() === 2 || p_elmt.getType() === 0) {
@@ -589,7 +606,7 @@ var Mareframe;
                                 }
                             });
                         }
-                        else if (ancestor.getType() === 1 && added.indexOf(ancestor.getID()) === -1) {
+                        else if (ancestor.getType() === 1 && ancestor.isInfluencing() && added.indexOf(ancestor.getID()) === -1) {
                             headerRows = Tools.addNewHeaderRow(ancestor.getMainValues(), headerRows);
                             added.push(ancestor.getID());
                         }
@@ -1531,6 +1548,11 @@ var Mareframe;
                         e.setUpdated(true);
                     }
                 });
+                //Update concerning decisions. It is important that this is done before decision values are calculated
+                p_model.getElementArr().forEach(function (p_elmt) {
+                    Tools.updateConcerningDecisions(p_elmt);
+                });
+                console.log("done updating concerning decisions");
                 p_model.getElementArr().forEach(function (e) {
                     if (!e.isUpdated()) {
                         //console.log("calculating for " + e.getName());

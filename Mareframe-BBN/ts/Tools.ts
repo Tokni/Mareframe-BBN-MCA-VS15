@@ -61,18 +61,28 @@
                     }
                 }
             }//borrowed code
-
+            static dataContainsNegative(p_data: any[]) {
+                for (var i = 1; i < p_data[p_data.length - 1].length; i++) {//For each column
+                    for (var j = Tools.numOfHeaderRows(p_data); j < p_data.length; j++) {//For each row
+                        if (parseFloat(p_data[j][i]) < 0) {
+                            return true;
+                        }
+                        //console.log("number: " + parseFloat(data[j][i]));
+                    }
+                }
+                return false;
+            }
             static columnSumsAreValid(data, numOfHeaderRows) {
-                console.log("Checking if sum is valid");
-                console.log("numOfHeaderRows: " + numOfHeaderRows);
-                console.log("data: " + data);
+                //console.log("Checking if sum is valid");
+                //console.log("numOfHeaderRows: " + numOfHeaderRows);
+                //console.log("data: " + data);
                 var sum = 0;
                 for (var i = 1; i < data[data.length - 1].length; i++) {//For each column
                     for (var j = numOfHeaderRows; j < data.length; j++) {//For each row
                         sum += parseFloat(data[j][i]);
-                        console.log("number: " + parseFloat(data[j][i]));
+                        //console.log("number: " + parseFloat(data[j][i]));
                     }
-                    console.log("sum: " + sum);
+                    //console.log("sum: " + sum);
                     if (sum < 0.999 || sum > 1.01) {
                         console.log("invalid sum");
                         return false;
@@ -599,6 +609,14 @@
                             headerRows = Tools.addNewHeaderRow(parent.getMainValues(), headerRows);
                         }
                     });
+                    p_elmt.getAllAncestors().forEach(function (ancestor: Element) {
+                        ancestor.getParentElements().forEach(function (parent: Element) {
+                            //If one of the ancestor has a influencing chance parent, this should be added too
+                            if (parent.getType() === 0 && parent.isInfluencing()) {
+                                headerRows = Tools.addNewHeaderRow(parent.getMainValues(), headerRows);
+                            }
+                        });
+                    });
                     p_elmt.setUpdated(true);
                 }
                 else if (p_elmt.getType() === 2 || p_elmt.getType() === 0) {//If this is a utility or chance node 
@@ -621,7 +639,7 @@
                                 }
                             });
                         }
-                        else if (ancestor.getType() === 1 && added.indexOf(ancestor.getID()) === -1) { //If ancestor is a decision
+                        else if (ancestor.getType() === 1 && ancestor.isInfluencing() && added.indexOf(ancestor.getID()) === -1) { //If ancestor is an influencing decision
                             headerRows = Tools.addNewHeaderRow(ancestor.getMainValues(), headerRows);
                             added.push(ancestor.getID());
                         }
@@ -1624,6 +1642,11 @@
                         e.setUpdated(true);
                     }
                 });
+                //Update concerning decisions. It is important that this is done before decision values are calculated
+                p_model.getElementArr().forEach(function (p_elmt: Element) {
+                    Tools.updateConcerningDecisions(p_elmt);
+                });
+                console.log("done updating concerning decisions");
                 p_model.getElementArr().forEach(function (e) {//This recalculates all values of decision elements
                     if (!e.isUpdated()) {
                         //console.log("calculating for " + e.getName());

@@ -64,6 +64,7 @@ var Mareframe;
                 };
                 this.setAutoUpdate = function (cb) {
                     //console.log(cb);
+                    $(".autoUpdate").removeClass("ui-state-focus");
                     this.m_model.setAutoUpdate(cb.currentTarget.checked);
                     if (cb.currentTarget.checked) {
                         $("#autoUpdateStatus").html("Updating automatically");
@@ -237,6 +238,7 @@ var Mareframe;
                     $("#updateMdl").hide();
                 }
                 $("#settings").show();
+                $("#modeStatus").hide();
                 this.m_mcaContainer.addChild(this.m_drawingCont);
             }
             GUIHandler.prototype.optionTypeChange = function (p_evt) {
@@ -267,6 +269,7 @@ var Mareframe;
                 //}
             };
             GUIHandler.prototype.cnctStatus = function (p_evt) {
+                $(".cnctTool").removeClass("ui-state-focus");
                 if ($("#cnctTool").prop("checked")) {
                     $("#modeStatus").html("Connect Mode");
                     document.body.style.cursor = "alias";
@@ -282,13 +285,15 @@ var Mareframe;
                 this.m_handler.getFileIO().loadModel($("#selectModel").val(), this.m_model, this.importStage);
             };
             GUIHandler.prototype.loadModel = function (p_evt) {
-                $("#selectModel").prop("selectedIndex", -1);
+                $("#lodDcmt").removeClass("ui-state-focus");
+                $("#selectModel").prop("selectedIndex", 0);
                 this.m_model.closeDown();
                 console.log("load model");
                 this.m_handler.getFileIO().loadfromGenie(this.m_model, this.importStage);
                 this.updateSize();
             };
             GUIHandler.prototype.saveModel = function (p_evt) {
+                $("#savDcmt").removeClass("ui-state-focus");
                 $("#saveFile_div").show();
                 this.m_handler.getFileIO().saveModel(this.m_model);
             };
@@ -304,6 +309,7 @@ var Mareframe;
                 document.getElementsByTagName("body")[0].style.cursor = "progress";
             };
             GUIHandler.prototype.updateModel = function () {
+                $("#updateMdl").removeClass("ui-state-focus");
                 //console.log("model: " + this.m_model.getName());
                 this.m_model.update();
                 this.updateMiniTables(this.m_model.getElementArr());
@@ -333,6 +339,8 @@ var Mareframe;
                 this.m_mcaStageCanvas.width += p_x;
             };
             GUIHandler.prototype.newDcmt = function () {
+                $("#newDcmt").removeClass("ui-state-focus");
+                $("#selectModel").prop("selectedIndex", 0);
                 console.log("new document clicked");
                 this.m_model = this.m_handler.addNewModel();
                 this.importStage();
@@ -583,7 +591,7 @@ var Mareframe;
                     //console.log("clicked a decision");
                     //console.log(p_evt);
                     var elmt = this.m_model.getElement(p_evt.currentTarget.name);
-                    this.m_model.setDecision(elmt, Math.floor(p_evt.localY / 12) - DST.Tools.numOfHeaderRows(elmt.getValues(), elmt));
+                    this.m_model.setDecision(elmt, Math.floor(p_evt.localY / 12) /*- Tools.numOfHeaderRows(elmt.getValues(), elmt)*/);
                     if (this.m_model.getAutoUpdate()) {
                         this.updateModel();
                     }
@@ -602,6 +610,7 @@ var Mareframe;
                 }
             };
             GUIHandler.prototype.updateEditorMode = function () {
+                $(".editorMode").removeClass("ui-state-focus");
                 console.log("updating editormode");
                 var mareframe = this;
                 if (this.m_editorMode) {
@@ -696,6 +705,7 @@ var Mareframe;
                 }
             };
             GUIHandler.prototype.fullscreen = function (p_evt) {
+                $(".fullscreen").removeClass("ui-state-focus");
                 console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
                 var model = this.m_model;
                 // this.m_handler.getFileIO().quickSave(model);
@@ -818,18 +828,21 @@ var Mareframe;
                 return [lowestElement, highestElement, leftmostElement, rightmostElement];
             };
             GUIHandler.prototype.createNewChance = function (p_evt) {
+                $("#newChance").removeClass("ui-state-focus");
                 var elmt = this.m_model.createNewElement(0);
                 this.addElementToStage(elmt);
                 elmt.update();
                 this.updateMiniTables([elmt]);
             };
             GUIHandler.prototype.createNewDec = function (p_evt) {
+                $("#newDec").removeClass("ui-state-focus");
                 var elmt = this.m_model.createNewElement(1);
                 this.addElementToStage(elmt);
                 elmt.update();
                 this.updateMiniTables([elmt]);
             };
             GUIHandler.prototype.createNewValue = function (p_evt) {
+                $("#newValue").removeClass("ui-state-focus");
                 var elmt = this.m_model.createNewElement(2);
                 this.addElementToStage(elmt);
                 elmt.update();
@@ -842,6 +855,7 @@ var Mareframe;
                 this.updateMiniTables([elmt]);
             };
             GUIHandler.prototype.deleteSelected = function (p_evt, selectedElmts, selectedCon) {
+                $("#deleteElmt").removeClass("ui-state-focus");
                 console.log("deleting");
                 if (selectedElmts) {
                     var elmts = selectedElmts;
@@ -1193,7 +1207,7 @@ var Mareframe;
                 select.setAttribute("id", "fromPointOfView");
                 fieldset.appendChild(select);
                 this.m_model.getElementArr().forEach(function (e) {
-                    if (e.getType() === 1) {
+                    if (e.getType() === 1 || e.isInformative()) {
                         var option = document.createElement("option");
                         option.setAttribute("selected", "selected");
                         option.setAttribute("value", e.getID());
@@ -1785,6 +1799,7 @@ var Mareframe;
                         else {
                             $("#addDataRow_" + id).hide();
                         }
+                        //edit name
                         $("#info_name_" + id).dblclick(function () {
                             $("#submit_" + id).show();
                             $(this).addClass("editable");
@@ -1801,7 +1816,7 @@ var Mareframe;
                                 originalName = mareframeGUI.updateValue(p_elmt, $("#info_name_" + id), $(this), originalName, newText);
                             });
                         });
-                        //    console.log("original value: " + originalDesc);
+                        //edit description
                         $("#description_div_" + id).dblclick(function () {
                             $("#submit_" + id).show();
                             //var originalValue = $(this).text();
@@ -1962,7 +1977,10 @@ var Mareframe;
                 console.log("new table: " + newTable);
                 //Remove header row with the title "Definition"
                 //newTable.splice(0, 1);
-                if (elmt.getType() == 0 && !DST.Tools.columnSumsAreValid(newTable, DST.Tools.numOfHeaderRows(newTable))) {
+                if (DST.Tools.dataContainsNegative(newTable)) {
+                    alert("Negative values are not allowed");
+                }
+                else if (elmt.getType() == 0 && !DST.Tools.columnSumsAreValid(newTable, DST.Tools.numOfHeaderRows(newTable))) {
                     //Should also show which row is unvalid (maybe right after the user has changed the value)
                     alert("The values in each column must add up to 1");
                 }
@@ -2278,6 +2296,7 @@ var Mareframe;
                 });
             };
             GUIHandler.prototype.resizeWindow = function () {
+                $("#fitToModel").removeClass("ui-state-focus");
                 var maxX = 0; // Right edge
                 var maxY = 0; //Bottom edge
                 var x;
@@ -2920,7 +2939,11 @@ var Mareframe;
                 console.log("input changed");
                 var elementWithUnsavedChanges = gui.getElementWithUnsavedChanges();
                 console.log("elementWithUnsavedChanges: " + elementWithUnsavedChanges);
-                if (elementWithUnsavedChanges === null || elementWithUnsavedChanges === elmt) {
+                if (parseFloat(field.value) < 0) {
+                    field.value = $(field).data("originalValue");
+                    alert("Negative values are not allowed");
+                }
+                else if (elementWithUnsavedChanges === null || elementWithUnsavedChanges === elmt) {
                     var newText = field.value;
                     $("#valuesTable_div_" + id).hide();
                     $("#values_" + id).show();

@@ -162,10 +162,7 @@
                 Tools.calcValuesLikelihoodSampling(this, this.m_numOfIteraions);
                // }
                     console.log("done updating with evidence");
-                this.m_elementArr.forEach(function (p_elmt: Element) {
-                    Tools.updateConcerningDecisions(p_elmt);
-                    });
-                console.log("done updating concerning decisions");
+                
             }
             getIdent(): string {
                 return this.m_modelIdent;
