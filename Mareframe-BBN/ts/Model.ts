@@ -1,7 +1,7 @@
 ﻿module Mareframe {
     export module DST {
         export class Model {
-            private m_numOfIteraions:number = 100;
+            private m_numOfIteraions:number = 10000;
             public m_bbnMode: boolean = false;
             private m_modelIdent: string = "temp";
             private m_elmtCounter: number = 0;

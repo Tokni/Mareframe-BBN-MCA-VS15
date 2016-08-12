@@ -4,7 +4,7 @@ var Mareframe;
     (function (DST) {
         var Model = (function () {
             function Model(p_bbnMode) {
-                this.m_numOfIteraions = 100;
+                this.m_numOfIteraions = 10000;
                 this.m_bbnMode = false;
                 this.m_modelIdent = "temp";
                 this.m_elmtCounter = 0;
