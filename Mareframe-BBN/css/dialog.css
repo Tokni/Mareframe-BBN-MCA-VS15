@@ -58,3 +58,26 @@ input {
 td {
 min-width:50px
 }
+.buttonFooter {
+    display : table-row;
+    vertical-align : bottom;
+    height : 1px;
+    bottom: 0;
+    position: absolute;
+}
+.dialogDiv {
+    position: absolute;
+}
+.voiMainTable {
+    width: 100%;
+    height: 100%;
+}
+.voicell {
+    padding-right: 70px;
+}
+#voiTable {
+    margin-bottom: 10px;
+}
+.mainVOIDiv {
+    overflow: hidden;
+} 

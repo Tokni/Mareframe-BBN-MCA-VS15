@@ -4,7 +4,7 @@ var Mareframe;
     (function (DST) {
         var Model = (function () {
             function Model(p_bbnMode) {
-                this.m_numOfIteraions = 1000;
+                this.m_numOfIteraions = 100;
                 this.m_bbnMode = false;
                 this.m_modelIdent = "temp";
                 this.m_elmtCounter = 0;
@@ -68,6 +68,14 @@ var Mareframe;
                             for (var i = 0; i < elmt.getData().length; i++) {
                                 dataStream += '<state id="' + elmt.getData(i) + '" />\n';
                             }
+                            //For some reason this is causing an infinite loop when uploading
+                            /*if (elmt.getParentElements().length > 0) {
+                                dataStream += '<parents>'
+                                elmt.getParentElements().forEach(function (parElmt) {
+                                    dataStream += parElmt.getID() + ' ';
+                                });
+                                dataStream = dataStream.slice(0, dataStream.length-1) + '</parents>\n';
+                            }*/
                             dataStream += '</decision>\n';
                             break;
                         case 2:
@@ -476,6 +484,10 @@ var Mareframe;
                         inputElmt.getAllAncestors().forEach(function (e) {
                             e.setUpdated(false);
                         });
+                        inputElmt.getAllDescendants().forEach(function (e) {
+                            //console.log("descendant: " + e.getName());
+                            e.setUpdated(false);
+                        });
                     }
                     //Delete connection from the elements
                     inputElmt.deleteConnection(p_connID);
@@ -564,8 +576,11 @@ var Mareframe;
                 console.log("finnished loading from json");
             };
             Model.prototype.createNewConnection = function (p_inputElmt, p_outputElmt) {
-                var c = new DST.Connection(p_inputElmt, p_outputElmt, "conn" + this.m_ConnCounter, this.m_bbnMode);
-                this.m_ConnCounter++;
+                do {
+                    var id = "conn" + this.m_ConnCounter;
+                    this.m_ConnCounter++;
+                } while (this.getConnection(id) != undefined);
+                var c = new DST.Connection(p_inputElmt, p_outputElmt, id, this.m_bbnMode);
                 return c;
             };
             Model.prototype.setDecision = function (p_elmt, p_decisNumb) {

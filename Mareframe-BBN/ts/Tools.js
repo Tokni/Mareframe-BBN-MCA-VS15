@@ -573,27 +573,17 @@ var Mareframe;
                     p_elmt.setUpdated(true);
                 }
                 else if (p_elmt.getType() === 2 || p_elmt.getType() === 0) {
-                    p_elmt.getAllInfluencingAncestors().forEach(function (ancestor) {
-                        if (ancestor.getType() === 0) {
-                            var isInformative = false;
-                            ancestor.getChildrenElements().forEach(function (child) {
-                                if (child.getType() === 1) {
-                                    isInformative = true;
-                                }
-                            });
-                            if (isInformative && added.indexOf(ancestor.getID()) === -1) {
+                    p_elmt.getAllAncestors().forEach(function (ancestor) {
+                        if (ancestor.getType() === 0 &&
+                            ancestor.isInfluencing()) {
+                            if (ancestor.isInformative() &&
+                                added.indexOf(ancestor.getID()) === -1) {
                                 added.push(ancestor.getID());
                                 headerRows = Tools.addNewHeaderRow(ancestor.getMainValues(), headerRows);
                             }
                             //If ancestor has an informative decsendant this should be added too
                             ancestor.getAllDescendants().forEach(function (descendant) {
-                                var isInformative = false;
-                                descendant.getChildrenElements().forEach(function (child) {
-                                    if (child.getType() === 1) {
-                                        isInformative = true;
-                                    }
-                                });
-                                if (isInformative && added.indexOf(descendant.getID()) === -1 && descendant.getID() !== p_elmt.getID()) {
+                                if (descendant.isInformative() && added.indexOf(descendant.getID()) === -1 && descendant.getID() !== p_elmt.getID()) {
                                     added.push(descendant.getID());
                                     headerRows = Tools.addNewHeaderRow(descendant.getMainValues(), headerRows);
                                 }
@@ -884,7 +874,7 @@ var Mareframe;
                 }
                 //Put headers and matrix back together
                 valueMatrix.unshift(["value"]);
-                if (valueHeaders[0].length > 0) {
+                if (valueHeaders.length > 0 && valueHeaders[0].length > 0) {
                     valueHeaders.push(math.flatten(valueMatrix));
                 }
                 else {
@@ -1390,15 +1380,27 @@ var Mareframe;
                 var matrix2 = Tools.getMatrixWithoutHeader(tempDecision.getValues()).slice();
                 //Subtract the two saved matrices
                 var resultMatrix = math.subtract(matrix2, matrix1);
+                //Find average between the two rows
+                var newResult = [];
+                for (var i = 0; i < Tools.numOfHeaderRows(resultMatrix); i++) {
+                    newResult.push(resultMatrix[i]);
+                }
+                newResult.push([]);
+                var numOfRows = resultMatrix.length;
+                for (var i = 0; i < resultMatrix[0].length; i++) {
+                    var val1 = resultMatrix[numOfRows - 2][i];
+                    var val2 = resultMatrix[numOfRows - 1][i];
+                    var average = (val1 + val2) / 2;
+                    newResult[newResult.length - 1].push(Tools.round(average));
+                }
                 //Delete temporary elements and connections
-                debugger;
                 p_gui.deleteSelected(new Event("click"), [tempDecision], tempConnections); //The event is empyt and not used
                 p_gui.updateModel();
                 if (isPossible) {
-                    return resultMatrix;
+                    return newResult;
                 }
                 else {
-                    return [[0], [0]];
+                    return [[0]];
                 }
             };
             Tools.calcValuesLikelihoodSampling = function (p_model, p_numOfIterations) {

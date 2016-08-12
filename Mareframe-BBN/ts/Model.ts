@@ -1,7 +1,7 @@
 ﻿module Mareframe {
     export module DST {
         export class Model {
-            private m_numOfIteraions:number = 1000;
+            private m_numOfIteraions:number = 100;
             public m_bbnMode: boolean = false;
             private m_modelIdent: string = "temp";
             private m_elmtCounter: number = 0;
@@ -72,12 +72,21 @@
                             for (var i = 0; i < elmt.getData().length; i++) {
                                 dataStream += '<state id="' + elmt.getData(i) + '" />\n';
                             }
+                            //For some reason this is causing an infinite loop when uploading
+                            /*if (elmt.getParentElements().length > 0) {
+                                dataStream += '<parents>'
+                                elmt.getParentElements().forEach(function (parElmt) {
+                                    dataStream += parElmt.getID() + ' ';
+                                });
+                                dataStream = dataStream.slice(0, dataStream.length-1) + '</parents>\n';
+                            }*/
                             dataStream += '</decision>\n';
                             break;
                         case 2:
                             dataStream += '<utility id="' + elmt.getID() + '">\n';
                             if (elmt.getParentElements().length > 0) {
                                 dataStream += '<parents>'
+
                                 elmt.getParentElements().forEach(function (parElmt) {
                                     dataStream = dataStream.substring(0, dataStream.lastIndexOf(">") + 1) + parElmt.getID() + ' ' + dataStream.substring(dataStream.lastIndexOf(">") + 1);
                                 });
@@ -523,6 +532,10 @@
                         inputElmt.getAllAncestors().forEach(function (e) {
                             e.setUpdated(false);
                         });
+                        inputElmt.getAllDescendants().forEach(function (e) {
+                            //console.log("descendant: " + e.getName());
+                            e.setUpdated(false);
+                        });
                     }
                     //Delete connection from the elements
                     inputElmt.deleteConnection(p_connID);
@@ -625,11 +638,13 @@
             }
 
             createNewConnection(p_inputElmt: Element, p_outputElmt: Element): Connection {
-                var c = new Connection(p_inputElmt, p_outputElmt, "conn" + this.m_ConnCounter,this.m_bbnMode);
-                this.m_ConnCounter++;
+                do {
+                    var id: string = "conn" + this.m_ConnCounter;
+                    this.m_ConnCounter++;
+                }
+                while (this.getConnection(id) != undefined)
+                var c = new Connection(p_inputElmt, p_outputElmt, id,this.m_bbnMode);
                 return c;
-
-
             }
 
             setDecision(p_elmt: Element, p_decisNumb: number): void {

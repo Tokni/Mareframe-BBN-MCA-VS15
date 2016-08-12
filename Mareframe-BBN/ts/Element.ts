@@ -163,26 +163,7 @@
                 return ancestors;
             }
 
-            getAllInfluencingAncestors(): Element[] {
-                var ancestors: Element[] = [];
-                var parents: Element[] = this.getParentElements();
-                if (parents.length === 0) {
-                    return ancestors;
-                }
-                else if (this.getType() === 1) {
-                    //If this is a decision we should only check one more level and only add chance nodes
-                }
-                else {
-                    parents.forEach(function (e) {
-                        if (ancestors.indexOf(e) === -1) {
-                            //   console.log("pushing " + e.getName());
-                            ancestors.push(e);
-                            ancestors = ancestors.concat(e.getAllInfluencingAncestors());
-                        }
-                    });
-                }
-                return ancestors;
-            }
+            
 
             isInfluencing(): boolean {//An element is influencing if it has a utility descendant
                 var descendants: Element[] = this.getAllDescendants();
@@ -193,6 +174,17 @@
                     }
                 }
                 return false;
+            }
+            isInformative(): boolean {//An element is informative if it has a decision child {
+                var informative: boolean = false;
+                if (this.getType() === 0) {//Only chance nodes can be informative
+                    this.getChildrenElements().forEach(function (e) {
+                        if (e.getType() === 1) {
+                            informative = true;
+                        }
+                    });
+                }
+                return informative;
             }
 
             getAllDecisionAncestors(): Element[] {
@@ -212,6 +204,7 @@
             getAllDescendants(): Element[] {
                 //console.log("get all decendants for " + this.getName());
                 var descendants: Element[] = [];
+                var elmt: Element = this;
                 var children: Element[] = this.getChildrenElements();
                 if (children.length === 0) {
                     //   console.log("returned: " + decendants);
@@ -219,7 +212,9 @@
                 }
                 else {
                     children.forEach(function (e) {
-                        if (descendants.indexOf(e) === -1) {
+                        //If this element is a chance and the child is a decision, the decision is not a real descendant
+                        if (descendants.indexOf(e) === -1 && (elmt.getType() !== 0 || e.getType() !== 1)) {
+                            
                             //   console.log("pushing " + e.getName());
                             descendants.push(e);
                             descendants = descendants.concat(e.getAllDescendants());
@@ -276,11 +271,13 @@
 
                 }
                 else {
-                    for (var i = 0; i < parents.length; i++) {
-                        var elmt: Element = parents[i];
-                        //console.log("Parent: " + elmt.getName());
-                        data = Tools.addNewHeaderRow(elmt.getMainValues(), data);
-                        // console.log(data);
+                    if (this.m_type !== 1) {//Decision elements should not have header rows
+                        for (var i = 0; i < parents.length; i++) {
+                            var elmt: Element = parents[i];
+                            //console.log("Parent: " + elmt.getName());
+                            data = Tools.addNewHeaderRow(elmt.getMainValues(), data);
+                            // console.log(data);
+                        }
                     }
                     //console.log("number of header rows : " + Tools.numOfHeaderRows(this.m_data));
                     //Add original values to the table

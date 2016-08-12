@@ -152,25 +152,6 @@ var Mareframe;
                 }
                 return ancestors;
             };
-            Element.prototype.getAllInfluencingAncestors = function () {
-                var ancestors = [];
-                var parents = this.getParentElements();
-                if (parents.length === 0) {
-                    return ancestors;
-                }
-                else if (this.getType() === 1) {
-                }
-                else {
-                    parents.forEach(function (e) {
-                        if (ancestors.indexOf(e) === -1) {
-                            //   console.log("pushing " + e.getName());
-                            ancestors.push(e);
-                            ancestors = ancestors.concat(e.getAllInfluencingAncestors());
-                        }
-                    });
-                }
-                return ancestors;
-            };
             Element.prototype.isInfluencing = function () {
                 var descendants = this.getAllDescendants();
                 for (var i = 0; i < descendants.length; i++) {
@@ -180,6 +161,17 @@ var Mareframe;
                     }
                 }
                 return false;
+            };
+            Element.prototype.isInformative = function () {
+                var informative = false;
+                if (this.getType() === 0) {
+                    this.getChildrenElements().forEach(function (e) {
+                        if (e.getType() === 1) {
+                            informative = true;
+                        }
+                    });
+                }
+                return informative;
             };
             Element.prototype.getAllDecisionAncestors = function () {
                 var decisions = [];
@@ -197,6 +189,7 @@ var Mareframe;
             Element.prototype.getAllDescendants = function () {
                 //console.log("get all decendants for " + this.getName());
                 var descendants = [];
+                var elmt = this;
                 var children = this.getChildrenElements();
                 if (children.length === 0) {
                     //   console.log("returned: " + decendants);
@@ -204,7 +197,8 @@ var Mareframe;
                 }
                 else {
                     children.forEach(function (e) {
-                        if (descendants.indexOf(e) === -1) {
+                        //If this element is a chance and the child is a decision, the decision is not a real descendant
+                        if (descendants.indexOf(e) === -1 && (elmt.getType() !== 0 || e.getType() !== 1)) {
                             //   console.log("pushing " + e.getName());
                             descendants.push(e);
                             descendants = descendants.concat(e.getAllDescendants());
@@ -255,10 +249,12 @@ var Mareframe;
                     }
                 }
                 else {
-                    for (var i = 0; i < parents.length; i++) {
-                        var elmt = parents[i];
-                        //console.log("Parent: " + elmt.getName());
-                        data = DST.Tools.addNewHeaderRow(elmt.getMainValues(), data);
+                    if (this.m_type !== 1) {
+                        for (var i = 0; i < parents.length; i++) {
+                            var elmt = parents[i];
+                            //console.log("Parent: " + elmt.getName());
+                            data = DST.Tools.addNewHeaderRow(elmt.getMainValues(), data);
+                        }
                     }
                     //console.log("number of header rows : " + Tools.numOfHeaderRows(this.m_data));
                     //Add original values to the table

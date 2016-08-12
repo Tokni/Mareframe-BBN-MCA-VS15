@@ -602,30 +602,20 @@
                     p_elmt.setUpdated(true);
                 }
                 else if (p_elmt.getType() === 2 || p_elmt.getType() === 0) {//If this is a utility or chance node 
-                    p_elmt.getAllInfluencingAncestors().forEach(function (ancestor: Element) {
+                    p_elmt.getAllAncestors().forEach(function (ancestor: Element) {
                       
-                        if (ancestor.getType() === 0) {//If ancestor is a chance node
-                            var isInformative: boolean = false;
-                            ancestor.getChildrenElements().forEach(function (child) {
+                        if (ancestor.getType() === 0 &&//If ancestor is chance
+                            ancestor.isInfluencing()) {//If ancestor is influencing
 
-                                if (child.getType() === 1) {//If a chance has a decision child it is informative
-                                    isInformative = true;
-                                }
-                            });
-                            if (isInformative && added.indexOf(ancestor.getID()) === -1) {
+                            if (ancestor.isInformative() &&//If ancestor is informative
+                                added.indexOf(ancestor.getID()) === -1) {//If ancestor has not been added
                                 added.push(ancestor.getID());
                                 headerRows = Tools.addNewHeaderRow(ancestor.getMainValues(), headerRows);
                             }
                             //If ancestor has an informative decsendant this should be added too
                             ancestor.getAllDescendants().forEach(function (descendant: Element) {
-                                var isInformative: boolean = false;
-                                descendant.getChildrenElements().forEach(function (child) {
-
-                                    if (child.getType() === 1) {//If a chance has a descendant child it is informative
-                                        isInformative = true;
-                                    }
-                                });
-                                if (isInformative && added.indexOf(descendant.getID()) === -1 && descendant.getID() !== p_elmt.getID()) {
+                                
+                                if (descendant.isInformative() && added.indexOf(descendant.getID()) === -1 && descendant.getID() !== p_elmt.getID()) {
                                     added.push(descendant.getID());
                                     headerRows = Tools.addNewHeaderRow(descendant.getMainValues(), headerRows);
                                 }
@@ -920,7 +910,7 @@
                 }
                 //Put headers and matrix back together
                 valueMatrix.unshift(["value"]);
-                if (valueHeaders[0].length > 0) {
+                if (valueHeaders.length > 0 && valueHeaders[0].length > 0) {
                     valueHeaders.push(math.flatten(valueMatrix));
                 }
                 else {
@@ -1402,8 +1392,8 @@
             }
 
             static valueOfInformation(p_model: Model, p_pov: Element, p_forDec: Element, p_chanceElmts: Element[], p_gui: GUIHandler): any[] {
-               
-                console.log("value of information. POV: "+ p_pov.getName() +" for dec: " + p_forDec.getName()+ " chancenodes: "+ p_chanceElmts.length);
+
+                console.log("value of information. POV: " + p_pov.getName() + " for dec: " + p_forDec.getName() + " chancenodes: " + p_chanceElmts.length);
                 var tempConnections: Connection[] = [];
                 var isPossible: boolean = true;
                 //Create temporary decision
@@ -1439,7 +1429,7 @@
                             e.setUpdated(false);
                         });
                         utilityFound = true;
-                    break;
+                        break;
                     }
                 }
                 if (!utilityFound) {
@@ -1456,7 +1446,7 @@
                         isPossible = false;
                     }
                     else {
-                    tempConnections.push(c);
+                        tempConnections.push(c);
                     }
                     p_forDec.setUpdated(false);
                     p_forDec.getAllDescendants().forEach(function (e) {
@@ -1471,16 +1461,28 @@
                 p_model.update();
                 var matrix2 = Tools.getMatrixWithoutHeader(tempDecision.getValues()).slice();
                 //Subtract the two saved matrices
-                var resultMatrix = math.subtract(matrix2, matrix1);
+                var resultMatrix:any[] = math.subtract(matrix2, matrix1);
+                //Find average between the two rows
+                var newResult = [];
+                for (var i = 0; i < Tools.numOfHeaderRows(resultMatrix); i++) {
+                    newResult.push(resultMatrix[i]);
+                }
+                newResult.push([]);
+                var numOfRows: number = resultMatrix.length;
+                for (var i = 0; i < resultMatrix[0].length; i++) {
+                    var val1: number = resultMatrix[numOfRows - 2][i];
+                    var val2: number = resultMatrix[numOfRows - 1][i];
+                    var average: number = (val1+val2) / 2;
+                    newResult[newResult.length - 1].push(Tools.round(average));
+                }
                 //Delete temporary elements and connections
-                debugger
                 p_gui.deleteSelected(new Event("click"), [tempDecision], tempConnections);//The event is empyt and not used
                 p_gui.updateModel();
                 if (isPossible) {
-                    return resultMatrix;
+                    return newResult;
                 }
                 else {
-                    return [[0],[0]];
+                    return [[0]];
                 }
             }
             static calcValuesLikelihoodSampling(p_model: Model, p_numOfIterations: number) {

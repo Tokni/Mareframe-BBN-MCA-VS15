@@ -619,6 +619,7 @@ module Mareframe {
                     $(".button").show();
                     $("#lodDcmtDiv").hide();
                     $("#cnctTool").prop("checked", false);
+                    document.body.style.cursor = "default";
                     if (!this.m_model.getAutoUpdate()) {
                         $("#updateMdl").show();
                     }
@@ -1147,21 +1148,39 @@ module Mareframe {
                 var voi = $(voiID).dialog(opt);
                 var opt = {
                     title: "Value of Information",
-                    width: 800,
-                    height: 800
                 }
+                voi.dialog({
+                    width: 500,
+                    height: 500
+                });
+                this.disableButtons(true);
+                var gui: GUIHandler = this;
+                $(voiID).on('dialogclose', function (event) {
+                    gui.disableButtons(false);
+                });
             }
             private createVOIDialog(): String {
-                var dialog = document.createElement("div");
-                dialog.setAttribute("id", "voiDialog");
-                var table: HTMLTableElement = document.createElement("table");
-                dialog.appendChild(table);
-                var mainRow = table.insertRow();
-                var resultRow = table.insertRow();
-                var buttonRow = table.insertRow();
-                var cell = mainRow.insertCell();
+                if (!$("#voiDialog").length) {
+                    var dialog = document.createElement("div");
+                    dialog.classList.add("dialogDiv");
+                    dialog.setAttribute("id", "voiDialog");
+                    $('body').append(dialog);
+                }
+                else {
+                    var dialog = <HTMLDivElement>document.getElementById("voiDialog");
+                    $("#voiDialog").empty();
+                }
+                var mainDiv = document.createElement("div");
+                mainDiv.classList.add("mainVOIDiv");
+                var div = document.createElement("div");
+                mainDiv.appendChild(div);
                 var fieldset = document.createElement("fieldset");
-                cell.appendChild(fieldset);
+                div.appendChild(fieldset);
+                div.style.cssFloat = "left";
+                div.classList.add("voiDiv");
+                dialog.appendChild(mainDiv);
+                fieldset.classList.add("voicell");
+                fieldset.style.padding = "15px";
                 var legend = document.createElement("legend");
                 fieldset.appendChild(legend);
                 legend.innerHTML = "Of Chance nodes:";
@@ -1184,9 +1203,11 @@ module Mareframe {
                         cell.appendChild(label);
                     }
                 });
-
+                var div = document.createElement("div");
+                div.style.padding = "15px";
+                mainDiv.appendChild(div);
                 var table: HTMLTableElement = document.createElement("table");
-                mainRow.appendChild(table);
+                div.appendChild(table);
                 //Create dropdown for decision nodes
                 var row = table.insertRow();
                 var cell = row.insertCell();
@@ -1233,26 +1254,38 @@ module Mareframe {
                         select.appendChild(option);
                     }
                 });
-                
+
                 //Result table
-                var cell = resultRow.insertCell();
+                var div = document.createElement("div");
+                dialog.appendChild(div);
+                div.setAttribute("id", "voiTable");
+                var table: HTMLTableElement = document.createElement("table");
+                div.appendChild(table);
+                table.classList.add("defTable_div");
+                var row = table.insertRow();
+                var th = document.createElement("th");
+                row.appendChild(th);
+                th.innerHTML = "Result";
+                row = table.insertRow();
+                var cell = row.insertCell();
                 var div = document.createElement("div");
                 cell.appendChild(div);
-                div.setAttribute("id", "voiTable");
-                div.innerHTML = "Result Table";
+                div.innerHTML = 'Click "Value of Information" to calculate';
 
                 //Update button
-                var cell = buttonRow.insertCell();
+                var buttonDiv = document.createElement("div");
+                buttonDiv.style.padding = "10px";
+                dialog.appendChild(buttonDiv);
                 var button = document.createElement("button");
-                cell.appendChild(button);
+                buttonDiv.appendChild(button);
+                buttonDiv.classList.add("buttonFooter");
                 button.setAttribute("id", "voiButton");
                 button.innerHTML = "Value of Information";
                 button.setAttribute("title", "Click to show the value of information for the selected nodes");
 
-                $('body').append(dialog);
+                
 
                 $("#voiButton").click(this.updateVOI)
-               
 
                 return "voiDialog";
             }
@@ -1270,6 +1303,11 @@ module Mareframe {
                 var resultMatrix = Tools.valueOfInformation(this.m_model, pov, forDec, chanceElmts, this);
                 $("#voiTable").empty();//First remove the previous table
                 var table: HTMLTableElement = document.createElement("table");
+                table.classList.add("defTable_div");
+                var row = table.insertRow();
+                var th = document.createElement("th");
+                row.appendChild(th);
+                th.innerHTML = "Result";
                 for (var i = 0; i < resultMatrix.length; i++) {
                     var row = table.insertRow();
                     for (var j = 0; j < resultMatrix[0].length; j++) {
