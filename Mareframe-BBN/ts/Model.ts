@@ -12,7 +12,7 @@
             private m_dataMatrix: any[][] = [];
             private m_mainObjective: Element;
             //private m_autoUpdate: boolean = false;
-            private m_altIndex: any[] = [];
+            public m_altIndex: any[] = [];
 
             private m_autoUpdate: boolean = true; //auto update is on by default
             constructor(p_bbnMode: boolean) {
@@ -218,19 +218,32 @@
             setDataMatrix(p_matrix: any[][]): void {
                 this.m_dataMatrix = p_matrix;
             }
-            getScore2(p_element: Element, p_criteria: number): number[][] {
-                var retMatrix: any[] = [];
-                if (p_criteria >= 0) {
-                    for (var c of p_element.getChildrenElements()) {
-                        retMatrix.push(this.getScore2(c, p_criteria - 1));
+            getScore2(p_element: Element, p_weight: number, p_criteria?: number): any[][] {
+                var retMatrix: any[][] = [];
+                
+                var w = Tools.getWeights(p_element, this, undefined, undefined, undefined, p_element.m_criteriaLevel + 1);
+                if (p_element.getChildrenElements().length !== 0 && p_criteria > 0) {
+                    var index = 0;
+                    for (var c in p_element.getChildrenElements()) {
+                        var score = this.getScore2(p_element.getChildrenElements()[c], w[index++][1] * p_weight, p_criteria  - 1);                       
+                        for (var s in score) {
+                                retMatrix.push(score[s]);
+                        }
                     }
                 }
                 else {
-                    for (var c of p_element.getChildrenElements()) {
-                        retMatrix.push(this.getScore2(c, -1));
+                    retMatrix[0] = [];
+                    retMatrix[0][0] = p_element.getName();
+                    retMatrix[0] = retMatrix[0].concat(p_element.getScore());
+                    
+                    for (var r in retMatrix[0]) {
+                        if (r != '0')
+                            retMatrix[0][parseInt(r)] *= p_weight;
                     }
+                    //console.log("weight: " + p_weight + "  " + "weighted score: " + retMatrix);
                 }
-
+                
+                
                 return retMatrix;
             }
             getScore(p_element: Element, p_criteria?: number, p_element1Replace?: Element, p_element2Replace?: Element, p_elementIgnoreValue?: number): number[][] {
@@ -258,20 +271,28 @@
                             }
                         }
                     }
+                    for (var j = 0; j < tempMatrix.length - 2; j++) {
+                        retMatrix[j] = [];
+                        
+                    }
+                    retMatrix[0][0] = "xx";
+
+                    
                     for (var i = 0; i < weightsArr.length; i++) {
-                        retMatrix[0] = [];
-                        retMatrix[1] = [];
-                        retMatrix[2] = [];
-                        //retMatrix[i][j] = 1;
-                        //var tmp = tempMatrix[0][i + 1];
+                        
+                        for (var j = 1; j < 3; j++) {
+                            retMatrix[j][0] = "r00";
+                            retMatrix[j][i+1] = 0;
+                        }
+                       
                         var index = 0;
                         retMatrix[0][i+1] = weightsArr[i][0];
-                        var elmt = this.getElement(tempMatrix[0][i+1]); // alternative element
-                        var tmep = weightsArr[0][i];
+                        //var elmt = this.getElement(tempMatrix[0][i+1]); // alternative element
+                        var elmt = this.getElement(weightsArr[i][0]);
                         
                         for (var j = 3; j < tempMatrix.length - 2; j++) {
                             if (elmt.m_disregard == false) {
-                                retMatrix[j] = [];
+                                //retMatrix[j] = [];
                                 retMatrix[j][0] = tempMatrix[j][0];
                                 //var tmp5 = tempMatrix[j][i + 1];
                                 //var tmp6 = elmt.getPwlVF().getValue(tempMatrix[j][i + 1]);
@@ -310,27 +331,38 @@
                                     }
                                 }
                                 else {
-                                    if (elmt.getMethod() == 1) {
-                                        var total = 0;
-                                        for (var k = 0; k < elmt.m_swingWeightsArr.length; k++) {
-                                            total += elmt.m_swingWeightsArr[k][1];
-                                        }
-                                        retMatrix[j][i + 1] = elmt.m_swingWeightsArr[j - 3][1] / total;
-                                    }
-                                    else {
-                                        var tm = tempMatrix[j][i + 1];
-                                        retMatrix[j][i + 1] = elmt.getPwlValue(tempMatrix[j][i + 1]);
-                                    }
+
+                                    //if (elmt.getMethod() == 1) {
+                                    //    if (elmt.getType() === 100) {
+                                    //        var total = 0;
+                                    //        for (var k = 0; k < elmt.m_swingWeightsArr.length; k++) {
+                                    //            total += elmt.m_swingWeightsArr[k][1];
+                                    //        }
+                                    //        retMatrix[j][i + 1] = elmt.m_swingWeightsArr[j - 3][1] / total;
+                                    //    }
+                                    //    else if (elmt.getType() === 101) {
+                                    //        //var tmp3 = elmt.getScore();
+                                    //        var tmp4 = this.m_mainObjective.getScore();
+                                    //        console.log(tmp4);
+                                    //    }
+                                    //}
+
+                                    //else {
+                                    //    var tm = tempMatrix[j][i + 1];
+                                    //    retMatrix[j][i + 1] = elmt.getPwlValue(tempMatrix[j][i + 1]);
+                                    //}
+                                    retMatrix[j] = elmt.getScore();
                                 }
-                                //var tmp7c = tempMatrix[j][i + 1];
-                                retMatrix[j][i + 1] *= sortedWeights[i];
-                                retMatrix[j][i + 1] = (Math.round(10000 * retMatrix[j-3][i + 1])) / 10000;
+                                var tmp7c = retMatrix[j][i + 1];
+                                //retMatrix[j][i + 1] *= sortedWeights[i];
+                                retMatrix[j][i + 1] *= weightsArr[i][1];
+                                retMatrix[j][i + 1] = (Math.round(10000 * retMatrix[j][i + 1])) / 10000;
                                 //var tmp8 = tempMatrix[j][i + 1];
                             }
                         }
                         retMatrix[0][i + 1] = elmt.getName(); // change from element ID to element name
                     }
-                    for (var j = 3; j < retMatrix.length - 2; j++) {
+                    for (var j = 3; j < retMatrix.length; j++) {
                         elmt = this.getElement(retMatrix[j][0]);
                         retMatrix[j][0] = elmt.getName();
                     }

@@ -910,7 +910,7 @@ module Mareframe {
                 }
                 this.updateTable(this.m_model.getDataMatrix(true));
                 if (!this.m_model.m_bbnMode && this.m_readyForSA) {
-                    this.updateFinalScores(this.m_finalScoreChosenObjective);
+                    this.updateFinalScores(this.m_finalScoreChosenObjective,1);
                     this.updateSADropdown();
                     this.updateFinalScoresDropDowns();
                     this.updateSA();
@@ -2244,15 +2244,31 @@ module Mareframe {
             private updateFinalScores(p_element: Element, p_criteria?: number): void {
     
                 //var finalScores = this.m_model.getScore(p_element, 1);
-                var finalScores = this.m_model.getScore(p_element, p_criteria);
+                //var finalScores = this.m_model.getScore(p_element, p_criteria);
+                var finalScores = this.m_model.getScore2(p_element, 1, p_criteria);
+                var t: any[][] = [];
+                t[0] = [];
+                t[0][0] = "xx";
+                for (var a in this.m_model.m_altIndex) {
+                    t[parseInt(a) + 1] = [];
+                    t[parseInt(a) + 1][0] = this.m_model.getElementArr()[this.m_model.m_altIndex[a]].getName();
+                }
                 
-                //var data = google.visualization.arrayToDataTable(finalScores);
+                for (var i = 0; i < finalScores[0].length; i++) {
+                    //t[i]=[]
+                    for (var j = 0; j < finalScores.length; j++) {
+                        t[i][j+1] = finalScores[j][i];
+                    }
+                }
+                
+                
+                var data = google.visualization.arrayToDataTable(t);
                 //data.removeRow(data.getNumberOfRows() - 1);
                 //data.removeRow(data.getNumberOfRows() - 1);
                 //data.removeRow(0);
                 //data.removeRow(0);
                 //data.removeRow(4);
-                //this.m_finalScoreChart.draw(data, this.m_finalScoreChartOptions);
+                this.m_finalScoreChart.draw(data, this.m_finalScoreChartOptions);
                 this.updateSA();
                 
             }

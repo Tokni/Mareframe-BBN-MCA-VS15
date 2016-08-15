@@ -666,7 +666,54 @@ var Mareframe;
                 return ret;
             };
             Element.prototype.getScore = function () {
-                var ret;
+                var ret = [];
+                if (this.getType() !== 100) {
+                    var w = DST.Tools.getWeights(this, this.m_model, undefined, undefined, undefined, this.m_criteriaLevel + 1);
+                    for (var c in this.getChildrenElements()) {
+                        var tmp = this.getChildrenElements()[c];
+                        if (ret.length == 0) {
+                            ret = this.getChildrenElements()[c].getScore();
+                            for (var r2 in ret) {
+                                ret[r2] *= w[c][1];
+                            }
+                            var tml = ret;
+                        }
+                        else {
+                            var tmpp = this.getChildrenElements();
+                            var score = this.getChildrenElements()[c].getScore();
+                            for (var r in ret) {
+                                var tm = parseFloat(w[c][1]);
+                                var tmpr = ret[r];
+                                var tmpm = score[r] * parseFloat(w[c][1]);
+                                ret[r] += (score[r] * parseFloat(w[c][1]));
+                                var tmps = score[r];
+                                var tmpm2 = tmps * tm;
+                                tmpr = ret[r];
+                            }
+                            var tmprt = ret;
+                        }
+                    }
+                }
+                else {
+                    if (this.m_weightingMethod == 1) {
+                        var total = 0;
+                        for (var k = 0; k < this.m_swingWeightsArr.length; k++) {
+                            total += this.m_swingWeightsArr[k][1];
+                        }
+                        for (var k = 0; k < this.m_swingWeightsArr.length; k++) {
+                            ret[k] = this.m_swingWeightsArr[k][1] / total;
+                        }
+                    }
+                    else {
+                        for (var k = 0; k < this.m_dataArr.length; k++) {
+                            //ret[k] = this.m_pwlVF.getValue(this.getDataArr[k]);
+                            //var tmp3 = this.getDataArr;
+                            var t = this.getDataArr()[k];
+                            ret[k] = this.getPwlValue(this.getDataArr()[k]);
+                        }
+                    }
+                }
+                console.log("ID: " + this.getID() + "  Name: " + this.getName() + "   Score: " + ret);
                 return ret;
             };
             return Element;
