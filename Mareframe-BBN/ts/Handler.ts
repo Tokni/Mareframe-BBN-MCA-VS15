@@ -15,7 +15,7 @@ module Mareframe {
             private m_resetModel: String;
             private m_mareframeMode: Boolean;
             constructor() {
-                console.log("handler started");
+                //console.log("handler started");
                 this.m_mareframeMode = true; 
                 var testPage = true;
                     ; 
@@ -66,16 +66,16 @@ module Mareframe {
                         //loadModel = "investment";
                     }
 
-                    //console.log("using model: " + loadModel);
+                    ////console.log("using model: " + loadModel);
                     if (loadModel != null) {
                         this.m_fileHandler.loadModel(loadModel, this.m_activeModel, this.m_gui.importStage);
                         var tmp = this.m_activeModel.getMainObjective();
                         if (this.m_activeModel.getMainObjective() != undefined) {
                             this.m_gui.setHasGoal(true);
                         }
-                        //console.log("model loaded")
+                        ////console.log("model loaded")
                         this.m_resetModel = JSON.stringify(this.m_activeModel);
-                        //console.log("reset model: " + this.m_resetModel);
+                        ////console.log("reset model: " + this.m_resetModel);
                     } else {
                         this.m_gui.setEditorMode(true);
                     }
@@ -101,7 +101,7 @@ module Mareframe {
                 //bbnMode = true;
                 //bbnMode = false;
                 var mdl = new Model(bbnMode);
-                console.log("BBN mode is: " + mdl.m_bbnMode);
+                //console.log("BBN mode is: " + mdl.m_bbnMode);
                 this.setActiveModel(mdl);
                 return mdl;
             }

@@ -12,7 +12,7 @@
                 this.reset = this.reset.bind(this);
             }
             saveModel(p_model: Model, p_filename?: string): void {
-                //console.log("generating download link");
+                ////console.log("generating download link");
                 // encode the data into base64
                 //var regDigit = /\d/;
                 //for (var e in p_model.getElementArr()) {
@@ -60,7 +60,7 @@
                 a.innerHTML = 'Download';
             }
             loadfromGenie(p_activeModelInstance: Model, p_updateGui: Function): any {
-                console.log("loadFromGenie");
+                ////console.log("loadFromGenie");
                 var win: any = window;
                 
                 // Check for the various File API support.
@@ -71,13 +71,13 @@
                     var loadedFile = fileInputObj.files[0];
                     //loadedFile.path 
 
-                    ////console.log(loadedFile);
+                    //////console.log(loadedFile);
 
                     var reader = new FileReader();
 
                     reader.onload = (function (theFile) {
                         return function (e) {
-                            ////console.log(e.target.result);
+                            //////console.log(e.target.result);
                             var file: string = e.target.result;
                             var connCounter = 1;
 
@@ -87,7 +87,7 @@
                                 $title = xml.find("smile"),
                                 $nodes = xml.find("nodes"),
                                 $extensions = xml.find("genie");
-                            //console.log($nodes[0].childNodes);
+                            ////console.log($nodes[0].childNodes);
 
                             JSONObj.mdlIdent = $title[0].id;
                             JSONObj.mdlName = $extensions[0].attributes["name"].nodeValue;
@@ -95,13 +95,13 @@
                             for (var i = 0; i < $nodes[0].childNodes.length;i++) {
                                 if ($nodes[0].childNodes[i].nodeName != "#text") {
                                     var node = $($nodes[0].childNodes)[i]
-                                    ////console.log(node.childNodes);
+                                    //////console.log(node.childNodes);
                                     var elmt = { posX: 0, posY: 0, elmtID: "", elmtName: "", elmtDesc: "", elmtType: 0, elmtData: [] };
                                     elmt.elmtID = node.id;
                                     
                                     var extensionNode = $($extensions.find("#" + node.id)[0]);
-                                    //console.log(extensionNode);
-                                    //console.log(extensionNode.find("name")[0].innerHTML);
+                                    ////console.log(extensionNode);
+                                    ////console.log(extensionNode.find("name")[0].innerHTML);
 
                                     elmt.elmtName = extensionNode.find("name")[0].innerHTML;
                                     var position = extensionNode.find("position")[0].innerHTML.split(" ");
@@ -127,7 +127,7 @@
 
                                     for (var j = 0; j < node.children.length; j++) {
                                         var subnode = $(node.children)[j];
-                                        ////console.log($(node.children));
+                                        //////console.log($(node.children));
                                         switch (subnode.nodeName) {
                                             case "parents":
                                                 var parentsList: any[] = subnode.innerHTML.split(" ");
@@ -166,13 +166,13 @@
                                                     if (m == elmt.elmtData.length) {
                                                         m = 0;
                                                     }
-                                                    ////console.log(elmt.elmtData);
+                                                    //////console.log(elmt.elmtData);
                                                     elmt.elmtData[m].push(probData[l]);
                                                     
                                                 }
 
 
-                                                ////console.log(probData);
+                                                //////console.log(probData);
                                                 break;
                                         }
                                     }
@@ -209,8 +209,8 @@
                             //    }
 
 
-                            //    //console.log(part);
-                            console.log(JSON.stringify(JSONObj));
+                            //    ////console.log(part);
+                            ////console.log(JSON.stringify(JSONObj));
                             //    currentStartIndex = indexOfSmileClose;
 
                                 //}
@@ -223,7 +223,7 @@
                     })(loadedFile);
                     
                     fileInputObj.val = '';
-                    console.log("loadfile " + loadedFile);
+                    ////console.log("loadfile " + loadedFile);
                     reader.readAsText(loadedFile);
                     
                 } else {
@@ -238,7 +238,7 @@
                 //var modelIdent: string = this.m_handler.getActiveModel().getIdent();
                 if (p_resetModel) {
                     var modelIdent: string = p_resetModel.getIdent();
-                    //console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
+                    ////console.log("in local storage: " + localStorage.getItem(this.m_handler.getActiveModel().getIdent()));
                     var jsonMdl: any = JSON.parse(localStorage.getItem(modelIdent));
                 }
                 if (jsonMdl) {
@@ -249,7 +249,7 @@
                 }
             }
             loadModel(p_modelStringIdent: string, p_activeModelInstance: Model, p_updateGui: Function): any {
-                console.log("attempting to load " + p_modelStringIdent);
+                ////console.log("attempting to load " + p_modelStringIdent);
                 var path: string = "JSON/";
                 if (p_activeModelInstance.m_bbnMode) {
                     path += "BBN/";
@@ -297,39 +297,39 @@
                         path += "newCar8.json";
                         break;
                     default:
-                        console.log("NO such file exists!!   " + p_modelStringIdent);
+                        //console.log("NO such file exists!!   " + p_modelStringIdent);
                         break;
                 }
-                console.log("resulting path is: " + path);
+                ////console.log("resulting path is: " + path);
                 jQuery.getJSON(path, function (data) {
-                    console.log("stringyfied Json: " + JSON.stringify(data));
-                    console.log("Pure json: " + data);
+                    ////console.log("stringyfied Json: " + JSON.stringify(data));
+                    ////console.log("Pure json: " + data);
                     p_activeModelInstance.fromJSON(data);
                     p_updateGui();
                 });
 
             }
             loadMCAModelFromFile(p_activeModelInstance: Model, p_updateGui: Function) {
-                console.log("Loading MCA model from file");
+                ////console.log("Loading MCA model from file");
                 var fileInputElement: any = $("#lodDcmt").get(0);
                 fileInputElement.files[0];
                 var file = fileInputElement.files[0];
-                console.log("file: " + file);
-                console.log("filename: " + file.name);
+                ////console.log("file: " + file);
+                ////console.log("filename: " + file.name);
                 var fileReader = new FileReader();
 
                 fileReader.onload = function (p_evt) {
                     var text = fileReader.result;
-                    console.log("loaded file: " + text);
+                    ////console.log("loaded file: " + text);
                     var jsonObj = JSON.parse(text);
-                    console.log("jsonObj: " + jsonObj);
+                    ////console.log("jsonObj: " + jsonObj);
                     p_activeModelInstance.fromJSON(jsonObj);
 
                     p_updateGui();
                 }
 
                 fileReader.readAsText(file); 
-                console.log("Result: " + fileReader.result);
+                ////console.log("Result: " + fileReader.result);
 
             }
             loadValueFunctionFromFile(): ValueFunction {
@@ -339,20 +339,20 @@
             }
             loadPWLFromFile(p_pwl: PiecewiseLinear, p_updateGui: Function, p_path?: string) {
                 //var ret: PiecewiseLinear = new PiecewiseLinear(0,0,0,0,0,0);
-                console.log("Loading MCA model from file");
+                ////console.log("Loading MCA model from file");
                 var fileInputElement: any = $("#loadFromFile").get(0);
                 fileInputElement.files[0];
                 var file = fileInputElement.files[0];
-                console.log("file: " + file);
-                console.log("filename: " + file.name);
+                ////console.log("file: " + file);
+                ////console.log("filename: " + file.name);
                 var fileReader = new FileReader();
                 
 
                 fileReader.onload = function (p_evt) {
                     var text = fileReader.result;
-                    console.log("loaded file: " + text);
+                    ////console.log("loaded file: " + text);
                     var jsonObj = JSON.parse(text);
-                    console.log("jsonObj: " + jsonObj);
+                    ////console.log("jsonObj: " + jsonObj);
                     //ret.fromJSON(jsonObj);
                     p_pwl.fromJSON(jsonObj);
                     p_updateGui();
@@ -360,7 +360,7 @@
                 }
 
                 fileReader.readAsText(file);
-                console.log("Result: " + fileReader.result);
+                ////console.log("Result: " + fileReader.result);
                 //return ret;
             }
             

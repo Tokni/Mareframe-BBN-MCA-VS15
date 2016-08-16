@@ -38,7 +38,7 @@ var Mareframe;
                     }
                 }
                 else {
-                    //console.log("type not defined");
+                    ////console.log("type not defined");
                     if (p_dstType === 1) {
                         this.m_type = 101;
                     }
@@ -143,14 +143,14 @@ var Mareframe;
                 this.m_decision = n;
             };
             Element.prototype.update = function () {
-                //console.log("Updating element " + this.getName() );
+                ////console.log("Updating element " + this.getName() );
                 if (this.m_type !== 1) {
-                    //   console.log("This is not a decision node");
+                    //   //console.log("This is not a decision node");
                     //Definition table in decision nodes does not rely on parents
                     this.updateData();
                 }
                 DST.Tools.calculateValues(this.m_model, this);
-                //console.log("Updated element " + this.getName());
+                ////console.log("Updated element " + this.getName());
                 this.m_updated = true;
             };
             Element.prototype.getParentElements = function () {
@@ -161,37 +161,37 @@ var Mareframe;
                         parents.push(c.getInputElement());
                     }
                 });
-                ////console.log(elmt.getName() + " parents: " + parents);
+                //////console.log(elmt.getName() + " parents: " + parents);
                 return parents;
             };
             Element.prototype.isParentOf = function (p_elmt) {
                 var retBool = false;
                 for (var e in this.getChildrenElements()) {
-                    //console.log("Element: " + p_elmt.getID() + "   ChildElement: " + this.getChildrenElements()[e].getID());
+                    ////console.log("Element: " + p_elmt.getID() + "   ChildElement: " + this.getChildrenElements()[e].getID());
                     if (this.getChildrenElements()[e].getID() == p_elmt.getID()) {
                         retBool = true;
                         break;
                     }
                 }
-                console.log(" Is Parent Of: " + retBool);
+                ////console.log(" Is Parent Of: " + retBool);
                 return retBool;
             };
             Element.prototype.isChildOf = function (p_elmt) {
                 var retBool = false;
                 for (var e in this.getParentElements()) {
-                    //console.log("Element: " + p_elmt.getID() + "   ParentElement: " + this.getParentElements()[e].getID());
+                    ////console.log("Element: " + p_elmt.getID() + "   ParentElement: " + this.getParentElements()[e].getID());
                     if (this.getParentElements()[e].getID() == p_elmt.getID()) {
                         retBool = true;
                         break;
                     }
                 }
-                console.log(" Is Child Of: " + retBool);
+                ////console.log(" Is Child Of: " + retBool );
                 return retBool;
             };
             Element.prototype.getChildrenElements = function () {
                 var children = [];
                 var elmt = this;
-                // console.log(this.m_connections);
+                // //console.log(this.m_connections);
                 this.m_connections.forEach(function (c) {
                     var tmp = c.getOutputElement().getID();
                     var tmp3 = c.getInputElement().getID();
@@ -200,21 +200,21 @@ var Mareframe;
                         children.push(c.getInputElement());
                     }
                 });
-                //   console.log(this.getName() + " chilxxdren: " + children);
+                //   //console.log(this.getName() + " chilxxdren: " + children);
                 return children;
             };
             Element.prototype.getAllAncestors = function () {
-                //  console.log("getting ancestors for: " + this.getName());
+                //  //console.log("getting ancestors for: " + this.getName());
                 var ancestors = [];
                 var parents = this.getParentElements();
                 if (parents.length === 0) {
-                    //  console.log("ancestors: " + ancestors);
+                    //  //console.log("ancestors: " + ancestors);
                     return ancestors;
                 }
                 else {
                     parents.forEach(function (e) {
                         if (ancestors.indexOf(e) === -1) {
-                            //   console.log("pushing " + e.getName());
+                            //   //console.log("pushing " + e.getName());
                             ancestors.push(e);
                             ancestors = ancestors.concat(e.getAllAncestors());
                         }
@@ -232,33 +232,33 @@ var Mareframe;
                 return decisions;
             };
             Element.prototype.isAncestorOf = function (elmt) {
-                //console.log("checking if " + this.getName() + " is an ancestor of " + elmt.getName() + ": " + (this.getAllAncestors().indexOf(elmt) > -1));
-                //console.log(this.getAllAncestors());
+                ////console.log("checking if " + this.getName() + " is an ancestor of " + elmt.getName() + ": " + (this.getAllAncestors().indexOf(elmt) > -1));
+                ////console.log(this.getAllAncestors());
                 return (this.getAllAncestors().indexOf(elmt) > -1);
             };
             Element.prototype.getAllDescendants = function () {
-                //   console.log("get all decendants for " + this.getName());
+                //   //console.log("get all decendants for " + this.getName());
                 var decendants = [];
                 var children = this.getChildrenElements();
                 if (children.length === 0) {
-                    //   console.log("returned: " + decendants);
+                    //   //console.log("returned: " + decendants);
                     return decendants;
                 }
                 else {
                     children.forEach(function (e) {
                         if (decendants.indexOf(e) === -1) {
-                            //   console.log("pushing " + e.getName());
+                            //   //console.log("pushing " + e.getName());
                             decendants.push(e);
                             decendants = decendants.concat(e.getAllDescendants());
                         }
                     });
                 }
-                //console.log("returned: " + decendants);
+                ////console.log("returned: " + decendants);
                 return decendants;
             };
             Element.prototype.copyDefArray = function () {
                 var valueArray = [];
-                //console.log(this);
+                ////console.log(this);
                 for (var i = 0; i < this.m_data.length; i++) {
                     valueArray[i] = [];
                     for (var j = 0; j < this.m_data[0].length; j++) {
@@ -268,14 +268,14 @@ var Mareframe;
                 return valueArray;
             };
             Element.prototype.updateData = function () {
-                // console.log("updateData " + this.m_name);
-                // console.log("data: " + this.m_data);
+                // //console.log("updateData " + this.m_name);
+                // //console.log("data: " + this.m_data);
                 this.m_data = this.updateHeaderRows(this.m_data);
-                // console.log("data: " + this.m_data);
+                // //console.log("data: " + this.m_data);
                 var rows;
                 var columns;
-                // console.log("checking: " + this.m_data[this.m_data.length - 1][1]);
-                //console.log("data length: " + this.m_data.length);
+                // //console.log("checking: " + this.m_data[this.m_data.length - 1][1]);
+                ////console.log("data length: " + this.m_data.length);
                 if (this.m_data[this.m_data.length - 1][1] === undefined) {
                     rows = 1;
                     columns = this.m_data.length;
@@ -284,46 +284,46 @@ var Mareframe;
                     rows = this.m_data.length;
                     columns = this.m_data[0].length;
                 }
-                //console.log("rows " + rows + " columns " + columns);
-                // console.log("in filling " + this.m_name + " last cell is " + this.m_data[rows - 1][columns - 1]);
+                ////console.log("rows " + rows + " columns " + columns);
+                // //console.log("in filling " + this.m_name + " last cell is " + this.m_data[rows - 1][columns - 1]);
                 if (this.m_data[rows - 1][columns - 1] === undefined) {
                     this.m_data = DST.Tools.fillDataTable(this.m_data);
                 }
             };
             Element.prototype.updateHeaderRows = function (p_originalData) {
-                //console.log("updating header rows in " + this.getName())
-                // console.log("data: " + p_originalData);
+                ////console.log("updating header rows in " + this.getName())
+                // //console.log("data: " + p_originalData);
                 var data = [];
                 var parents = this.getParentElements();
                 for (var i = 0; i < parents.length; i++) {
                     var elmt = parents[i];
-                    // console.log("Parent: " + elmt.getName());
+                    // //console.log("Parent: " + elmt.getName());
                     data = DST.Tools.addNewHeaderRow(elmt.getMainValues(), data);
                 }
-                //console.log("number of header rows : " + Tools.numOfHeaderRows(this.m_data));
+                ////console.log("number of header rows : " + Tools.numOfHeaderRows(this.m_data));
                 //Add original values to the table
                 for (var i = DST.Tools.numOfHeaderRows(this.m_data); i < p_originalData.length; i++) {
-                    //console.log("i: " + i);
-                    // console.log("new data: " + p_originalData[i]);
+                    ////console.log("i: " + i);
+                    // //console.log("new data: " + p_originalData[i]);
                     data.push(p_originalData[i]);
                 }
-                // console.log(data);
+                // //console.log(data);
                 return data;
             };
             Element.prototype.addDefaultDataInEmptyCells = function (p_originalData, p_editedElmt, p_addedState) {
-                console.log("adding default values in " + this.getName());
+                ////console.log("adding default values in " + this.getName());
                 var data = DST.Tools.makeSureItsTwoDimensional(p_originalData);
                 var elmtType = this.getType();
                 var rows = data.length;
                 var columns = data[0].length;
                 for (var i = 0; i < rows; i++) {
                     if (data[i][0] === p_editedElmt.getID()) {
-                        console.log("found row");
+                        ////console.log("found row");
                         for (var j = 0; j < columns; j++) {
                             if (data[i][j] === p_addedState) {
-                                console.log("found column");
+                                ////console.log("found column");
                                 for (var n = DST.Tools.numOfHeaderRows(data); n < rows; n++) {
-                                    console.log("adding " + (1 / (rows - DST.Tools.numOfHeaderRows(data))));
+                                    ////console.log("adding " + (1 / (rows - Tools.numOfHeaderRows(data))));
                                     data[n].splice(j, 0, (1 / (rows - DST.Tools.numOfHeaderRows(data))));
                                 }
                             }
@@ -334,18 +334,18 @@ var Mareframe;
             };
             //returns the different variables (conditions or choices) that belong to the element
             Element.prototype.getMainValues = function () {
-                //console.log(this.m_data);
+                ////console.log(this.m_data);
                 var row = [];
                 var data = this.m_data;
                 row.push(this.m_id);
                 for (var i = 0; i < data.length; i++) {
-                    // //console.log("i: " + i);
-                    // //console.log("check data: " + data[i][1]);
+                    // ////console.log("i: " + i);
+                    // ////console.log("check data: " + data[i][1]);
                     if (!isNaN(parseFloat(data[i][1])) || data[i][1] === undefined) {
                         row.push(data[i][0]);
                     }
                 }
-                ////console.log("new row: " + row);
+                //////console.log("new row: " + row);
                 return row;
             };
             //MCA TOOL
@@ -428,7 +428,7 @@ var Mareframe;
                     case 102: return "Alternative";
                     //break;
                     case 103: return "Goal";
-                    default: console.log("No such element type name: " + this.getType());
+                    default: ////console.log("No such element type name: " + this.getType() );
                 }
             };
             Element.prototype.setType = function (p_type) {
@@ -459,21 +459,19 @@ var Mareframe;
                         return true;
                     }
                 });
-                console.log("Key: " + key + "  Lengthm_conn: " + this.m_connections.length);
+                ////console.log("Key: " + key + "  Lengthm_conn: " + this.m_connections.length) ;
                 if (key >= this.m_connections.length)
                     return false;
                 else {
                     for (var index in this.m_connections) {
-                        console.log(this.m_name + "  EBefore: " + this.m_connections[index].getID());
                     }
                     this.m_connections.splice(key, 1);
-                    console.log("m_conn Length: " + this.m_connections.length);
+                    //console.log("m_conn Length: " + this.m_connections.length);
                     for (var index in this.m_connections) {
-                        console.log(this.m_name + "  EAfter: " + this.m_connections[index].getID());
                     }
-                    //console.log("Total conections: " + this.m_model.getConnectionArr().length);
+                    ////console.log("Total conections: " + this.m_model.getConnectionArr().length);
                     //this.deleteConnection(p_connID);
-                    //console.log("Total conections: " + this.m_model.getConnectionArr().length);
+                    ////console.log("Total conections: " + this.m_model.getConnectionArr().length);
                     return true;
                 }
             };
@@ -528,17 +526,17 @@ var Mareframe;
                 };
             };
             Element.prototype.fromJSON = function (p_jsonElmt) {
-                // console.log("element.fromJSON()");
-                //console.log(p_jsonElmt);
+                // //console.log("element.fromJSON()");
+                ////console.log(p_jsonElmt);
                 this.m_easelElmt.x = p_jsonElmt.posX;
                 this.m_easelElmt.y = p_jsonElmt.posY;
                 this.m_id = p_jsonElmt.elmtID;
                 this.m_name = p_jsonElmt.elmtName;
-                //console.log("FromJSONname: " + this.m_name);
+                ////console.log("FromJSONname: " + this.m_name);
                 this.m_description = p_jsonElmt.elmtDesc;
                 this.m_type = p_jsonElmt.elmtType;
                 //this.m_data = p_jsonElmt.elmtData;
-                //console.log("FromJSONdata: " + this.m_data);
+                ////console.log("FromJSONdata: " + this.m_data);
                 this.m_weightingMethod = p_jsonElmt.elmtWghtMthd;
                 switch (this.m_type) {
                     case 100: {
@@ -580,7 +578,7 @@ var Mareframe;
                 //        this.m_valueFunctionY = p_jsonElmt.elmtValueFnY;
                 //        this.m_valueFunctionFlip = p_jsonElmt.elmtValueFnFlip;
                 //        break;
-                //    default: console.log("Json Goof");
+                //    default: //console.log("Json Goof");
                 if (p_jsonElmt.elmtData) {
                     for (var i = 0; i < p_jsonElmt.elmtData.length; i++) {
                         this.m_swingWeightsArr[i] = p_jsonElmt.elmtData[i];
@@ -589,20 +587,20 @@ var Mareframe;
                 this.m_valueFunctionX = p_jsonElmt.elmtValueFnX;
                 this.m_valueFunctionY = p_jsonElmt.elmtValueFnY;
                 this.m_valueFunctionFlip = p_jsonElmt.elmtValueFnFlip;
-                console.log("element " + p_jsonElmt.elmtName + " imported from JSON.");
+                //console.log("element " + p_jsonElmt.elmtName + " imported from JSON.");
             };
             Element.prototype.fromJSONOld = function (p_jsonElmt) {
-                // console.log("element.fromJSON()");
-                //console.log(p_jsonElmt);
+                // //console.log("element.fromJSON()");
+                ////console.log(p_jsonElmt);
                 this.m_easelElmt.x = p_jsonElmt.posX;
                 this.m_easelElmt.y = p_jsonElmt.posY;
                 this.m_id = p_jsonElmt.elmtID;
                 this.m_name = p_jsonElmt.elmtName;
-                //console.log("FromJSONname: " + this.m_name);
+                ////console.log("FromJSONname: " + this.m_name);
                 this.m_description = p_jsonElmt.elmtDesc;
                 this.m_type = p_jsonElmt.elmtType;
                 //this.m_data = p_jsonElmt.elmtData;
-                //console.log("FromJSONdata: " + this.m_data);
+                ////console.log("FromJSONdata: " + this.m_data);
                 this.m_weightingMethod = p_jsonElmt.elmtWghtMthd;
             };
             Element.prototype.getConnectionFrom = function (p_elmt) {
@@ -713,7 +711,7 @@ var Mareframe;
                         }
                     }
                 }
-                console.log("ID: " + this.getID() + "  Name: " + this.getName() + "   Score: " + ret);
+                ////console.log("ID: " + this.getID() + "  Name: " + this.getName() + "   Score: " + ret);
                 return ret;
             };
             return Element;

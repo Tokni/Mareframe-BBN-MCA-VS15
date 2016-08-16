@@ -164,7 +164,7 @@
             }
             savePWL(): string {
                 var datastream = JSON.stringify(this);
-                console.log("ValueFunction Stream: " + datastream);
+                //console.log("ValueFunction Stream: " + datastream);
                 return datastream;;
             }
         

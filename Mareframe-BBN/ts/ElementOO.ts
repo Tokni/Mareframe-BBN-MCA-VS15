@@ -72,49 +72,49 @@ module Mareframe {
                         parents.push(c.getInputElement());
                     }
                 })
-                ////console.log(elmt.getName() + " parents: " + parents);
+                //////console.log(elmt.getName() + " parents: " + parents);
                 return parents;
             }
             isParentOf(p_elmt: ElementOO): boolean {
                 var retBool: boolean = false;
 
                 for (var e in this.getChildrenElements()) {
-                    //console.log("Element: " + p_elmt.getID() + "   ChildElement: " + this.getChildrenElements()[e].getID());
+                    ////console.log("Element: " + p_elmt.getID() + "   ChildElement: " + this.getChildrenElements()[e].getID());
                     if (this.getChildrenElements()[e].getID() == p_elmt.getID()) {
 
                         retBool = true;
                         break;
                     }
                 }
-                console.log(" Is Parent Of: " + retBool);
+                //console.log(" Is Parent Of: " + retBool);
                 return retBool;
             }
             isChildOf(p_elmt: ElementOO): boolean {
                 var retBool: boolean = false;
 
                 for (var e in this.getParentElements()) {
-                    //console.log("Element: " + p_elmt.getID() + "   ParentElement: " + this.getParentElements()[e].getID());
+                    ////console.log("Element: " + p_elmt.getID() + "   ParentElement: " + this.getParentElements()[e].getID());
                     if (this.getParentElements()[e].getID() == p_elmt.getID()) {
 
                         retBool = true;
                         break;
                     }
                 }
-                console.log(" Is Child Of: " + retBool);
+                //console.log(" Is Child Of: " + retBool);
                 return retBool;
             }
             getChildrenElements(): ElementOO[] {
                 var children: Element[] = [];
                 var elmt = this;
-                // console.log(this.m_connections);
+                // //console.log(this.m_connections);
                 this.m_connections.forEach(function (c) {
-                    //console.log("OutputElement: " + c.getOutputElement().getID());
-                    //console.log("this Element id: " + elmt.getID());
+                    ////console.log("OutputElement: " + c.getOutputElement().getID());
+                    ////console.log("this Element id: " + elmt.getID());
                     if (c.getInputElement().getID() === elmt.getID()) {
                         children.push(c.getOutputElement());
                     }
                 })
-                //   console.log(this.getName() + " chilxxdren: " + children);
+                //   //console.log(this.getName() + " chilxxdren: " + children);
                 return children;
             }
             deleteConnection(p_connID: string): boolean;
@@ -130,23 +130,23 @@ module Mareframe {
                         return true;
                     }
                 });
-                console.log("Key: " + key + "  Lengthm_conn: " + this.m_connections.length);
+                //console.log("Key: " + key + "  Lengthm_conn: " + this.m_connections.length);
                 if (key >= this.m_connections.length)
                     return false;
                 else {
                     for (var index in this.m_connections) {
-                        console.log(this.m_name + "  EBefore: " + this.m_connections[index].getID());
+                        //console.log(this.m_name + "  EBefore: " + this.m_connections[index].getID());
                     }
 
                     this.m_connections.splice(key, 1);
 
-                    console.log("m_conn Length: " + this.m_connections.length);
+                    //console.log("m_conn Length: " + this.m_connections.length);
                     for (var index in this.m_connections) {
-                        console.log(this.m_name + "  EAfter: " + this.m_connections[index].getID());
+                        //console.log(this.m_name + "  EAfter: " + this.m_connections[index].getID());
                     }
-                    //console.log("Total conections: " + this.m_model.getConnectionArr().length);
+                    ////console.log("Total conections: " + this.m_model.getConnectionArr().length);
                     //this.deleteConnection(p_connID);
-                    //console.log("Total conections: " + this.m_model.getConnectionArr().length);
+                    ////console.log("Total conections: " + this.m_model.getConnectionArr().length);
 
                     return true;
                 }

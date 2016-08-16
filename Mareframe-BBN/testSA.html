@@ -41,7 +41,7 @@
         }
         function init() {
             //pwlDataArray
-            //console.log("origin: " + pwlDataArray);
+            ////console.log("origin: " + pwlDataArray);
             $("#lineChart_div").draggable();
             $("#tableChart_div").draggable();
             //$("#sliderControl_div").draggable();
@@ -62,20 +62,20 @@
             pointCurrent = [ui.value, 1, 'X'];
             //find current point position in pwlDataArray
             var i = 1;
-            //console.log("i: " + i + "  uiVal: " + ui.value + "  pwlAt_i: " + pwlDataArray[pwlDataArray.length-1][0]);
+            ////console.log("i: " + i + "  uiVal: " + ui.value + "  pwlAt_i: " + pwlDataArray[pwlDataArray.length-1][0]);
             if (ui.value > pwlDataArray[pwlDataArray.length - 1][0]) {
-                console.log("hrll");
+                //console.log("hrll");
                 pwlDataArray.splice(pwlDataArray.length, 0, pointCurrent);
             }
             else {
                 while (i < pwlDataArray.length) {
-                    //console.log(i);
+                    ////console.log(i);
 
                     if (ui.value > pwlDataArray[i][0]) { i++; }
                     else {
-                        //console.log("before: " + pwlDataArray);
+                        ////console.log("before: " + pwlDataArray);
                         pwlDataArray.splice(i, 0, pointCurrent); break;
-                        //console.log("after: " + pwlDataArray);break; 
+                        ////console.log("after: " + pwlDataArray);break; 
                     }
 
                 }
@@ -84,7 +84,7 @@
             var b = pwlDataArray[i + 1][1] - a * pwlDataArray[i + 1][0];
             pointCurrent[1] = a * pwlDataArray[i][0] + b;
             //pwlDataArray.push(pointCurrent);
-            //console.log(pwlDataArray);
+            ////console.log(pwlDataArray);
             pointOld = pointCurrent;
             draw();
         }

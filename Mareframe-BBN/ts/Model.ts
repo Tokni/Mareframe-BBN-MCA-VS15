@@ -21,8 +21,8 @@
                 //this.m_counter.
                 this.createNewElement = this.createNewElement.bind(this);
                 this.deleteElement = this.deleteElement.bind(this);
-                console.log("model loaded, MCA is: " + !this.m_bbnMode);
-                ////console.log(this);
+                //console.log("model loaded, MCA is: " + !this.m_bbnMode);
+                //////console.log(this);
 
             };
             updateAltIndex() {
@@ -62,7 +62,7 @@
                                 dataStream = dataStream.slice(0, dataStream.length - 1) + '</parents>\n';
                             }
 
-                            console.log(elmt.getDataOld());
+                            //console.log(elmt.getDataOld());
                             dataStream += '<probabilities>'
                             for (var i = 1; i < elmt.getDataOld(1).length; i++) {
                                 for (var j = elmt.getParentElements().length; j < elmt.getDataOld().length; j++)
@@ -113,15 +113,15 @@
                 return dataStream;
             }
             private getMCADataStream(): string {
-                //console.log("MCADataStream: " + JSON.stringify(this));
+                ////console.log("MCADataStream: " + JSON.stringify(this));
                 var ret = JSON.stringify(this);
                 return JSON.stringify(this);
             }
             update() {
                 var m: Model = this;
-                console.log("updating model");
+                //console.log("updating model");
                 this.m_elementArr.forEach(function (p_elmt: Element) {
-                    console.log(p_elmt.getID() + " has been updated: " + p_elmt.isUpdated());
+                    //console.log(p_elmt.getID() + " has been updated: " + p_elmt.isUpdated());
                     if (!p_elmt.isUpdated()) {
                         p_elmt.update();
                     }
@@ -240,7 +240,7 @@
                         if (r != '0')
                             retMatrix[0][parseInt(r)] *= p_weight;
                     }
-                    //console.log("weight: " + p_weight + "  " + "weighted score: " + retMatrix);
+                    ////console.log("weight: " + p_weight + "  " + "weighted score: " + retMatrix);
                 }
                 
                 
@@ -287,8 +287,8 @@
                        
                         var index = 0;
                         retMatrix[0][i+1] = weightsArr[i][0];
-                        //var elmt = this.getElement(tempMatrix[0][i+1]); // alternative element
-                        var elmt = this.getElement(weightsArr[i][0]);
+                        var elmt = this.getElement(tempMatrix[0][i+1]); // alternative element
+                        //var elmt = this.getElement(weightsArr[i][0]);
                         
                         for (var j = 3; j < tempMatrix.length - 2; j++) {
                             if (elmt.m_disregard == false) {
@@ -327,40 +327,44 @@
                                         }
                                         else
                                             //tempMatrix[j][i + 1] = elmt.getPwlValue(tempMatrix[j][i + 1]);
+                                            var tm345 = tempMatrix[j][i + 1];
+                                            var tmp45 = elmt.getPwlValue(tempMatrix[j][i + 1]);
                                             retMatrix[j][i + 1] = elmt.getPwlValue(tempMatrix[j][i + 1]);
                                     }
                                 }
                                 else {
 
-                                    //if (elmt.getMethod() == 1) {
-                                    //    if (elmt.getType() === 100) {
-                                    //        var total = 0;
-                                    //        for (var k = 0; k < elmt.m_swingWeightsArr.length; k++) {
-                                    //            total += elmt.m_swingWeightsArr[k][1];
-                                    //        }
-                                    //        retMatrix[j][i + 1] = elmt.m_swingWeightsArr[j - 3][1] / total;
-                                    //    }
-                                    //    else if (elmt.getType() === 101) {
-                                    //        //var tmp3 = elmt.getScore();
-                                    //        var tmp4 = this.m_mainObjective.getScore();
-                                    //        console.log(tmp4);
-                                    //    }
-                                    //}
+                                    if (elmt.getMethod() == 1) {
+                                        if (elmt.getType() === 100) {
+                                            var total = 0;
+                                            for (var k = 0; k < elmt.m_swingWeightsArr.length; k++) {
+                                                total += elmt.m_swingWeightsArr[k][1];
+                                            }
+                                            retMatrix[j][i + 1] = elmt.m_swingWeightsArr[j - 3][1] / total;
+                                        }
+                                        else if (elmt.getType() === 101) {
+                                            //var tmp3 = elmt.getScore();
+                                            var tmp4 = this.m_mainObjective.getScore();
+                                            //console.log(tmp4);
+                                        }
+                                    }
 
-                                    //else {
-                                    //    var tm = tempMatrix[j][i + 1];
-                                    //    retMatrix[j][i + 1] = elmt.getPwlValue(tempMatrix[j][i + 1]);
-                                    //}
-                                    retMatrix[j] = elmt.getScore();
+                                    else {
+                                        var tm = tempMatrix[j][i + 1];
+                                        retMatrix[j][i + 1] = elmt.getPwlValue(tempMatrix[j][i + 1]);
+                                        
+                                    }
+                                    //retMatrix[j] = elmt.getScore();
                                 }
                                 var tmp7c = retMatrix[j][i + 1];
-                                //retMatrix[j][i + 1] *= sortedWeights[i];
-                                retMatrix[j][i + 1] *= weightsArr[i][1];
-                                retMatrix[j][i + 1] = (Math.round(10000 * retMatrix[j][i + 1])) / 10000;
+                                retMatrix[j][i + 1] *= sortedWeights[i];
+                                //retMatrix[j][i + 1] *= weightsArr[i][1];
+                                retMatrix[j][i + 1] = (Math.round(100000 * retMatrix[j][i + 1])) / 100000;
                                 //var tmp8 = tempMatrix[j][i + 1];
                             }
-                        }
+                        }                       
                         retMatrix[0][i + 1] = elmt.getName(); // change from element ID to element name
+                        
                     }
                     for (var j = 3; j < retMatrix.length; j++) {
                         elmt = this.getElement(retMatrix[j][0]);
@@ -368,7 +372,7 @@
                     }
                 }
                 else {
-                    console.log("There is no main objective yet.");
+                    //console.log("There is no main objective yet.");
                 }
                 return retMatrix;
             }
@@ -379,19 +383,19 @@
                 if (p_addHeader) {
                     tempMatrix.push(['string', 'number']);
                 }
-                //console.log("DataMatrixx  --------  -------- : " + dm);
+                ////console.log("DataMatrixx  --------  -------- : " + dm);
                 switch (p_elmt.getType()) {
                     case 102: //scenario
                         
                         break;
                     case 100: //attribute
-                        //console.log("Type 0, attibute");
+                        ////console.log("Type 0, attibute");
                         //set minimum and maximum values
                         var maxVal = p_elmt.getDataMax();
                         var minVal = p_elmt.getDataMin();
 
                         //calculate weights according to valueFn or sliders
-                        //console.log("Method num: " + p_elmt.getMethod()); 
+                        ////console.log("Method num: " + p_elmt.getMethod()); 
                         if (p_elmt.getMethod() == 1) {
                             var total = 0;
                             for (var i = 0; i < p_elmt.m_swingWeightsArr.length; i++) {
@@ -419,7 +423,7 @@
                                     toAdd.push(frac);
                                     //toAdd.push(Mareframe.DST.Tools.getValueFn(Math.abs(p_elmt.m_valueFunctionFlip - (p_elmt.getDataArrAtIndex(i - 3) - minVal) / (maxVal - minVal)), Math.abs(p_elmt.m_valueFunctionFlip - p_elmt.m_valueFunctionX / 100), 1 - p_elmt.m_valueFunctionY / 100));
                                 }
-                                //console.log("toAdd2: " + toAdd);
+                                ////console.log("toAdd2: " + toAdd);
                                 tempMatrix.push(toAdd);
                             }
                         } else if (p_elmt.getMethod() === 4) {
@@ -429,7 +433,7 @@
 
                                     toAdd.push("ss");
                                 }
-                                //console.log("toAdd4: " + toAdd);
+                                ////console.log("toAdd4: " + toAdd);
                                 tempMatrix.push(toAdd);
                             }
                         } else {
@@ -438,16 +442,16 @@
 
                         break;
                     case 101: //sub-objective
-                        //console.log("Type 1, sub-objective");
+                        ////console.log("Type 1, sub-objective");
                         //var total = 0.0;
                         //p_elmt.getData(1).forEach(function (val) { total += val; });
-                        //////console.log(total + " : " + elmt.getName());
+                        ////////console.log(total + " : " + elmt.getName());
                         //for (var i = 0; i < p_elmt.getData(0).length; i++) {
-                        //    ////console.log(elmt.getData());
+                        //    //////console.log(elmt.getData());
                         //    var tempEl = this.getConnection(p_elmt.getData(0, i)).getInputElement();
 
                         //    var tempArr = this.getWeightedData(tempEl, false);
-                        //    ////console.log(tempArr);
+                        //    //////console.log(tempArr);
 
 
                         //    var result = 0;
@@ -456,21 +460,21 @@
                         //        result += tempArr[j][1];
 
                         //    }
-                        //    ////console.log(result + " " + elmt.getName()+"; "+tempArr+" "+tempEl.getName());
+                        //    //////console.log(result + " " + elmt.getName()+"; "+tempArr+" "+tempEl.getName());
                         //    tempMatrix.push([tempEl.getName(), result * (p_elmt.getData(1, i) / total)]);
-                        //    //console.log("******SubTempMatrix: " + i + "   " + tempMatrix);
+                        //    ////console.log("******SubTempMatrix: " + i + "   " + tempMatrix);
                         //}
                         break;
                 }
                 //tempMatrix = [["a", "b", "d"], ["c", 50, 100]];
                 //tempMatrix = [["a", 15, 45], ["c", 50, 100]];
                 //tempMatrix = [10, 20, 30, 50];
-                //console.log("WeigthedData: " + tempMatrix);
+                ////console.log("WeigthedData: " + tempMatrix);
                 return tempMatrix;
             }
             createNewElement(p_type: number): Element {
-                ////console.log(this.m_counter);
-                //console.log("Current elements Array length: " + this.m_elementArr.length);
+                //////console.log(this.m_counter);
+                ////console.log("Current elements Array length: " + this.m_elementArr.length);
                 this.m_counter++;
                 if (this.m_bbnMode === false) {
                     var e = new Element("elmt" + this.m_counter, this, p_type, 1);
@@ -498,21 +502,21 @@
 
                         break;
                 }
-                //console.log("New elements Array length: " + this.m_elementArr.length);
-                //console.log("Data: " + e.getDataOld());
+                ////console.log("New elements Array length: " + this.m_elementArr.length);
+                ////console.log("Data: " + e.getDataOld());
                 return e;
 
             }
             getElement(p_elmtStringId: string): Element {
-                //console.log("elementId: " + p_elmtStringId);
+                ////console.log("elementId: " + p_elmtStringId);
                 return this.m_elementArr[this.getObjectIndex(p_elmtStringId)];
             }
             private getObjectIndex(p_objectStringId: string): number {
-                //console.log(" get object "  + p_objectStringId + " in list: "+ this.m_elementArr);
+                ////console.log(" get object "  + p_objectStringId + " in list: "+ this.m_elementArr);
                 var key = 0;
                 if (p_objectStringId.substr(0, 4) === "elmt") {
                     this.m_elementArr.every(function (p_elmt) {
-                        //console.log("comparing with : " + p_elmt.getID());
+                        ////console.log("comparing with : " + p_elmt.getID());
                         if (p_elmt.getID() === p_objectStringId)
                             return false;
                         else {
@@ -530,10 +534,10 @@
                         }
                     });
                 } else {
-                    //console.log(p_objectStringId + " not found");
+                    ////console.log(p_objectStringId + " not found");
                     throw DOMException.NOT_FOUND_ERR;
                 }
-                //console.log("returned key: " + key);
+                ////console.log("returned key: " + key);
                 return key;
             }
             getEaselElementsInBox(p_x1: number, p_y1: number, p_x2: number, p_y2: number): createjs.Container[] {
@@ -552,7 +556,7 @@
                 return this.m_connectionArr;
             }
             getConnection(p_connectionStringId: string): Connection {
-                //console.log("connectId: " + p_connectionStringId);
+                ////console.log("connectId: " + p_connectionStringId);
                 return this.m_connectionArr[this.getObjectIndex(p_connectionStringId)];
             }
             getElementArr(): Element[] {
@@ -590,33 +594,33 @@
                 if (key >= this.m_connectionArr.length)
                     return false;
                 else {
-                    console.log("Deleting connection: " + p_connID + "   ----------------");
+                    //console.log("Deleting connection: " + p_connID + "   ----------------");
 
                     if (this.m_bbnMode) {
                         var states: number = this.m_connectionArr[key].getInputElement().getDataOld().length;
                         var data = this.m_connectionArr[key].getOutputElement().getDataOld();
                         var dataIn = this.m_connectionArr[key].getInputElement().getDataOld();
                         var removeHeader = this.m_connectionArr[key].getInputElement().getID();
-                        //console.log("Remove header: " + removeHeader);
-                        //console.log("Original Data Out: " + data);
-                        //console.log("Original Data In: " + dataIn);
+                        ////console.log("Remove header: " + removeHeader);
+                        ////console.log("Original Data Out: " + data);
+                        ////console.log("Original Data In: " + dataIn);
                     
                         var dims: number[] = [0, 0, 0];
                         data = Tools.removeHeaderRow(removeHeader, data);
                         //var splicePos = 1 + Math.floor((data[data.length - 1].length / states));
-                        //console.log("states: " + states);
-                        //console.log("splicepos: " + splicePos);
+                        ////console.log("states: " + states);
+                        ////console.log("splicepos: " + splicePos);
                         //for (var row = 0; row < data.length;row++) {
                         //    if(data[row].length-1 > splicePos)
                         //        data[row].splice(splicePos);
                         //}
-                        //console.log("New data: " + data);
-                        //console.log("ConnectionArr: " + this.m_connectionArr[key]);
+                        ////console.log("New data: " + data);
+                        ////console.log("ConnectionArr: " + this.m_connectionArr[key]);
                         this.m_connectionArr[key].getOutputElement().setData(data);
 
                         this.m_connectionArr.splice(key, 1);
 
-                        //console.log(this.m_elementArr);
+                        ////console.log(this.m_elementArr);
                         return true;
                     }
                     else { // MCA
@@ -627,7 +631,7 @@
                             case 100: //attribute
                                 break;
                             case 101: //objective
-                                console.log("updating  data:  ");
+                                //console.log("updating  data:  ");
                                 for (var e in elmtOut.m_swingWeightsArr) {
                                     var out = elmtOut.m_swingWeightsArr[e][0];
                                     var id = this.m_connectionArr[key].getID();
@@ -640,7 +644,7 @@
                             case 102: //alternative
                                 break;
                             case 103: //goal
-                                console.log("updating  data:  ");
+                                //console.log("updating  data:  ");
                                 for (var e in elmtOut.m_swingWeightsArr) {
                                     if (elmtOut.m_swingWeightsArr[e][0] === this.m_connectionArr[key].getID()) {
                                         //elmt.m_swingWeightsArr.splice(parseInt(e) , 1);
@@ -707,7 +711,7 @@
 
             }
             fromJSON(p_jsonObject: any): void {
-                //console.log("from json: p_jsonObject = " + p_jsonObject);
+                ////console.log("from json: p_jsonObject = " + p_jsonObject);
                 $("#modelHeader").html(p_jsonObject.mdlName);
                 var header = $("#model_header").html();
                 //Only append if model name has not been added
@@ -715,9 +719,9 @@
                     $("#model_header").append(p_jsonObject.mdlName);
                 }
 
-                console.log("jsonObject.elements: " + p_jsonObject.elements);
+                //console.log("jsonObject.elements: " + p_jsonObject.elements);
                 this.m_modelName = p_jsonObject.mdlName;
-                console.log("Model name: " + this.m_modelName);
+                //console.log("Model name: " + this.m_modelName);
                 this.m_modelIdent = p_jsonObject.mdlIdent;
 
                 this.m_dataMatrix = p_jsonObject.dataMat;
@@ -742,7 +746,7 @@
                     var tmp = parseInt(elmt.getID().substr(4));
                     if (parseInt(elmt.getID().substr(4)) !== NaN && parseInt(elmt.getID().substr(4)) > this.m_counter)
                         this.m_counter = parseInt(elmt.getID().substr(4));
-                    //console.log("created from json: " + elmt.getName());
+                    ////console.log("created from json: " + elmt.getName());
                 }
 
                 for (var i = 0; i < p_jsonObject.connections.length; i++) {
@@ -765,8 +769,8 @@
 
                 for (var i = 0; i < p_jsonObject.elements.length; i++) {
                     if (this.m_bbnMode)
-                        //console.log("from json: " + elmt.getName());
-                        //console.log(this.m_elementArr);
+                        ////console.log("from json: " + elmt.getName());
+                        ////console.log(this.m_elementArr);
                         //elmt.update();
                         
                         this.m_elementArr[i].update();
@@ -774,8 +778,8 @@
                 //h.gui.setSize(maxX + 80, maxY + 20);
 
                 //h.gui.updateTable(this.dataMatrix);
-                ////console.log("model.fromJSON()");
-                ////console.log(this);
+                //////console.log("model.fromJSON()");
+                //////console.log(this);
                 var tmp = this.m_counter;
             }
             createNewConnection(p_inputElmt: Element, p_outputElmt: Element): Connection {
@@ -789,7 +793,7 @@
             setDecision(p_elmtIdent: string, p_decisNumb: number): void {
                 var elmt: Element = this.getElement(p_elmtIdent);
                 if (elmt.getDecision() == p_decisNumb) {
-                    //console.log("unsetting decision");
+                    ////console.log("unsetting decision");
                     elmt.setDecision(undefined)
                 }
                 else {
@@ -803,9 +807,9 @@
                 The problem occured when first one decision was set and the model was updated and then another decision was set. 
                 elmt.getAllDescendants().forEach(function (e: Element) {
                     e.setUpdated(false);
-                    console.log(e.getName() + " not updated");
+                    //console.log(e.getName() + " not updated");
                 });*/
-                //console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
+                ////console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
             }
             getCumuluValue(p_element, p_level): number {
                 var retValue = 0;

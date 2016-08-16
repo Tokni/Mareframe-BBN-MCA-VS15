@@ -1717,8 +1717,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var node = parseTree(_signatures, []);
 
 	      //var util = require('util');
-	      //console.log('ROOT');
-	      //console.log(util.inspect(node, { depth: null }));
+	      ////console.log('ROOT');
+	      ////console.log(util.inspect(node, { depth: null }));
 
 	      // generate code for the typed function
 	      var code = [];
@@ -1740,7 +1740,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var factory = (new Function(refs.name, 'createError', body));
 	      var fn = factory(refs, createError);
 
-	      //console.log('FN\n' + fn.toString()); // TODO: cleanup
+	      ////console.log('FN\n' + fn.toString()); // TODO: cleanup
 
 	      // attach the signatures with sub-functions to the constructed function
 	      fn.signatures = mapSignatures(_signatures);
@@ -3062,13 +3062,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (index !== -1) {
 	      // right value, wrong casing
 	      // TODO: lower case values are deprecated since v3, remove this warning some day.
-	      console.warn('Warning: Wrong casing for configuration option "' + name + '", should be "' + values[index] + '" instead of "' + options[name] + '".');
+	      //console.warn('Warning: Wrong casing for configuration option "' + name + '", should be "' + values[index] + '" instead of "' + options[name] + '".');
 
 	      options[name] = values[index]; // change the option to the right casing
 	    }
 	    else {
 	      // unknown value
-	      console.warn('Warning: Unknown value "' + options[name] + '" for configuration option "' + name + '". Available options: ' + values.map(JSON.stringify).join(', ') + '.');
+	      //console.warn('Warning: Unknown value "' + options[name] + '" for configuration option "' + name + '". Available options: ' + values.map(JSON.stringify).join(', ') + '.');
 	    }
 	  }
 	}
@@ -17403,7 +17403,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   *
 	   * To get the result of the range:
 	   *     range.forEach(function (x) {
-	   *         console.log(x);
+	   *         //console.log(x);
 	   *     });
 	   *     range.map(function (x) {
 	   *         return math.sin(x);
@@ -26284,7 +26284,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  ],
 	  'description': 'Iterates over all elements of a matrix/array, and executes the given callback function.',
 	  'examples': [
-	    'forEach([1, 2, 3], function(val) { console.log(val) })'
+	    'forEach([1, 2, 3], function(val) { //console.log(val) })'
 	  ],
 	  'seealso': ['map', 'sort', 'filter']
 	};
@@ -33221,7 +33221,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    // TODO deprecated since v3.0, cleanup some day
 	    if (typeof fn === 'string') {
-	      console.warn('WARNING: passing a string to FunctionNode is deprecated, pass a SymbolNode instead.');
+	      //console.warn('WARNING: passing a string to FunctionNode is deprecated, pass a SymbolNode instead.');
 	      fn = new SymbolNode(fn);
 	    }
 
@@ -33794,9 +33794,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	   *
 	   * Examples:
 	   *
-	   *    console.log(math.help('sin').toString());
-	   *    console.log(math.help(math.add).toString());
-	   *    console.log(math.help(math.add).toJSON());
+	   *    //console.log(math.help('sin').toString());
+	   *    //console.log(math.help(math.add).toString());
+	   *    //console.log(math.help(math.add).toJSON());
 	   *
 	   * @param {Function | string | Object} search   A function or function name
 	   *                                              for which to get help
@@ -34612,7 +34612,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * Examples:
 	   *
 	   *    math.forEach([1, 2, 3], function(value) {
-	   *      console.log(value);
+	   *      //console.log(value);
 	   *    });
 	   *    // outputs 1, 2, 3
 	   *
@@ -43853,13 +43853,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      throw new Error('Parameters in function xgcd must be integer numbers');
 	    }
 
-	    //console.log('start', [a, b].toString())
+	    ////console.log('start', [a, b].toString())
 
 	    while (!b.isZero()) {
-	      //console.log('inner', [a, b, t, q, r, x, y, lastx, lasty].toString());
+	      ////console.log('inner', [a, b, t, q, r, x, y, lastx, lasty].toString());
 	      q = a.div(b).floor();
 	      r = a.mod(b);
-	      //console.log('MOD', [a, b, a.mod(b), r].toString())
+	      ////console.log('MOD', [a, b, a.mod(b), r].toString())
 
 	      t = x;
 	      x = lastx.minus(q.times(x));
@@ -43872,10 +43872,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      a = b;
 	      b = r;
 
-	      //console.log('inner end', [a, b, t, q, r, x, y, lastx, lasty].toString());
+	      ////console.log('inner end', [a, b, t, q, r, x, y, lastx, lasty].toString());
 	    }
 
-	    //console.log('end', [a, lastx, lasty].toString())
+	    ////console.log('end', [a, lastx, lasty].toString())
 
 	    var res;
 	    if (a.lt(zero)) {

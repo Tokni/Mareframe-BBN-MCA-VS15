@@ -150,14 +150,14 @@
                     <option> 4 </option>
                 </select>
             </div>
-            <div id="finalScoreBars_div">
+            <!--<div id="finalScoreBars_div">
                 Bars
                 <select id="finalScoreBars_select">
                     <option> 5 </option>
                     <option> 6 </option>
                 </select>
             </div>
-            <button id="finalScoreSetAsText_button">As text</button>
+            <button id="finalScoreSetAsText_button">As text</button>-->
         </div>
         <div id="MCADataTable" class="table-editable" style="display:inline-block">
             <!--<table id="editableDataTable" class="table" style="border: 2px solid #ffffff;border-collapse:collapse;">-->
@@ -335,7 +335,7 @@
             },
             modal: false,
             close: function () {
-                console.log("closing dialog html");
+                //console.log("closing dialog html");
                     $("#valuesTable_div").hide();
                     $("#weightingMethodSelector").hide();
                     $("#valueFn_div").hide();
@@ -344,7 +344,7 @@
                     $("#description_div").hide();
                     $("#chart_div").hide();
             }, // end close
-            //beforeclose: function (){ console.log("beforeclosing dialog");},
+            //beforeclose: function (){ //console.log("beforeclosing dialog");},
             buttons: {
                 Close: function () {                 
                     $(this).dialog("close");

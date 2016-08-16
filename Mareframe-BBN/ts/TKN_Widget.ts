@@ -183,9 +183,9 @@
 
                     //oldText = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
                     //var saveName = oldText + ".xdsl";
-                    //console.log("saveName: " + saveName);
+                    ////console.log("saveName: " + saveName);
                     //gui.m_handler.getFileIO().saveModel(gui.m_model, saveName);
-                    //console.log("filenamehtml: " + $filename.html());
+                    ////console.log("filenamehtml: " + $filename.html());
                 }
             }
             
@@ -193,7 +193,7 @@
                 
               //handleMouseDown(e: createjs.MouseEvent) {
                 //alert("mouseDown");
-                //console.log("mousedown on " + e.target.id);
+                ////console.log("mousedown on " + e.target.id);
                 //var tt = e.target;
                 //e.data;
                 
@@ -239,7 +239,7 @@
                 this.addPWLToStage();
                 var t = this.m_selectedPointIndex;
                 var t2 = this.m_pwl;
-                //console.log("selectedIndex: " + this.m_selectedPointIndex); 
+                ////console.log("selectedIndex: " + this.m_selectedPointIndex); 
                 this.update();               
             }
             hd(e: createjs.MouseEvent, data: any) { }
@@ -270,7 +270,7 @@
                 this.update();
             }
             handleDeleteButton = (e: createjs.MouseEvent) => {
-                console.log("houh");
+                //console.log("houh");
                 this.m_pwl.removePointAtIndex(this.m_selectedPointIndex);
                 this.m_selectedPointIndex = null;
                 $("#selectedPointInfo").hide();
@@ -315,18 +315,18 @@
                 this.update();
             }
             handleLoadFromFile = (e: createjs.MouseEvent) => {
-                console.log("not done yet, no not yet");
+                //console.log("not done yet, no not yet");
                 this.m_fileIO.loadPWLFromFile(this.m_pwl, this.addPWLToStage);
                 this.update();
             }
             handleSaveToFile = (e: createjs.MouseEvent) => {
-                console.log("not done yet");
+                //console.log("not done yet");
                 var fileIO = this.m_fileIO;
                 var widget = this;
                 fileIO.savePiecewiseLinearFunction(widget.m_pwl);
                 $("#saveFile_div").show();
                 $("#saveFile_div").show().dblclick(function () {
-                    //console.log("DC filname");
+                    ////console.log("DC filname");
                 
                     var $filename = $("#filename");
 
@@ -336,7 +336,7 @@
                     $filename.children().first().keypress(function (e) {
                         if (e.which == 13) {
                             var newText = $(this).val();
-                            console.log("new text: " + newText);
+                            //console.log("new text: " + newText);
                             if (newText.length < 1) { //Must not update the text if the new text string is empty
                                 $filename.html(oldText);
                                 newText = oldText;
@@ -345,7 +345,7 @@
 
                             oldText = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
                             var saveName = oldText + ".tkn";
-                            console.log("saveName: " + saveName);
+                            //console.log("saveName: " + saveName);
                             fileIO.savePiecewiseLinearFunction(widget.m_pwl);
                         }
 
@@ -354,13 +354,13 @@
                               
             }
             handleDeleteAllPoints = (e: createjs.MouseEvent) => {
-                console.log("not done yet");
+                //console.log("not done yet");
                 this.m_pwl.getPoints().splice(1, this.m_pwl.getPoints().length - 2);
                 this.addPWLToStage();
                 this.update();
             }
             handleShowAlternatives = (e: createjs.MouseEvent) => {
-                console.log("not done yet");
+                //console.log("not done yet");
                 var tnp2 = this.m_unitX;
                 var vertLines: createjs.Shape[] = [];
                 var i = 0;
