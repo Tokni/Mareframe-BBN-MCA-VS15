@@ -37,6 +37,7 @@
     <Content Include="MCA.html" />
     <Content Include="saveFile.php" />
     <Content Include="Script1.js" />
+    <Content Include="updater.js" />
     <Content Include="ts\HashTable.js" />
     <Content Include="ts\WebWorker.js" />
     <Content Include="web.config" />

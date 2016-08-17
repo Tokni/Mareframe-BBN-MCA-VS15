@@ -304,20 +304,25 @@ module Mareframe {
                 document.getElementsByTagName("body")[0].style.cursor = "progress";
             }
             private cancelWorker(p_evt: Event): void {
-                var worker: Worker = p_evt.data.worker;
+                var worker: Worker = p_evt.data.worker1;
+                Tools.stopWorker(worker);
+            }
+            private cancelTwoWorkers(p_evt: Event): void {
+                var worker: Worker = p_evt.data.worker1;
+                (p_evt.data.worker2).terminate
                 Tools.stopWorker(worker);
             }
             public updateModel() {
+                //this.updateModelParallel();
                 var gui: GUIHandler = this;
                 $("#updateMdl").removeClass("ui-state-focus");
-                debugger
-                var worker: Worker = Tools.startWorker(true);
+                var worker: Worker = Tools.startWorker("../Script1.js",true);
                 this.goToUpdateMode(true);
                 $("#cancelProgress").click({ worker: worker }, this.cancelWorker);
                 worker.postMessage({
                     model: JSON.stringify(this.m_model.toJSON())
                 });
-
+                var status: number = 0;
                 worker.onmessage = function (evt) {
                     switch (evt.data.command) {
                         case "finnished":
@@ -338,7 +343,7 @@ module Mareframe {
                             gui.goToUpdateMode(false);
                             break;
                         case "progress":
-                            var status: number = evt.data.progress;
+                           status += evt.data.progress;
                             $("#progressBar").progressbar({
                                 value: status
                             });
@@ -346,6 +351,149 @@ module Mareframe {
                     }
                 };
 
+            }
+
+            public updateModelParallel() {
+                var gui: GUIHandler = this;
+                $("#updateMdl").removeClass("ui-state-focus");
+                this.goToUpdateMode(true);
+
+                var worker1: Worker = Tools.startWorker("../updater.js", true);
+                var worker2: Worker = Tools.startWorker("../updater.js", true);
+                worker1.postMessage({
+                    command: "createTable",
+                    model: JSON.stringify(this.m_model.toJSON())
+                });
+                $("#cancelProgress").click({ worker1: worker1, worker2: worker2 }, this.cancelWorker);
+                var elmtNo: number = 0;
+                var elments: Element[] = this.m_model.getElementArr();
+                var sampleTable: any[];
+                var updatingModel: Model;
+                var firstWorkerDone: boolean = false;
+                worker1.onmessage = function (evt) {
+                    switch (evt.data.command) {
+                        case "tableCreated":
+                            //First part of updating is done
+                            var model: Model = new Model(true)
+                            model.fromJSON(JSON.parse(evt.data.model), false);
+                            updatingModel = model;
+                            var table = evt.data.table;
+                            sampleTable = table;
+                            worker1.postMessage({
+                                command: "updateElmt",
+                                elmt: JSON.stringify(elments[elmtNo].toJSON()),
+                                table: table
+                            });
+                            elmtNo++;
+                            worker2.postMessage({
+                                command: "updateElmt",
+                                elmt: JSON.stringify(elments[elmtNo].toJSON()),
+                                table: table
+                            });
+                            elmtNo++;
+                            break;
+                        case "elementUpdated":
+                            //Update values table of updated element
+                            var elmt: Element = new Element("elmt", undefined, undefined);
+                            elmt.fromJSON(JSON.parse(evt.data.elmt));
+                            var e = gui.m_model.getElement(elmt.getID());
+                            e.setValues(elmt.getValues());
+                            e.setUpdated(true);
+                            if (elmtNo === elments.length) {
+                                //If this was the last element, move on to decisions
+                                if (firstWorkerDone) {
+                                    worker1.postMessage({
+                                        command: "updateDecisions",
+                                        model: JSON.stringify(gui.m_model.toJSON())
+                                    });
+                                }
+                                else {
+                                    Tools.stopWorker(worker1);
+                                    firstWorkerDone = true;
+                                }
+                            }
+                            else {
+                                //start updating next element
+                                worker1.postMessage({
+                                    command: "updateElmt",
+                                    elmt: JSON.stringify(elments[elmtNo].toJSON()),
+                                    table: sampleTable
+                                });
+                                elmtNo++;
+                            }
+                            break;
+                        case "decisionsUpdated":
+                            gui.m_model.closeDown();
+                            var model: Model = new Model(true)
+                            model.fromJSON(JSON.parse(evt.data.model), false);
+                            gui.m_model = model;
+                            //this.m_model.update();
+                            gui.m_model.getElementArr().forEach(function (e) {
+                                e.addMinitable();
+                                e.addEaselElmt();
+                                e.setUpdated(true);
+                            });
+                            gui.updateMiniTables(gui.m_model.getElementArr());
+                            gui.updateOpenDialogs();
+                            gui.importStage();
+                            Tools.stopWorker(worker1);
+                            gui.goToUpdateMode(false);
+                            break;
+                        default: console.log("unknown command");
+
+                    }
+                }
+                worker2.onmessage = function (evt) {
+                    switch (evt.data.command) {
+                        case "elementUpdated":
+                            //Update values table of updated element
+                            var elmt: Element = new Element("elmt", undefined, undefined);
+                            elmt.fromJSON(JSON.parse(evt.data.elmt));
+                            var e = gui.m_model.getElement(elmt.getID());
+                            e.setValues(elmt.getValues());
+                            e.setUpdated(true);
+                            if (elmtNo === elments.length) {
+                                if (firstWorkerDone) {
+                                    worker2.postMessage({
+                                        command: "updateDecisions",
+                                        model: JSON.stringify(gui.m_model.toJSON())
+                                    });
+                                }
+                                else {
+                                    Tools.stopWorker(worker2);
+                                    firstWorkerDone = true;
+                                }
+                            }
+                            else {
+                                //start updating next element
+                                worker2.postMessage({
+                                    command: "updateElmt",
+                                    elmt: JSON.stringify(elments[elmtNo].toJSON()),
+                                    table: sampleTable
+                                });
+                                elmtNo++;
+                            }
+                            break;
+                        case "decisionsUpdated":
+                            gui.m_model.closeDown();
+                            var model: Model = new Model(true)
+                            model.fromJSON(JSON.parse(evt.data.model), false);
+                            gui.m_model = model;
+                            //this.m_model.update();
+                            gui.m_model.getElementArr().forEach(function (e) {
+                                e.addMinitable();
+                                e.addEaselElmt();
+                                e.setUpdated(true);
+                            });
+                            gui.updateMiniTables(gui.m_model.getElementArr());
+                            gui.updateOpenDialogs();
+                            gui.importStage();
+                            Tools.stopWorker(worker2);
+                            gui.goToUpdateMode(false);
+                            break;
+                        default: console.log("unknown command");
+                    }
+                }
             }
             private updateDecAndEvidenceVisually() {
                 this.updateMiniTables(this.m_model.getElementArr());
@@ -1386,8 +1534,7 @@ module Mareframe {
             }
 
             private updateVOI = (p_evt: Event): void => {
-               
-
+                var gui: GUIHandler = this;
                 var pov: Element = this.m_model.getElement($("#fromPointOfView").val());
                 var forDec: Element = this.m_model.getElement($("#forDec").val());
                 var chanceElmts: Element[] = [];
@@ -1396,8 +1543,77 @@ module Mareframe {
                         chanceElmts.push(e);
                     }
                 });
-
-                var resultMatrix = Tools.valueOfInformation(this.m_model, pov, forDec, chanceElmts, this);
+                var worker1: Worker = Tools.startWorker("../Script1.js",true);
+                var worker2: Worker = Tools.startWorker("../Script1.js", false);
+                $("#cancelProgress").click({ worker1: worker1, worker2: worker2}, this.cancelWorker);
+                var VOIResults: any[] = Tools.getVIOMatrices(this.m_model, pov, forDec, chanceElmts, this);
+                var resultMatrix: any[][];
+                if (VOIResults) {
+                    worker1.postMessage({
+                        model: JSON.stringify(VOIResults[0])
+                    });
+                    worker2.postMessage({
+                        model: JSON.stringify(VOIResults[1])
+                    });
+                    var tempDecID: string = VOIResults[2];
+                    var firstWorkerDone = false;
+                    var matrix1: any[];
+                    var matrix2: any[];
+                    var status: number = 0;
+                    worker1.onmessage = function (evt) {
+                        switch (evt.data.command) {
+                            case "finnished":
+                                var model: Model = new Model(true);
+                                model.fromJSON(JSON.parse(evt.data.model), false);
+                                matrix1 = Tools.getMatrixWithoutHeader(model.getElement(tempDecID).getValues());
+                                if (firstWorkerDone) {
+                                    Tools.stopWorker(worker1);
+                                    resultMatrix = Tools.calcVOIResult(matrix1, matrix2);
+                                    gui.updateVOIVisual(resultMatrix);
+                                }
+                                else {
+                                    worker1.terminate();
+                                    firstWorkerDone = true;
+                                }
+                                break;
+                            case "progress":
+                                status += evt.data.progress / 2;
+                                $("#progressBar").progressbar({
+                                    value: status
+                                });
+                                break;
+                        }
+                    };
+                    worker2.onmessage = function (evt) {
+                        switch (evt.data.command) {
+                            case "finnished":
+                                var model: Model = new Model(true);
+                                model.fromJSON(JSON.parse(evt.data.model), false);
+                                matrix2 = Tools.getMatrixWithoutHeader(model.getElement(tempDecID).getValues());
+                                if (firstWorkerDone) {
+                                    Tools.stopWorker(worker2);
+                                    resultMatrix = Tools.calcVOIResult(matrix1, matrix2);
+                                    gui.updateVOIVisual(resultMatrix);
+                                }
+                                else {
+                                    worker2.terminate();
+                                    firstWorkerDone = true;
+                                }
+                                break;
+                            case "progress":
+                                status += evt.data.progress / 2;
+                                $("#progressBar").progressbar({
+                                    value: status
+                                });
+                                break;
+                        }
+                    };
+                }
+                else {
+                    this.updateVOIVisual([[0], [0]]);
+                }
+            }
+            private updateVOIVisual(p_result): void {
                 $("#voiTable").empty();//First remove the previous table
                 var table: HTMLTableElement = document.createElement("table");
                 table.classList.add("defTable_div");
@@ -1405,13 +1621,13 @@ module Mareframe {
                 var th = document.createElement("th");
                 row.appendChild(th);
                 th.innerHTML = "Result";
-                for (var i = 0; i < resultMatrix.length; i++) {
+                for (var i = 0; i < p_result.length; i++) {
                     var row = table.insertRow();
-                    for (var j = 0; j < resultMatrix[0].length; j++) {
+                    for (var j = 0; j < p_result[0].length; j++) {
                         var cell = row.insertCell();
                         var div = document.createElement("div");
                         cell.appendChild(div);
-                        div.innerHTML = resultMatrix[i][j];
+                        div.innerHTML = p_result[i][j];
                     }
                 }
                 $("#voiTable").append(table);

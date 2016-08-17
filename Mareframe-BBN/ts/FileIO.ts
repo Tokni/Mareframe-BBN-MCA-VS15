@@ -180,7 +180,8 @@
                             //    currentStartIndex = indexOfSmileClose;
 
                                 //}
-                                p_activeModelInstance.fromJSON(JSONObj, true);
+                            p_activeModelInstance.fromJSON(JSONObj, true);
+                            p_activeModelInstance.initialize();
                                 p_updateGui();
 
 

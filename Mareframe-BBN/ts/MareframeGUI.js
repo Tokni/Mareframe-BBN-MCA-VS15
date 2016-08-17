@@ -78,6 +78,7 @@ var Mareframe;
                     //console.log("auto update: " + this.m_model.m_autoUpdate);
                 };
                 this.updateVOI = function (p_evt) {
+                    var gui = _this;
                     var pov = _this.m_model.getElement($("#fromPointOfView").val());
                     var forDec = _this.m_model.getElement($("#forDec").val());
                     var chanceElmts = [];
@@ -86,24 +87,75 @@ var Mareframe;
                             chanceElmts.push(e);
                         }
                     });
-                    var resultMatrix = DST.Tools.valueOfInformation(_this.m_model, pov, forDec, chanceElmts, _this);
-                    $("#voiTable").empty(); //First remove the previous table
-                    var table = document.createElement("table");
-                    table.classList.add("defTable_div");
-                    var row = table.insertRow();
-                    var th = document.createElement("th");
-                    row.appendChild(th);
-                    th.innerHTML = "Result";
-                    for (var i = 0; i < resultMatrix.length; i++) {
-                        var row = table.insertRow();
-                        for (var j = 0; j < resultMatrix[0].length; j++) {
-                            var cell = row.insertCell();
-                            var div = document.createElement("div");
-                            cell.appendChild(div);
-                            div.innerHTML = resultMatrix[i][j];
-                        }
+                    var worker1 = DST.Tools.startWorker("../Script1.js", true);
+                    var worker2 = DST.Tools.startWorker("../Script1.js", false);
+                    $("#cancelProgress").click({ worker1: worker1, worker2: worker2 }, _this.cancelWorker);
+                    var VOIResults = DST.Tools.getVIOMatrices(_this.m_model, pov, forDec, chanceElmts, _this);
+                    var resultMatrix;
+                    if (VOIResults) {
+                        worker1.postMessage({
+                            model: JSON.stringify(VOIResults[0])
+                        });
+                        worker2.postMessage({
+                            model: JSON.stringify(VOIResults[1])
+                        });
+                        var tempDecID = VOIResults[2];
+                        var firstWorkerDone = false;
+                        var matrix1;
+                        var matrix2;
+                        var status = 0;
+                        worker1.onmessage = function (evt) {
+                            switch (evt.data.command) {
+                                case "finnished":
+                                    var model = new DST.Model(true);
+                                    model.fromJSON(JSON.parse(evt.data.model), false);
+                                    matrix1 = DST.Tools.getMatrixWithoutHeader(model.getElement(tempDecID).getValues());
+                                    if (firstWorkerDone) {
+                                        DST.Tools.stopWorker(worker1);
+                                        resultMatrix = DST.Tools.calcVOIResult(matrix1, matrix2);
+                                        gui.updateVOIVisual(resultMatrix);
+                                    }
+                                    else {
+                                        worker1.terminate();
+                                        firstWorkerDone = true;
+                                    }
+                                    break;
+                                case "progress":
+                                    status += evt.data.progress / 2;
+                                    $("#progressBar").progressbar({
+                                        value: status
+                                    });
+                                    break;
+                            }
+                        };
+                        worker2.onmessage = function (evt) {
+                            switch (evt.data.command) {
+                                case "finnished":
+                                    var model = new DST.Model(true);
+                                    model.fromJSON(JSON.parse(evt.data.model), false);
+                                    matrix2 = DST.Tools.getMatrixWithoutHeader(model.getElement(tempDecID).getValues());
+                                    if (firstWorkerDone) {
+                                        DST.Tools.stopWorker(worker2);
+                                        resultMatrix = DST.Tools.calcVOIResult(matrix1, matrix2);
+                                        gui.updateVOIVisual(resultMatrix);
+                                    }
+                                    else {
+                                        worker2.terminate();
+                                        firstWorkerDone = true;
+                                    }
+                                    break;
+                                case "progress":
+                                    status += evt.data.progress / 2;
+                                    $("#progressBar").progressbar({
+                                        value: status
+                                    });
+                                    break;
+                            }
+                        };
                     }
-                    $("#voiTable").append(table);
+                    else {
+                        _this.updateVOIVisual([[0], [0]]);
+                    }
                 };
                 this.m_handler = p_handler;
                 this.saveChanges = this.saveChanges.bind(this);
@@ -331,19 +383,25 @@ var Mareframe;
                 document.getElementsByTagName("body")[0].style.cursor = "progress";
             };
             GUIHandler.prototype.cancelWorker = function (p_evt) {
-                var worker = p_evt.data.worker;
+                var worker = p_evt.data.worker1;
+                DST.Tools.stopWorker(worker);
+            };
+            GUIHandler.prototype.cancelTwoWorkers = function (p_evt) {
+                var worker = p_evt.data.worker1;
+                (p_evt.data.worker2).terminate;
                 DST.Tools.stopWorker(worker);
             };
             GUIHandler.prototype.updateModel = function () {
+                //this.updateModelParallel();
                 var gui = this;
                 $("#updateMdl").removeClass("ui-state-focus");
-                debugger;
-                var worker = DST.Tools.startWorker(true);
+                var worker = DST.Tools.startWorker("../Script1.js", true);
                 this.goToUpdateMode(true);
                 $("#cancelProgress").click({ worker: worker }, this.cancelWorker);
                 worker.postMessage({
                     model: JSON.stringify(this.m_model.toJSON())
                 });
+                var status = 0;
                 worker.onmessage = function (evt) {
                     switch (evt.data.command) {
                         case "finnished":
@@ -364,11 +422,151 @@ var Mareframe;
                             gui.goToUpdateMode(false);
                             break;
                         case "progress":
-                            var status = evt.data.progress;
+                            status += evt.data.progress;
                             $("#progressBar").progressbar({
                                 value: status
                             });
                             break;
+                    }
+                };
+            };
+            GUIHandler.prototype.updateModelParallel = function () {
+                var gui = this;
+                $("#updateMdl").removeClass("ui-state-focus");
+                this.goToUpdateMode(true);
+                var worker1 = DST.Tools.startWorker("../updater.js", true);
+                var worker2 = DST.Tools.startWorker("../updater.js", true);
+                worker1.postMessage({
+                    command: "createTable",
+                    model: JSON.stringify(this.m_model.toJSON())
+                });
+                $("#cancelProgress").click({ worker1: worker1, worker2: worker2 }, this.cancelWorker);
+                var elmtNo = 0;
+                var elments = this.m_model.getElementArr();
+                var sampleTable;
+                var updatingModel;
+                var firstWorkerDone = false;
+                worker1.onmessage = function (evt) {
+                    switch (evt.data.command) {
+                        case "tableCreated":
+                            //First part of updating is done
+                            var model = new DST.Model(true);
+                            model.fromJSON(JSON.parse(evt.data.model), false);
+                            updatingModel = model;
+                            var table = evt.data.table;
+                            sampleTable = table;
+                            worker1.postMessage({
+                                command: "updateElmt",
+                                elmt: JSON.stringify(elments[elmtNo].toJSON()),
+                                table: table
+                            });
+                            elmtNo++;
+                            worker2.postMessage({
+                                command: "updateElmt",
+                                elmt: JSON.stringify(elments[elmtNo].toJSON()),
+                                table: table
+                            });
+                            elmtNo++;
+                            break;
+                        case "elementUpdated":
+                            //Update values table of updated element
+                            var elmt = new DST.Element("elmt", undefined, undefined);
+                            elmt.fromJSON(JSON.parse(evt.data.elmt));
+                            var e = gui.m_model.getElement(elmt.getID());
+                            e.setValues(elmt.getValues());
+                            e.setUpdated(true);
+                            if (elmtNo === elments.length) {
+                                //If this was the last element, move on to decisions
+                                if (firstWorkerDone) {
+                                    worker1.postMessage({
+                                        command: "updateDecisions",
+                                        model: JSON.stringify(gui.m_model.toJSON())
+                                    });
+                                }
+                                else {
+                                    DST.Tools.stopWorker(worker1);
+                                    firstWorkerDone = true;
+                                }
+                            }
+                            else {
+                                //start updating next element
+                                worker1.postMessage({
+                                    command: "updateElmt",
+                                    elmt: JSON.stringify(elments[elmtNo].toJSON()),
+                                    table: sampleTable
+                                });
+                                elmtNo++;
+                            }
+                            break;
+                        case "decisionsUpdated":
+                            gui.m_model.closeDown();
+                            var model = new DST.Model(true);
+                            model.fromJSON(JSON.parse(evt.data.model), false);
+                            gui.m_model = model;
+                            //this.m_model.update();
+                            gui.m_model.getElementArr().forEach(function (e) {
+                                e.addMinitable();
+                                e.addEaselElmt();
+                                e.setUpdated(true);
+                            });
+                            gui.updateMiniTables(gui.m_model.getElementArr());
+                            gui.updateOpenDialogs();
+                            gui.importStage();
+                            DST.Tools.stopWorker(worker1);
+                            gui.goToUpdateMode(false);
+                            break;
+                        default: console.log("unknown command");
+                    }
+                };
+                worker2.onmessage = function (evt) {
+                    switch (evt.data.command) {
+                        case "elementUpdated":
+                            //Update values table of updated element
+                            var elmt = new DST.Element("elmt", undefined, undefined);
+                            elmt.fromJSON(JSON.parse(evt.data.elmt));
+                            var e = gui.m_model.getElement(elmt.getID());
+                            e.setValues(elmt.getValues());
+                            e.setUpdated(true);
+                            if (elmtNo === elments.length) {
+                                if (firstWorkerDone) {
+                                    worker2.postMessage({
+                                        command: "updateDecisions",
+                                        model: JSON.stringify(gui.m_model.toJSON())
+                                    });
+                                }
+                                else {
+                                    DST.Tools.stopWorker(worker2);
+                                    firstWorkerDone = true;
+                                }
+                            }
+                            else {
+                                //start updating next element
+                                worker2.postMessage({
+                                    command: "updateElmt",
+                                    elmt: JSON.stringify(elments[elmtNo].toJSON()),
+                                    table: sampleTable
+                                });
+                                elmtNo++;
+                            }
+                            break;
+                        case "decisionsUpdated":
+                            gui.m_model.closeDown();
+                            var model = new DST.Model(true);
+                            model.fromJSON(JSON.parse(evt.data.model), false);
+                            gui.m_model = model;
+                            //this.m_model.update();
+                            gui.m_model.getElementArr().forEach(function (e) {
+                                e.addMinitable();
+                                e.addEaselElmt();
+                                e.setUpdated(true);
+                            });
+                            gui.updateMiniTables(gui.m_model.getElementArr());
+                            gui.updateOpenDialogs();
+                            gui.importStage();
+                            DST.Tools.stopWorker(worker2);
+                            gui.goToUpdateMode(false);
+                            break;
+                        default: console.log("unknown command");
                     }
                 };
             };
@@ -1319,6 +1517,25 @@ var Mareframe;
                 button.setAttribute("title", "Click to show the value of information for the selected nodes");
                 $("#voiButton").click(this.updateVOI);
                 return "voiDialog";
+            };
+            GUIHandler.prototype.updateVOIVisual = function (p_result) {
+                $("#voiTable").empty(); //First remove the previous table
+                var table = document.createElement("table");
+                table.classList.add("defTable_div");
+                var row = table.insertRow();
+                var th = document.createElement("th");
+                row.appendChild(th);
+                th.innerHTML = "Result";
+                for (var i = 0; i < p_result.length; i++) {
+                    var row = table.insertRow();
+                    for (var j = 0; j < p_result[0].length; j++) {
+                        var cell = row.insertCell();
+                        var div = document.createElement("div");
+                        cell.appendChild(div);
+                        div.innerHTML = p_result[i][j];
+                    }
+                }
+                $("#voiTable").append(table);
             };
             GUIHandler.prototype.createDetailsDialog = function (p_elmt) {
                 //console.log("creating dialog for " + p_elmt.getName());

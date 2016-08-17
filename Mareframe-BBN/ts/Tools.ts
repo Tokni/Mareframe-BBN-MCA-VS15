@@ -1418,7 +1418,80 @@
                // console.log("valid connection between " + inputElmt.getType() + " and  " + outputElmt.getType() + ": " + valid);
                 return valid;
             }
-
+            static getVIOMatrices(p_model: Model, p_pov: Element, p_forDec: Element, p_chanceElmts: Element[], p_gui: GUIHandler): any[] {
+                var tempConnections: Connection[] = [];
+                var isPossible: boolean = true;
+                //Create temporary decision
+                var tempDecision: Element = p_model.createNewElement(1);
+                //Add connection from temp dec to point of interest
+                var c = p_model.createNewConnection(tempDecision, p_pov);
+                if (!p_model.addConnection(c)) {
+                    isPossible = false;
+                }
+                p_pov.setUpdated(false);
+                p_pov.getAllDescendants().forEach(function (e) {
+                    e.setUpdated(false);
+                });
+                p_pov.getAllAncestors().forEach(function (e) {
+                    e.setUpdated(false);
+                });
+                tempDecision.setUpdated(false);
+                //Find a utility node
+                var utilityFound: boolean = false;
+                for (var i = 0; i < p_model.getElementArr().length; i++) {
+                    var elmt: Element = p_model.getElementArr()[i];
+                    if (elmt.getType() === 2) {
+                        //Add connection from temp dec to utility node
+                        var c = p_model.createNewConnection(tempDecision, elmt);
+                        if (!p_model.addConnection(c)) {
+                            isPossible = false;
+                        }
+                        elmt.setUpdated(false);
+                        elmt.getAllDescendants().forEach(function (e) {
+                            e.setUpdated(false);
+                        });
+                        elmt.getAllAncestors().forEach(function (e) {
+                            e.setUpdated(false);
+                        });
+                        utilityFound = true;
+                        break;
+                    }
+                }
+                if (!utilityFound) {
+                    //If there is no utility node in the model it is not possible to calc value of information
+                    isPossible = false;
+                }
+                var model1: Object = $.extend(true, {},p_model.toJSON());
+                
+                //Create connection from each of the selected chance nodes to the selected for decision
+                p_chanceElmts.forEach(function (e) {
+                    var c = p_model.createNewConnection(e, p_forDec);
+                    if (!p_model.addConnection(c)) {
+                        isPossible = false;
+                    }
+                    else {
+                        tempConnections.push(c);
+                    }
+                    p_forDec.setUpdated(false);
+                    p_forDec.getAllDescendants().forEach(function (e) {
+                        e.setUpdated(false);
+                    });
+                    p_forDec.getAllAncestors().forEach(function (e) {
+                        e.setUpdated(false);
+                    });
+                    e.setUpdated(false);
+                });
+                var model2: Object = $.extend(true, {}, p_model.toJSON());
+                
+                //Delete temporary elements and connections
+                p_gui.deleteSelected(new Event("click"), [tempDecision], tempConnections);//The event is empty and not used
+                if (isPossible) {
+                    return [model1, model2,tempDecision.getID()];
+                }
+                else {
+                    return undefined;
+                } 
+            }
             static valueOfInformation(p_model: Model, p_pov: Element, p_forDec: Element, p_chanceElmts: Element[], p_gui: GUIHandler): any[] {
                
                 console.log("value of information. POV: " + p_pov.getName() + " for dec: " + p_forDec.getName() + " chancenodes: " + p_chanceElmts.length);
@@ -1504,13 +1577,31 @@
                     newResult[newResult.length - 1].push(Tools.round(average));
                 }
                 //Delete temporary elements and connections
-                p_gui.deleteSelected(new Event("click"), [tempDecision], tempConnections);//The event is empyt and not used
+                p_gui.deleteSelected(new Event("click"), [tempDecision], tempConnections);//The event is empty and not used
                 if (isPossible) {
                     return newResult;
                 }
                 else {
                     return [[0]];
                 }
+            }
+            static calcVOIResult(p_matrix1: any[], p_matrix2: any[]): any[] {
+                //Subtract the two saved matrices
+                var resultMatrix: any[] = math.subtract(p_matrix2, p_matrix1);
+                //Find average between the two rows
+                var newResult = [];
+                for (var i = 0; i < Tools.numOfHeaderRows(resultMatrix); i++) {
+                    newResult.push(resultMatrix[i]);
+                }
+                newResult.push([]);
+                var numOfRows: number = resultMatrix.length;
+                for (var i = 0; i < resultMatrix[0].length; i++) {
+                    var val1: number = resultMatrix[numOfRows - 2][i];
+                    var val2: number = resultMatrix[numOfRows - 1][i];
+                    var average: number = (val1 + val2) / 2;
+                    newResult[newResult.length - 1].push(Tools.round(average));
+                }
+                return newResult;
             }
             static createLikelihoodTable(p_model: Model, p_numOfIterations: number): any[] {
                 console.log("creating table");
@@ -1546,27 +1637,28 @@
                 console.log("done creating table");
                 return table;
             }
-            static calcValuesLikelihoodSamplingElmt(e: Element, weightSum: number, table: any[], ) {
+            
+            static calcValuesLikelihoodSamplingElmt(p_elmt: Element, p_table: any[]) {
 
-                console.log("calculating values for " + e.getName());
-                if (e.getType() === 0 || e.getType() === 2) {
-                    var data = e.getData();
+                console.log("calculating values for " + p_elmt.getName());
+                if (p_elmt.getType() === 0 || p_elmt.getType() === 2) {
+                    var data = p_elmt.getData();
                     var values = [];
-                    var oldValues = e.getValues(); //This is used to gain information about the headerrows in values
+                    var oldValues = p_elmt.getValues(); //This is used to gain information about the headerrows in values
                     //Add the headerrows into values
-                    for (var row = 0; row < Tools.numOfHeaderRows(oldValues, e); row++) {
+                    for (var row = 0; row < Tools.numOfHeaderRows(oldValues, p_elmt); row++) {
                         values.push(oldValues[row]);
                     }
                     var dataLength = data.length;
-                    var startCol = Tools.numOfHeaderRows(data, e);
-                    if (e.getType() === 2) {
+                    var startCol = Tools.numOfHeaderRows(data, p_elmt);
+                    if (p_elmt.getType() === 2) {
                         dataLength = data[0].length;
                         startCol = 1;
                     }
                     // console.log("startCol: " + startCol + " dataLenght: " + dataLength);
                     for (var i = startCol; i < dataLength; i++) {//For each of the different values
                         var valRow = [];
-                        if (e.getType() === 0) {
+                        if (p_elmt.getType() === 0) {
                             valRow.push(data[i][0]);//push name of value
                         }
                         else {
@@ -1576,41 +1668,41 @@
                             var value = 0;
 
                             //console.log("calculating for " + data[i][0] + " column: " + col + " in " + e.getName());
-                            weightSum = 0; //Calculate a new weight sum for each column
-                            for (var j = 0; j < table.length; j++) {//For each case
+                            var weightSum: number = 0; //Calculate a new weight sum for each column
+                            for (var j = 0; j < p_table.length; j++) {//For each case
                                 //console.log("case: " + JSON.stringify(table[j][0]));
                                 var matchingCase = true;
                                 var matchingValue = true;
 
-                                if (e.getType() === 2) {
+                                if (p_elmt.getType() === 2) {
                                     for (var headerRow = 0; headerRow < Tools.numOfHeaderRows(data); headerRow++) {
 
                                         //console.log("column: " + i + ". Checking " + data[headerRow][0] + ", " + table[j][0][data[headerRow][0]] + " against " + data[headerRow][i]);
-                                        if (table[j][0][data[headerRow][0]] !== data[headerRow][i]) {//If the value in headerrow is not the same as the one sampled
+                                        if (p_table[j][0][data[headerRow][0]] !== data[headerRow][i]) {//If the value in headerrow is not the same as the one sampled
                                             matchingValue = false;
                                             //console.log("does not match");
                                         }
                                     }
                                 }
-                                else if (table[j][0][e.getID()] !== data[i][0]) {
+                                else if (p_table[j][0][p_elmt.getID()] !== data[i][0]) {
                                     //console.log("value does not match");
                                     matchingValue = false;
                                 }
-                                for (var headerRow = 0; headerRow < Tools.numOfHeaderRows(oldValues, e); headerRow++) {//Checking if all elements in this column match
+                                for (var headerRow = 0; headerRow < Tools.numOfHeaderRows(oldValues, p_elmt); headerRow++) {//Checking if all elements in this column match
                                     var headerElmt = oldValues[headerRow][0];
                                     //console.log("checking if case includes " + p_model.getElement(headerElmt).getName() + " : " + oldValues[headerRow][col]); 
-                                    if (table[j][0][headerElmt] !== oldValues[headerRow][col]) {
+                                    if (p_table[j][0][headerElmt] !== oldValues[headerRow][col]) {
                                         //console.log("does not match");
                                         matchingCase = false;
                                     }
                                 }
                                 if (matchingCase) {//Only increment weigthsum if this case includes all choices in this column
-                                    weightSum += table[j][1];
+                                    weightSum += p_table[j][1];
                                     //console.log("mathcing case. Updated weight sum to " + weightSum);
                                 }
                                 if (matchingValue && matchingCase) {
                                     //console.log("matching case and value");
-                                    value += table[j][1];//Add the weight
+                                    value += p_table[j][1];//Add the weight
 
                                     //console.log("value = " + value);
 
@@ -1627,7 +1719,7 @@
                         }
                         values.push(valRow);
                     }
-                    if (e.getType() === 2) {//If this is a utility node then values corresponds to a chance node where the states are the headers of the utility def
+                    if (p_elmt.getType() === 2) {//If this is a utility node then values corresponds to a chance node where the states are the headers of the utility def
                         //console.log("values: ");
                         //console.log(values);
                         //console.log("multiplying "+ Tools.getMatrixWithoutHeader(data) + " and " + Tools.getMatrixWithoutHeader(values));
@@ -1640,7 +1732,7 @@
                         //console.log(utilityValue);
                         //Add the headerrows into values
                         values = [];
-                        for (var row = 0; row < Tools.numOfHeaderRows(oldValues, e); row++) {
+                        for (var row = 0; row < Tools.numOfHeaderRows(oldValues, p_elmt); row++) {
                             values.push(oldValues[row]);
                         }
                         var valueRow = ["Value"];
@@ -1655,8 +1747,8 @@
                     //console.log("new values: ");
                     //console.log(values);
                     //console.log("setting values for " + e.getName()+ " + to: "+ values);
-                    e.setValues(values);
-                    e.setUpdated(true);
+                    p_elmt.setValues(values);
+                    p_elmt.setUpdated(true);
                 }
             }
             static calcValuesLikelihoodSampling(p_model: Model, p_numOfIterations: number) {
@@ -1670,7 +1762,7 @@
                 //console.log("weightSum " + weightSum);
 
                 p_model.getElementArr().forEach(function (e) {
-                    Tools.calcValuesLikelihoodSamplingElmt(e, weightSum, table);
+                    Tools.calcValuesLikelihoodSamplingElmt(e, table);
                     
                 });
                 //Update concerning decisions. It is important that this is done before decision values are calculated
@@ -1817,7 +1909,7 @@
                 //console.log("getting value row: " + p_elmt.getEvidence() + " col: " + column);
                 return averageLikelihood;
             }
-            static startWorker(p_showProgress: boolean): Worker {
+            static startWorker(p_script: string, p_showProgress: boolean): Worker {
                 if (p_showProgress) {
                     $("#progressbarDialog").dialog();
                     $("#progressBar").progressbar({
@@ -1828,7 +1920,7 @@
                 var w;
                 if (typeof (Worker) !== "undefined") {
                     if (typeof (w) == "undefined") {
-                        w = new Worker("../Script1.js");
+                        w = new Worker(p_script);
                     }
                     w.onmessage = function (event) {
                         console.log(event.data);

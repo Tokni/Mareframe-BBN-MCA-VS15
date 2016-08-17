@@ -553,7 +553,7 @@ var Mareframe;
                     //    maxX = JsonElmt.posX;
                     //if (JsonElmt.posY > maxY)
                     //    maxY = JsonElmt.posY;
-                    elmt.fromJSON(JsonElmt, !p_showVisual);
+                    elmt.fromJSON(JsonElmt);
                 }
                 for (var i = 0; i < p_jsonObject.connections.length; i++) {
                     var conn = p_jsonObject.connections[i];

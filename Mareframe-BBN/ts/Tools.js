@@ -1334,6 +1334,78 @@ var Mareframe;
                 // console.log("valid connection between " + inputElmt.getType() + " and  " + outputElmt.getType() + ": " + valid);
                 return valid;
             };
+            Tools.getVIOMatrices = function (p_model, p_pov, p_forDec, p_chanceElmts, p_gui) {
+                var tempConnections = [];
+                var isPossible = true;
+                //Create temporary decision
+                var tempDecision = p_model.createNewElement(1);
+                //Add connection from temp dec to point of interest
+                var c = p_model.createNewConnection(tempDecision, p_pov);
+                if (!p_model.addConnection(c)) {
+                    isPossible = false;
+                }
+                p_pov.setUpdated(false);
+                p_pov.getAllDescendants().forEach(function (e) {
+                    e.setUpdated(false);
+                });
+                p_pov.getAllAncestors().forEach(function (e) {
+                    e.setUpdated(false);
+                });
+                tempDecision.setUpdated(false);
+                //Find a utility node
+                var utilityFound = false;
+                for (var i = 0; i < p_model.getElementArr().length; i++) {
+                    var elmt = p_model.getElementArr()[i];
+                    if (elmt.getType() === 2) {
+                        //Add connection from temp dec to utility node
+                        var c = p_model.createNewConnection(tempDecision, elmt);
+                        if (!p_model.addConnection(c)) {
+                            isPossible = false;
+                        }
+                        elmt.setUpdated(false);
+                        elmt.getAllDescendants().forEach(function (e) {
+                            e.setUpdated(false);
+                        });
+                        elmt.getAllAncestors().forEach(function (e) {
+                            e.setUpdated(false);
+                        });
+                        utilityFound = true;
+                        break;
+                    }
+                }
+                if (!utilityFound) {
+                    //If there is no utility node in the model it is not possible to calc value of information
+                    isPossible = false;
+                }
+                var model1 = $.extend(true, {}, p_model.toJSON());
+                //Create connection from each of the selected chance nodes to the selected for decision
+                p_chanceElmts.forEach(function (e) {
+                    var c = p_model.createNewConnection(e, p_forDec);
+                    if (!p_model.addConnection(c)) {
+                        isPossible = false;
+                    }
+                    else {
+                        tempConnections.push(c);
+                    }
+                    p_forDec.setUpdated(false);
+                    p_forDec.getAllDescendants().forEach(function (e) {
+                        e.setUpdated(false);
+                    });
+                    p_forDec.getAllAncestors().forEach(function (e) {
+                        e.setUpdated(false);
+                    });
+                    e.setUpdated(false);
+                });
+                var model2 = $.extend(true, {}, p_model.toJSON());
+                //Delete temporary elements and connections
+                p_gui.deleteSelected(new Event("click"), [tempDecision], tempConnections); //The event is empty and not used
+                if (isPossible) {
+                    return [model1, model2, tempDecision.getID()];
+                }
+                else {
+                    return undefined;
+                }
+            };
             Tools.valueOfInformation = function (p_model, p_pov, p_forDec, p_chanceElmts, p_gui) {
                 console.log("value of information. POV: " + p_pov.getName() + " for dec: " + p_forDec.getName() + " chancenodes: " + p_chanceElmts.length);
                 var tempConnections = [];
@@ -1418,13 +1490,31 @@ var Mareframe;
                     newResult[newResult.length - 1].push(Tools.round(average));
                 }
                 //Delete temporary elements and connections
-                p_gui.deleteSelected(new Event("click"), [tempDecision], tempConnections); //The event is empyt and not used
+                p_gui.deleteSelected(new Event("click"), [tempDecision], tempConnections); //The event is empty and not used
                 if (isPossible) {
                     return newResult;
                 }
                 else {
                     return [[0]];
                 }
+            };
+            Tools.calcVOIResult = function (p_matrix1, p_matrix2) {
+                //Subtract the two saved matrices
+                var resultMatrix = math.subtract(p_matrix2, p_matrix1);
+                //Find average between the two rows
+                var newResult = [];
+                for (var i = 0; i < Tools.numOfHeaderRows(resultMatrix); i++) {
+                    newResult.push(resultMatrix[i]);
+                }
+                newResult.push([]);
+                var numOfRows = resultMatrix.length;
+                for (var i = 0; i < resultMatrix[0].length; i++) {
+                    var val1 = resultMatrix[numOfRows - 2][i];
+                    var val2 = resultMatrix[numOfRows - 1][i];
+                    var average = (val1 + val2) / 2;
+                    newResult[newResult.length - 1].push(Tools.round(average));
+                }
+                return newResult;
             };
             Tools.createLikelihoodTable = function (p_model, p_numOfIterations) {
                 console.log("creating table");
@@ -1458,26 +1548,26 @@ var Mareframe;
                 console.log("done creating table");
                 return table;
             };
-            Tools.calcValuesLikelihoodSamplingElmt = function (e, weightSum, table) {
-                console.log("calculating values for " + e.getName());
-                if (e.getType() === 0 || e.getType() === 2) {
-                    var data = e.getData();
+            Tools.calcValuesLikelihoodSamplingElmt = function (p_elmt, p_table) {
+                console.log("calculating values for " + p_elmt.getName());
+                if (p_elmt.getType() === 0 || p_elmt.getType() === 2) {
+                    var data = p_elmt.getData();
                     var values = [];
-                    var oldValues = e.getValues(); //This is used to gain information about the headerrows in values
+                    var oldValues = p_elmt.getValues(); //This is used to gain information about the headerrows in values
                     //Add the headerrows into values
-                    for (var row = 0; row < Tools.numOfHeaderRows(oldValues, e); row++) {
+                    for (var row = 0; row < Tools.numOfHeaderRows(oldValues, p_elmt); row++) {
                         values.push(oldValues[row]);
                     }
                     var dataLength = data.length;
-                    var startCol = Tools.numOfHeaderRows(data, e);
-                    if (e.getType() === 2) {
+                    var startCol = Tools.numOfHeaderRows(data, p_elmt);
+                    if (p_elmt.getType() === 2) {
                         dataLength = data[0].length;
                         startCol = 1;
                     }
                     // console.log("startCol: " + startCol + " dataLenght: " + dataLength);
                     for (var i = startCol; i < dataLength; i++) {
                         var valRow = [];
-                        if (e.getType() === 0) {
+                        if (p_elmt.getType() === 0) {
                             valRow.push(data[i][0]); //push name of value
                         }
                         else {
@@ -1486,37 +1576,37 @@ var Mareframe;
                         for (var col = 1; col < oldValues[0].length; col++) {
                             var value = 0;
                             //console.log("calculating for " + data[i][0] + " column: " + col + " in " + e.getName());
-                            weightSum = 0; //Calculate a new weight sum for each column
-                            for (var j = 0; j < table.length; j++) {
+                            var weightSum = 0; //Calculate a new weight sum for each column
+                            for (var j = 0; j < p_table.length; j++) {
                                 //console.log("case: " + JSON.stringify(table[j][0]));
                                 var matchingCase = true;
                                 var matchingValue = true;
-                                if (e.getType() === 2) {
+                                if (p_elmt.getType() === 2) {
                                     for (var headerRow = 0; headerRow < Tools.numOfHeaderRows(data); headerRow++) {
                                         //console.log("column: " + i + ". Checking " + data[headerRow][0] + ", " + table[j][0][data[headerRow][0]] + " against " + data[headerRow][i]);
-                                        if (table[j][0][data[headerRow][0]] !== data[headerRow][i]) {
+                                        if (p_table[j][0][data[headerRow][0]] !== data[headerRow][i]) {
                                             matchingValue = false;
                                         }
                                     }
                                 }
-                                else if (table[j][0][e.getID()] !== data[i][0]) {
+                                else if (p_table[j][0][p_elmt.getID()] !== data[i][0]) {
                                     //console.log("value does not match");
                                     matchingValue = false;
                                 }
-                                for (var headerRow = 0; headerRow < Tools.numOfHeaderRows(oldValues, e); headerRow++) {
+                                for (var headerRow = 0; headerRow < Tools.numOfHeaderRows(oldValues, p_elmt); headerRow++) {
                                     var headerElmt = oldValues[headerRow][0];
                                     //console.log("checking if case includes " + p_model.getElement(headerElmt).getName() + " : " + oldValues[headerRow][col]); 
-                                    if (table[j][0][headerElmt] !== oldValues[headerRow][col]) {
+                                    if (p_table[j][0][headerElmt] !== oldValues[headerRow][col]) {
                                         //console.log("does not match");
                                         matchingCase = false;
                                     }
                                 }
                                 if (matchingCase) {
-                                    weightSum += table[j][1];
+                                    weightSum += p_table[j][1];
                                 }
                                 if (matchingValue && matchingCase) {
                                     //console.log("matching case and value");
-                                    value += table[j][1]; //Add the weight
+                                    value += p_table[j][1]; //Add the weight
                                 }
                                 else {
                                 }
@@ -1529,7 +1619,7 @@ var Mareframe;
                         }
                         values.push(valRow);
                     }
-                    if (e.getType() === 2) {
+                    if (p_elmt.getType() === 2) {
                         //console.log("values: ");
                         //console.log(values);
                         //console.log("multiplying "+ Tools.getMatrixWithoutHeader(data) + " and " + Tools.getMatrixWithoutHeader(values));
@@ -1542,7 +1632,7 @@ var Mareframe;
                         //console.log(utilityValue);
                         //Add the headerrows into values
                         values = [];
-                        for (var row = 0; row < Tools.numOfHeaderRows(oldValues, e); row++) {
+                        for (var row = 0; row < Tools.numOfHeaderRows(oldValues, p_elmt); row++) {
                             values.push(oldValues[row]);
                         }
                         var valueRow = ["Value"];
@@ -1556,8 +1646,8 @@ var Mareframe;
                     //console.log("new values: ");
                     //console.log(values);
                     //console.log("setting values for " + e.getName()+ " + to: "+ values);
-                    e.setValues(values);
-                    e.setUpdated(true);
+                    p_elmt.setValues(values);
+                    p_elmt.setUpdated(true);
                 }
             };
             Tools.calcValuesLikelihoodSampling = function (p_model, p_numOfIterations) {
@@ -1570,7 +1660,7 @@ var Mareframe;
                 }*/
                 //console.log("weightSum " + weightSum);
                 p_model.getElementArr().forEach(function (e) {
-                    Tools.calcValuesLikelihoodSamplingElmt(e, weightSum, table);
+                    Tools.calcValuesLikelihoodSamplingElmt(e, table);
                 });
                 //Update concerning decisions. It is important that this is done before decision values are calculated
                 p_model.getElementArr().forEach(function (p_elmt) {
@@ -1711,7 +1801,7 @@ var Mareframe;
                 //console.log("getting value row: " + p_elmt.getEvidence() + " col: " + column);
                 return averageLikelihood;
             };
-            Tools.startWorker = function (p_showProgress) {
+            Tools.startWorker = function (p_script, p_showProgress) {
                 if (p_showProgress) {
                     $("#progressbarDialog").dialog();
                     $("#progressBar").progressbar({
@@ -1721,7 +1811,7 @@ var Mareframe;
                 var w;
                 if (typeof (Worker) !== "undefined") {
                     if (typeof (w) == "undefined") {
-                        w = new Worker("../Script1.js");
+                        w = new Worker(p_script);
                     }
                     w.onmessage = function (event) {
                         console.log(event.data);
