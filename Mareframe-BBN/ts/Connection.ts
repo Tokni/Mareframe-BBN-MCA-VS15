@@ -4,21 +4,24 @@
             private m_inputElement: Element;
             private m_outputElement: Element;
             private m_id: string;
-            public m_easelElmt: createjs.Container = new createjs.Container();
+            public m_easelElmt: createjs.Container;
             private m_color = "black";
 
 
 
-            constructor(p_inputElmt: Element, p_outputElmt: Element, p_connID: string, p_bbnMode?: boolean) {
+            constructor(p_inputElmt: Element, p_outputElmt: Element, p_connID: string, p_bbnMode?: boolean, p_notVisual?: boolean) {
 
                 this.m_inputElement = p_inputElmt;
                 this.m_outputElement = p_outputElmt;
-               
-                    this.m_id = p_connID;
-                
 
-                if (p_bbnMode&&p_inputElmt.getType() === 1 && p_outputElmt.getType() === 1) {
+                this.m_id = p_connID;
+
+
+                if (p_bbnMode && p_inputElmt.getType() === 1 && p_outputElmt.getType() === 1) {
                     this.m_color = "gray";
+                }
+                if (!p_notVisual) {
+                    this.m_easelElmt = new createjs.Container();
                 }
             }
 

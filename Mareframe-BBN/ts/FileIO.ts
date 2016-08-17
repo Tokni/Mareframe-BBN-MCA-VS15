@@ -180,7 +180,7 @@
                             //    currentStartIndex = indexOfSmileClose;
 
                                 //}
-                                p_activeModelInstance.fromJSON(JSONObj);
+                                p_activeModelInstance.fromJSON(JSONObj, true);
                                 p_updateGui();
 
 
@@ -260,7 +260,8 @@
                 console.log("resulting path is: " + path);
                 jQuery.getJSON(path, function (data) {
                     //console.log(JSON.stringify(data));
-                    p_activeModelInstance.fromJSON(data);
+                    p_activeModelInstance.fromJSON(data, true);
+                    p_activeModelInstance.initialize();
                     p_updateGui();
                 });
             }

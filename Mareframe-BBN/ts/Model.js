@@ -139,7 +139,7 @@ var Mareframe;
                         p_elmt.update();
                     }
                 });
-                console.log("done updating first round");
+                //console.log("done updating first round");
                 // if (this.getElmtsWithEvidence().length > 0) {
                 this.getElementArr().forEach(function (e) {
                     if (e.getType() !== 0) {
@@ -149,6 +149,11 @@ var Mareframe;
                 DST.Tools.calcValuesLikelihoodSampling(this, this.m_numOfIteraions);
                 // }
                 console.log("done updating with evidence");
+            };
+            Model.prototype.initialize = function () {
+                this.m_elementArr.forEach(function (e) {
+                    e.update();
+                });
             };
             Model.prototype.getIdent = function () {
                 return this.m_modelIdent;
@@ -297,14 +302,14 @@ var Mareframe;
                 console.log("WeigthedData: " + tempMatrix);
                 return tempMatrix;
             };
-            Model.prototype.createNewElement = function (p_type) {
+            Model.prototype.createNewElement = function (p_type, p_notVisual) {
                 console.log("number of elements: " + this.m_elmtCounter);
                 //This loop makes sure that no two elements have the same id
                 do {
                     var name = "elmt" + this.m_elmtCounter;
                     this.m_elmtCounter++;
                 } while (this.getElement(name) != undefined);
-                var e = new DST.Element(name, this, p_type);
+                var e = new DST.Element(name, this, p_type, p_notVisual);
                 this.m_elementArr.push(e);
                 switch (p_type) {
                     case 0:
@@ -523,13 +528,15 @@ var Mareframe;
             Model.prototype.toJSON = function () {
                 return { elements: this.m_elementArr, connections: this.m_connectionArr, mdlName: this.m_modelName, mainObj: this.m_mainObjective, dataMat: this.m_dataMatrix, mdlIdent: this.m_modelIdent };
             };
-            Model.prototype.fromJSON = function (p_jsonObject) {
+            Model.prototype.fromJSON = function (p_jsonObject, p_showVisual) {
                 // console.log("from json: p_jsonObject = " + p_jsonObject);
-                $("#modelHeader").html(p_jsonObject.mdlName);
-                var header = $("#model_header").html();
-                //Only append if model name has not been added
-                if (header.indexOf(">", header.length - 1) !== -1) {
-                    $("#model_header").append(p_jsonObject.mdlName);
+                if (p_showVisual) {
+                    $("#modelHeader").html(p_jsonObject.mdlName);
+                    var header = $("#model_header").html();
+                    //Only append if model name has not been added
+                    if (header.indexOf(">", header.length - 1) !== -1) {
+                        $("#model_header").append(p_jsonObject.mdlName);
+                    }
                 }
                 this.m_modelName = p_jsonObject.mdlName;
                 this.m_modelIdent = p_jsonObject.mdlIdent;
@@ -541,17 +548,17 @@ var Mareframe;
                 var maxY = 0;
                 for (var i = 0; i < p_jsonObject.elements.length; i++) {
                     var JsonElmt = p_jsonObject.elements[i];
-                    var elmt = this.createNewElement(undefined);
+                    var elmt = this.createNewElement(undefined, !p_showVisual);
                     //if (JsonElmt.posX > maxX)
                     //    maxX = JsonElmt.posX;
                     //if (JsonElmt.posY > maxY)
                     //    maxY = JsonElmt.posY;
-                    elmt.fromJSON(JsonElmt);
+                    elmt.fromJSON(JsonElmt, !p_showVisual);
                 }
                 for (var i = 0; i < p_jsonObject.connections.length; i++) {
                     var conn = p_jsonObject.connections[i];
                     var inpt = this.getElement(conn.connInput);
-                    var c = this.createNewConnection(inpt, this.getElement(conn.connOutput));
+                    var c = this.createNewConnection(inpt, this.getElement(conn.connOutput), !p_showVisual);
                     //this.m_counter++;
                     c.fromJSON(conn);
                     this.addConnection(c);
@@ -571,12 +578,12 @@ var Mareframe;
                 //console.log(this);
                 console.log("finnished loading from json");
             };
-            Model.prototype.createNewConnection = function (p_inputElmt, p_outputElmt) {
+            Model.prototype.createNewConnection = function (p_inputElmt, p_outputElmt, p_notVisual) {
                 do {
                     var id = "conn" + this.m_ConnCounter;
                     this.m_ConnCounter++;
                 } while (this.getConnection(id) != undefined);
-                var c = new DST.Connection(p_inputElmt, p_outputElmt, id, this.m_bbnMode);
+                var c = new DST.Connection(p_inputElmt, p_outputElmt, id, this.m_bbnMode, p_notVisual);
                 return c;
             };
             Model.prototype.setDecision = function (p_elmt, p_decisNumb) {

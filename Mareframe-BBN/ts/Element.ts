@@ -12,15 +12,15 @@
             private m_connections: Connection[] = [];
             private m_values: number[][] = [];
             private m_updated: boolean = false;
-            public m_easelElmt: createjs.Container = new createjs.Container();
-            public m_minitableEaselElmt: createjs.Container = new createjs.Container();
+            public m_easelElmt: any//createjs.Container;
+            public m_minitableEaselElmt: createjs.Container;
             private m_model: Model;
             private m_decision: number; //undefined if no decision is sat
             private m_dialog: JQuery;
             private m_evidence: number;
             private m_visuallySelected = false;
 
-            constructor(p_id: string, p_model: Model, p_type: number) {
+            constructor(p_id: string, p_model: Model, p_type: number, p_notVisual?: boolean) {
                 if (p_id.substr(0, 4) == "elmt")
                 { this.m_id = p_id; }
                 else { this.m_id = "elmt" + p_id; }
@@ -29,8 +29,26 @@
                 }
                 this.m_model = p_model;
                 this.getChildrenElements = this.getChildrenElements.bind(this);
-            }
+                if (!p_notVisual) {
+                    this.m_easelElmt = new createjs.Container();
+                    this.m_minitableEaselElmt = new createjs.Container();
+                }
+                else {
+                    //This is used when the model is created from the web worker
+                    this.m_easelElmt = {x: 0, y:0};
+                }
 
+            }
+            addEaselElmt() {
+                var x: number = this.m_easelElmt.x;
+                var y: number = this.m_easelElmt.y
+                this.m_easelElmt = new createjs.Container();
+                this.m_easelElmt.x = x;
+                this.m_easelElmt.y = y;
+            }
+            addMinitable() {
+                this.m_minitableEaselElmt = new createjs.Container();
+            }
             getVisuallySelected() {
                 return this.m_visuallySelected;
             }
@@ -83,7 +101,7 @@
                // Tools.calculateValues(this.m_model, this);
                 Tools.updateValuesHeaders(this.m_model, this);
                 //console.log("Updated element " + this.getName());
-                this.m_updated = true;
+               // this.m_updated = true;
             }
 
             getParentElements(): Element[] {
@@ -447,20 +465,23 @@
             }
 
             toJSON(): any {
-                return { posX: this.m_easelElmt.x, posY: this.m_easelElmt.y, elmtID: this.getID(), elmtName: this.getName(), elmtDesc: this.getDescription(), elmtType: this.getType(), elmtData: this.getData(), elmtWghtMthd: this.getMethod() };
+                return { posX: this.m_easelElmt.x, posY: this.m_easelElmt.y, elmtID: this.getID(), elmtName: this.getName(), elmtDesc: this.getDescription(), elmtType: this.getType(), elmtData: this.getData(), elmtWghtMthd: this.getMethod() , elmtValues: this.getValues()};
             }
 
-            fromJSON(p_jsonElmt: any): void {
+            fromJSON(p_jsonElmt: any, p_notVisual?: boolean): void {
                 // console.log("element.fromJSON()");
                 //console.log(p_jsonElmt);
-                this.m_easelElmt.x = p_jsonElmt.posX;
-                this.m_easelElmt.y = p_jsonElmt.posY;
+               
+                    this.m_easelElmt.x = p_jsonElmt.posX;
+                    this.m_easelElmt.y = p_jsonElmt.posY;
+                
                 this.m_id = p_jsonElmt.elmtID;
                 this.m_name = p_jsonElmt.elmtName;
                 //console.log("FromJSONname: " + this.m_name);
                 this.m_description = p_jsonElmt.elmtDesc;
                 this.m_type = p_jsonElmt.elmtType;
                 this.m_data = p_jsonElmt.elmtData;
+                this.m_values = p_jsonElmt.elmtValues;
                 //console.log("FromJSONdata: " + this.m_data);
                 this.m_weightingMethod = p_jsonElmt.elmtWghtMthd;
 

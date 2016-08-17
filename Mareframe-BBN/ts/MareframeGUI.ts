@@ -4,7 +4,7 @@ module Mareframe {
     export module DST {
         export class GUIHandler {
             private m_settingsDiv;
-            
+            private m_updating: boolean = false;
             private m_noOfDialogsOpen: number = 0;
             private m_windowResizable: boolean = false;
             private m_editorMode: boolean = false;
@@ -145,8 +145,7 @@ module Mareframe {
                 this.m_mcaBackground.addEventListener("pressmove", this.pressMove);
                 this.m_mcaBackground.addEventListener("pressup", this.pressUp);
                 this.m_controlP.mouseChildren = false;
-
-                $("#selectModel").on("change", this.selectModel);
+               $("#selectModel").on("change", this.selectModel);
                 $("#MCAelmtType").on("change", this.optionTypeChange);
                 $("#MCAWeightingMethod").on("change", this.optionMethodChange);
                 $("#debugButton").on("click", this.allModeltoConsole);
@@ -182,6 +181,7 @@ module Mareframe {
                     console.log("click");
                     this.value = null;
                 });
+               
 
 
                 this.m_mcaStage.addChild(this.m_mcaBackground);
@@ -194,14 +194,42 @@ module Mareframe {
                 createjs.Ticker.addEventListener("tick", this.tick);
                 createjs.Ticker.setFPS(60);
                 $("#debug").hide();
-                this.updateEditorMode();
+                $(".advButton").hide();
+                $(".button").show();
+                $("#lodDcmtDiv").hide();
                 if (this.m_model.getAutoUpdate()) {
                     $("#updateMdl").hide();
                 }
                 $("#settings").show();
                 $("#modeStatus").hide();
                 this.m_mcaContainer.addChild(this.m_drawingCont);
+
+                this.createProgressbarDialog();
             }
+
+            private createProgressbarDialog() {
+                var progressBarDialog = document.createElement("div");
+                $('body').append(progressBarDialog);
+                progressBarDialog.setAttribute("id", "progressbarDialog");
+
+                var div = document.createElement("div");
+                div.innerHTML = "Updating Model";
+                progressBarDialog.appendChild(div);
+                var progressBar = document.createElement("div");
+                progressBar.setAttribute("id", "progressBar");
+                progressBarDialog.appendChild(progressBar);
+                $("#progressBar").progressbar();
+                $("#progressBar").progressbar("option", "max", 100);
+
+                var button = document.createElement("button");
+                button.setAttribute("id", "cancelProgress");
+                button.innerHTML = "Cancel";
+                button.style.marginTop = "6px";
+                progressBarDialog.appendChild(button);
+                
+                
+            }
+            
             private optionTypeChange(p_evt: Event) {
 
                 //console.log("Element name: " + p_evt.target.id);
@@ -275,14 +303,49 @@ module Mareframe {
                 console.log("changing to progress");
                 document.getElementsByTagName("body")[0].style.cursor = "progress";
             }
+            private cancelWorker(p_evt: Event): void {
+                var worker: Worker = p_evt.data.worker;
+                Tools.stopWorker(worker);
+            }
             public updateModel() {
+                var gui: GUIHandler = this;
                 $("#updateMdl").removeClass("ui-state-focus");
-                    //console.log("model: " + this.m_model.getName());
-                    this.m_model.update();
-                    this.updateMiniTables(this.m_model.getElementArr());
-                    this.updateOpenDialogs();
-               /* console.log("changing back to auto");
-                document.getElementsByTagName("body")[0].style.cursor = "auto";*/ //Not working
+                debugger
+                var worker: Worker = Tools.startWorker(true);
+                this.goToUpdateMode(true);
+                $("#cancelProgress").click({ worker: worker }, this.cancelWorker);
+                worker.postMessage({
+                    model: JSON.stringify(this.m_model.toJSON())
+                });
+
+                worker.onmessage = function (evt) {
+                    switch (evt.data.command) {
+                        case "finnished":
+                            gui.m_model.closeDown();
+                            var model: Model = new Model(true)
+                            model.fromJSON(JSON.parse(evt.data.model), false);
+                            gui.m_model = model;
+                            //this.m_model.update();
+                            gui.m_model.getElementArr().forEach(function (e) {
+                                e.addMinitable();
+                                e.addEaselElmt();
+                                e.setUpdated(true);
+                            });
+                            gui.updateMiniTables(gui.m_model.getElementArr());
+                            gui.updateOpenDialogs();
+                            gui.importStage();
+                            Tools.stopWorker(worker);
+                            gui.goToUpdateMode(false);
+                            break;
+                        case "progress":
+                            var status: number = evt.data.progress;
+                            $("#progressBar").progressbar({
+                                value: status
+                            });
+                            break;
+                    }
+                };
+
             }
             private updateDecAndEvidenceVisually() {
                 this.updateMiniTables(this.m_model.getElementArr());
@@ -322,7 +385,7 @@ module Mareframe {
                     this.m_handler.getFileIO().loadModel(loadModel, this.m_handler.getActiveModel(), this.importStage);
                 }
                 else {
-                    this.m_model.fromJSON(this.m_handler.getFileIO().reset());
+                    this.m_model.fromJSON(this.m_handler.getFileIO().reset(), true);
                     this.importStage();
                     if (!this.m_model.getElementArr().length) {
                         var loadModel: string = Tools.getUrlParameter('model');
@@ -574,7 +637,7 @@ module Mareframe {
                 //}
             }
             private clickedDecision(p_evt: createjs.MouseEvent) {
-                if (!this.m_editorMode && this.m_noOfDialogsOpen == 0) {// Setting decision while in editor mode messes with the calculations
+                if (!this.m_editorMode && this.m_noOfDialogsOpen == 0 && !this.m_updating) {// Setting decision while in editor mode messes with the calculations
                     //console.log("clicked a decision");
                     //console.log(p_evt);
                     var elmt: Element = this.m_model.getElement(p_evt.currentTarget.name);
@@ -586,7 +649,7 @@ module Mareframe {
                 }
             }
             private clickedEvidence(p_evt: createjs.MouseEvent) {
-                if (!this.m_editorMode && this.m_noOfDialogsOpen == 0) {// Setting evidence while in editor mode messes with the calculations
+                if (!this.m_editorMode && this.m_noOfDialogsOpen == 0 && !this.m_updating) {// Setting evidence while in editor mode messes with the calculations
                     var elmt: Element = this.m_model.getElement(p_evt.currentTarget.name);
                     console.log("Local: " + p_evt.localY / 12 + " header rows: " + Tools.numOfHeaderRows(elmt.getValues(), elmt));
                     this.m_model.setEvidence(elmt, Math.floor(p_evt.localY / 12));// - Tools.numOfHeaderRows(elmt.getValues(),elmt));
@@ -594,6 +657,25 @@ module Mareframe {
                         this.updateModel();
                     }
                     this.updateDecAndEvidenceVisually();
+                }
+            }
+            private goToUpdateMode(p_bool: boolean): void {
+                this.m_updating = p_bool;
+                if (p_bool) {
+                    $(".editorBut").addClass("disabled"); 
+                    $(".editorBut").addClass("ui-state-disabled");
+                    $(".editorBut").attr("disabled", "disabled"); 
+                    $(".notAllowedDuringUpdate").addClass("disabled"); 
+                    $(".notAllowedDuringUpdate").attr("disabled", "disabled"); 
+                    $(".notAllowedDuringUpdate").addClass("ui-state-disabled");
+                }
+                else {
+                    $(".editorBut").removeClass("disabled");
+                    $(".editorBut").removeClass("ui-state-disabled");
+                    $(".editorBut").removeAttr("disabled");
+                    $(".notAllowedDuringUpdate").removeClass("disabled");
+                    $(".notAllowedDuringUpdate").removeAttr("disabled"); 
+                    $(".notAllowedDuringUpdate").removeClass("ui-state-disabled");
                 }
             }
             private updateEditorMode() {
@@ -670,8 +752,10 @@ module Mareframe {
                             elementArr[i].m_easelElmt.removeEventListener("pressmove", this.pressMove);
                             elementArr[i].m_easelElmt.removeEventListener("pressup", this.pressUp);
                         }
+                        elementArr[i].update();
+                        elementArr[i].setUpdated(false);
                     }
-                    this.updateModel();
+                    this.updateMiniTables(this.m_model.getElementArr());
                 }
             }
             private setShowDescription(p_evt: Event) {
@@ -1296,10 +1380,14 @@ module Mareframe {
 
                 $("#voiButton").click(this.updateVOI)
 
+                
+
                 return "voiDialog";
             }
 
             private updateVOI = (p_evt: Event): void => {
+               
+
                 var pov: Element = this.m_model.getElement($("#fromPointOfView").val());
                 var forDec: Element = this.m_model.getElement($("#forDec").val());
                 var chanceElmts: Element[] = [];
@@ -1885,7 +1973,7 @@ module Mareframe {
                     var originalDesc = p_elmt.getDescription();
                     var originalUserComments = p_elmt.getUserDescription();
                     console.log("Element: " + p_elmt.getName() + "ready for editing");
-                    // $(function () {
+                    // User description
                     $("#userDescription_div_" + id).dblclick(function () {
                         
                         //mareframeGUI.editFunction(p_elmt, $("#userDescription_div"), $(this), originalUserComments); //This is for some reason not working
@@ -2128,8 +2216,10 @@ module Mareframe {
                 console.log("new table: "+ newTable);
                 //Remove header row with the title "Definition"
                 //newTable.splice(0, 1);
-                
-                 if (Tools.dataContainsNegative(newTable)) {
+                if ((elmt.getType() === 0 || elmt.getType() === 1) && !Tools.allStatesAreDestrinct(newTable)) {
+                    alert("State names must be unique");
+                }
+                 else if (elmt.getType() === 0 && Tools.dataContainsNegative(newTable)) {
                     alert("Negative values are not allowed");
                 }
                  else if (elmt.getType() == 0 && !Tools.columnSumsAreValid(newTable, Tools.numOfHeaderRows(newTable))) {
@@ -3185,7 +3275,7 @@ module Mareframe {
                 console.log("input changed");
                 var elementWithUnsavedChanges = gui.getElementWithUnsavedChanges();
                 console.log("elementWithUnsavedChanges: " + elementWithUnsavedChanges);
-                if (parseFloat(field.value) < 0) {
+                if (elmt.getType() === 0 && parseFloat(field.value) < 0) {
                     field.value = $(field).data("originalValue");
                     alert("Negative values are not allowed");
                 }

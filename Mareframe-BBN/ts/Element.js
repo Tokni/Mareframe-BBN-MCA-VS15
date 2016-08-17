@@ -3,7 +3,7 @@ var Mareframe;
     var DST;
     (function (DST) {
         var Element = (function () {
-            function Element(p_id, p_model, p_type) {
+            function Element(p_id, p_model, p_type, p_notVisual) {
                 this.m_data = [];
                 this.m_dateDim = [];
                 this.m_id = "elmtbroken";
@@ -15,8 +15,6 @@ var Mareframe;
                 this.m_connections = [];
                 this.m_values = [];
                 this.m_updated = false;
-                this.m_easelElmt = new createjs.Container();
-                this.m_minitableEaselElmt = new createjs.Container();
                 this.m_visuallySelected = false;
                 if (p_id.substr(0, 4) == "elmt") {
                     this.m_id = p_id;
@@ -29,7 +27,25 @@ var Mareframe;
                 }
                 this.m_model = p_model;
                 this.getChildrenElements = this.getChildrenElements.bind(this);
+                if (!p_notVisual) {
+                    this.m_easelElmt = new createjs.Container();
+                    this.m_minitableEaselElmt = new createjs.Container();
+                }
+                else {
+                    //This is used when the model is created from the web worker
+                    this.m_easelElmt = { x: 0, y: 0 };
+                }
             }
+            Element.prototype.addEaselElmt = function () {
+                var x = this.m_easelElmt.x;
+                var y = this.m_easelElmt.y;
+                this.m_easelElmt = new createjs.Container();
+                this.m_easelElmt.x = x;
+                this.m_easelElmt.y = y;
+            };
+            Element.prototype.addMinitable = function () {
+                this.m_minitableEaselElmt = new createjs.Container();
+            };
             Element.prototype.getVisuallySelected = function () {
                 return this.m_visuallySelected;
             };
@@ -82,7 +98,7 @@ var Mareframe;
                 // Tools.calculateValues(this.m_model, this);
                 DST.Tools.updateValuesHeaders(this.m_model, this);
                 //console.log("Updated element " + this.getName());
-                this.m_updated = true;
+                // this.m_updated = true;
             };
             Element.prototype.getParentElements = function () {
                 var elmt = this;
@@ -414,9 +430,9 @@ var Mareframe;
                 return this.m_connections;
             };
             Element.prototype.toJSON = function () {
-                return { posX: this.m_easelElmt.x, posY: this.m_easelElmt.y, elmtID: this.getID(), elmtName: this.getName(), elmtDesc: this.getDescription(), elmtType: this.getType(), elmtData: this.getData(), elmtWghtMthd: this.getMethod() };
+                return { posX: this.m_easelElmt.x, posY: this.m_easelElmt.y, elmtID: this.getID(), elmtName: this.getName(), elmtDesc: this.getDescription(), elmtType: this.getType(), elmtData: this.getData(), elmtWghtMthd: this.getMethod(), elmtValues: this.getValues() };
             };
-            Element.prototype.fromJSON = function (p_jsonElmt) {
+            Element.prototype.fromJSON = function (p_jsonElmt, p_notVisual) {
                 // console.log("element.fromJSON()");
                 //console.log(p_jsonElmt);
                 this.m_easelElmt.x = p_jsonElmt.posX;
@@ -427,6 +443,7 @@ var Mareframe;
                 this.m_description = p_jsonElmt.elmtDesc;
                 this.m_type = p_jsonElmt.elmtType;
                 this.m_data = p_jsonElmt.elmtData;
+                this.m_values = p_jsonElmt.elmtValues;
                 //console.log("FromJSONdata: " + this.m_data);
                 this.m_weightingMethod = p_jsonElmt.elmtWghtMthd;
             };

@@ -201,11 +201,19 @@
 
                 //Add new state
                 var newStateName: String;
+                var stateNames: String[] = math.flatten(Tools.getColumn(oldData, 0));
+                var num: number = oldData.length - Tools.numOfHeaderRows(oldData);
                 if (p_elmt.getType() === 0) {
-                    newStateName = "State" + (oldData.length - Tools.numOfHeaderRows(oldData));
+                    do {
+                        newStateName = "State" + num;
+                        num++;
+                    } while(stateNames.indexOf(newStateName) !== -1) 
                 }
                 else if (p_elmt.getType() === 1) {
-                    newStateName = "Choice" + (oldData.length - Tools.numOfHeaderRows(oldData));
+                    do {
+                        newStateName = "Choice" + num;
+                        num++;
+                    } while (stateNames.indexOf(newStateName) !== -1) 
                 }
                 newData[oldData.length][0] = newStateName;
                 //Add 0 in every cell in new row (In decisions nothing is done here)
@@ -617,7 +625,7 @@
                             }
                         });
                     });
-                    p_elmt.setUpdated(true);
+                    //p_elmt.setUpdated(true);
                 }
                 else if (p_elmt.getType() === 2 || p_elmt.getType() === 0) {//If this is a utility or chance node 
                     p_elmt.getAllAncestors().forEach(function (ancestor: Element) {
@@ -659,7 +667,7 @@
                             }
                         }
                     });
-                    p_elmt.setUpdated(true);
+                    //p_elmt.setUpdated(true);
                 }
                 p_elmt.setValues(headerRows);
                 Tools.addMainValues(p_model, p_elmt);
@@ -1033,8 +1041,10 @@
                 //        console.log("numOfDiffValues " + numOfDiffValues)
                 var newRow: any[];
                 if (p_table[0] !== undefined) {
-                    if (!($.isArray((p_table)[0]))) {
-                        p_table = [p_table];
+                    if (p_table[0].constructor !== Array) {
+                       // if (!($.isArray((p_table)[0]))) {
+                            p_table = [p_table];
+                     //   }
                     }
                     var rowLength = p_table[0].length - 1;
                     //For each row
@@ -1410,7 +1420,7 @@
             }
 
             static valueOfInformation(p_model: Model, p_pov: Element, p_forDec: Element, p_chanceElmts: Element[], p_gui: GUIHandler): any[] {
-
+               
                 console.log("value of information. POV: " + p_pov.getName() + " for dec: " + p_forDec.getName() + " chancenodes: " + p_chanceElmts.length);
                 var tempConnections: Connection[] = [];
                 var isPossible: boolean = true;
@@ -1495,7 +1505,6 @@
                 }
                 //Delete temporary elements and connections
                 p_gui.deleteSelected(new Event("click"), [tempDecision], tempConnections);//The event is empyt and not used
-                p_gui.updateModel();
                 if (isPossible) {
                     return newResult;
                 }
@@ -1503,12 +1512,23 @@
                     return [[0]];
                 }
             }
-            static calcValuesLikelihoodSampling(p_model: Model, p_numOfIterations: number) {
-                //console.log("calculating values with evidence");
+            static createLikelihoodTable(p_model: Model, p_numOfIterations: number): any[] {
+                console.log("creating table");
                 var numberOfRuns = p_numOfIterations;
                 var table = [];//contains all cases
                 var evidenceElmts: Element[] = p_model.getElmtsWithEvidence();
+
+                var interval = setInterval(loop, 1);
+                function loop() {
+                    if (numberOfRuns % n === 10) {
+                        $("#progressBar").progressbar({
+                            value: n
+                        });
+
+                    }
+                };
                 for (var n = 0; n < numberOfRuns; n++) {
+
                     var w = 1;
                     var aCase = {};
                     var sampledElmts: Element[] = [];
@@ -1523,6 +1543,125 @@
                     });
                     table.push([aCase, w]);
                 }
+                console.log("done creating table");
+                return table;
+            }
+            static calcValuesLikelihoodSamplingElmt(e: Element, weightSum: number, table: any[], ) {
+
+                console.log("calculating values for " + e.getName());
+                if (e.getType() === 0 || e.getType() === 2) {
+                    var data = e.getData();
+                    var values = [];
+                    var oldValues = e.getValues(); //This is used to gain information about the headerrows in values
+                    //Add the headerrows into values
+                    for (var row = 0; row < Tools.numOfHeaderRows(oldValues, e); row++) {
+                        values.push(oldValues[row]);
+                    }
+                    var dataLength = data.length;
+                    var startCol = Tools.numOfHeaderRows(data, e);
+                    if (e.getType() === 2) {
+                        dataLength = data[0].length;
+                        startCol = 1;
+                    }
+                    // console.log("startCol: " + startCol + " dataLenght: " + dataLength);
+                    for (var i = startCol; i < dataLength; i++) {//For each of the different values
+                        var valRow = [];
+                        if (e.getType() === 0) {
+                            valRow.push(data[i][0]);//push name of value
+                        }
+                        else {
+                            valRow.push("dummyCol");
+                        }
+                        for (var col = 1; col < oldValues[0].length; col++) {//There must be the same amount of columns in new values as there were in old values
+                            var value = 0;
+
+                            //console.log("calculating for " + data[i][0] + " column: " + col + " in " + e.getName());
+                            weightSum = 0; //Calculate a new weight sum for each column
+                            for (var j = 0; j < table.length; j++) {//For each case
+                                //console.log("case: " + JSON.stringify(table[j][0]));
+                                var matchingCase = true;
+                                var matchingValue = true;
+
+                                if (e.getType() === 2) {
+                                    for (var headerRow = 0; headerRow < Tools.numOfHeaderRows(data); headerRow++) {
+
+                                        //console.log("column: " + i + ". Checking " + data[headerRow][0] + ", " + table[j][0][data[headerRow][0]] + " against " + data[headerRow][i]);
+                                        if (table[j][0][data[headerRow][0]] !== data[headerRow][i]) {//If the value in headerrow is not the same as the one sampled
+                                            matchingValue = false;
+                                            //console.log("does not match");
+                                        }
+                                    }
+                                }
+                                else if (table[j][0][e.getID()] !== data[i][0]) {
+                                    //console.log("value does not match");
+                                    matchingValue = false;
+                                }
+                                for (var headerRow = 0; headerRow < Tools.numOfHeaderRows(oldValues, e); headerRow++) {//Checking if all elements in this column match
+                                    var headerElmt = oldValues[headerRow][0];
+                                    //console.log("checking if case includes " + p_model.getElement(headerElmt).getName() + " : " + oldValues[headerRow][col]); 
+                                    if (table[j][0][headerElmt] !== oldValues[headerRow][col]) {
+                                        //console.log("does not match");
+                                        matchingCase = false;
+                                    }
+                                }
+                                if (matchingCase) {//Only increment weigthsum if this case includes all choices in this column
+                                    weightSum += table[j][1];
+                                    //console.log("mathcing case. Updated weight sum to " + weightSum);
+                                }
+                                if (matchingValue && matchingCase) {
+                                    //console.log("matching case and value");
+                                    value += table[j][1];//Add the weight
+
+                                    //console.log("value = " + value);
+
+                                } else {
+                                    //console.log("does not match");
+                                }
+                            }
+                            value /= weightSum;
+                            if (isNaN(value)) {
+                                value = 0;
+                            }
+                            valRow.push(value);
+
+                        }
+                        values.push(valRow);
+                    }
+                    if (e.getType() === 2) {//If this is a utility node then values corresponds to a chance node where the states are the headers of the utility def
+                        //console.log("values: ");
+                        //console.log(values);
+                        //console.log("multiplying "+ Tools.getMatrixWithoutHeader(data) + " and " + Tools.getMatrixWithoutHeader(values));
+                        var utilityValue = math.multiply(Tools.getMatrixWithoutHeader(data), Tools.getMatrixWithoutHeader(values));
+                        utilityValue = math.squeeze(utilityValue);
+                        if (!isNaN(utilityValue)) {//check if utility value is just a number
+                            utilityValue = [utilityValue];
+                        }
+                        //console.log("result: ");
+                        //console.log(utilityValue);
+                        //Add the headerrows into values
+                        values = [];
+                        for (var row = 0; row < Tools.numOfHeaderRows(oldValues, e); row++) {
+                            values.push(oldValues[row]);
+                        }
+                        var valueRow = ["Value"];
+                        for (var i = 0; i < utilityValue.length; i++) {
+                            valueRow.push(utilityValue[i]);
+                        }
+                        //console.log("valueRow: " + valueRow);
+                        //console.log(valueRow);
+                        values[row] = valueRow;
+                        //console.log(values);
+                    }
+                    //console.log("new values: ");
+                    //console.log(values);
+                    //console.log("setting values for " + e.getName()+ " + to: "+ values);
+                    e.setValues(values);
+                    e.setUpdated(true);
+                }
+            }
+            static calcValuesLikelihoodSampling(p_model: Model, p_numOfIterations: number) {
+                //console.log("calculating values with evidence");
+                var table: any[] = Tools.createLikelihoodTable(p_model, p_numOfIterations);
                 var weightSum = 0;
                 /*for (var i = 0; i < table.length; i++) {
                     //console.log("weight: " + table[i][1]);
@@ -1531,116 +1670,8 @@
                 //console.log("weightSum " + weightSum);
 
                 p_model.getElementArr().forEach(function (e) {
-                    console.log("calculating values for " + e.getName());
-                    if (e.getType() === 0 || e.getType() === 2) {
-                        var data = e.getData();
-                        var values = [];
-                        var oldValues = e.getValues(); //This is used to gain information about the headerrows in values
-                        //Add the headerrows into values
-                        for (var row = 0; row < Tools.numOfHeaderRows(oldValues, e); row++) {
-                            values.push(oldValues[row]);
-                        }
-                        var dataLength = data.length;
-                        var startCol = Tools.numOfHeaderRows(data, e);
-                        if (e.getType() === 2) {
-                            dataLength = data[0].length;
-                            startCol = 1;
-                        }
-                       // console.log("startCol: " + startCol + " dataLenght: " + dataLength);
-                        for (var i = startCol; i < dataLength; i++) {//For each of the different values
-                            var valRow = [];
-                            if (e.getType() === 0) {
-                                valRow.push(data[i][0]);//push name of value
-                            }
-                            else {
-                                valRow.push("dummyCol");
-                            }
-                            for (var col = 1; col < oldValues[0].length; col++) {//There must be the same amount of columns in new values as there were in old values
-                                var value = 0;
-                                
-                                //console.log("calculating for " + data[i][0] + " column: " + col + " in " + e.getName());
-                                weightSum = 0; //Calculate a new weight sum for each column
-                                for (var j = 0; j < table.length; j++) {//For each case
-                                    //console.log("case: " + JSON.stringify(table[j][0]));
-                                    var matchingCase = true;
-                                    var matchingValue = true;
-                                    
-                                    if (e.getType() === 2) {
-                                        for (var headerRow = 0; headerRow < Tools.numOfHeaderRows(data); headerRow++) {
-                                            
-                                            //console.log("column: " + i + ". Checking " + data[headerRow][0] + ", " + table[j][0][data[headerRow][0]] + " against " + data[headerRow][i]);
-                                            if (table[j][0][data[headerRow][0]] !== data[headerRow][i]) {//If the value in headerrow is not the same as the one sampled
-                                                matchingValue = false;
-                                                //console.log("does not match");
-                                            }
-                                        }
-                                    }
-                                    else if (table[j][0][e.getID()] !== data[i][0]) {
-                                        //console.log("value does not match");
-                                        matchingValue = false;
-                                    }
-                                    for (var headerRow = 0; headerRow < Tools.numOfHeaderRows(oldValues, e); headerRow++) {//Checking if all elements in this column match
-                                        var headerElmt = oldValues[headerRow][0];
-                                        //console.log("checking if case includes " + p_model.getElement(headerElmt).getName() + " : " + oldValues[headerRow][col]); 
-                                        if (table[j][0][headerElmt] !== oldValues[headerRow][col]) {
-                                            //console.log("does not match");
-                                            matchingCase = false;
-                                        }
-                                    }
-                                    if (matchingCase) {//Only increment weigthsum if this case includes all choices in this column
-                                        weightSum += table[j][1];
-                                        //console.log("mathcing case. Updated weight sum to " + weightSum);
-                                    }
-                                    if (matchingValue && matchingCase) {
-                                        //console.log("matching case and value");
-                                        value += table[j][1];//Add the weight
-                                        
-                                        //console.log("value = " + value);
-                                    
-                                    } else {
-                                        //console.log("does not match");
-                                    }
-                                }
-                                value /= weightSum;
-                                if (isNaN(value)) {
-                                    value = 0;
-                                }
-                                valRow.push(value);
-                                
-                            }
-                            values.push(valRow);
-                        }
-                        if (e.getType() === 2) {//If this is a utility node then values corresponds to a chance node where the states are the headers of the utility def
-                            //console.log("values: ");
-                            //console.log(values);
-                            //console.log("multiplying "+ Tools.getMatrixWithoutHeader(data) + " and " + Tools.getMatrixWithoutHeader(values));
-                            var utilityValue = math.multiply(Tools.getMatrixWithoutHeader(data), Tools.getMatrixWithoutHeader(values));
-                            utilityValue = math.squeeze(utilityValue);
-                            if (!isNaN(utilityValue)) {//check if utility value is just a number
-                                utilityValue = [utilityValue];
-                            }
-                            //console.log("result: ");
-                            //console.log(utilityValue);
-                            //Add the headerrows into values
-                            values = [];
-                            for (var row = 0; row < Tools.numOfHeaderRows(oldValues, e); row++) {
-                                values.push(oldValues[row]);
-                            }
-                            var valueRow = ["Value"];
-                            for (var i = 0; i < utilityValue.length; i++) {
-                                valueRow.push(utilityValue[i]);
-                            }
-                            //console.log("valueRow: " + valueRow);
-                            //console.log(valueRow);
-                            values[row] = valueRow;
-                            //console.log(values);
-                        }
-                        //console.log("new values: ");
-                        //console.log(values);
-                        //console.log("setting values for " + e.getName()+ " + to: "+ values);
-                        e.setValues(values);
-                        e.setUpdated(true);
-                    }
+                    Tools.calcValuesLikelihoodSamplingElmt(e, weightSum, table);
+                    
                 });
                 //Update concerning decisions. It is important that this is done before decision values are calculated
                 p_model.getElementArr().forEach(function (p_elmt: Element) {
@@ -1683,6 +1714,17 @@
                     p_case[p_elmt.getID()] = sample;
                 }
                 return [p_case, p_weight, p_sampledElmts];
+            }
+            static allStatesAreDestrinct(p_data: any[][]): boolean {
+                var states: String[] = math.flatten(Tools.getColumn(p_data, 0));
+                for (var i = 0; i < states.length; i++) {
+                    for (var j = i + 1; j < states.length; j++) {
+                        if (states[i] === states[j]) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
             }
             static getElmtsWithEvidence(p_model: Model): Element[] {
                 var elementsWithEvidence: Element[] = [];
@@ -1774,6 +1816,31 @@
                 //console.log("averageLikelihood: " + averageLikelihood);
                 //console.log("getting value row: " + p_elmt.getEvidence() + " col: " + column);
                 return averageLikelihood;
+            }
+            static startWorker(p_showProgress: boolean): Worker {
+                if (p_showProgress) {
+                    $("#progressbarDialog").dialog();
+                    $("#progressBar").progressbar({
+                        value: 1
+                    });
+                }
+
+                var w;
+                if (typeof (Worker) !== "undefined") {
+                    if (typeof (w) == "undefined") {
+                        w = new Worker("../Script1.js");
+                    }
+                    w.onmessage = function (event) {
+                        console.log(event.data);
+                    };
+                } else {
+                    console.log("Sorry! No Web Worker support.");
+                }
+                return w;
+            }
+            static stopWorker(p_worker: Worker): void {
+                p_worker.terminate();
+                $("#progressbarDialog").dialog("close");
             }
         }
     }

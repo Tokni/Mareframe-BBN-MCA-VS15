@@ -32,6 +32,7 @@
     <script src="ts/Handler.js" type="text/javascript"></script>
     <script src="ts/Tools.js" type="text/javascript"></script>
 
+
     <div class="container">
         <div class="row">
             <div class="col-lg-8">
@@ -69,7 +70,7 @@
 
         <div style="padding: 1em 1em 0.5em 1.4em; font-size: 0.7em">
             <label id="selectModelLabel"for="selectModel">Select a model</label>
-            <select id="selectModel">
+            <select id="selectModel" class="notAllowedDuringUpdate">
                 <option disabled>Select one</option>
                 <option value="resturant">Opening a Resturant</option>
                 <option value="happiness" >Happiness</option>
@@ -77,33 +78,34 @@
             </select>
 
 
-            <div class="LoadFileBtn advButton" id="lodDcmtDiv" title="Click to open model from local disk">
-                <input class="advButton upload" type="file" id="lodDcmt" />
-                <span class="advButton">Open Model</span>
+            <div class="LoadFileBtn advButton editorBut" id="lodDcmtDiv" title="Click to open model from local disk">
+                <input class="advButton upload editorBut" type="file" id="lodDcmt" />
+                <span class="advButton editorBut">Open Model</span>
             </div>
 
-            <button class="advButton" id="savDcmt" title="Click to save the model">Save Model</button>
-            <button class="advButton" id="resetDcmt">Reset</button>
-            <button class="advButton" id="newDcmt" title="Click to create a new model">New Model</button>
-            <button class="advButton" id="newElmt" title="Click to create a new element">New Element</button>
-            <button class="advButton" id="newChance" title="Click to create a new chance element">New Chance</button>
-            <button class="advButton" id="newDec"title="Click to create a new decision element">New Decision</button>
-            <button class="advButton" id="newValue"title="Click to create a new utility element">New Utility</button>
-            <button class="advButton" id="deleteElmt"title="Click to delete selected elements">Delete Selected</button>
-            <button class="advButton" id="selectAllElmt"title="Click to select all elements">Select All</button>
-            <input class="advButton" type="checkbox" id="cnctTool">
-            <label for="cnctTool" class="advButton cnctTool" title="Click to enable the connect tool">Connect Tool</label> 
-            <button class="advButton" id="fitToModel"title="Click to resize window to fit model">Resize window</button>
+            <button class="advButton editorBut" id="savDcmt" title="Click to save the model">Save Model</button>
+            <button class="advButton editorBut" id="resetDcmt">Reset</button>
+            <button class="advButton editorBut" id="newDcmt" title="Click to create a new model">New Model</button>
+            <button class="advButton editorBut" id="newElmt" title="Click to create a new element">New Element</button>
+            <button class="advButton editorBut" id="newChance" title="Click to create a new chance element">New Chance</button>
+            <button class="advButton editorBut" id="newDec" title="Click to create a new decision element">New Decision</button>
+            <button class="advButton editorBut" id="newValue" title="Click to create a new utility element">New Utility</button>
+            <button class="advButton editorBut" id="deleteElmt" title="Click to delete selected elements">Delete Selected</button>
+            <button class="advButton editorBut" id="selectAllElmt" title="Click to select all elements">Select All</button>
+            <input class="advButton editorBut" type="checkbox" id="cnctTool">
+            <label for="cnctTool" class="advButton cnctTool editorBut" title="Click to enable the connect tool">Connect Tool</label> 
+
             <div style="float:right">
-                <button class="button advButton" id="voi" title="Click to open the Value of Information dialog">Value of Information</button>
+            <button class="button advButton notAllowedDuringUpdate" id="fitToModel" title="Click to resize window to fit model">Resize window</button>
+                <button class="button advButton notAllowedDuringUpdate" id="voi" title="Click to open the Value of Information dialog">Value of Information</button>
                 <input class="button advButton" type="checkbox" id="fullscreen">
                 <label for="fullscreen" class="button fullscreen" title="Click to to to full screen">Fullscreen</label>
                 <input class="button advButton" type="checkbox" id="editorMode" >
                 <label for="editorMode" class="button editorMode" title="Click to enable editormode">Editor Mode</label>
-                <input class="button advButton" type="checkbox" id="autoUpdate">
-                <label for="autoUpdate" class="button autoUpdate" title="Click to enable automatic updating">Update Automatically</label>
-                <button class="button advButton" id="updateMdl"title="Click to update model">Update</button>
-                <button class="button advButton" id="settings" title="Click to open properties window">Properties</button>
+                <input class="button advButton notAllowedDuringUpdate" type="checkbox" id="autoUpdate">
+                <label for="autoUpdate" class="button autoUpdate notAllowedDuringUpdate" title="Click to enable automatic updating">Update Automatically</label>
+                <button class="button advButton notAllowedDuringUpdate" id="updateMdl"title="Click to update model">Update</button>
+                <button class="button advButton notAllowedDuringUpdate" id="settings" title="Click to open properties window">Properties</button>
             </div>
         </div>
 

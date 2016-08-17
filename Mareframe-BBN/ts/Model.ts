@@ -35,8 +35,6 @@
                 } else {
                     dataStream = this.getMCADataStream();
                 }
-
-                
                 return dataStream;
             }
             private getBBNDataStream(): string {
@@ -143,6 +141,7 @@
                $(".removebleDialog").remove(); //Removes all created dialogs
             }
             update() {
+                
                 var m: Model = this;
                 console.log("updating model");
                 this.m_elementArr.forEach(function (p_elmt: Element) {
@@ -150,9 +149,8 @@
                     if (!p_elmt.isUpdated()) {
                         p_elmt.update();
                     }
-
                 });
-                console.log("done updating first round");
+                //console.log("done updating first round");
                // if (this.getElmtsWithEvidence().length > 0) {
                     this.getElementArr().forEach(function (e) {//This is needed to make sure values and decisions are updated in the right order
                         if (e.getType() !== 0) {
@@ -161,8 +159,14 @@
                 });
                 Tools.calcValuesLikelihoodSampling(this, this.m_numOfIteraions);
                // }
-                    console.log("done updating with evidence");
+                console.log("done updating with evidence");
+               
                 
+            }
+            initialize(): void {
+                this.m_elementArr.forEach(function (e: Element) {
+                    e.update();
+                });
             }
             getIdent(): string {
                 return this.m_modelIdent;
@@ -335,7 +339,7 @@
                 return tempMatrix;
             }
 
-            createNewElement(p_type: number): Element {
+            createNewElement(p_type: number, p_notVisual?: boolean): Element {
                 console.log("number of elements: " + this.m_elmtCounter);
                 //This loop makes sure that no two elements have the same id
                 do {
@@ -343,7 +347,7 @@
                     this.m_elmtCounter++;
                 }
                 while (this.getElement(name) != undefined)
-                var e = new Element(name, this, p_type);
+                var e = new Element(name, this, p_type, p_notVisual);
                 this.m_elementArr.push(e);
                 switch (p_type) {
                     case 0:
@@ -574,13 +578,15 @@
                 return { elements: this.m_elementArr, connections: this.m_connectionArr, mdlName: this.m_modelName, mainObj: this.m_mainObjective, dataMat: this.m_dataMatrix, mdlIdent: this.m_modelIdent };
 
             }
-            fromJSON(p_jsonObject: any): void {
+            fromJSON(p_jsonObject: any, p_showVisual: boolean): void {
                // console.log("from json: p_jsonObject = " + p_jsonObject);
-                $("#modelHeader").html(p_jsonObject.mdlName);
-                var header = $("#model_header").html();
-                //Only append if model name has not been added
-                if (header.indexOf(">", header.length - 1) !== -1) {
-                    $("#model_header").append(p_jsonObject.mdlName);
+                if (p_showVisual) {
+                    $("#modelHeader").html(p_jsonObject.mdlName);
+                    var header = $("#model_header").html();
+                    //Only append if model name has not been added
+                    if (header.indexOf(">", header.length - 1) !== -1) {
+                        $("#model_header").append(p_jsonObject.mdlName);
+                    }
                 }
                 this.m_modelName = p_jsonObject.mdlName;
                 this.m_modelIdent = p_jsonObject.mdlIdent;
@@ -595,13 +601,13 @@
                 var maxY = 0;
                 for (var i = 0; i < p_jsonObject.elements.length; i++) {
                     var JsonElmt = p_jsonObject.elements[i];
-                    var elmt = this.createNewElement(undefined)
+                    var elmt = this.createNewElement(undefined, !p_showVisual)
                     //if (JsonElmt.posX > maxX)
                     //    maxX = JsonElmt.posX;
 
                     //if (JsonElmt.posY > maxY)
                     //    maxY = JsonElmt.posY;
-                    elmt.fromJSON(JsonElmt);
+                    elmt.fromJSON(JsonElmt,!p_showVisual);
                   //  console.log("created from json: " + elmt.getName());
                    // console.log("position " + elmt.m_easelElmt.y);
                 }
@@ -610,7 +616,7 @@
                 {
                     var conn = p_jsonObject.connections[i];
                     var inpt = this.getElement(conn.connInput);
-                    var c = this.createNewConnection(inpt, this.getElement(conn.connOutput));
+                    var c = this.createNewConnection(inpt, this.getElement(conn.connOutput), !p_showVisual);
                     //this.m_counter++;
                     c.fromJSON(conn);
                     this.addConnection(c);
@@ -634,13 +640,13 @@
                 console.log("finnished loading from json");
             }
 
-            createNewConnection(p_inputElmt: Element, p_outputElmt: Element): Connection {
+            createNewConnection(p_inputElmt: Element, p_outputElmt: Element, p_notVisual?:boolean): Connection {
                 do {
                     var id: string = "conn" + this.m_ConnCounter;
                     this.m_ConnCounter++;
                 }
                 while (this.getConnection(id) != undefined)
-                var c = new Connection(p_inputElmt, p_outputElmt, id,this.m_bbnMode);
+                var c = new Connection(p_inputElmt, p_outputElmt, id,this.m_bbnMode, p_notVisual);
                 return c;
             }
 
@@ -687,7 +693,5 @@
                 return elements;
             }
         }
-
-
     }
 }

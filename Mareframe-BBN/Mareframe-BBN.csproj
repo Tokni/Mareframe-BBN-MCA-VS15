@@ -32,10 +32,13 @@
     <Content Include="jQueryUI\jquery-ui.css" />
     <Content Include="jQueryUI\jquery-ui.structure.css" />
     <Content Include="jQueryUI\jquery-ui.theme.css" />
+    <Content Include="js\createjs.js" />
     <Content Include="js\math.min.js" />
     <Content Include="MCA.html" />
     <Content Include="saveFile.php" />
+    <Content Include="Script1.js" />
     <Content Include="ts\HashTable.js" />
+    <Content Include="ts\WebWorker.js" />
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -67,6 +70,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="ts\Calculator.ts" />
     <TypeScriptCompile Include="ts\Connection.ts" />
     <TypeScriptCompile Include="ts\Declarations\createjs-lib.d.ts" />
     <TypeScriptCompile Include="ts\Declarations\easeljs.d.ts" />
@@ -80,6 +84,7 @@
     <TypeScriptCompile Include="ts\Handler.ts" />
     <TypeScriptCompile Include="ts\MareframeGUI.ts" />
     <TypeScriptCompile Include="ts\Model.ts" />
+    <TypeScriptCompile Include="ts\Table.ts" />
     <TypeScriptCompile Include="ts\Tools.ts" />
   </ItemGroup>
   <ItemGroup />

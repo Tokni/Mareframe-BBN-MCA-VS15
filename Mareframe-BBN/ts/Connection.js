@@ -3,14 +3,16 @@ var Mareframe;
     var DST;
     (function (DST) {
         var Connection = (function () {
-            function Connection(p_inputElmt, p_outputElmt, p_connID, p_bbnMode) {
-                this.m_easelElmt = new createjs.Container();
+            function Connection(p_inputElmt, p_outputElmt, p_connID, p_bbnMode, p_notVisual) {
                 this.m_color = "black";
                 this.m_inputElement = p_inputElmt;
                 this.m_outputElement = p_outputElmt;
                 this.m_id = p_connID;
                 if (p_bbnMode && p_inputElmt.getType() === 1 && p_outputElmt.getType() === 1) {
                     this.m_color = "gray";
+                }
+                if (!p_notVisual) {
+                    this.m_easelElmt = new createjs.Container();
                 }
             }
             Connection.prototype.getColor = function () {
