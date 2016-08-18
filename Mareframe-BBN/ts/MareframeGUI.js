@@ -101,8 +101,8 @@ var Mareframe;
                     var VOIResults = DST.Tools.getVIOMatrices(_this.m_model, pov, forDec, chanceElmts, _this);
                     if (VOIResults) {
                         _this.gotToVOICalcMode(true);
-                        var worker1 = DST.Tools.startWorker("../Script1.js", true);
-                        var worker2 = DST.Tools.startWorker("../Script1.js", false);
+                        var worker1 = DST.Tools.startWorker("../Calculator.js", true);
+                        var worker2 = DST.Tools.startWorker("../Calculator.js", false);
                         $("#progressText").text("Calculating value of information");
                         $("#cancelProgress").click({ worker1: worker1, worker2: worker2 }, _this.cancelTwoWorkers);
                         $("#progressbarDialog").on("dialogclose", { worker1: worker1, worker2: worker2 }, _this.cancelTwoWorkers);
@@ -403,7 +403,7 @@ var Mareframe;
                 //this.updateModelParallel();
                 var gui = this;
                 $("#updateMdl").removeClass("ui-state-focus");
-                var worker = DST.Tools.startWorker("../Script1.js", true);
+                var worker = DST.Tools.startWorker("../Calculator.js", true);
                 this.goToUpdateMode(true);
                 $("#progressText").text("Updating model");
                 $("#cancelProgress").click({ worker: worker }, this.cancelWorker);
@@ -416,12 +416,12 @@ var Mareframe;
                 worker.onmessage = function (evt) {
                     switch (evt.data.command) {
                         case "finnished":
-                            gui.m_model.closeDown();
                             var model = new DST.Model(true);
                             model.fromJSON(JSON.parse(evt.data.model), false);
-                            gui.m_model = model;
+                            //gui.m_model = model;
                             //this.m_model.update();
                             gui.m_model.getElementArr().forEach(function (e) {
+                                e.setValues(model.getElement(e.getID()).getValues());
                                 e.addMinitable();
                                 e.addEaselElmt();
                                 e.setUpdated(true);
@@ -1323,7 +1323,7 @@ var Mareframe;
                 numOfIterations.style.marginLeft = "10px";
                 numOfIterations.style.width = "100px";
                 numOfIterations.type = "number";
-                numOfIterations.max = "50000";
+                numOfIterations.max = "200000";
                 numOfIterations.min = "100";
                 numOfIterations.step = "100";
                 numOfIterations.value = this.m_model.getmumOfIteraions() + "";
@@ -1555,7 +1555,7 @@ var Mareframe;
                         var cell = row.insertCell();
                         var div = document.createElement("div");
                         cell.appendChild(div);
-                        div.innerHTML = p_result[i][j];
+                        div.innerHTML = p_result[i][j].toPrecision(4);
                     }
                 }
                 $("#voiTable").append(table);
@@ -3053,6 +3053,7 @@ var Mareframe;
                 var mareframGUI = this;
                 this.m_model.getElementArr().forEach(function (e) {
                     if (e.getDialog() !== undefined && e.getDialog().data("isOpen")) {
+                        e.getDialog().dialog("open");
                         console.log("updating tables for: " + e.getName());
                         if (!(e.isUpdated())) {
                             mareframGUI.updateValueButton(true, e.getID());

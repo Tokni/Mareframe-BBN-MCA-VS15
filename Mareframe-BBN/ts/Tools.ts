@@ -638,14 +638,16 @@
                                 added.push(ancestor.getID());
                                 headerRows = Tools.addNewHeaderRow(ancestor.getMainValues(), headerRows);
                             }
-                            //If ancestor has an informative influencing decsendant this should be added too
-                            ancestor.getAllDescendants().forEach(function (descendant: Element) {
-                                
-                                if (descendant.isInformative() && descendant.isInfluencing() && added.indexOf(descendant.getID()) === -1 && descendant.getID() !== p_elmt.getID()) {
-                                    added.push(descendant.getID());
-                                    headerRows = Tools.addNewHeaderRow(descendant.getMainValues(), headerRows);
-                                }
-                            });
+                            if (!ancestor.isInformative()) {
+                                //If ancestor has an informative decsendant this should be added too, but only if ancestor is not informative
+                                ancestor.getAllDescendants().forEach(function (descendant: Element) {
+
+                                    if (descendant.isInformative() && added.indexOf(descendant.getID()) === -1 && descendant.getID() !== p_elmt.getID()) {
+                                        added.push(descendant.getID());
+                                        headerRows = Tools.addNewHeaderRow(descendant.getMainValues(), headerRows);
+                                    }
+                                });
+                            }
                         }
                         else if (ancestor.getType() === 1 && ancestor.isInfluencing() && added.indexOf(ancestor.getID()) === -1) { //If ancestor is an influencing decision
                             headerRows = Tools.addNewHeaderRow(ancestor.getMainValues(), headerRows);
@@ -1422,7 +1424,7 @@
                 var tempDecision: Element = p_model.createNewElement(1);
                 //Add connection from temp dec to point of interest
                 var c = p_model.createNewConnection(tempDecision, p_pov);
-                if (!p_model.addConnection(c)) {
+                if (!Tools.validConnection(tempDecision, p_pov) || !p_model.addConnection(c)) {
                     isPossible = false;
                 }
                 p_pov.setUpdated(false);
@@ -1440,7 +1442,7 @@
                     if (elmt.getType() === 2) {
                         //Add connection from temp dec to utility node
                         var c = p_model.createNewConnection(tempDecision, elmt);
-                        if (!p_model.addConnection(c)) {
+                        if (!Tools.validConnection(tempDecision, elmt) || !p_model.addConnection(c)) {
                             isPossible = false;
                         }
                         elmt.setUpdated(false);

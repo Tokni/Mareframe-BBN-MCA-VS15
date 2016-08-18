@@ -466,7 +466,7 @@
 
             toJSON(): any {
                 
-                return { posX: this.m_easelElmt.x, posY: this.m_easelElmt.y, elmtID: this.getID(), elmtName: this.getName(), elmtDesc: this.getDescription(), elmtType: this.getType(), elmtData: this.getData(), elmtWghtMthd: this.getMethod() , elmtValues: this.getValues(), elmtUpdated: this.isUpdated(), elmtDec: this.m_decision, elmtEvidence: this.m_evidence};
+                return { posX: this.m_easelElmt.x, posY: this.m_easelElmt.y, elmtID: this.getID(), elmtName: this.getName(), elmtDesc: this.getDescription(), elmtType: this.getType(), elmtData: this.getData(), elmtWghtMthd: this.getMethod(), elmtValues: this.getValues(), elmtUpdated: this.isUpdated(), elmtDec: this.m_decision, elmtEvidence: this.m_evidence, elmtDialog: this.m_dialog};
             }
 
             fromJSON(p_jsonElmt: any): void {
@@ -488,6 +488,7 @@
                 this.m_updated = p_jsonElmt.elmtUpdated;
                 this.m_evidence = p_jsonElmt.elmtEvidence;
                 this.m_decision = p_jsonElmt.elmtDec;
+                this.m_dialog = p_jsonElmt.elmtDialog;
             }
 
             getConnectionFrom(p_elmt: Element): Connection {

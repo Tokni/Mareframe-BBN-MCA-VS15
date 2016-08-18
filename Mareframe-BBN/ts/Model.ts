@@ -585,7 +585,7 @@
                     elmts.push(e.toJSON());
 
                 });
-                return { elements: elmts, connections: connections, mdlName: this.m_modelName, mainObj: this.m_mainObjective, dataMat: this.m_dataMatrix, mdlIdent: this.m_modelIdent };
+                return { elements: elmts, connections: connections, mdlName: this.m_modelName, mainObj: this.m_mainObjective, dataMat: this.m_dataMatrix, mdlIdent: this.m_modelIdent, mdlIterations: this.m_numOfIteraions };
 
             }
             fromJSON(p_jsonObject: any, p_showVisual: boolean): void {
@@ -600,7 +600,10 @@
                 }
                 this.m_modelName = p_jsonObject.mdlName;
                 this.m_modelIdent = p_jsonObject.mdlIdent;
-
+                if (p_jsonObject.mdlIterations) {
+                    //First time a model is loaded num of iterations is undefined
+                    this.m_numOfIteraions = p_jsonObject.mdlIterations;
+                }
                 this.m_dataMatrix = p_jsonObject.dataMat;
 
                 this.m_elementArr = [];
