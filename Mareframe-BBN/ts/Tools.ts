@@ -638,10 +638,10 @@
                                 added.push(ancestor.getID());
                                 headerRows = Tools.addNewHeaderRow(ancestor.getMainValues(), headerRows);
                             }
-                            //If ancestor has an informative decsendant this should be added too
+                            //If ancestor has an informative influencing decsendant this should be added too
                             ancestor.getAllDescendants().forEach(function (descendant: Element) {
                                 
-                                if (descendant.isInformative() && added.indexOf(descendant.getID()) === -1 && descendant.getID() !== p_elmt.getID()) {
+                                if (descendant.isInformative() && descendant.isInfluencing() && added.indexOf(descendant.getID()) === -1 && descendant.getID() !== p_elmt.getID()) {
                                     added.push(descendant.getID());
                                     headerRows = Tools.addNewHeaderRow(descendant.getMainValues(), headerRows);
                                 }
@@ -652,21 +652,18 @@
                             added.push(ancestor.getID());
                         }
                     });
-                    p_elmt.getAllDescendants().forEach(function (descendant: Element) {
-                        if (descendant.getType() === 0) {//If descendant is a chance node
-                            var isInformative: boolean = false;
-                            descendant.getChildrenElements().forEach(function (child) {
+                    if (!p_elmt.isInformative()) {
+                        //Decsendants are only important if this is not an informative node
+                        p_elmt.getAllDescendants().forEach(function (descendant: Element) {
+                            if (descendant.getType() === 0) {//If descendant is a chance node
 
-                                if (child.getType() === 1) {//If a chance has a decision child it is informative
-                                    isInformative = true;
+                                if (descendant.isInformative() && added.indexOf(descendant.getID()) === -1) {
+                                    headerRows = Tools.addNewHeaderRow(descendant.getMainValues(), headerRows);
+                                    added.push(descendant.getID());
                                 }
-                            });
-                            if (isInformative && added.indexOf(descendant.getID()) === -1) {
-                                headerRows = Tools.addNewHeaderRow(descendant.getMainValues(), headerRows);
-                                added.push(descendant.getID());
                             }
-                        }
-                    });
+                        });
+                    }
                     //p_elmt.setUpdated(true);
                 }
                 p_elmt.setValues(headerRows);
@@ -1645,18 +1642,20 @@
                     var data = p_elmt.getData();
                     var values = [];
                     var oldValues = p_elmt.getValues(); //This is used to gain information about the headerrows in values
+                    var numOfHeaderrowsData: number = Tools.numOfHeaderRows(data);
+                    var numOfHeaderrowsOldValues: number = Tools.numOfHeaderRows(oldValues, p_elmt);
                     //Add the headerrows into values
                     for (var row = 0; row < Tools.numOfHeaderRows(oldValues, p_elmt); row++) {
                         values.push(oldValues[row]);
                     }
                     var dataLength = data.length;
-                    var startCol = Tools.numOfHeaderRows(data, p_elmt);
+                    var startRow = Tools.numOfHeaderRows(data, p_elmt);
                     if (p_elmt.getType() === 2) {
                         dataLength = data[0].length;
-                        startCol = 1;
+                        startRow = 1;
                     }
                     // console.log("startCol: " + startCol + " dataLenght: " + dataLength);
-                    for (var i = startCol; i < dataLength; i++) {//For each of the different values
+                    for (var i = startRow; i < dataLength; i++) {//For each of the different values
                         var valRow = [];
                         if (p_elmt.getType() === 0) {
                             valRow.push(data[i][0]);//push name of value
@@ -1669,13 +1668,14 @@
 
                             //console.log("calculating for " + data[i][0] + " column: " + col + " in " + e.getName());
                             var weightSum: number = 0; //Calculate a new weight sum for each column
+                            
                             for (var j = 0; j < p_table.length; j++) {//For each case
                                 //console.log("case: " + JSON.stringify(table[j][0]));
                                 var matchingCase = true;
                                 var matchingValue = true;
 
                                 if (p_elmt.getType() === 2) {
-                                    for (var headerRow = 0; headerRow < Tools.numOfHeaderRows(data); headerRow++) {
+                                    for (var headerRow = 0; headerRow < numOfHeaderrowsData; headerRow++) {
 
                                         //console.log("column: " + i + ". Checking " + data[headerRow][0] + ", " + table[j][0][data[headerRow][0]] + " against " + data[headerRow][i]);
                                         if (p_table[j][0][data[headerRow][0]] !== data[headerRow][i]) {//If the value in headerrow is not the same as the one sampled
@@ -1688,7 +1688,7 @@
                                     //console.log("value does not match");
                                     matchingValue = false;
                                 }
-                                for (var headerRow = 0; headerRow < Tools.numOfHeaderRows(oldValues, p_elmt); headerRow++) {//Checking if all elements in this column match
+                                for (var headerRow = 0; headerRow < numOfHeaderrowsOldValues; headerRow++) {//Checking if all elements in this column match
                                     var headerElmt = oldValues[headerRow][0];
                                     //console.log("checking if case includes " + p_model.getElement(headerElmt).getName() + " : " + oldValues[headerRow][col]); 
                                     if (p_table[j][0][headerElmt] !== oldValues[headerRow][col]) {
@@ -1732,7 +1732,7 @@
                         //console.log(utilityValue);
                         //Add the headerrows into values
                         values = [];
-                        for (var row = 0; row < Tools.numOfHeaderRows(oldValues, p_elmt); row++) {
+                        for (var row = 0; row < numOfHeaderrowsOldValues; row++) {
                             values.push(oldValues[row]);
                         }
                         var valueRow = ["Value"];

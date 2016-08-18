@@ -213,6 +213,7 @@ module Mareframe {
                 progressBarDialog.setAttribute("id", "progressbarDialog");
 
                 var div = document.createElement("div");
+                div.setAttribute("id", "progressText");
                 div.innerHTML = "Updating Model";
                 progressBarDialog.appendChild(div);
                 var progressBar = document.createElement("div");
@@ -303,14 +304,16 @@ module Mareframe {
                 console.log("changing to progress");
                 document.getElementsByTagName("body")[0].style.cursor = "progress";
             }
-            private cancelWorker(p_evt: Event): void {
-                var worker: Worker = p_evt.data.worker1;
+            private cancelWorker = (p_evt: Event): void => {
+                var worker: Worker = p_evt.data.worker;
                 Tools.stopWorker(worker);
+                this.goToUpdateMode(false);
             }
-            private cancelTwoWorkers(p_evt: Event): void {
+            private cancelTwoWorkers = (p_evt: Event): void => {
                 var worker: Worker = p_evt.data.worker1;
                 (p_evt.data.worker2).terminate
                 Tools.stopWorker(worker);
+                this.gotToVOICalcMode(false);
             }
             public updateModel() {
                 //this.updateModelParallel();
@@ -318,10 +321,14 @@ module Mareframe {
                 $("#updateMdl").removeClass("ui-state-focus");
                 var worker: Worker = Tools.startWorker("../Script1.js",true);
                 this.goToUpdateMode(true);
+                $("#progressText").text("Updating model");
                 $("#cancelProgress").click({ worker: worker }, this.cancelWorker);
+                $("#progressbarDialog").on("dialogclose", { worker: worker }, this.cancelWorker);
+                var t = this.m_model.toJSON()
                 worker.postMessage({
                     model: JSON.stringify(this.m_model.toJSON())
                 });
+                 
                 var status: number = 0;
                 worker.onmessage = function (evt) {
                     switch (evt.data.command) {
@@ -502,7 +509,7 @@ module Mareframe {
             private fitToModel() {
                 this.repositionModel();
                 this.updateSize();
-            }
+          
             private setSize(p_width: number, p_height: number): void {
                 //console.log("setting size to " + p_width + " , " + p_height);
                 this.m_mcaStageCanvas.height = p_height;
@@ -807,8 +814,20 @@ module Mareframe {
                     this.updateDecAndEvidenceVisually();
                 }
             }
+            private gotToVOICalcMode(p_bool: boolean): void {
+                if (p_bool) {
+                    $(".notAllowedDuringVOI").addClass("disabled");
+                    $(".notAllowedDuringVOI").addClass("ui-state-disabled");
+                    $(".notAllowedDuringVOI").attr("disabled", "disabled");
+                }
+                else {
+                    $(".notAllowedDuringVOI").removeClass("disabled");
+                    $(".notAllowedDuringVOI").removeClass("ui-state-disabled");
+                    $(".notAllowedDuringVOI").removeAttr("disabled");
+                }
+            }
+
             private goToUpdateMode(p_bool: boolean): void {
-                this.m_updating = p_bool;
                 if (p_bool) {
                     $(".editorBut").addClass("disabled"); 
                     $(".editorBut").addClass("ui-state-disabled");
@@ -1523,7 +1542,7 @@ module Mareframe {
                 button.setAttribute("id", "voiButton");
                 button.innerHTML = "Value of Information";
                 button.setAttribute("title", "Click to show the value of information for the selected nodes");
-
+                button.classList.add("notAllowedDuringVOI");
                 
 
                 $("#voiButton").click(this.updateVOI)
@@ -1534,6 +1553,7 @@ module Mareframe {
             }
 
             private updateVOI = (p_evt: Event): void => {
+                
                 var gui: GUIHandler = this;
                 var pov: Element = this.m_model.getElement($("#fromPointOfView").val());
                 var forDec: Element = this.m_model.getElement($("#forDec").val());
@@ -1543,12 +1563,15 @@ module Mareframe {
                         chanceElmts.push(e);
                     }
                 });
-                var worker1: Worker = Tools.startWorker("../Script1.js",true);
-                var worker2: Worker = Tools.startWorker("../Script1.js", false);
-                $("#cancelProgress").click({ worker1: worker1, worker2: worker2}, this.cancelWorker);
                 var VOIResults: any[] = Tools.getVIOMatrices(this.m_model, pov, forDec, chanceElmts, this);
-                var resultMatrix: any[][];
-                if (VOIResults) {
+                if (VOIResults) {//Only start workers if it is possible to calc voi
+                    this.gotToVOICalcMode(true);
+                    var worker1: Worker = Tools.startWorker("../Script1.js", true);
+                    var worker2: Worker = Tools.startWorker("../Script1.js", false);
+                    $("#progressText").text("Calculating value of information");
+                    $("#cancelProgress").click({ worker1: worker1, worker2: worker2 }, this.cancelTwoWorkers);
+                    $("#progressbarDialog").on("dialogclose", { worker1: worker1, worker2: worker2 }, this.cancelTwoWorkers);
+                    var resultMatrix: any[][];
                     worker1.postMessage({
                         model: JSON.stringify(VOIResults[0])
                     });
@@ -1570,6 +1593,7 @@ module Mareframe {
                                     Tools.stopWorker(worker1);
                                     resultMatrix = Tools.calcVOIResult(matrix1, matrix2);
                                     gui.updateVOIVisual(resultMatrix);
+                                    gui.gotToVOICalcMode(false);
                                 }
                                 else {
                                     worker1.terminate();
@@ -1594,6 +1618,7 @@ module Mareframe {
                                     Tools.stopWorker(worker2);
                                     resultMatrix = Tools.calcVOIResult(matrix1, matrix2);
                                     gui.updateVOIVisual(resultMatrix);
+                                    gui.gotToVOICalcMode(false);
                                 }
                                 else {
                                     worker2.terminate();
@@ -1610,7 +1635,7 @@ module Mareframe {
                     };
                 }
                 else {
-                    this.updateVOIVisual([[0], [0]]);
+                    this.updateVOIVisual([[0]]);
                 }
             }
             private updateVOIVisual(p_result): void {

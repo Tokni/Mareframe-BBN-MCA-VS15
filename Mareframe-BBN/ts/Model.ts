@@ -575,7 +575,17 @@
                 }
             }
             toJSON(): any {
-                return { elements: this.m_elementArr, connections: this.m_connectionArr, mdlName: this.m_modelName, mainObj: this.m_mainObjective, dataMat: this.m_dataMatrix, mdlIdent: this.m_modelIdent };
+                var connections: Connection[] = [];//This is created to prevent circular references
+                this.m_connectionArr.forEach(function (c) {
+                    connections.push(c.toJSON());
+
+                });
+                var elmts: Connection[] = [];//This is created to prevent circular references
+                this.m_elementArr.forEach(function (e) {
+                    elmts.push(e.toJSON());
+
+                });
+                return { elements: elmts, connections: connections, mdlName: this.m_modelName, mainObj: this.m_mainObjective, dataMat: this.m_dataMatrix, mdlIdent: this.m_modelIdent };
 
             }
             fromJSON(p_jsonObject: any, p_showVisual: boolean): void {

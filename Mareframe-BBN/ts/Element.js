@@ -430,7 +430,7 @@ var Mareframe;
                 return this.m_connections;
             };
             Element.prototype.toJSON = function () {
-                return { posX: this.m_easelElmt.x, posY: this.m_easelElmt.y, elmtID: this.getID(), elmtName: this.getName(), elmtDesc: this.getDescription(), elmtType: this.getType(), elmtData: this.getData(), elmtWghtMthd: this.getMethod(), elmtValues: this.getValues(), elmtMdl: this.m_model, elmtUpdated: this.isUpdated() };
+                return { posX: this.m_easelElmt.x, posY: this.m_easelElmt.y, elmtID: this.getID(), elmtName: this.getName(), elmtDesc: this.getDescription(), elmtType: this.getType(), elmtData: this.getData(), elmtWghtMthd: this.getMethod(), elmtValues: this.getValues(), elmtUpdated: this.isUpdated(), elmtDec: this.m_decision, elmtEvidence: this.m_evidence };
             };
             Element.prototype.fromJSON = function (p_jsonElmt) {
                 // console.log("element.fromJSON()");
@@ -446,8 +446,9 @@ var Mareframe;
                 this.m_values = p_jsonElmt.elmtValues;
                 //console.log("FromJSONdata: " + this.m_data);
                 this.m_weightingMethod = p_jsonElmt.elmtWghtMthd;
-                this.m_model = p_jsonElmt.elmtMdl;
                 this.m_updated = p_jsonElmt.elmtUpdated;
+                this.m_evidence = p_jsonElmt.elmtEvidence;
+                this.m_decision = p_jsonElmt.elmtDec;
             };
             Element.prototype.getConnectionFrom = function (p_elmt) {
                 var retConnection = null;

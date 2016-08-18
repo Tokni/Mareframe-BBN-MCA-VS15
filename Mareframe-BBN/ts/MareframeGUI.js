@@ -46,6 +46,17 @@ var Mareframe;
                 };
                 this.m_elementColors = [["#efefff", "#15729b", "#dfdfff",], ["#fff6e0", "#f6a604", "#fef4c6"], ["#ffefef", "#c42f33", "#ffdfdf"], ["#ffefef", "#c42f33", "#ffdfdf"], ["#efffef", "#2fc433", "#dfffdf"]];
                 this.m_trashBin = [];
+                this.cancelWorker = function (p_evt) {
+                    var worker = p_evt.data.worker;
+                    DST.Tools.stopWorker(worker);
+                    _this.goToUpdateMode(false);
+                };
+                this.cancelTwoWorkers = function (p_evt) {
+                    var worker = p_evt.data.worker1;
+                    (p_evt.data.worker2).terminate;
+                    DST.Tools.stopWorker(worker);
+                    _this.gotToVOICalcMode(false);
+                };
                 this.setEditorMode = function (cb) {
                     //console.log(cb);
                     this.m_editorMode = cb.currentTarget.checked;
@@ -87,12 +98,15 @@ var Mareframe;
                             chanceElmts.push(e);
                         }
                     });
-                    var worker1 = DST.Tools.startWorker("../Script1.js", true);
-                    var worker2 = DST.Tools.startWorker("../Script1.js", false);
-                    $("#cancelProgress").click({ worker1: worker1, worker2: worker2 }, _this.cancelWorker);
                     var VOIResults = DST.Tools.getVIOMatrices(_this.m_model, pov, forDec, chanceElmts, _this);
-                    var resultMatrix;
                     if (VOIResults) {
+                        _this.gotToVOICalcMode(true);
+                        var worker1 = DST.Tools.startWorker("../Script1.js", true);
+                        var worker2 = DST.Tools.startWorker("../Script1.js", false);
+                        $("#progressText").text("Calculating value of information");
+                        $("#cancelProgress").click({ worker1: worker1, worker2: worker2 }, _this.cancelTwoWorkers);
+                        $("#progressbarDialog").on("dialogclose", { worker1: worker1, worker2: worker2 }, _this.cancelTwoWorkers);
+                        var resultMatrix;
                         worker1.postMessage({
                             model: JSON.stringify(VOIResults[0])
                         });
@@ -114,6 +128,7 @@ var Mareframe;
                                         DST.Tools.stopWorker(worker1);
                                         resultMatrix = DST.Tools.calcVOIResult(matrix1, matrix2);
                                         gui.updateVOIVisual(resultMatrix);
+                                        gui.gotToVOICalcMode(false);
                                     }
                                     else {
                                         worker1.terminate();
@@ -138,6 +153,7 @@ var Mareframe;
                                         DST.Tools.stopWorker(worker2);
                                         resultMatrix = DST.Tools.calcVOIResult(matrix1, matrix2);
                                         gui.updateVOIVisual(resultMatrix);
+                                        gui.gotToVOICalcMode(false);
                                     }
                                     else {
                                         worker2.terminate();
@@ -154,7 +170,7 @@ var Mareframe;
                         };
                     }
                     else {
-                        _this.updateVOIVisual([[0], [0]]);
+                        _this.updateVOIVisual([[0]]);
                     }
                 };
                 this.m_handler = p_handler;
@@ -302,6 +318,7 @@ var Mareframe;
                 $('body').append(progressBarDialog);
                 progressBarDialog.setAttribute("id", "progressbarDialog");
                 var div = document.createElement("div");
+                div.setAttribute("id", "progressText");
                 div.innerHTML = "Updating Model";
                 progressBarDialog.appendChild(div);
                 var progressBar = document.createElement("div");
@@ -382,22 +399,16 @@ var Mareframe;
                 console.log("changing to progress");
                 document.getElementsByTagName("body")[0].style.cursor = "progress";
             };
-            GUIHandler.prototype.cancelWorker = function (p_evt) {
-                var worker = p_evt.data.worker1;
-                DST.Tools.stopWorker(worker);
-            };
-            GUIHandler.prototype.cancelTwoWorkers = function (p_evt) {
-                var worker = p_evt.data.worker1;
-                (p_evt.data.worker2).terminate;
-                DST.Tools.stopWorker(worker);
-            };
             GUIHandler.prototype.updateModel = function () {
                 //this.updateModelParallel();
                 var gui = this;
                 $("#updateMdl").removeClass("ui-state-focus");
                 var worker = DST.Tools.startWorker("../Script1.js", true);
                 this.goToUpdateMode(true);
+                $("#progressText").text("Updating model");
                 $("#cancelProgress").click({ worker: worker }, this.cancelWorker);
+                $("#progressbarDialog").on("dialogclose", { worker: worker }, this.cancelWorker);
+                var t = this.m_model.toJSON();
                 worker.postMessage({
                     model: JSON.stringify(this.m_model.toJSON())
                 });
@@ -862,8 +873,19 @@ var Mareframe;
                     this.updateDecAndEvidenceVisually();
                 }
             };
+            GUIHandler.prototype.gotToVOICalcMode = function (p_bool) {
+                if (p_bool) {
+                    $(".notAllowedDuringVOI").addClass("disabled");
+                    $(".notAllowedDuringVOI").addClass("ui-state-disabled");
+                    $(".notAllowedDuringVOI").attr("disabled", "disabled");
+                }
+                else {
+                    $(".notAllowedDuringVOI").removeClass("disabled");
+                    $(".notAllowedDuringVOI").removeClass("ui-state-disabled");
+                    $(".notAllowedDuringVOI").removeAttr("disabled");
+                }
+            };
             GUIHandler.prototype.goToUpdateMode = function (p_bool) {
-                this.m_updating = p_bool;
                 if (p_bool) {
                     $(".editorBut").addClass("disabled");
                     $(".editorBut").addClass("ui-state-disabled");
@@ -1515,6 +1537,7 @@ var Mareframe;
                 button.setAttribute("id", "voiButton");
                 button.innerHTML = "Value of Information";
                 button.setAttribute("title", "Click to show the value of information for the selected nodes");
+                button.classList.add("notAllowedDuringVOI");
                 $("#voiButton").click(this.updateVOI);
                 return "voiDialog";
             };

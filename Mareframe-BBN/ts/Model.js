@@ -526,7 +526,15 @@ var Mareframe;
                 }
             };
             Model.prototype.toJSON = function () {
-                return { elements: this.m_elementArr, connections: this.m_connectionArr, mdlName: this.m_modelName, mainObj: this.m_mainObjective, dataMat: this.m_dataMatrix, mdlIdent: this.m_modelIdent };
+                var connections = []; //This is created to prevent circular references
+                this.m_connectionArr.forEach(function (c) {
+                    connections.push(c.toJSON());
+                });
+                var elmts = []; //This is created to prevent circular references
+                this.m_elementArr.forEach(function (e) {
+                    elmts.push(e.toJSON());
+                });
+                return { elements: elmts, connections: connections, mdlName: this.m_modelName, mainObj: this.m_mainObjective, dataMat: this.m_dataMatrix, mdlIdent: this.m_modelIdent };
             };
             Model.prototype.fromJSON = function (p_jsonObject, p_showVisual) {
                 // console.log("from json: p_jsonObject = " + p_jsonObject);

@@ -14,10 +14,12 @@
     <link href="css/DST.css" rel="stylesheet" />
 </head>
 <body>
+    
     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     <script src="https://code.createjs.com/createjs-2015.05.21.min.js"></script>
     <script src="https://www.google.com/jsapi"></script>
+
     <script>
         google.load("visualization", "1.0", { "packages": ["corechart", "table"] });
     </script>
@@ -32,7 +34,7 @@
     <script src="ts/Handler.js" type="text/javascript"></script>
     <script src="ts/Tools.js" type="text/javascript"></script>
 
-
+    <script src="//ajax.googleapis.com/ajax/libs/dojo/1.11.2/dojo/dojo.js"></script>
     <div class="container">
         <div class="row">
             <div class="col-lg-8">
@@ -102,9 +104,9 @@
                 <label for="fullscreen" class="button fullscreen" title="Click to to to full screen">Fullscreen</label>
                 <input class="button advButton" type="checkbox" id="editorMode" >
                 <label for="editorMode" class="button editorMode" title="Click to enable editormode">Editor Mode</label>
-                <input class="button advButton notAllowedDuringUpdate" type="checkbox" id="autoUpdate">
-                <label for="autoUpdate" class="button autoUpdate notAllowedDuringUpdate" title="Click to enable automatic updating">Update Automatically</label>
-                <button class="button advButton notAllowedDuringUpdate" id="updateMdl"title="Click to update model">Update</button>
+                <input class="button advButton notAllowedDuringUpdate notAllowedDuringVOI" type="checkbox" id="autoUpdate">
+                <label for="autoUpdate" class="button autoUpdate notAllowedDuringUpdate notAllowedDuringVOI" title="Click to enable automatic updating">Update Automatically</label>
+                <button class="button advButton notAllowedDuringUpdate notAllowedDuringVOI" id="updateMdl"title="Click to update model">Update</button>
                 <button class="button advButton notAllowedDuringUpdate" id="settings" title="Click to open properties window">Properties</button>
             </div>
         </div>

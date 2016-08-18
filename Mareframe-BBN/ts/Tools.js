@@ -605,9 +605,9 @@ var Mareframe;
                                 added.push(ancestor.getID());
                                 headerRows = Tools.addNewHeaderRow(ancestor.getMainValues(), headerRows);
                             }
-                            //If ancestor has an informative decsendant this should be added too
+                            //If ancestor has an informative influencing decsendant this should be added too
                             ancestor.getAllDescendants().forEach(function (descendant) {
-                                if (descendant.isInformative() && added.indexOf(descendant.getID()) === -1 && descendant.getID() !== p_elmt.getID()) {
+                                if (descendant.isInformative() && descendant.isInfluencing() && added.indexOf(descendant.getID()) === -1 && descendant.getID() !== p_elmt.getID()) {
                                     added.push(descendant.getID());
                                     headerRows = Tools.addNewHeaderRow(descendant.getMainValues(), headerRows);
                                 }
@@ -618,20 +618,17 @@ var Mareframe;
                             added.push(ancestor.getID());
                         }
                     });
-                    p_elmt.getAllDescendants().forEach(function (descendant) {
-                        if (descendant.getType() === 0) {
-                            var isInformative = false;
-                            descendant.getChildrenElements().forEach(function (child) {
-                                if (child.getType() === 1) {
-                                    isInformative = true;
+                    if (!p_elmt.isInformative()) {
+                        //Decsendants are only important if this is not an informative node
+                        p_elmt.getAllDescendants().forEach(function (descendant) {
+                            if (descendant.getType() === 0) {
+                                if (descendant.isInformative() && added.indexOf(descendant.getID()) === -1) {
+                                    headerRows = Tools.addNewHeaderRow(descendant.getMainValues(), headerRows);
+                                    added.push(descendant.getID());
                                 }
-                            });
-                            if (isInformative && added.indexOf(descendant.getID()) === -1) {
-                                headerRows = Tools.addNewHeaderRow(descendant.getMainValues(), headerRows);
-                                added.push(descendant.getID());
                             }
-                        }
-                    });
+                        });
+                    }
                 }
                 p_elmt.setValues(headerRows);
                 Tools.addMainValues(p_model, p_elmt);
@@ -1554,18 +1551,20 @@ var Mareframe;
                     var data = p_elmt.getData();
                     var values = [];
                     var oldValues = p_elmt.getValues(); //This is used to gain information about the headerrows in values
+                    var numOfHeaderrowsData = Tools.numOfHeaderRows(data);
+                    var numOfHeaderrowsOldValues = Tools.numOfHeaderRows(oldValues, p_elmt);
                     //Add the headerrows into values
                     for (var row = 0; row < Tools.numOfHeaderRows(oldValues, p_elmt); row++) {
                         values.push(oldValues[row]);
                     }
                     var dataLength = data.length;
-                    var startCol = Tools.numOfHeaderRows(data, p_elmt);
+                    var startRow = Tools.numOfHeaderRows(data, p_elmt);
                     if (p_elmt.getType() === 2) {
                         dataLength = data[0].length;
-                        startCol = 1;
+                        startRow = 1;
                     }
                     // console.log("startCol: " + startCol + " dataLenght: " + dataLength);
-                    for (var i = startCol; i < dataLength; i++) {
+                    for (var i = startRow; i < dataLength; i++) {
                         var valRow = [];
                         if (p_elmt.getType() === 0) {
                             valRow.push(data[i][0]); //push name of value
@@ -1582,7 +1581,7 @@ var Mareframe;
                                 var matchingCase = true;
                                 var matchingValue = true;
                                 if (p_elmt.getType() === 2) {
-                                    for (var headerRow = 0; headerRow < Tools.numOfHeaderRows(data); headerRow++) {
+                                    for (var headerRow = 0; headerRow < numOfHeaderrowsData; headerRow++) {
                                         //console.log("column: " + i + ". Checking " + data[headerRow][0] + ", " + table[j][0][data[headerRow][0]] + " against " + data[headerRow][i]);
                                         if (p_table[j][0][data[headerRow][0]] !== data[headerRow][i]) {
                                             matchingValue = false;
@@ -1593,7 +1592,7 @@ var Mareframe;
                                     //console.log("value does not match");
                                     matchingValue = false;
                                 }
-                                for (var headerRow = 0; headerRow < Tools.numOfHeaderRows(oldValues, p_elmt); headerRow++) {
+                                for (var headerRow = 0; headerRow < numOfHeaderrowsOldValues; headerRow++) {
                                     var headerElmt = oldValues[headerRow][0];
                                     //console.log("checking if case includes " + p_model.getElement(headerElmt).getName() + " : " + oldValues[headerRow][col]); 
                                     if (p_table[j][0][headerElmt] !== oldValues[headerRow][col]) {
@@ -1632,7 +1631,7 @@ var Mareframe;
                         //console.log(utilityValue);
                         //Add the headerrows into values
                         values = [];
-                        for (var row = 0; row < Tools.numOfHeaderRows(oldValues, p_elmt); row++) {
+                        for (var row = 0; row < numOfHeaderrowsOldValues; row++) {
                             values.push(oldValues[row]);
                         }
                         var valueRow = ["Value"];
