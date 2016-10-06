@@ -385,7 +385,7 @@
                 this.m_stage.update();
                 this.m_guiHandler.updateDataTableDiv(this.m_currentElement);
                 if (this.m_guiHandler.m_readyForSA) {
-                    this.m_guiHandler.updateFinalScores(this.m_guiHandler.m_finalScoreChosenObjective);
+                    this.m_guiHandler.updateFinalScores(this.m_guiHandler.m_finalScoreChosenObjective, this.m_guiHandler.getCritSelected());
                     var tm1 = this.m_currentElement;
                     this.m_guiHandler.updateChartData(this.m_guiHandler.m_SAChosenElement);
                     this.m_guiHandler.updateSATableData();

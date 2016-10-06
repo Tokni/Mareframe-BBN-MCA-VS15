@@ -58,7 +58,7 @@ module Mareframe {
                     //loadModel = "iceland";
                     //loadModel = "cadiz";
                         //loadModel = "test";
-                        loadModel = "newCar8";
+                        //loadModel = "newCar8";
                     }
                     else {//Tokni mode
                         //loadModel = "resturant";

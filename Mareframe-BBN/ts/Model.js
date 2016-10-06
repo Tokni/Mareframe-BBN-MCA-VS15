@@ -461,6 +461,8 @@ var Mareframe;
             Model.prototype.getObjectIndex = function (p_objectStringId) {
                 ////console.log(" get object "  + p_objectStringId + " in list: "+ this.m_elementArr);
                 var key = 0;
+                if (!p_objectStringId)
+                    debugger;
                 if (p_objectStringId.substr(0, 4) === "elmt") {
                     this.m_elementArr.every(function (p_elmt) {
                         ////console.log("comparing with : " + p_elmt.getID());

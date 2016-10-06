@@ -55,7 +55,7 @@
                     this.m_type = p_type; 
                     } else {
                         this.m_type = p_type;
-                }
+                    }
                 }
                 else {
                     ////console.log("type not defined");

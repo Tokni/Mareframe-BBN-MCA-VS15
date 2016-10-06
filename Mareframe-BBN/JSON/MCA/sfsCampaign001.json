@@ -1,0 +1,603 @@
+{
+  
+  "elements": [
+    {
+      "posX": 208.92903201428032,
+      "posY": 408.2080200501255,
+      "elmtID": "elmt3",
+      "elmtName": "Goal",
+      "elmtDesc": "write description here",
+      "elmtType": 103,
+      "elmtWghtMthd": 1,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [
+        [ "conn18", 50 ],
+        [ "conn19", 50 ],
+        [ "conn20", 50 ]
+      ]
+    },
+    {
+      "posX": 477.2345016653122,
+      "posY": 415.7268170426068,
+      "elmtID": "elmt1",
+      "elmtName": "Environmental",
+      "elmtDesc": "write description here",
+      "elmtType": 101,
+      "elmtWghtMthd": 1,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [
+        [ "conn14", 50 ],
+        [ "conn15", 50 ]
+      ]
+    },
+    {
+      "posX": 462.706204269603,
+      "posY": 294.1729323308272,
+      "elmtID": "elmt4",
+      "elmtName": "Financial",
+      "elmtDesc": "write description here",
+      "elmtType": 101,
+      "elmtWghtMthd": 1,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [
+        [ "conn12", 50 ],
+        [ "conn13", 50 ]
+      ]
+    },
+    {
+      "posX": 476.3711289295051,
+      "posY": 534.7744360902257,
+      "elmtID": "elmt5",
+      "elmtName": "Social",
+      "elmtDesc": "write description here",
+      "elmtType": 101,
+      "elmtWghtMthd": 1,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [
+        [ "conn16", 50 ],
+        [ "conn17", 50 ]
+      ]
+    },
+    {
+      "posX": 814.0899812385121,
+      "posY": 391.9172932330827,
+      "elmtValueFnX": 50,
+      "elmtValueFnY": 50,
+      "elmtValueFnFlip": 0,
+      "elmtID": "elmt8",
+      "elmtName": "Biomass",
+      "elmtDesc": "write description here",
+      "elmtType": 100,
+      "elmtWghtMthd": 2,
+      "elmtDstType": 1,
+      "elmtDataMin": 0,
+      "elmtDataMax": 570000,
+      "elmtDataUnit": "Tons",
+      "elmtDataBaseLine": 263748,
+      "elmtDataArr": [ 324076, 257805, 226079, 105444, 174975, 379721, 282848, 240079, 224081, 240653, 347230, 269986, 259335, 244143, 232493, 300131, 312633, 301852, 272163, 279229 ],
+      "pwl": {
+        "points": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 100,
+            "y": 1
+          }
+        ]
+      },
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 812.1378491442404,
+      "posY": 434.5238095238096,
+      "elmtValueFnX": 50,
+      "elmtValueFnY": 50,
+      "elmtValueFnFlip": 0,
+      "elmtID": "elmt9",
+      "elmtName": "Recruitment",
+      "elmtDesc": "write description here",
+      "elmtType": 100,
+      "elmtWghtMthd": 2,
+      "elmtDstType": 1,
+      "elmtDataMin": 0,
+      "elmtDataMax": 1328000,
+      "elmtDataUnit": "Tons",
+      "elmtDataBaseLine": 750525,
+      "elmtDataArr": [ 806410, 730375, 699390, 534047, 656862, 885538, 784447, 724366, 715219, 732924, 856008, 756549, 746888, 731654, 703893, 799511, 796820, 801182, 782082, 766344 ],
+      "pwl": {
+        "points": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 100,
+            "y": 1
+          }
+        ]
+      },
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 804.3293207671534,
+      "posY": 236.52882205513788,
+      "elmtValueFnX": 50,
+      "elmtValueFnY": 50,
+      "elmtValueFnFlip": 0,
+      "elmtID": "elmt6",
+      "elmtName": "Income",
+      "elmtDesc": "write description here",
+      "elmtType": 100,
+      "elmtWghtMthd": 2,
+      "elmtDstType": 1,
+      "elmtDataMin": 0,
+      "elmtDataMax": 1177000,
+      "elmtDataUnit": "Euros",
+      "elmtDataBaseLine": 543721,
+      "elmtDataArr": [ 218789.99999999988, 314544.6000000001, 360770.3999999999, 433121.4, 424554.39999999997, 330374.7000000002, 463230.9, 586339.2, 573716.3999999999, 571086.8999999999, 429065.99999999994, 585583.1999999998, 640623.5999999994, 709743.9999999998, 738529.5999999996, 543127.5, 706536, 784859.5, 735669, 724154 ],
+      "pwl": {
+        "points": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 100,
+            "y": 1
+          }
+        ]
+      },
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 802.3771886728821,
+      "posY": 274.1228070175439,
+      "elmtValueFnX": 50,
+      "elmtValueFnY": 50,
+      "elmtValueFnFlip": 0,
+      "elmtID": "elmt7",
+      "elmtName": "Investment",
+      "elmtDesc": "write description here",
+      "elmtType": 100,
+      "elmtWghtMthd": 2,
+      "elmtDstType": 1,
+      "elmtDataMin": 0,
+      "elmtDataMax": 3150000,
+      "elmtDataUnit": "Euros",
+      "elmtDataBaseLine": 1190000,
+      "elmtDataArr": [ 600000, 1000000, 1400000, 1800000, 2100000, 600000, 1000000, 1400000, 1700000, 1500000, 600000, 1000000, 1400000, 1400000, 1500000, 600000, 1000000, 1000000, 1200000, 1000000 ],
+      "pwl": {
+        "points": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 100,
+            "y": 1
+          }
+        ]
+      },
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 814.0899812385121,
+      "posY": 596.1779448621553,
+      "elmtValueFnX": 50,
+      "elmtValueFnY": 50,
+      "elmtValueFnFlip": 0,
+      "elmtID": "elmt11",
+      "elmtName": "Onshore",
+      "elmtDesc": "write description here",
+      "elmtType": 100,
+      "elmtWghtMthd": 2,
+      "elmtDstType": 1,
+      "elmtDataMin": 0,
+      "elmtDataMax": 130,
+      "elmtDataUnit": "People",
+      "elmtDataBaseLine": 30,
+      "elmtDataArr": [ 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30 ],
+      "pwl": {
+        "points": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 100,
+            "y": 1
+          }
+        ]
+      },
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 812.1378491442406,
+      "posY": 554.8245614035086,
+      "elmtValueFnX": 50,
+      "elmtValueFnY": 50,
+      "elmtValueFnFlip": 0,
+      "elmtID": "elmt10",
+      "elmtName": "Offshore",
+      "elmtDesc": "write description here",
+      "elmtType": 100,
+      "elmtWghtMthd": 2,
+      "elmtDstType": 1,
+      "elmtDataMin": 0,
+      "elmtDataMax": 268,
+      "elmtDataUnit": "People",
+      "elmtDataBaseLine": 95,
+      "elmtDataArr": [ 48, 80, 112, 144, 168, 48, 80, 112, 136, 120, 48, 80, 112, 112, 120, 48, 80, 80, 96, 80 ],
+      "pwl": {
+        "points": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 100,
+            "y": 1
+          }
+        ]
+      },
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 1000,
+      "posY": 300,
+      "elmtID": "elmt1000",
+      "elmtName": "SC 6, 10% ",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 1000,
+      "posY": 350,
+      "elmtID": "elmt1001",
+      "elmtName": "SC 10, 10% ",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 1000,
+      "posY": 400,
+      "elmtID": "elmt1002",
+      "elmtName": "SC 14, 10% ",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 1000,
+      "posY": 450,
+      "elmtID": "elmt1003",
+      "elmtName": "SC 18, 10% ",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 1000,
+      "posY": 500,
+      "elmtID": "elmt1004",
+      "elmtName": "SC 22, 10% ",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 1160,
+      "posY": 300,
+      "elmtID": "elmt1005",
+      "elmtName": "SC 6, 15% ",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 1160,
+      "posY": 350,
+      "elmtID": "elmt1006",
+      "elmtName": "SC 10, 15% ",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 1160,
+      "posY": 400,
+      "elmtID": "elmt1007",
+      "elmtName": "SC 14, 15% ",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 1160,
+      "posY": 450,
+      "elmtID": "elmt1008",
+      "elmtName": "SC 18, 15% ",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 1160,
+      "posY": 500,
+      "elmtID": "elmt1009",
+      "elmtName": "SC 22, 15% ",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 1320,
+      "posY": 300,
+      "elmtID": "elmt1010",
+      "elmtName": "SC 6, 20% ",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 1320,
+      "posY": 350,
+      "elmtID": "elmt1011",
+      "elmtName": "SC 10, 20% ",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 1320,
+      "posY": 400,
+      "elmtID": "elmt1012",
+      "elmtName": "SC 14, 20% ",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 1320,
+      "posY": 450,
+      "elmtID": "elmt1013",
+      "elmtName": "SC 18, 20% ",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 1320,
+      "posY": 500,
+      "elmtID": "elmt1014",
+      "elmtName": "SC 22, 20% ",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 1480,
+      "posY": 300,
+      "elmtID": "elmt1015",
+      "elmtName": "SC 6, 25% ",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 1480,
+      "posY": 350,
+      "elmtID": "elmt1016",
+      "elmtName": "SC 10, 25% ",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 1480,
+      "posY": 400,
+      "elmtID": "elmt1017",
+      "elmtName": "SC 14, 25% ",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 1480,
+      "posY": 450,
+      "elmtID": "elmt1018",
+      "elmtName": "SC 18, 25% ",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    },
+    {
+      "posX": 1480,
+      "posY": 500,
+      "elmtID": "elmt1019",
+      "elmtName": "SC 22, 25% ",
+      "elmtDesc": "write description here",
+      "elmtType": 102,
+      "elmtWghtMthd": 0,
+      "elmtDstType": 1,
+      "elmtDataArr": [ ],
+      "pwlFlipVertical": false,
+      "pwlFlipHorizontal": false,
+      "elmtData": [ ]
+    }
+  ],
+  "connections": [
+    {
+      "connInput": "elmt6",
+      "connOutput": "elmt4",
+      "connID": "conn12"
+    },
+    {
+      "connInput": "elmt7",
+      "connOutput": "elmt4",
+      "connID": "conn13"
+    },
+    {
+      "connInput": "elmt8",
+      "connOutput": "elmt1",
+      "connID": "conn14"
+    },
+    {
+      "connInput": "elmt9",
+      "connOutput": "elmt1",
+      "connID": "conn15"
+    },
+    {
+      "connInput": "elmt10",
+      "connOutput": "elmt5",
+      "connID": "conn16"
+    },
+    {
+      "connInput": "elmt11",
+      "connOutput": "elmt5",
+      "connID": "conn17"
+    },
+    {
+      "connInput": "elmt1",
+      "connOutput": "elmt3",
+      "connID": "conn18"
+    },
+    {
+      "connInput": "elmt4",
+      "connOutput": "elmt3",
+      "connID": "conn19"
+    },
+    {
+      "connInput": "elmt5",
+      "connOutput": "elmt3",
+      "connID": "conn20"
+    }
+  ],
+  "mdlName": "title",
+  "mainObj": "elmt3",
+  "dataMat": [ ],
+  "mdlIdent": "temp"
+}

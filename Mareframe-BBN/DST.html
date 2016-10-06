@@ -45,7 +45,7 @@
             <div class="col-lg-8">
                 <div class="page-header">
                     <h1 id="model_header">
-                        <a id="webpage"href="http://www.mareframe-fp7.org/">
+                        <a id="webpage" href="http://www.mareframe-fp7.org/">
                             <img id="logo" src="img/logo_mareframe.png">
                         </a>
                     </h1>
@@ -61,17 +61,6 @@
                 <img src="img/locations/west-coast-of-scotland.jpg" class="center-block img-responsive img-rounded">
             </div>
         </div>
-    </div>
-    <div id="debug">
-        <p id="mX"></p>
-        <p id="mY"></p>
-        <p id="elmtX"></p>
-        <p id="elmtY"></p>
-        <p id="mAction"></p>
-        <p id="mTarget"></p>
-        <p id="mConnect"></p>
-        <button id="debugButton"> Debug </button>
-        <button id="debugConnect"> Connections </button>
     </div>
     <div class="ui-widget ui-dialog ui-corner-all ui-widget-content header-bar" style="position: static">
         <div class="ui-widget-header ui-corner-all ui-dialog-titlebar" id="modelHeader">Model</div>
@@ -90,10 +79,10 @@
 
             <div class="LoadFileBtn" id="lodDcmtDiv">
                 <input class="upload" type="file" id="lodDcmt" />
-                <span >Open Document</span>
+                <span>Open Document</span>
             </div>
 
-            <button  id="savDcmt">Save Document</button>
+            <button id="savDcmt">Save Document</button>
             <button class="advButton" id="resetDcmt">Reset</button>
             <button class="advButton" id="newElmt">New Element</button>
             <button class="advButton" id="newChance">New Chance</button>
@@ -102,54 +91,110 @@
             <button class="advButton" id="deleteElmt">Delete Element</button>
             <button class="advButton" id="selectAllElmt">Select All</button>
             <input class="advButton" type="checkbox" id="cnctTool">
-            <label for="cnctTool" class="advButton">Connect Tool</label> 
-            </div>
-            <div style="float:right">
-                <input class="button" type="checkbox" id="fullscreen">
-                <label for="fullscreen" class="button">Fullscreen</label>
-                <input class="button" type="checkbox" id="editorMode">
-                <label for="editorMode" class="button">Editor Mode</label>
-                <input class="button" type="checkbox" id="autoUpdate" checked>
-                <label for="autoUpdate" class="button" >Automatically update</label>
-                <button class="button" id="updateMdl">Update</button>
-            </div>
+            <label for="cnctTool" class="advButton">Connect Tool</label>
         </div>
-
-    
-
-    <div id="autoUpdateStatus" class="modeStatus"></div>
-    <div id="modeStatus" class="modeStatus"></div>
-    <div id="saveFile_div"> <span>Filename: </span> <span id="filename">test</span> <span>.xdsl</span>
-        <!--<form name="saveFileForm" action="" onsubmit="Mareframe.DST.Tools.saveFileFormSubmit()" >
-            <label for="saveFileName">Filename: </label>
-            <input id="saveFileName" name="saveFileName" type="text" />
-        </form>-->
-        <a id="downloadLink"></a>
+        <div style="float:right">
+            <input class="button" type="checkbox" id="fullscreen">
+            <label for="fullscreen" class="button">Fullscreen</label>
+            <input class="button" type="checkbox" id="editorMode">
+            <label for="editorMode" class="button">Editor Mode</label>
+            <input class="button" type="checkbox" id="autoUpdate" checked>
+            <label for="autoUpdate" class="button">Automatically update</label>
+            <button class="button" id="updateMdl">Update</button>
+        </div>
     </div>
+
+            <div id="MCAContainer" style="text-align:center">
+
+                <!--MCA Tool canvas-->
+                <!--<canvas id="MCATool" width="800" height="600" style="display:inline-block; min-height: 400px; min-width: 600px" ></canvas>-->
+                <canvas id="MCATool" width="1500" height="1000" style="display:inline-block;"></canvas>
+
+                <!--Data Table-->
+                <div id="finalScoreOverview_div" style="display:inline-block">
+                    <div id="finalScoreChartOverview_div">Scores</div>
+                    <div id="finalScoreObjectiveOverview_div">
+                        Objective
+                        <select id="finalScoreObjectiveOverview_select">
+                            <option> 133 </option>
+                            <option> 2 </option>
+                        </select>
+                    </div>
+                    <div id="finalScoreSegmentsOverview_div">
+                        Segments<br />
+                        <select id="finalScoreSegmentOverview_select">
+                            <option> 3 </option>
+                            <option> 4 </option>
+                        </select>
+                    </div>
+                    <!--<div id="finalScoreBars_div">
+                        Bars
+                        <select id="finalScoreBars_select">
+                            <option> 5 </option>
+                            <option> 6 </option>
+                        </select>
+                    </div>
+                    <button id="finalScoreSetAsText_button">As text</button>-->
+                </div>
+                <div id="MCADataTable" class="table-editable" style="display:inline-block">
+                    <!--<table id="editableDataTable" class="table" style="border: 2px solid #ffffff;border-collapse:collapse;">-->
+                    <table id="editableDataTable" class="table">
+                        <tr id="table_header">
+                            <th style="border: 1px solid black">UnDef</th>
+                            <th style="border: 1px solid black">UnDef</th>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">undefined</td>
+                            <td contenteditable="true">undefined</td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">undefined</td>
+                            <td contenteditable="true">undefined</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!--Sensitivity analysis Start   -->
+                <div id="SenAna">
+                    <!--<div class="senana" id="sliderControl_div"></div>-->
+                    <div class="senana" id="dropdownControl_div">
+                        <select id="elementSelect"></select>
+                    </div>
+                    <div class="senana" id="dropdownControlSub_div">
+                        <select id="elementSubSelect"></select>
+                    </div>
+                    <div class="senana" id="lineChart_div">Line Chart</div>
+                    <div class="senana" id="tableChart_div">Table Chart</div>
+
+                    <div class="senana" id="sliderControl_div"></div>
+                    <div class="senana" id="sliderValNormDebug">---</div>
+                    <div class="senana" id="sliderValDebug">---</div>
+                </div>
+                <!--Sensitivity analysis End     -->
+            </div> <!--MCAContainer End-->
+     
     
-    <div id="MCAContainer" style="text-align:center">
-
-        <!--MCA Tool canvas-->
-        <!--<canvas id="MCATool" width="800" height="600" style="display:inline-block; min-height: 400px; min-width: 600px" ></canvas>-->
-        <canvas id="MCATool" width="1500" height="1000"  style="display:inline-block;"></canvas>
-
+    
+        <!--<canvas id="MCATool" width="1500" height="1000" style="display:inline-block;"></canvas>-->
+    
+   
         <!--Data Table-->
-        <div id="finalScore_div" style="display:inline-block">
-            <div id="finalScoreChart_div">Scores</div>
-            <div id="finalScoreObjective_div">
+        <!--<div id="finalScoreTab_div" style="display:inline-block">
+            <div id="finalScoreChartTab_div">Scores</div>
+            <div id="finalScoreObjectiveTab_div">
                 Objective
-                <select id="finalScoreObjective_select">
+                <select id="finalScoreObjectiveTab_select">
                     <option> 1 </option>
                     <option> 2 </option>
                 </select>
             </div>
-            <div id="finalScoreSegments_div">
-                Segments
-                <select id="finalScoreSegment_select">
+            <div id="finalScoreSegmentsTab_div">
+                Segments<br />
+                <select id="finalScoreSegmentTab_select">
                     <option> 3 </option>
                     <option> 4 </option>
                 </select>
-            </div>
+            </div>-->
             <!--<div id="finalScoreBars_div">
                 Bars
                 <select id="finalScoreBars_select">
@@ -158,184 +203,176 @@
                 </select>
             </div>
             <button id="finalScoreSetAsText_button">As text</button>-->
-        </div>
-        <div id="MCADataTable" class="table-editable" style="display:inline-block">
-            <!--<table id="editableDataTable" class="table" style="border: 2px solid #ffffff;border-collapse:collapse;">-->
-            <table id="editableDataTable" class="table">
-                <tr id="table_header">
-                    <th style="border: 1px solid black">UnDef</th>
-                    <th style="border: 1px solid black">UnDef</th>
-                </tr>
-                <tr>
-                    <td contenteditable="true">undefined</td>
-                    <td contenteditable="true">undefined</td>
-                </tr>
-                <tr>
-                    <td contenteditable="true">undefined</td>
-                    <td contenteditable="true">undefined</td>
-                </tr>
-            </table>
+        <!--</div>-->
+   
+        <!--<div id="debug">
+            <p id="mX"></p>
+            <p id="mY"></p>
+            <p id="elmtX"></p>
+            <p id="elmtY"></p>
+            <p id="mAction"></p>
+            <p id="mTarget"></p>
+            <p id="mConnect"></p>
+            <button id="debugButton"> Debug </button>
+            <button id="debugConnect"> Connections </button>
+        </div>-->
+
+
+
+
+        <div id="autoUpdateStatus" class="modeStatus"></div>
+        <div id="modeStatus" class="modeStatus"></div>
+        <div id="saveFile_div">
+            <span>Filename: </span> <span id="filename">test</span> <span>.xdsl</span>
+            <!--<form name="saveFileForm" action="" onsubmit="Mareframe.DST.Tools.saveFileFormSubmit()" >
+                <label for="saveFileName">Filename: </label>
+                <input id="saveFileName" name="saveFileName" type="text" />
+            </form>-->
+            <a id="downloadLink"></a>
         </div>
 
-        <!--Sensitivity analysis Start   -->
-        <div id="SenAna">
-            <!--<div class="senana" id="sliderControl_div"></div>-->
-            <div class="senana" id="dropdownControl_div">
-                <select id="elementSelect"></select>
-            </div>
-            <div class="senana" id="dropdownControlSub_div">
-                <select id="elementSubSelect"></select>
-            </div>
-            <div class="senana" id="lineChart_div">Line Chart</div>
-            <div class="senana" id="tableChart_div">Table Chart</div>
 
-            <div class="senana" id="sliderControl_div"></div>
-            <div class="senana" id="sliderValNormDebug">---</div>
-            <div class="senana" id="sliderValDebug">---</div>
-        </div>
-        <!--Sensitivity analysis End     -->
-    </div> <!--MCAContainer End-->
-    <div id="saveFile_div"><a id="downloadLink"></a></div>
-    
-    <!--Popup Dialog-->
-    <div id="detailsDialog" >
-        <div  class="info_div dialogDiv" style="width: 30%; overflow: visible;">
-            <div class="info_div" style="width: 80px; float: left;"> Name: </div>
-            <div class="info_div" id="info_name" style="margin-left: 50px;">  </div>
-            <div class="info_div" id="info_type_tag"style="width: 80px; float: left;"> Type: </div>
-            <div class="info_div" id="info_type" style="margin-left: 50px;">  </div>
-        </div>
-    <!--<ul id="testList">
-        <li>opt1</li>
-        <li>opt2</li>
-    </ul>-->
-        <div id="elementType" class="dialogDiv">
-            <form >
-                <fieldset>
-                    <label for = "MCAelmtType" >Type of Element:</label>
-                    <select name="MCAelmtType" id="MCAelmtType">
-                        <option id="optionAttribute" value="103">Goal</option>
-                        <option id="optionObjective" value="101">Objective</option>
-                        <option id="optionAlternative" value="100">Attribute</option>
-                        <option id="optionGoal" value="102">Alternative</option>
-                    </select>
-                </fieldset>
-            </form>
-        </div> <!--end elementType-->
-        <div id="DisregardAlternative">
-            <input id="disAlt_check" type="checkbox"/>
-            <label for="disAlt_check">Exclude Alternatives</label>
-        </div>
-        <div id="weightingMethodSelector" class="dialogDiv">
-            <form>
-                <fieldset>
-                    <label for="MCAWeightingMethod">Type of Weighting Method:</label>
-                    <select name="MCAWeightingMethod" id="MCAWeightingMethod">
-                        <option id="optionSwingDirect" value="1">Swing / Direct</option>
-                        <option id="optionValueFunction" value="2">Value Function</option>
-                    </select>
-                </fieldset>
-            </form>
-        </div> <!--end weightingMethodSelector-->
-        <div id="valueFn_div" class="dialogDiv">
-            <canvas id="valueFn_canvas" width="100" height="100"></canvas>
-            <button class="button" id="valueFn_Linear">Linearize</button>
-            <button class="button" id="valueFn_Flip">Flip Direction</button>
-        </div>
-        <div id="pwl_div" class="dialogDiv">
-            <canvas id="pwl" width="200" height="200" style="border: solid black; float: left"></canvas>
-            <div style="margin: 30px">
-                <button id="flipHorizontal">Flip Horizontal</button>
-                <button id="flipVertical">Flip Vertical</button>
+        <div id="saveFile_div"><a id="downloadLink"></a></div>
+
+        <!--Popup Dialog-->
+        <div id="detailsDialog">
+            <div class="info_div dialogDiv" style="width: 30%; overflow: visible;">
+                <div class="info_div" style="width: 80px; float: left;"> Name: </div>
+                <div class="info_div" id="info_name" style="margin-left: 50px;">  </div>
+                <div class="info_div" id="info_type_tag" style="width: 80px; float: left;"> Type: </div>
+                <div class="info_div" id="info_type" style="margin-left: 50px;">  </div>
             </div>
-            <div style="margin: 30px">
-                <button id="linearize">Linearize</button>
-                <!--<button id="loadFromFile">Load from file</button>-->
-                <div class="LoadFileBtn" id="loadFromFileDiv">
-                    <input class="upload" type="file" id="loadFromFile" />
-                    <span>Load from file</span>
+            <!--<ul id="testList">
+                <li>opt1</li>
+                <li>opt2</li>
+            </ul>-->
+            <div id="elementType" class="dialogDiv">
+                <form>
+                    <fieldset>
+                        <label for="MCAelmtType">Type of Element:</label>
+                        <select name="MCAelmtType" id="MCAelmtType">
+                            <option id="optionAttribute" value="103">Goal</option>
+                            <option id="optionObjective" value="101">Objective</option>
+                            <option id="optionAlternative" value="100">Attribute</option>
+                            <option id="optionGoal" value="102">Alternative</option>
+                        </select>
+                    </fieldset>
+                </form>
+            </div> <!--end elementType-->
+            <div id="DisregardAlternative">
+                <input id="disAlt_check" type="checkbox" />
+                <label for="disAlt_check">Exclude Alternatives</label>
+            </div>
+            <div id="weightingMethodSelector" class="dialogDiv">
+                <form>
+                    <fieldset>
+                        <label for="MCAWeightingMethod">Type of Weighting Method:</label>
+                        <select name="MCAWeightingMethod" id="MCAWeightingMethod">
+                            <option id="optionSwingDirect" value="1">Swing / Direct</option>
+                            <option id="optionValueFunction" value="2">Value Function</option>
+                        </select>
+                    </fieldset>
+                </form>
+            </div> <!--end weightingMethodSelector-->
+            <div id="valueFn_div" class="dialogDiv">
+                <canvas id="valueFn_canvas" width="100" height="100"></canvas>
+                <button class="button" id="valueFn_Linear">Linearize</button>
+                <button class="button" id="valueFn_Flip">Flip Direction</button>
+            </div>
+            <div id="pwl_div" class="dialogDiv">
+                <canvas id="pwl" width="200" height="200" style="border: solid black; float: left"></canvas>
+                <div style="margin: 30px">
+                    <button id="flipHorizontal">Flip Horizontal</button>
+                    <button id="flipVertical">Flip Vertical</button>
                 </div>
-                <button id="saveToFile">Save to file</button>
-                <button id="deleteAllPoints">Delete all points</button>
-            </div>
-            <div id="selectedPointInfo" style="margin: 30px">
-                <label for="posX">X:</label>
-                <input type="number" step="0.1" id="posX" />
-                <label for="posY">Y:</label>
-                <input type="number" step="0.1" id="posY" />
-                <button id="deleteButton" style="display: inline">Delete Point</button>
-            </div>
-            <div id="saveFile_div">
-                <span>Filename: </span> <span id="filename">valueFn</span> <span>.data</span>
-                <a id="downloadLinkValueFunction"></a>
-            </div>
-            <div style="margin: 30px">
-                <button id="showAlternatives">Show Alternatives</button>
+                <div style="margin: 30px">
+                    <button id="linearize">Linearize</button>
+                    <!--<button id="loadFromFile">Load from file</button>-->
+                    <div class="LoadFileBtn" id="loadFromFileDiv">
+                        <input class="upload" type="file" id="loadFromFile" />
+                        <span>Load from file</span>
+                    </div>
+                    <button id="saveToFile">Save to file</button>
+                    <button id="deleteAllPoints">Delete all points</button>
+                </div>
+                <div id="selectedPointInfo" style="margin: 30px">
+                    <label for="posX">X:</label>
+                    <input type="number" step="0.1" id="posX" />
+                    <label for="posY">Y:</label>
+                    <input type="number" step="0.1" id="posY" />
+                    <button id="deleteButton" style="display: inline">Delete Point</button>
+                </div>
+                <div id="saveFile_div">
+                    <span>Filename: </span> <span id="filename">valueFn</span> <span>.data</span>
+                    <a id="downloadLinkValueFunction"></a>
+                </div>
+                <div style="margin: 30px">
+                    <button id="showAlternatives">Show Alternatives</button>
 
+                </div>
             </div>
-        </div>
 
-        <div id="sliders_div" class="dialogDiv"></div>
-        <div id="datatable_div" class="dialogDiv"></div>
-        <div id="description_div" class="dialogDiv" ></div>
-        <div id="chart_div" class="dialogDiv"></div>
-        <input class="dialogButton dialogDiv" type="checkbox" id="showDescription" checked>
-        <label for="showDescription dialogDiv" class="button" id="showDescriptionButtonLabel">Hide Description</label>
-        <div id="userDescription_div dialogDiv"> </div>
-        <div class="editable dialogDiv">
-            <div id="defTable_div"></div>
-        </div>
-        <button class="dialogButton dialogDiv" id="addDataRow">Add Data Row</button>
-        <button class="dialogButton dialogDiv" id="submit">Submit changes</button>
-        <button class="dialogButton dialogDiv" id="values">Show values</button>
-        <div id="valuesTable_div"></div>
-        <div id="userDescription_div"> </div>
-    
-    </div> <!--end detailsDialog-->
-    
-    <script>
-        function cnctPress() {
-            $this.hide();
-        };
+            <div id="sliders_div" class="dialogDiv"></div>
+            <div id="datatable_div" class="dialogDiv"></div>
+            <div id="description_div" class="dialogDiv"></div>
+            <div id="chart_div" class="dialogDiv"></div>
+            <input class="dialogButton dialogDiv" type="checkbox" id="showDescription" checked>
+            <label for="showDescription dialogDiv" class="button" id="showDescriptionButtonLabel">Hide Description</label>
+            <div id="userDescription_div dialogDiv"> </div>
+            <div class="editable dialogDiv">
+                <div id="defTable_div"></div>
+            </div>
+            <button class="dialogButton dialogDiv" id="addDataRow">Add Data Row</button>
+            <button class="dialogButton dialogDiv" id="submit">Submit changes</button>
+            <button class="dialogButton dialogDiv" id="values">Show values</button>
+            <div id="valuesTable_div"></div>
+            <div id="userDescription_div"> </div>
 
-        $("input[type=checkbox]").button();
-        $("debugButton").button({ icons: { primary: "ui-icon-document" } });
-        $("debugConnect").button({ icons: { primary: "ui-icon-document" } });
-        
-        $("#valueFn_Linear").button();
-        $("#valueFn_Flip").button();
-        $("#newDcmt").button({ icons: { primary: "ui-icon-document" } });
-        $("#lodDcmtDiv").button({ icons: { primary: "ui-icon-folder-open" } });
-        $("#savDcmt").button({ icons: { primary: "ui-icon-disk" } });
-        $("#newElmt").button({ icons: { primary: "ui-icon-plus" } });
-        $("#newDec").button({ icons: { primary: "ui-icon-plus" } });
-        $("#newChance").button({ icons: { primary: "ui-icon-plus" } });
-        $("#newValue").button({ icons: { primary: "ui-icon-plus" } });
-        $("#deleteElmt").button({ icons: { primary: "ui-icon-trash" } });
-        $("#cnctTool").button({ icons: { primary: "ui-icon-link" } }, cnctPress);
-        $("#fullscreen").button({ icons: { primary: "ui-icon-zoomin" } });
-        $("#editorMode").button({ icons: { primary: "ui-icon-link" } });
-        $("#autoUpdate").button({ icons: { primary: "ui-icon-refresh" } });
-        $("#updateMdl").button({ icons: { primary: "ui-icon-refresh" } });
-        $("#resetDcmt").button({ icons: { primary: "ui-icon-arrowreturnthick-1-w" } })
-        $("#selectAllElmt").button({ icons: { primary: "ui-icon-star" } });
-        $("#detailsDialog").dialog({
-            autoOpen: false,
-            resizable: true,
-            height: 600,
-            width: 800,
-            show: {
-                effect: "scale",
-                duration: 400
-            },
-            hide: {
-                //effect: "scale",
-                effect: "explode",
-                duration: 400
-            },
-            modal: false,
-            close: function () {
-                //console.log("closing dialog html");
+        </div> <!--end detailsDialog-->
+
+        <script>
+            function cnctPress() {
+                $this.hide();
+            };
+
+            $("input[type=checkbox]").button();
+            $("debugButton").button({ icons: { primary: "ui-icon-document" } });
+            $("debugConnect").button({ icons: { primary: "ui-icon-document" } });
+
+            $("#valueFn_Linear").button();
+            $("#valueFn_Flip").button();
+            $("#newDcmt").button({ icons: { primary: "ui-icon-document" } });
+            $("#lodDcmtDiv").button({ icons: { primary: "ui-icon-folder-open" } });
+            $("#savDcmt").button({ icons: { primary: "ui-icon-disk" } });
+            $("#newElmt").button({ icons: { primary: "ui-icon-plus" } });
+            $("#newDec").button({ icons: { primary: "ui-icon-plus" } });
+            $("#newChance").button({ icons: { primary: "ui-icon-plus" } });
+            $("#newValue").button({ icons: { primary: "ui-icon-plus" } });
+            $("#deleteElmt").button({ icons: { primary: "ui-icon-trash" } });
+            $("#cnctTool").button({ icons: { primary: "ui-icon-link" } }, cnctPress);
+            $("#fullscreen").button({ icons: { primary: "ui-icon-zoomin" } });
+            $("#editorMode").button({ icons: { primary: "ui-icon-link" } });
+            $("#autoUpdate").button({ icons: { primary: "ui-icon-refresh" } });
+            $("#updateMdl").button({ icons: { primary: "ui-icon-refresh" } });
+            $("#resetDcmt").button({ icons: { primary: "ui-icon-arrowreturnthick-1-w" } })
+            $("#selectAllElmt").button({ icons: { primary: "ui-icon-star" } });
+            $("#detailsDialog").dialog({
+                autoOpen: false,
+                resizable: true,
+                height: 600,
+                width: 800,
+                show: {
+                    effect: "scale",
+                    duration: 400
+                },
+                hide: {
+                    //effect: "scale",
+                    effect: "explode",
+                    duration: 400
+                },
+                modal: false,
+                close: function () {
+                    //console.log("closing dialog html");
                     $("#valuesTable_div").hide();
                     $("#weightingMethodSelector").hide();
                     $("#valueFn_div").hide();
@@ -343,44 +380,45 @@
                     $("#datatable_div").hide();
                     $("#description_div").hide();
                     $("#chart_div").hide();
-            }, // end close
-            //beforeclose: function (){ //console.log("beforeclosing dialog");},
-            buttons: {
-                Close: function () {                 
-                    $(this).dialog("close");
-                },
-            } // end buttons
-        }); // end dialog
-        $("#weightingMethodSelector").hide();
-        $("#valueFn_div").hide();
-        $("#sliders_div").hide();
-        $("#datatable_div").hide();
-        $("#description_div").hide();
-        $("#chart_div").hide();
-        $("#valuesTable_div").hide();
-        $("#saveFile_div").hide();
-        $("#addDataRow").hide();
-        $("#values").hide();
-        $(document).ready(function () {
-            var MareFrame = MareFrame || {};
-            MareFrame.DST = MareFrame.DST || {};
-            new Mareframe.DST.Handler();
-            //new Mareframe.DST.TestHandler();
-        }); // end ready function
+                }, // end close
+                //beforeclose: function (){ //console.log("beforeclosing dialog");},
+                buttons: {
+                    Close: function () {
+                        $(this).dialog("close");
+                    },
+                } // end buttons
+            }); // end dialog
+            $("#weightingMethodSelector").hide();
+            $("#valueFn_div").hide();
+            $("#sliders_div").hide();
+            $("#datatable_div").hide();
+            $("#description_div").hide();
+            $("#chart_div").hide();
+            $("#valuesTable_div").hide();
+            $("#saveFile_div").hide();
+            $("#addDataRow").hide();
+            $("#values").hide();
+            $(document).ready(function () {
+                var MareFrame = MareFrame || {};
+                MareFrame.DST = MareFrame.DST || {};
+                new Mareframe.DST.Handler();
+                //new Mareframe.DST.TestHandler();
+            }); // end ready function
 
-    </script>
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-xs-2 col-sm-2 col-md-2">
-                    <img src="img/logo_eu.png" class="center-block img-responsive">
-                </div>
-                <div class="col-xs-10 col-sm-10 col-md-6">
-                    <p class="text-muted">This project has received funding from the European Union's Seventh Framework Programme for research, technological development and demonstration under grant agreement no. 613571.</p>
+        </script>
+        <footer class="footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-2 col-sm-2 col-md-2">
+                        <img src="img/logo_eu.png" class="center-block img-responsive">
+                    </div>
+                    <div class="col-xs-10 col-sm-10 col-md-6">
+                        <p class="text-muted">This project has received funding from the European Union's Seventh Framework Programme for research, technological development and demonstration under grant agreement no. 613571.</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </footer>
+        </footer>
 
 </body>
+
 </html>

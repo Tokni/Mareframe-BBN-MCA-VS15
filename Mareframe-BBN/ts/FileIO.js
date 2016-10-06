@@ -244,6 +244,9 @@ var Mareframe;
                     case "newCar8":
                         path += "newCar8.json";
                         break;
+                    case "sfsCampaign001":
+                        path += "sfsCampaign001.json";
+                        break;
                     default:
                         //console.log("NO such file exists!!   " + p_modelStringIdent);
                         break;
