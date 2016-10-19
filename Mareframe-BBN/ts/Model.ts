@@ -577,8 +577,24 @@
                 if (key >= this.m_elementArr.length)
                     return false;
                 else {
-                    if (this.m_elementArr[key].getType() === 103) this.m_mainObjective = undefined;
+                    if (this.m_elementArr[key].getType() === 103)
+                        this.m_mainObjective = undefined;
+                    else if (this.m_elementArr[key].getType() === 102) {
+                        for (var elm of this.m_elementArr) {
+                            if (elm.getType() === 100) {
+                                this.updateAltIndex();
+                                var t = this.m_altIndex[key];
+                                var n: number = 0;
+                                for (var i of this.m_altIndex) {
+                                    if (i == key) break;
+                                    else n++;
+                                }
+                                elm.deleteValueAtIndex(n);
+                            }
+                        }
+                    }
                     this.m_elementArr.splice(key, 1);
+                    this.updateAltIndex();
                     return true;
                 }
             }

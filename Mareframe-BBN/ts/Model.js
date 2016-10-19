@@ -525,7 +525,26 @@ var Mareframe;
                 else {
                     if (this.m_elementArr[key].getType() === 103)
                         this.m_mainObjective = undefined;
+                    else if (this.m_elementArr[key].getType() === 102) {
+                        for (var _i = 0, _a = this.m_elementArr; _i < _a.length; _i++) {
+                            var elm = _a[_i];
+                            if (elm.getType() === 100) {
+                                this.updateAltIndex();
+                                var t = this.m_altIndex[key];
+                                var n = 0;
+                                for (var _b = 0, _c = this.m_altIndex; _b < _c.length; _b++) {
+                                    var i = _c[_b];
+                                    if (i == key)
+                                        break;
+                                    else
+                                        n++;
+                                }
+                                elm.deleteValueAtIndex(n);
+                            }
+                        }
+                    }
                     this.m_elementArr.splice(key, 1);
+                    this.updateAltIndex();
                     return true;
                 }
             };

@@ -300,7 +300,8 @@ module Mareframe {
                     });
 
                 });
-                $("#disAlt_check").on("change", this.changeAlt);
+                $("#disAlt_check").on("click", this.changeAlt);
+                //$("#disAlt_check").checkboxradio();
 
                 this.m_mcaStage.addChild(this.m_mcaBackground);
                 this.m_mcaStage.addChild(this.m_mcaContainer);
@@ -319,12 +320,14 @@ module Mareframe {
             changeAlt = (e) => {
                 var $disAlt = $("#disAlt_check");
                 var elmt = this.m_model.getElement(this.m_altId);
-                
-                if ($disAlt.prop("checked")) {
+
+                if (!elmt.m_disregard) {
+                    $disAlt.prop("checked", true);
                     $disAlt.siblings().html("Include Alternative");
                     elmt.m_disregard = true;
                 }
                 else {
+                    $disAlt.prop("checked", false);
                     $disAlt.siblings().html("Exclude Alternative");
                     elmt.m_disregard = false;
                 }
@@ -593,6 +596,7 @@ module Mareframe {
                             this.deleteConnectionsFromElement(elmt);
                             this.m_hasGoal = true;
                             this.m_model.setMainObj(elmt);
+                            this.m_finalScoreChosenObjective=elmt;
                             elmt.setMethod(1);
                         }
                         this.updateAtributeIndex();
@@ -1258,45 +1262,22 @@ module Mareframe {
                     this.updateSA();
                 }
                 // elmt.update();
-                this.updateMiniTables([elmt]);
+                //this.updateMiniTables([elmt]);
                 //this.importStage();
                 this.m_updateMCAStage = true;
                 this.m_updateMCATables = true;
             }
-            private deleteSelected(p_evt: Event) {                
-                //console.log("deleting");
+            private deleteSelected(p_evt: Event) {
                 for (var i = 0; i < this.m_selectedItems.length; i++) {
                     var elmt: Element = this.m_model.getElement(this.m_selectedItems[i].name);
-                    //console.log("deleting: " + elmt.getName());
-                    //for (var index in elmt.getConnections()) {
-                    //    //console.log(elmt.getName() + "  Before: " + elmt.getConnections()[index].getID());
-                    //}
                     if (elmt.getType() === 100) this.m_attributeCount--;
                     else if (elmt.getType() === 102) this.m_alternativCount--;
                     if (this.addToTrash(elmt)) {
-                        //////console.log(this.m_trashBin);
-                        //alert("begin delete connections from " + elmt.getName() );
-                        //for (var j = 0; j < elmt.getConnections().length; j++) {
-                        //var j = 0;
-                            while (elmt.getConnections().length){
-                                //                  //it is going wrong here, as the connenction array is changed by deleteconnection
-                                this.m_mcaContainer.removeChild(elmt.getConnections()[0].m_easelElmt);
-                                this.m_model.deleteConnection(elmt.getConnections()[0].getID());
-                            //var conn: Connection = elmt.getConnections()[j];
-                            ////console.log("deleting connection " + conn.getID());
-                            //if (conn.getOutputElement().getID() === elmt.getID()) {
-                            //    conn.getInputElement().deleteConnection(conn.getID());
-                            //    conn.getOutputElement().deleteConnection(conn.getID());
-                            //} else {
-                            //    conn.getOutputElement().deleteConnection(conn.getID());
-                            //    conn.getOutputElement().deleteConnection(conn.getID());
-                            //}
+                        while (elmt.getConnections().length) {
+                            this.m_mcaContainer.removeChild(elmt.getConnections()[0].m_easelElmt);
+                            this.m_model.deleteConnection(elmt.getConnections()[0].getID());
                         }
-                        //alert("end delete connections");
                     }
-                    //for (var index in elmt.getConnections()) {
-                    //    //console.log(elmt.getName() + "  After: " + elmt.getConnections()[index].getID());
-                    //}
                 }
                 this.clearSelection();
                 for (var i = 0; i < this.m_trashBin.length; i++) {
@@ -1304,18 +1285,13 @@ module Mareframe {
                         this.m_hasGoal = false;
                     this.m_mcaContainer.removeChild(this.m_model.getElement(this.m_trashBin[i].getID()).m_easelElmt);
                     this.m_model.deleteElement(this.m_trashBin[i].getID());
-                    
+
                 }
                 this.m_trashBin = [];// empty trashbin
-                //alert("before update");
-                //this.m_mcaStage.update();
-                //alert("after update");
+                //this.updateTable(this.m_model.getDataMatrix(true));
+                this.updateSADropdown();
                 this.m_updateMCAStage = true;
                 this.m_updateMCATables = true;
-                ////console.log(this.m_model.getConnectionArr());
-                ////console.log(this.m_model.getElementArr());
-                //this.importStage();
-                ////console.log("deleting done");
             }
             private addToTrash(p_obj: any): boolean {
                 //////console.log(this.m_trashBin.indexOf(p_obj));
@@ -1440,6 +1416,7 @@ module Mareframe {
                     $("#info_type").hide();
                     $("#info_type_tag").hide();
                     $("#detailsDialog").data("element", p_elmt);
+                    $("#DisregardAlternative").hide()
                     ////console.log(tableMat);
                     
                     var chartOptions: Object = {
@@ -1455,6 +1432,7 @@ module Mareframe {
                         case 102:  //Alternative
                             //show: tabledata,description
                             $("#weightingMethodSelector").hide();
+                            $("#DisregardAlternative").show();
                             $("#description_div").show();
 
                             break;
@@ -2279,61 +2257,31 @@ module Mareframe {
                     ////console.log("tableHtML: " + tableHTML);
                     $("#editableDataTable").html(tableHTML);
 
-                    $("#MCADataTable").on('dblclick', "td", this.editTableData); 
+                    $("#MCADataTable").on("dblclick", "td", this.editTableData);
+                    
                     //$(".tableEdit").on("click", this.editTableData);
                     ////console.log("original datamatrix" + this.m_model.getDataMatrix());
                     //////console.log(this.m_model.getDataMatrix());
                 }
             }
             private mouseDown(p_evt: createjs.MouseEvent): void {
-                console.log("mouse down");
-                ////console.log("DataMatrix: " + this.m_model.getDataMatrix());
                 $("#mX").html("stageX: " + p_evt.stageX + "  localX: " + p_evt.localX + "  rawX: " + p_evt.rawX);
                 $("#mY").html("Y: " + p_evt.stageY);
                 $("#mAction").html("Action: mousedown");
                 $("#mTarget").html("Target: " + p_evt.target.name);
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
                     var elmt: Element = this.m_model.getElement(p_evt.target.name);
-                    ////console.log("");
-                    ////console.log("*********************");
-                    for (var i in elmt.getConnections()) {
-                        ////console.log(elmt.getID() + "  " + elmt.getConnections()[i].getID())
-                    }
-                    
-                    ////console.log("Values: " + elmt.getValues());
-                    ////console.log("Name: " + elmt.getName());
-                    ////console.log("ID: " + elmt.getID());
-                    ////console.log("Type: " + elmt.getTypeName());
-                    ////console.log("Method: " + elmt.getMethodName());
-                    ////console.log("MainValues: " + elmt.getMainValues());
-                    if (elmt.getType() === 100) {
-                        
-                        ////console.log("minimum: " + elmt.getDataMin());
-                        ////console.log("maximum: " + elmt.getDataMax());
-                        ////console.log("unit: " + elmt.m_dataUnit);
-                        ////console.log("Data: " + elmt.getDataArr());  
-                        ////console.log("BaseLine: " + elmt.getDataBaseLine());
-                    }
-                    if (elmt.getType() === 101 || elmt.getType() === 103) {
-                        for (var j = 0; j < elmt.m_swingWeightsArr.length; j++) {
-                            ////console.log("------Data: " + elmt.m_swingWeightsArr[j]);                           
-                        }
-                    }
-
-                    ////console.log("------------------");
                 }
-                ////////console.log("mouse down at: ("+e.stageX+","+e.stageY+")");
                 this.m_oldX = p_evt.stageX;
                 this.m_oldY = p_evt.stageY;
                 this.m_originalPressX = p_evt.stageX;
                 this.m_originalPressY = p_evt.stageY;
-                ////////console.log("cnctool options: "+$("#cnctTool").button("option","checked"));
+                
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
                    var cnctChkbox: HTMLInputElement = <HTMLInputElement>document.getElementById("cnctTool")   // What the hell no jQuery
                     if (cnctChkbox.checked) //check if connect tool is enabled
                     {
                        if (this.m_model.m_bbnMode) {
-                        //////console.log("cnctTool enabled");
                            if (!this.connectionExist(p_evt)) {
                         this.connectTo(p_evt);
                         }
@@ -2341,7 +2289,6 @@ module Mareframe {
                             this.disconnectFrom(p_evt);
                         }
                     } else {
-                           ////console.log("connencting MCA");
                            if (!this.connectionExist(p_evt))
                                this.connctToMCAElement(p_evt);
                               
@@ -2368,10 +2315,10 @@ module Mareframe {
             private pressMove(p_evt: createjs.MouseEvent): void {
                 var gui = this;
                 ////console.log("press move on target " + p_evt.target.name);
-                $("#mX").html("stageX: " + p_evt.stageX + "  localX: " + p_evt.localX + "  rawX: " + p_evt.rawX);
-                $("#mY").html("stageX: " + p_evt.stageY + "  localY: " + p_evt.localY + "  rawY: " + p_evt.rawY);
-                $("#mAction").html("Action: PressMove");
-                $("#mTarget").html("Target: " + p_evt.target.name);
+                //$("#mX").html("stageX: " + p_evt.stageX + "  localX: " + p_evt.localX + "  rawX: " + p_evt.rawX);
+                //$("#mY").html("stageX: " + p_evt.stageY + "  localY: " + p_evt.localY + "  rawY: " + p_evt.rawY);
+                //$("#mAction").html("Action: PressMove");
+                //$("#mTarget").html("Target: " + p_evt.target.name);
                 if (p_evt.target.name === "hitarea") {
                     ////console.log("editorMode: " + this.m_editorMode);
                     if (p_evt.nativeEvent.ctrlKey) {
@@ -2380,41 +2327,24 @@ module Mareframe {
                         this.m_selectionBox.graphics.clear().s("rgba(0,0,0,0.7)").setStrokeDash([2, 2], createjs.Ticker.getTime()).drawRect(this.m_originalPressX, this.m_originalPressY, p_evt.stageX - this.m_originalPressX, p_evt.stageY - this.m_originalPressY);
                         this.m_mcaContainer.addChild(this.m_selectionBox)
                     } else if (this.m_editorMode) {
-                        ////console.log("elements off screen: "+ this.elementOffScreen( p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
-                        var tmp1 = p_evt.stageX - this.m_oldX;
-                        var tmp2 = p_evt.stageY - this.m_oldY;
                         if (!this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
-                        ////console.log("panning");
-                            $("#mAction").html("Action: Panning");
-                        //This moves all elements instead of the background
                         this.moveAllElements(p_evt.stageX - gui.m_oldX, p_evt.stageY - gui.m_oldY);
-
-                        /*this.m_mcaContainer.x += p_evt.stageX - this.m_oldX;
-                        this.m_mcaContainer.y += p_evt.stageY - this.m_oldY;
-                            */
-                        //this.resizeWindow();
                         }
                     }
                 } else if (p_evt.target.name.substr(0, 4) === "elmt") {
                     var connectTool = $("#cnctTool").prop("checked");
                     if (connectTool) {
                         //alert("connecting shit");
-                        $("#mAction").html("connecting");
+                        //$("#mAction").html("connecting");
                     }
                     else {
-                        ////console.log("elements off screen: " + this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY));
-                        var tmp3 = p_evt.stageX - this.m_oldX;
-                        var tmp4 = p_evt.stageY - this.m_oldY;
-                        if (!this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
+                        //if (!this.elementOffScreen(p_evt.stageX - this.m_oldX, p_evt.stageY - this.m_oldY)) {
+                            if (true) {
                         for (var i = 0; i < this.m_selectedItems.length; i++) {
                             var elmt = this.m_selectedItems[i];
 
                             elmt.x += p_evt.stageX - this.m_oldX;
                             elmt.y += p_evt.stageY - this.m_oldY;
-                            $("#elmtX").html("elmentX: " + elmt.x);
-                            $("#elmtY").html("elmentY: " + elmt.y);
-                            ////console.log("selected elements: " + this.m_selectedItems);
-                            //        //console.log("element: " + elmt.name);
                             for (var j = 0; j < this.m_model.getElement(elmt.name).getConnections().length; j++) {
                                 var c = this.m_model.getElement(elmt.name).getConnections()[j];
                                 this.updateConnection(c);
@@ -2495,9 +2425,18 @@ module Mareframe {
                     this.m_updateMCAStage = false;
                     this.m_mcaStage.update();
                     this.m_valueFnStage.update();
+                    
                     this.m_selectionBox.graphics.clear();
+                    //this.m_readyForSA = this.isReadyForSA();
+                    //if (this.m_readyForSA) {
+                    //    this.updateFinalScores(this.m_finalScoreChosenObjective);
+                    //    this.updateSATableData();
+                    //    this.updateChartData(this.m_SAChosenElement);
+                    //    this.updateSA();
+                    //}
                 }
                 if (this.m_updateMCATables) {
+                    this.updateTable(this.m_model.getDataMatrix(true));
                     this.m_updateMCATables = false;
 
                 }

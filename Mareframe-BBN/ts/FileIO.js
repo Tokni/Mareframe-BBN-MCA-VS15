@@ -305,6 +305,17 @@ var Mareframe;
                 //return ret;
             };
             FileIO.prototype.saveValueFunctionToFile = function (p_vfn) {
+                throw ("Not imp yet");
+            };
+            FileIO.prototype.importAttributesAndAlternativesFromCSV = function (p_activeModelInstance, p_updateGui) {
+                var fileInputElement = $("#loadFromFile").get(0);
+                fileInputElement.files[0];
+                var file = fileInputElement.files[0];
+                var fileReader = new FileReader();
+                fileReader.onload = function (p_evt) {
+                    var text = fileReader.result;
+                    p_updateGui();
+                };
             };
             return FileIO;
         }());

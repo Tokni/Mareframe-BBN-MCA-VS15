@@ -368,7 +368,21 @@
             }
             
             saveValueFunctionToFile(p_vfn: ValueFunction) {
-                
+                throw ("Not imp yet");
+            }
+
+            importAttributesAndAlternativesFromCSV(p_activeModelInstance: Model, p_updateGui: Function) {
+                var fileInputElement: any = $("#loadFromFile").get(0);
+                fileInputElement.files[0];
+                var file = fileInputElement.files[0];
+                var fileReader = new FileReader();
+
+                fileReader.onload = function (p_evt) {
+                    var text = fileReader.result;
+                                  
+                    p_updateGui();
+
+                }
             }
         }
     }
