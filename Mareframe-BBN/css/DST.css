@@ -21,11 +21,11 @@ input[type="checkbox"] + label span {
     display:inline-block;
     width:249px;
     height:19px;
-    /*background:url(check_radio_sheet.png) left top no-repeat;*/
+    /*background:url(check_radio_sheet.png) left top no-repeat;
 }*/
 .advButton {
     margin:0;
-    float:left;
+    /*float:left;*/
 }
 
 .button {
@@ -169,4 +169,9 @@ input[type="checkbox"] + label span {
     /*border:red solid 3px;*/
     position: relative;
     border-radius:3px;
+}
+.ui-icon-background,
+.ui-state-active .ui-icon-background {
+	border: #aaaaaa;
+	background-color: #888888;
 }

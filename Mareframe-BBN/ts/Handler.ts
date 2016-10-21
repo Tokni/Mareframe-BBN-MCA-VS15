@@ -76,8 +76,9 @@ module Mareframe {
                         ////console.log("model loaded")
                         this.m_resetModel = JSON.stringify(this.m_activeModel);
                         ////console.log("reset model: " + this.m_resetModel);
+                        this.m_gui.initEditorMode(false);
                     } else {
-                        this.m_gui.setEditorMode(true);
+                        this.m_gui.initEditorMode(true);
                     }
                 }
             }

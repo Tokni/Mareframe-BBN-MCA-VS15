@@ -150,7 +150,7 @@ module Mareframe {
                     $("#submit").on("click", this.saveChanges);
                     $("#values").on("click", this.showValues);
                                        
-                    this.setEditorMode = this.setEditorMode.bind(this);
+                    //this.setEditorMode = this.setEditorMode.bind(this);
                     this.setAutoUpdate = this.setAutoUpdate.bind(this);
                     $("#MCADataTable").hide();
                     $("#addDataRow").hide();
@@ -159,7 +159,7 @@ module Mareframe {
                 }
                 else {
                     $("#model_description").text("This is the Mareframe MCA tool. Data has been loaded into the table on the right. You may doubleclick on each element below, to access the properties panel for that element. If you doubleclick on one of the red or green elements, you may adjust the weights of it's child elements, and thus the data it points to. In the chart at the bottom, you will see the result of the analysis, with the tallest column being the highest scoring one.");
-                    this.setEditorMode = this.setEditorMode.bind(this);
+                    //this.setEditorMode = this.setEditorMode.bind(this);
                     this.m_editorMode = false;
                     $("#newDcmt").hide();
                     $("#lodDcmtDiv").show();
@@ -245,7 +245,7 @@ module Mareframe {
                 $("#newDec").on("click", this.createNewDec);
                 $("#newValue").on("click", this.createNewValue);
                 $("#deleteElmt").on("click", this.deleteSelected);
-                $("#editorMode").on("click", this.setEditorMode);
+                $("#editorMode").on("click", this.handleEditorMode);
                 $("#showDescription").on("click", this.setShowDescription);
                 $("#autoUpdate").on("click", this.setAutoUpdate);
                 $("#resetDcmt").on("click", this.resetDcmt);
@@ -314,6 +314,8 @@ module Mareframe {
                 $("#debug").hide();
                 $("#MCADataTable").hide();
                 $("#SenAna").hide();
+                $("#finalScoreOverview_div").hide();
+                
                 this.updateEditorMode();
                 $("#pwl_div").show();
             }      
@@ -343,7 +345,7 @@ module Mareframe {
                 this.m_hasGoal = true;
             }  
             
-            private isReadyForSA(): boolean {
+            public isReadyForSA(): boolean {
                 var ret: boolean = true;
                 if (this.m_model.getMainObj()) {
                     for (var elmt of this.m_model.getElementArr()) {
@@ -486,7 +488,7 @@ module Mareframe {
                         var altKeyes: any[] = [];
                         var index: number = 0;
                         for (var e in this.m_model.getElementArr()) {
-                            if (this.m_model.getElementArr()[e].getType() === 2) {
+                            if (this.m_model.getElementArr()[e].getType() === 102) {
                                 altKeyes[index] = e;
                             }
                         }
@@ -498,7 +500,8 @@ module Mareframe {
                         }
                 
                         for (var e in this.m_model.getElementArr()) {
-                            if (this.m_model.getElementArr()[e].getType() === 0) {
+                            var tm = this.m_model.getElementArr()[e].getType();
+                            if (this.m_model.getElementArr()[e].getType() === 100) {
                                 this.m_model.getElementArr()[e].deleteValueAtIndex(deleteIndex);
                             }
                         }
@@ -580,6 +583,7 @@ module Mareframe {
                         }
                         this.m_alternativCount++;
                         this.updateAtributeIndex();
+                        this.m_model.updateAltIndex();
                         this.m_readyForSA = this.isReadyForSA();
                         if (this.m_readyForSA) {
                             this.updateFinalScores(this.m_finalScoreChosenObjective);
@@ -692,11 +696,13 @@ module Mareframe {
             }
             private cnctStatus() {
                 if ($("#cnctTool").prop("checked")) {
-                    $("#modeStatus").html("Connect Mode");
+                    //$("#modeStatus").html("Connect Mode");
                 }
                 else {
-                    $("#modeStatus").html("Editor Mode");
+                    //$("#modeStatus").html("Editor Mode");
                 }
+                $("#cnctTool").button('refresh').blur();
+
             }
             private selectModel(p_evt: Event) {
                 this.m_handler.getFileIO().loadModel($("#selectModel").val(), this.m_model, this.importStage);
@@ -1087,32 +1093,37 @@ module Mareframe {
                     $("#showDescription").siblings('label').html("Show description");
                 }
             }
-            public setEditorMode = function (cb) {
-                ////console.log(cb);
-                if (cb === true) {
+            public initEditorMode(p_on: boolean) {
+                if (p_on === true) {
                     this.m_editorMode = true;
+                    $("#editorMode").prop('checked', true);
+                    //$("#modeStatus").html("Editor Mode");
                 }
-                else if (cb === false) {
-                    this.m_editorMode = false;
-                }                
                 else {
-                    this.m_editorMode = cb.currentTarget.checked;
-                    if (this.m_editorMode) {
-                        if ($("#cnctTool").prop("checked")) {
-                            $("#modeStatus").html("Connect Mode");
-                        }
-                        else {
-                            $("#modeStatus").html("Editor Mode");
-                        }
+                    this.m_editorMode = false;
+                    $("#editorMode").prop('checked', false);
+                    //$("#modeStatus").html("");
+                }  
+                $("#editorMode").button('refresh'); 
+                this.updateEditorMode();      
+            }
+            public handleEditorMode = (cb) => {
+                $("#editorMode").blur();
+                if (this.m_editorMode) {
+                    if ($("#cnctTool").prop("checked")) {
+                        //$("#modeStatus").html("Connect Mode");
                     }
                     else {
-                        $("#modeStatus").html("");
+                        //$("#modeStatus").html("");
                     }
+                    this.m_editorMode = false;
                 }
-
+                else {
+                    //$("#modeStatus").html("Editor Mode");
+                    this.m_editorMode = true;
+                }
                 this.updateEditorMode();
-                
-                ////console.log("editormode: " + this.m_editorMode);
+
             }
             private setAutoUpdate = function (cb) {
                 ////console.log(cb);
@@ -2265,10 +2276,10 @@ module Mareframe {
                 }
             }
             private mouseDown(p_evt: createjs.MouseEvent): void {
-                $("#mX").html("stageX: " + p_evt.stageX + "  localX: " + p_evt.localX + "  rawX: " + p_evt.rawX);
-                $("#mY").html("Y: " + p_evt.stageY);
-                $("#mAction").html("Action: mousedown");
-                $("#mTarget").html("Target: " + p_evt.target.name);
+                //$("#mX").html("stageX: " + p_evt.stageX + "  localX: " + p_evt.localX + "  rawX: " + p_evt.rawX);
+                //$("#mY").html("Y: " + p_evt.stageY);
+                //$("#mAction").html("Action: mousedown");
+                //$("#mTarget").html("Target: " + p_evt.target.name);
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
                     var elmt: Element = this.m_model.getElement(p_evt.target.name);
                 }
@@ -2279,16 +2290,16 @@ module Mareframe {
                 
                 if (p_evt.target.name.substr(0, 4) === "elmt") {
                    var cnctChkbox: HTMLInputElement = <HTMLInputElement>document.getElementById("cnctTool")   // What the hell no jQuery
-                    if (cnctChkbox.checked) //check if connect tool is enabled
-                    {
+                   if (cnctChkbox.checked) {        //check if connect tool is enabled                   
                        if (this.m_model.m_bbnMode) {
                            if (!this.connectionExist(p_evt)) {
-                        this.connectTo(p_evt);
-                        }
-                        else {
-                            this.disconnectFrom(p_evt);
-                        }
-                    } else {
+                                this.connectTo(p_evt);
+                            }
+                            else {
+                                this.disconnectFrom(p_evt);
+                            }
+                       }
+                       else {
                            if (!this.connectionExist(p_evt))
                                this.connctToMCAElement(p_evt);
                               
@@ -2427,15 +2438,28 @@ module Mareframe {
                     this.m_valueFnStage.update();
                     
                     this.m_selectionBox.graphics.clear();
-                    //this.m_readyForSA = this.isReadyForSA();
-                    //if (this.m_readyForSA) {
-                    //    this.updateFinalScores(this.m_finalScoreChosenObjective);
-                    //    this.updateSATableData();
-                    //    this.updateChartData(this.m_SAChosenElement);
-                    //    this.updateSA();
-                    //}
+                   
                 }
                 if (this.m_updateMCATables) {
+                    this.m_readyForSA = this.isReadyForSA();
+                    if (this.m_readyForSA) {
+                        $("#SenAna").show();
+                        $("#finalScoreOverview_div").show();
+                        $("#finalScoreTab_div").show();
+                    }
+                    else {
+                        $("#SenAna").hide();
+                        $("#finalScoreOverview_div").hide();
+                        $("#finalScoreTab_div").hide();
+                    }
+                    if (this.m_readyForSA) {
+                        //this.updateSADropdown();
+                        //this.updateFinalScoresDropDowns();
+                        this.updateFinalScores(this.m_finalScoreChosenObjective);
+                        this.updateSATableData();
+                        this.updateChartData(this.m_SAChosenElement);
+                        this.updateSA();
+                    }
                     this.updateTable(this.m_model.getDataMatrix(true));
                     this.m_updateMCATables = false;
 
@@ -2477,6 +2501,7 @@ module Mareframe {
                     //var tmp2 = outputElmt.getParentElements();
                     if (inputElmt.isChildOf(outputElmt)) {
                         var conn = outputElmt.getConnectionFrom(inputElmt);
+                        this.m_mcaContainer.removeChild(conn.m_easelElmt);
                         this.m_model.deleteConnection(conn.getID());
                     }
                     else {

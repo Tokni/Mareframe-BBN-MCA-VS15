@@ -5,22 +5,25 @@
     <title>Mareframe Decision Support Tool</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <!--<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">-->
     <link href="css/lib/bootstrap.min.css" rel="stylesheet" />
+    <!--<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">-->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/start/jquery-ui.css">
+
     <link href="css/body.css" rel="stylesheet" />
     <link href="css/footer.css" rel="stylesheet" />
     <link href="css/dialog.css" rel="stylesheet" />
     <link href="css/debug.css" rel="stylesheet" />
     <link href="css/SA.css" rel="stylesheet" />
 
-    <link id="ui_css" href="jQueryUI/jquery-ui_original.css" rel="stylesheet" />
+    <!--<link id="ui_css" href="jQueryUI/jquery-ui_original.css" rel="stylesheet" />-->
     <link href="css/DST.css" rel="stylesheet" />
     
 </head>
 <body>
-    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.3.js"></script>
     <!--<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>-->
-    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="https://code.createjs.com/createjs-2015.05.21.min.js"></script>
 
     <script src="https://www.google.com/jsapi"></script>
@@ -66,7 +69,7 @@
         <div class="ui-widget-header ui-corner-all ui-dialog-titlebar" id="modelHeader">Model</div>
 
 
-        <div style="padding: 1em 1em 0.5em 1.4em; font-size: 0.7em">
+        <div style="padding: 1em 1em 0.5em 1.4em; font-size: 0.7em; border: 1px solid black">
             <div id="selectModelDiv">
                 <label for="selectModel">Select a model</label>
                 <select id="selectModel">
@@ -90,10 +93,12 @@
             <button class="advButton" id="newValue">New Value</button>
             <button class="advButton" id="deleteElmt">Delete Element</button>
             <button class="advButton" id="selectAllElmt">Select All</button>
-            <input class="advButton" type="checkbox" id="cnctTool">
+            <input class="advButton" type="checkbox" id="cnctTool" style="display: inline-block">
             <label for="cnctTool" class="advButton">Connect Tool</label>
+            <input class="button" type="checkbox" id="editorMode" style="float: left; display: inline-block">
+            <label for="editorMode" class="button" style="float: right">Editor Mode</label>
         </div>
-        <div style="float:right">
+        <!--<div style="float:right">
             <input class="button" type="checkbox" id="fullscreen">
             <label for="fullscreen" class="button">Fullscreen</label>
             <input class="button" type="checkbox" id="editorMode">
@@ -101,7 +106,7 @@
             <input class="button" type="checkbox" id="autoUpdate" checked>
             <label for="autoUpdate" class="button">Automatically update</label>
             <button class="button" id="updateMdl">Update</button>
-        </div>
+        </div>-->
     </div>
 
             <div id="MCAContainer" style="text-align:center">
@@ -318,7 +323,7 @@
             <div id="description_div" class="dialogDiv"></div>
             <div id="chart_div" class="dialogDiv"></div>
             <input class="dialogButton dialogDiv" type="checkbox" id="showDescription" checked>
-            <label for="showDescription dialogDiv" class="button" id="showDescriptionButtonLabel">Hide Description</label>
+            <label for="showDescription" class="button" id="showDescriptionButtonLabel">Hide Description</label>
             <div id="userDescription_div dialogDiv"> </div>
             <div class="editable dialogDiv">
                 <div id="defTable_div"></div>
@@ -336,29 +341,30 @@
                 $this.hide();
             };
 
-            $("input[type=checkbox]").button();
+            
             
             $("debugButton").button({ icons: { primary: "ui-icon-document" } });
             $("debugConnect").button({ icons: { primary: "ui-icon-document" } });
 
             $("#valueFn_Linear").button();
             $("#valueFn_Flip").button();
-            $("#newDcmt").button({ icons: { primary: "ui-icon-document" } });
-            $("#lodDcmtDiv").button({ icons: { primary: "ui-icon-folder-open" } });
+            $("#newDcmt").button({ icons: "ui-icon-document" });
+            $("#lodDcmtDiv").button({ icons: "ui-icon-folder-open" });
             $("#lodDcmtDiv").button({ icon: "ui-icon-folder-open", iconPosition: "beginning" });
-            $("#savDcmt").button({ icon: { primary: "ui-icon-disk" } });
-            $("#newElmt").button({ icons: { primary: "ui-icon-plus" } });
-            $("#newDec").button({ icons: { primary: "ui-icon-plus" } });
-            $("#newChance").button({ icons: { primary: "ui-icon-plus" } });
-            $("#newValue").button({ icons: { primary: "ui-icon-plus" } });
-            $("#deleteElmt").button({ icons: { primary: "ui-icon-trash" } });
-            $("#cnctTool").button({ icons: { primary: "ui-icon-link" } }, cnctPress);
-            $("#fullscreen").button({ icons: { primary: "ui-icon-zoomin" } });
-            $("#editorMode").button({ icons: { primary: "ui-icon-link" } });
-            $("#autoUpdate").button({ icons: { primary: "ui-icon-refresh" } });
-            $("#updateMdl").button({ icons: { primary: "ui-icon-refresh" } });
-            $("#resetDcmt").button({ icons: { primary: "ui-icon-arrowreturnthick-1-w" } })
-            $("#selectAllElmt").button({ icons: { primary: "ui-icon-star" } });
+            $("#savDcmt").button({ icon: "ui-icon-disk" });
+            $("#newElmt").button({ icon: "ui-icon-plus" });
+            $("#newDec").button({ icon: "ui-icon-plus" });
+            $("#newChance").button({ icon: "ui-icon-plus" });
+            $("#newValue").button({ icon: "ui-icon-plus" });
+            $("#deleteElmt").button({ icon: "ui-icon-trash" });
+            //$("#cnctTool").button({ icon: "ui-icon-link" }, cnctPress);
+            $("#fullscreen").button({ icon: "ui-icon-zoomin" });
+            //$("#editorMode").button({ icon: "ui-icon-link" });
+            $("#autoUpdate").button({ icon: "ui-icon-refresh" });
+            $("#updateMdl").button({ icon: "ui-icon-refresh" });
+            $("#resetDcmt").button({ icon: "ui-icon-arrowreturnthick-1-w" })
+            $("#selectAllElmt").button({ icon: "ui-icon-star" });
+            $("input[type=checkbox]").checkboxradio();
             $("#detailsDialog").dialog({
                 autoOpen: false,
                 resizable: true,
