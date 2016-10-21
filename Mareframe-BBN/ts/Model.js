@@ -13,16 +13,11 @@ var Mareframe;
                 this.m_modelPath = "./";
                 this.m_modelChanged = true;
                 this.m_dataMatrix = [];
-                //private m_autoUpdate: boolean = false;
                 this.m_altIndex = [];
                 this.m_autoUpdate = true; //auto update is on by default
                 this.m_bbnMode = p_bbnMode;
-                //this.m_bbnMode = true;
-                //this.m_counter.
                 this.createNewElement = this.createNewElement.bind(this);
                 this.deleteElement = this.deleteElement.bind(this);
-                //console.log("model loaded, MCA is: " + !this.m_bbnMode);
-                //////console.log(this);
             }
             ;
             Model.prototype.updateAltIndex = function () {
@@ -58,7 +53,6 @@ var Mareframe;
                                 });
                                 dataStream = dataStream.slice(0, dataStream.length - 1) + '</parents>\n';
                             }
-                            //console.log(elmt.getDataOld());
                             dataStream += '<probabilities>';
                             for (var i = 1; i < elmt.getDataOld(1).length; i++) {
                                 for (var j = elmt.getParentElements().length; j < elmt.getDataOld().length; j++)
@@ -104,15 +98,12 @@ var Mareframe;
                 return dataStream;
             };
             Model.prototype.getMCADataStream = function () {
-                ////console.log("MCADataStream: " + JSON.stringify(this));
                 var ret = JSON.stringify(this);
                 return JSON.stringify(this);
             };
             Model.prototype.update = function () {
                 var m = this;
-                //console.log("updating model");
                 this.m_elementArr.forEach(function (p_elmt) {
-                    //console.log(p_elmt.getID() + " has been updated: " + p_elmt.isUpdated());
                     if (!p_elmt.isUpdated()) {
                         p_elmt.update();
                     }
@@ -155,7 +146,6 @@ var Mareframe;
                 for (var e in this.m_elementArr) {
                     if (this.m_elementArr[e].getType() === 102) {
                         retDataMatrix[j] = [];
-                        //retDataMatrix[j++][0] = this.m_elementArr[e].getName();
                         if (p_name)
                             retDataMatrix[j++][0] = this.m_elementArr[e].getName();
                         else
@@ -237,13 +227,10 @@ var Mareframe;
                         var t = c.getID();
                     }
                     var weightsArr = DST.Tools.getWeights(p_element, this, p_element2Replace, p_element1Replace, p_elementIgnoreValue, p_criteria);
-                    //var weightsArr = Tools.getWeights(p_element, this, p_element2Replace, p_element1Replace, p_elementIgnoreValue);
                     var sortedWeights = [];
                     //sortedWeigths matches tempMatrix
                     for (var i = 0; i < weightsArr.length; i++) {
                         for (var j = 1; j < tempMatrix[0].length; j++) {
-                            //var tmp = tempMatrix[0][j];
-                            var tmp2 = weightsArr[i][0];
                             if (tempMatrix[0][j] === weightsArr[i][0]) {
                                 sortedWeights[j - 1] = weightsArr[i][1];
                                 break;
@@ -262,15 +249,9 @@ var Mareframe;
                         var index = 0;
                         retMatrix[0][i + 1] = weightsArr[i][0];
                         var elmt = this.getElement(tempMatrix[0][i + 1]); // alternative element
-                        //var elmt = this.getElement(weightsArr[i][0]);
                         for (var j = 3; j < tempMatrix.length - 2; j++) {
                             if (elmt.m_disregard == false) {
-                                //retMatrix[j] = [];
                                 retMatrix[j][0] = tempMatrix[j][0];
-                                //var tmp5 = tempMatrix[j][i + 1];
-                                //var tmp6 = elmt.getPwlVF().getValue(tempMatrix[j][i + 1]);
-                                var tmp7 = weightsArr[i][1];
-                                //var tmp7a = tempMatrix[0][i + 1];
                                 if (p_element1Replace != undefined) {
                                     var tmp7b = p_element2Replace.getID();
                                     if (p_element2Replace.getID() === tempMatrix[0][i + 1] && p_element1Replace.getID() === tempMatrix[j][0]) {
@@ -282,7 +263,6 @@ var Mareframe;
                                             retMatrix[j][i + 1] = elmt.m_swingWeightsArr[j - 3][1] / total;
                                         }
                                         else
-                                            //tempMatrix[j][i + 1] = elmt.getPwlValue(p_elementIgnoreValue);
                                             retMatrix[j][i + 1] = elmt.getPwlValue(p_elementIgnoreValue);
                                     }
                                     else {
@@ -291,14 +271,10 @@ var Mareframe;
                                             for (var k = 0; k < elmt.m_swingWeightsArr.length; k++) {
                                                 total += elmt.m_swingWeightsArr[k][1];
                                             }
-                                            //tempMatrix[j][i + 1] = elmt.m_swingWeightsArr[j - 3][1] / total;
                                             retMatrix[j][i + 1] = elmt.m_swingWeightsArr[j - 3][1] / total;
                                         }
                                         else
-                                            //tempMatrix[j][i + 1] = elmt.getPwlValue(tempMatrix[j][i + 1]);
-                                            var tm345 = tempMatrix[j][i + 1];
-                                        var tmp45 = elmt.getPwlValue(tempMatrix[j][i + 1]);
-                                        retMatrix[j][i + 1] = elmt.getPwlValue(tempMatrix[j][i + 1]);
+                                            retMatrix[j][i + 1] = elmt.getPwlValue(tempMatrix[j][i + 1]);
                                     }
                                 }
                                 else {
@@ -311,8 +287,6 @@ var Mareframe;
                                             retMatrix[j][i + 1] = elmt.m_swingWeightsArr[j - 3][1] / total;
                                         }
                                         else if (elmt.getType() === 101) {
-                                            //var tmp3 = elmt.getScore();
-                                            var tmp4 = this.m_mainObjective.getScore();
                                         }
                                     }
                                     else {
@@ -320,9 +294,7 @@ var Mareframe;
                                         retMatrix[j][i + 1] = elmt.getPwlValue(tempMatrix[j][i + 1]);
                                     }
                                 }
-                                var tmp7c = retMatrix[j][i + 1];
                                 retMatrix[j][i + 1] *= sortedWeights[i];
-                                //retMatrix[j][i + 1] *= weightsArr[i][1];
                                 retMatrix[j][i + 1] = (Math.round(100000 * retMatrix[j][i + 1])) / 100000;
                             }
                         }
@@ -344,17 +316,13 @@ var Mareframe;
                 if (p_addHeader) {
                     tempMatrix.push(['string', 'number']);
                 }
-                ////console.log("DataMatrixx  --------  -------- : " + dm);
                 switch (p_elmt.getType()) {
                     case 102:
                         break;
                     case 100:
-                        ////console.log("Type 0, attibute");
-                        //set minimum and maximum values
                         var maxVal = p_elmt.getDataMax();
                         var minVal = p_elmt.getDataMin();
-                        //calculate weights according to valueFn or sliders
-                        ////console.log("Method num: " + p_elmt.getMethod()); 
+                        //calculate weights according to valueFn or sliders 
                         if (p_elmt.getMethod() == 1) {
                             var total = 0;
                             for (var i = 0; i < p_elmt.m_swingWeightsArr.length; i++) {
@@ -372,14 +340,10 @@ var Mareframe;
                             for (var i = 3; i < this.getDataMatrix().length - 2; i++) {
                                 var toAdd = [this.m_elementArr[this.m_altIndex[i - 3]].getName(), p_elmt.getDataArrAtIndex(i - 3)];
                                 if (!p_addHeader) {
-                                    var tmp = p_elmt.getDataArrAtIndex(i - 3);
-                                    //var nom = p_elmt.getDataArrAtIndex(i - 3) - minVal;
-                                    //var denom = (maxVal - minVal);
                                     var frac2 = p_elmt.getPwlVF().getPoints();
                                     var frac = p_elmt.getPwlValue(p_elmt.getDataArrAtIndex(i - 3));
                                     toAdd.push(frac);
                                 }
-                                ////console.log("toAdd2: " + toAdd);
                                 tempMatrix.push(toAdd);
                             }
                         }
@@ -389,7 +353,6 @@ var Mareframe;
                                 if (!p_addHeader) {
                                     toAdd.push("ss");
                                 }
-                                ////console.log("toAdd4: " + toAdd);
                                 tempMatrix.push(toAdd);
                             }
                         }
@@ -397,34 +360,11 @@ var Mareframe;
                         }
                         break;
                     case 101:
-                        ////console.log("Type 1, sub-objective");
-                        //var total = 0.0;
-                        //p_elmt.getData(1).forEach(function (val) { total += val; });
-                        ////////console.log(total + " : " + elmt.getName());
-                        //for (var i = 0; i < p_elmt.getData(0).length; i++) {
-                        //    //////console.log(elmt.getData());
-                        //    var tempEl = this.getConnection(p_elmt.getData(0, i)).getInputElement();
-                        //    var tempArr = this.getWeightedData(tempEl, false);
-                        //    //////console.log(tempArr);
-                        //    var result = 0;
-                        //    for (var j = 0; j < tempArr.length; j++) {
-                        //        result += tempArr[j][1];
-                        //    }
-                        //    //////console.log(result + " " + elmt.getName()+"; "+tempArr+" "+tempEl.getName());
-                        //    tempMatrix.push([tempEl.getName(), result * (p_elmt.getData(1, i) / total)]);
-                        //    ////console.log("******SubTempMatrix: " + i + "   " + tempMatrix);
-                        //}
                         break;
                 }
-                //tempMatrix = [["a", "b", "d"], ["c", 50, 100]];
-                //tempMatrix = [["a", 15, 45], ["c", 50, 100]];
-                //tempMatrix = [10, 20, 30, 50];
-                ////console.log("WeigthedData: " + tempMatrix);
                 return tempMatrix;
             };
             Model.prototype.createNewElement = function (p_type) {
-                //////console.log(this.m_counter);
-                ////console.log("Current elements Array length: " + this.m_elementArr.length);
                 this.m_counter++;
                 if (this.m_bbnMode === false) {
                     var e = new DST.Element("elmt" + this.m_counter, this, p_type, 1);
@@ -432,7 +372,6 @@ var Mareframe;
                 else {
                     var e = new DST.Element("elmt" + this.m_counter, this, p_type);
                 }
-                //var e = new Element("elmt" + this.m_counter, this, p_type);
                 this.m_elementArr.push(e);
                 switch (p_type) {
                     case 0:
@@ -447,25 +386,19 @@ var Mareframe;
                         e.setData([["Value", 0]]);
                         e.setValues([["Value", 0]]);
                     default:
-                        //e.setData([this.m_elementArr.length-2, 50, 50, 0, 50, 50]);
                         break;
                 }
-                ////console.log("New elements Array length: " + this.m_elementArr.length);
-                ////console.log("Data: " + e.getDataOld());
                 return e;
             };
             Model.prototype.getElement = function (p_elmtStringId) {
-                ////console.log("elementId: " + p_elmtStringId);
                 return this.m_elementArr[this.getObjectIndex(p_elmtStringId)];
             };
             Model.prototype.getObjectIndex = function (p_objectStringId) {
-                ////console.log(" get object "  + p_objectStringId + " in list: "+ this.m_elementArr);
                 var key = 0;
                 if (!p_objectStringId)
                     debugger;
                 if (p_objectStringId.substr(0, 4) === "elmt") {
                     this.m_elementArr.every(function (p_elmt) {
-                        ////console.log("comparing with : " + p_elmt.getID());
                         if (p_elmt.getID() === p_objectStringId)
                             return false;
                         else {
@@ -485,10 +418,8 @@ var Mareframe;
                     });
                 }
                 else {
-                    ////console.log(p_objectStringId + " not found");
                     throw DOMException.NOT_FOUND_ERR;
                 }
-                ////console.log("returned key: " + key);
                 return key;
             };
             Model.prototype.getEaselElementsInBox = function (p_x1, p_y1, p_x2, p_y2) {
@@ -504,7 +435,6 @@ var Mareframe;
                 return this.m_connectionArr;
             };
             Model.prototype.getConnection = function (p_connectionStringId) {
-                ////console.log("connectId: " + p_connectionStringId);
                 return this.m_connectionArr[this.getObjectIndex(p_connectionStringId)];
             };
             Model.prototype.getElementArr = function () {
@@ -562,29 +492,15 @@ var Mareframe;
                 if (key >= this.m_connectionArr.length)
                     return false;
                 else {
-                    //console.log("Deleting connection: " + p_connID + "   ----------------");
                     if (this.m_bbnMode) {
                         var states = this.m_connectionArr[key].getInputElement().getDataOld().length;
                         var data = this.m_connectionArr[key].getOutputElement().getDataOld();
                         var dataIn = this.m_connectionArr[key].getInputElement().getDataOld();
                         var removeHeader = this.m_connectionArr[key].getInputElement().getID();
-                        ////console.log("Remove header: " + removeHeader);
-                        ////console.log("Original Data Out: " + data);
-                        ////console.log("Original Data In: " + dataIn);
                         var dims = [0, 0, 0];
                         data = DST.Tools.removeHeaderRow(removeHeader, data);
-                        //var splicePos = 1 + Math.floor((data[data.length - 1].length / states));
-                        ////console.log("states: " + states);
-                        ////console.log("splicepos: " + splicePos);
-                        //for (var row = 0; row < data.length;row++) {
-                        //    if(data[row].length-1 > splicePos)
-                        //        data[row].splice(splicePos);
-                        //}
-                        ////console.log("New data: " + data);
-                        ////console.log("ConnectionArr: " + this.m_connectionArr[key]);
                         this.m_connectionArr[key].getOutputElement().setData(data);
                         this.m_connectionArr.splice(key, 1);
-                        ////console.log(this.m_elementArr);
                         return true;
                     }
                     else {
@@ -595,12 +511,10 @@ var Mareframe;
                             case 100:
                                 break;
                             case 101:
-                                //console.log("updating  data:  ");
                                 for (var e in elmtOut.m_swingWeightsArr) {
                                     var out = elmtOut.m_swingWeightsArr[e][0];
                                     var id = this.m_connectionArr[key].getID();
                                     if (elmtOut.m_swingWeightsArr[e][0] === this.m_connectionArr[key].getID()) {
-                                        //elmt.m_swingWeightsArr.splice(parseInt(e) , 1);
                                         elmtOut.m_swingWeightsArr.splice(parseInt(e), 1);
                                     }
                                 }
@@ -608,10 +522,8 @@ var Mareframe;
                             case 102:
                                 break;
                             case 103:
-                                //console.log("updating  data:  ");
                                 for (var e in elmtOut.m_swingWeightsArr) {
                                     if (elmtOut.m_swingWeightsArr[e][0] === this.m_connectionArr[key].getID()) {
-                                        //elmt.m_swingWeightsArr.splice(parseInt(e) , 1);
                                         elmtOut.m_swingWeightsArr.splice(parseInt(e), 1);
                                     }
                                 }
@@ -626,7 +538,6 @@ var Mareframe;
                         this.m_connectionArr.splice(key, 1);
                     }
                 }
-                //this.update();
             };
             Model.prototype.setName = function (name) {
                 this.m_modelName = name;
@@ -658,7 +569,6 @@ var Mareframe;
                 var mainObj = "";
                 if (this.m_mainObjective !== undefined)
                     mainObj = this.m_mainObjective.getID();
-                //return { elements: this.m_elementArr, connections: this.m_connectionArr, mdlName: this.m_modelName, mainObj: this.m_mainObjective.getID(), dataMat: this.m_dataMatrix, mdlIdent: this.m_modelIdent };
                 return {
                     elements: this.m_elementArr,
                     connections: this.m_connectionArr,
@@ -669,16 +579,13 @@ var Mareframe;
                 };
             };
             Model.prototype.fromJSON = function (p_jsonObject) {
-                ////console.log("from json: p_jsonObject = " + p_jsonObject);
                 $("#modelHeader").html(p_jsonObject.mdlName);
                 var header = $("#model_header").html();
                 //Only append if model name has not been added
                 if (header.indexOf(">", header.length - 1) !== -1) {
                     $("#model_header").append(p_jsonObject.mdlName);
                 }
-                //console.log("jsonObject.elements: " + p_jsonObject.elements);
                 this.m_modelName = p_jsonObject.mdlName;
-                //console.log("Model name: " + this.m_modelName);
                 this.m_modelIdent = p_jsonObject.mdlIdent;
                 this.m_dataMatrix = p_jsonObject.dataMat;
                 this.m_elementArr = [];
@@ -689,13 +596,6 @@ var Mareframe;
                 for (var i = 0; i < p_jsonObject.elements.length; i++) {
                     var JsonElmt = p_jsonObject.elements[i];
                     var elmt = this.createNewElement(undefined);
-                    //if (JsonElmt.posX > maxX)
-                    //    maxX = JsonElmt.posX;
-                    //if (JsonElmt.posY > maxY)
-                    //    maxY = JsonElmt.posY;
-                    elmt.fromJSON(JsonElmt);
-                    var tmp2 = elmt.getID().substr(4);
-                    var tmp = parseInt(elmt.getID().substr(4));
                     if (parseInt(elmt.getID().substr(4)) !== NaN && parseInt(elmt.getID().substr(4)) > this.m_counter)
                         this.m_counter = parseInt(elmt.getID().substr(4));
                 }
@@ -704,8 +604,6 @@ var Mareframe;
                     var inpt = this.getElement(conn.connInput);
                     var c = this.createNewConnection(inpt, this.getElement(conn.connOutput));
                     c.fromJSON(conn);
-                    var tmp3 = c.getID().substr(4);
-                    var tmp4 = parseInt(c.getID().substr(4));
                     if (parseInt(c.getID().substr(4)) !== NaN && parseInt(c.getID().substr(4)) > this.m_counter)
                         this.m_counter = parseInt(c.getID().substr(4)) + 1;
                     this.addConnection(c);
@@ -718,15 +616,8 @@ var Mareframe;
                         p_jsonObject.mainObj = undefined;
                 for (var i = 0; i < p_jsonObject.elements.length; i++) {
                     if (this.m_bbnMode)
-                        ////console.log("from json: " + elmt.getName());
-                        ////console.log(this.m_elementArr);
-                        //elmt.update();
                         this.m_elementArr[i].update();
                 }
-                //h.gui.setSize(maxX + 80, maxY + 20);
-                //h.gui.updateTable(this.dataMatrix);
-                //////console.log("model.fromJSON()");
-                //////console.log(this);
                 var tmp = this.m_counter;
             };
             Model.prototype.createNewConnection = function (p_inputElmt, p_outputElmt) {
@@ -737,7 +628,6 @@ var Mareframe;
             Model.prototype.setDecision = function (p_elmtIdent, p_decisNumb) {
                 var elmt = this.getElement(p_elmtIdent);
                 if (elmt.getDecision() == p_decisNumb) {
-                    ////console.log("unsetting decision");
                     elmt.setDecision(undefined);
                 }
                 else {
@@ -753,7 +643,6 @@ var Mareframe;
                     e.setUpdated(false);
                     //console.log(e.getName() + " not updated");
                 });*/
-                ////console.log(elmt.getName() + " wants to set decision number " + p_decisNumb);
             };
             Model.prototype.getCumuluValue = function (p_element, p_level) {
                 var retValue = 0;
