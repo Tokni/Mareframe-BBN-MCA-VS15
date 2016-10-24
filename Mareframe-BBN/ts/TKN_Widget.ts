@@ -190,34 +190,13 @@
             }
             
             handleMouseDown = (e: createjs.MouseEvent, data: any) => {
-                
-              //handleMouseDown(e: createjs.MouseEvent) {
-                //alert("mouseDown");
-                ////console.log("mousedown on " + e.target.id);
-                //var tt = e.target;
-                //e.data;
-                
                 if (this.m_selectedPointIndex !== null) {
                     var s1 = this.getStageX(this.m_selectedPointIndex);
                     var s2 = this.getStageY(this.m_selectedPointIndex);
-
-                    //this.m_selectedPoint.graphics.clear().beginFill("green").drawCircle(this.getStageX(this.m_selectedPointIndex), this.getStageY(this.m_selectedPointIndex), 8);                   
-                    //this.m_selectedPoint.graphics.clear().beginFill("green").drawCircle((this.m_pwl.getPoints()[this.m_selectedPointIndex].x - this.m_pwl.getPoints()[0].x) * this.m_unitX, (this.m_pwl.m_maxValue - this.m_pwl.getPoints()[this.m_selectedPointIndex].y) * this.m_unitY, 8);
-                    //this.m_selectedPoint.graphics.clear().beginFill("green").drawCircle(data.PosX - this.m_pwl.getPoints()[0].x * this.m_unitX, this.m_pwl.m_maxValue * this.m_unitY - data.PosY, 8);
                 }
-                //if (data !== undefined) {
                 if (data !== undefined) {   
                     $("#selectedPointInfo").show();
-                    var tmp6 = this.m_selectedPointIndex;
-                    var tmp7 = data.clickedPointIndex;
-
-                    
                     this.m_selectedPoint = e.target;
-                    
-                    var tmp = data;
-                    var tmp2 = data.clickedPointIndex;
-                    var tmp3 = this.m_pwl.getPoints();
-                    var tmp4 = data.clickedPointIndex.valueOf();
 
                     this.m_selectedPointIndex = data.clickedPointIndex.valueOf();
                     this.updateInput();
@@ -228,9 +207,6 @@
                     
                     var s3 = this.getStageX(this.m_selectedPointIndex);
                     var s4 = this.getStageY(this.m_selectedPointIndex);
-                    //e.target.graphics.clear().beginFill("red").drawCircle(this.getStageX(data.clickedPointIndex), this.getStageY(data.clickedPointIndex), 6);
-
-                    //e.target.graphics.clear().beginFill("red").drawCircle((this.m_pwl.getPoints()[data.clickedPointIndex].x - this.m_pwl.getPoints()[0].x) * this.m_unitX, (this.m_pwl.m_maxValue - this.m_pwl.getPoints()[data.clickedPointIndex].y) * this.m_unitY, 6);
                 }
                 else {
                     $("#selectedPointInfo").hide();
@@ -239,7 +215,6 @@
                 this.addPWLToStage();
                 var t = this.m_selectedPointIndex;
                 var t2 = this.m_pwl;
-                ////console.log("selectedIndex: " + this.m_selectedPointIndex); 
                 this.update();               
             }
             hd(e: createjs.MouseEvent, data: any) { }
@@ -270,7 +245,6 @@
                 this.update();
             }
             handleDeleteButton = (e: createjs.MouseEvent) => {
-                //console.log("houh");
                 this.m_pwl.removePointAtIndex(this.m_selectedPointIndex);
                 this.m_selectedPointIndex = null;
                 $("#selectedPointInfo").hide();
@@ -315,19 +289,15 @@
                 this.update();
             }
             handleLoadFromFile = (e: createjs.MouseEvent) => {
-                //console.log("not done yet, no not yet");
                 this.m_fileIO.loadPWLFromFile(this.m_pwl, this.addPWLToStage);
                 this.update();
             }
             handleSaveToFile = (e: createjs.MouseEvent) => {
-                //console.log("not done yet");
                 var fileIO = this.m_fileIO;
                 var widget = this;
                 fileIO.savePiecewiseLinearFunction(widget.m_pwl);
                 $("#saveFile_div").show();
                 $("#saveFile_div").show().dblclick(function () {
-                    ////console.log("DC filname");
-                
                     var $filename = $("#filename");
 
                     var oldText = $filename.html();
@@ -345,7 +315,6 @@
 
                             oldText = newText; //This is needed if the user wants to change the text multiple times without saving inbetween
                             var saveName = oldText + ".tkn";
-                            //console.log("saveName: " + saveName);
                             fileIO.savePiecewiseLinearFunction(widget.m_pwl);
                         }
 
@@ -354,13 +323,11 @@
                               
             }
             handleDeleteAllPoints = (e: createjs.MouseEvent) => {
-                //console.log("not done yet");
                 this.m_pwl.getPoints().splice(1, this.m_pwl.getPoints().length - 2);
                 this.addPWLToStage();
                 this.update();
             }
             handleShowAlternatives = (e: createjs.MouseEvent) => {
-                //console.log("not done yet");
                 var tnp2 = this.m_unitX;
                 var vertLines: createjs.Shape[] = [];
                 var i = 0;
@@ -394,7 +361,6 @@
                 }
             }
             addValueFunctionToStage() {
-                //for (var i = 1; i < this.m_valueFunction.
                 alert("not imp yet");
             }
             addPWLToStage = () => {
