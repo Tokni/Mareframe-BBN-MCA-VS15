@@ -204,7 +204,7 @@ module Mareframe {
                 $("#modeStatus").hide();
                 this.m_mcaContainer.addChild(this.m_drawingCont);
 
-                this.createProgressbarDialog();
+                //this.createProgressbarDialog();
             }
 
             private createProgressbarDialog() {
@@ -316,6 +316,14 @@ module Mareframe {
                 this.gotToVOICalcMode(false);
             }
             public updateModel() {
+                $("#updateMdl").removeClass("ui-state-focus");
+                this.goToUpdateMode(true);
+                this.m_model.update();
+                this.updateMiniTables(this.m_model.getElementArr());
+                this.updateOpenDialogs();
+                this.goToUpdateMode(false);
+            }
+            public updateModelUsingWebWorkers() {
                 //this.updateModelParallel();
                 var gui: GUIHandler = this;
                 $("#updateMdl").removeClass("ui-state-focus");
@@ -509,7 +517,7 @@ module Mareframe {
             private fitToModel() {
                 this.repositionModel();
                 this.updateSize();
-          
+            }
             private setSize(p_width: number, p_height: number): void {
                 //console.log("setting size to " + p_width + " , " + p_height);
                 this.m_mcaStageCanvas.height = p_height;
@@ -1551,8 +1559,36 @@ module Mareframe {
 
                 return "voiDialog";
             }
-
             private updateVOI = (p_evt: Event): void => {
+                var pov: Element = this.m_model.getElement($("#fromPointOfView").val());
+                var forDec: Element = this.m_model.getElement($("#forDec").val());
+                var chanceElmts: Element[] = [];
+                this.m_model.getElementArr().forEach(function (e) {
+                    if (e.getType() === 0 && $("#voiCB_" + e.getID()).is(":checked")) {
+                        chanceElmts.push(e);
+                    }
+                });
+
+                var resultMatrix = Tools.valueOfInformation(this.m_model, pov, forDec, chanceElmts, this);
+                $("#voiTable").empty();//First remove the previous table
+                var table: HTMLTableElement = document.createElement("table");
+                table.classList.add("defTable_div");
+                var row = table.insertRow();
+                var th = document.createElement("th");
+                row.appendChild(th);
+                th.innerHTML = "Result";
+                for (var i = 0; i < resultMatrix.length; i++) {
+                    var row = table.insertRow();
+                    for (var j = 0; j < resultMatrix[0].length; j++) {
+                        var cell = row.insertCell();
+                        var div = document.createElement("div");
+                        cell.appendChild(div);
+                        div.innerHTML = resultMatrix[i][j].toPrecision(4);
+                    }
+                }
+                $("#voiTable").append(table);
+            }
+            private updateVOIUsingWebWorkers = (p_evt: Event): void => {
                 
                 var gui: GUIHandler = this;
                 var pov: Element = this.m_model.getElement($("#fromPointOfView").val());

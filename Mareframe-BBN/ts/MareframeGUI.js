@@ -89,6 +89,34 @@ var Mareframe;
                     //console.log("auto update: " + this.m_model.m_autoUpdate);
                 };
                 this.updateVOI = function (p_evt) {
+                    var pov = _this.m_model.getElement($("#fromPointOfView").val());
+                    var forDec = _this.m_model.getElement($("#forDec").val());
+                    var chanceElmts = [];
+                    _this.m_model.getElementArr().forEach(function (e) {
+                        if (e.getType() === 0 && $("#voiCB_" + e.getID()).is(":checked")) {
+                            chanceElmts.push(e);
+                        }
+                    });
+                    var resultMatrix = DST.Tools.valueOfInformation(_this.m_model, pov, forDec, chanceElmts, _this);
+                    $("#voiTable").empty(); //First remove the previous table
+                    var table = document.createElement("table");
+                    table.classList.add("defTable_div");
+                    var row = table.insertRow();
+                    var th = document.createElement("th");
+                    row.appendChild(th);
+                    th.innerHTML = "Result";
+                    for (var i = 0; i < resultMatrix.length; i++) {
+                        var row = table.insertRow();
+                        for (var j = 0; j < resultMatrix[0].length; j++) {
+                            var cell = row.insertCell();
+                            var div = document.createElement("div");
+                            cell.appendChild(div);
+                            div.innerHTML = resultMatrix[i][j].toPrecision(4);
+                        }
+                    }
+                    $("#voiTable").append(table);
+                };
+                this.updateVOIUsingWebWorkers = function (p_evt) {
                     var gui = _this;
                     var pov = _this.m_model.getElement($("#fromPointOfView").val());
                     var forDec = _this.m_model.getElement($("#forDec").val());
@@ -311,7 +339,7 @@ var Mareframe;
                 $("#settings").show();
                 $("#modeStatus").hide();
                 this.m_mcaContainer.addChild(this.m_drawingCont);
-                this.createProgressbarDialog();
+                //this.createProgressbarDialog();
             }
             GUIHandler.prototype.createProgressbarDialog = function () {
                 var progressBarDialog = document.createElement("div");
@@ -400,6 +428,14 @@ var Mareframe;
                 document.getElementsByTagName("body")[0].style.cursor = "progress";
             };
             GUIHandler.prototype.updateModel = function () {
+                $("#updateMdl").removeClass("ui-state-focus");
+                this.goToUpdateMode(true);
+                this.m_model.update();
+                this.updateMiniTables(this.m_model.getElementArr());
+                this.updateOpenDialogs();
+                this.goToUpdateMode(false);
+            };
+            GUIHandler.prototype.updateModelUsingWebWorkers = function () {
                 //this.updateModelParallel();
                 var gui = this;
                 $("#updateMdl").removeClass("ui-state-focus");
