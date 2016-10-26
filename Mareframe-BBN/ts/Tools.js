@@ -1802,26 +1802,102 @@ var Mareframe;
                 //console.log("getting value row: " + p_elmt.getEvidence() + " col: " + column);
                 return averageLikelihood;
             };
-            Tools.startWorker = function (p_script, p_showProgress) {
+            Tools.startWorker = function (p_showProgress) {
                 if (p_showProgress) {
                     $("#progressbarDialog").dialog();
                     $("#progressBar").progressbar({
                         value: 1
                     });
                 }
-                var w;
-                if (typeof (Worker) !== "undefined") {
-                    if (typeof (w) == "undefined") {
-                        w = new Worker(p_script);
+                //Web worker code. Not pretty to have it here, but it did not work if it was in a seperate file
+                var myworker = function () {
+                    function start() {
+                        debugger;
+                        postMessage("web worker started");
+                        //importScripts("ts/Model.js", "ts/Element.js", "ts/Connection.js", "ts/Tools.js", "js/math.min.js");
                     }
-                    w.onmessage = function (event) {
+                    start();
+                    self.addEventListener('message', function (e) {
+                        debugger;
+                        if (e.data.model) {
+                            var model = new Mareframe.DST.Model(true);
+                            model.fromJSON(JSON.parse(e.data.model), false);
+                            var iterations = model.getmumOfIteraions();
+                            update(model);
+                            var mdlString = JSON.stringify(model.toJSON());
+                            self.postMessage({ command: "finnished", model: mdlString });
+                        }
+                        if (e.data.url) {
+                            var url = e.data.url;
+                            var index = url.indexOf('DST.html');
+                            if (index != -1) {
+                                url = url.substring(0, index);
+                            }
+                            importScripts(url + "/ts/Model.js", url + "/ts/Element.js", url + "/ts/Connection.js", url + "/ts/Tools.js", url + "/js/math.min.js");
+                        }
+                    }, false);
+                    function update(p_model) {
+                        p_model.getElementArr().forEach(function (e) {
+                            if (!e.isUpdated()) {
+                                e.update();
+                            }
+                        });
+                        var n = 0;
+                        p_model.getElementArr().forEach(function (e) {
+                            if (e.getType() !== 0) {
+                                e.setUpdated(false);
+                            }
+                            n++;
+                        });
+                        calcValuesLikelihoodSampling(p_model, p_model.m_numOfIteraions, n);
+                    }
+                    function calcValuesLikelihoodSampling(p_model, p_numOfIterations, p_noOfElmts) {
+                        //console.log("calculating values with evidence");
+                        var table = Mareframe.DST.Tools.createLikelihoodTable(p_model, p_numOfIterations);
+                        var weightSum = 0;
+                        /*for (var i = 0; i < table.length; i++) {
+                            //console.log("weight: " + table[i][1]);
+                            weightSum += table[i][1];
+                        }*/
+                        //console.log("weightSum " + weightSum);
+                        p_model.getElementArr().forEach(function (e) {
+                            if (!e.isUpdated()) {
+                                status = 100 / p_noOfElmts;
+                                self.postMessage({ command: "progress", progress: status });
+                                Mareframe.DST.Tools.calcValuesLikelihoodSamplingElmt(e, table);
+                            }
+                        });
+                        //Update concerning decisions. It is important that this is done before decision values are calculated
+                        p_model.getElementArr().forEach(function (p_elmt) {
+                            Mareframe.DST.Tools.updateConcerningDecisions(p_elmt);
+                        });
+                        console.log("done updating concerning decisions");
+                        p_model.getElementArr().forEach(function (e) {
+                            if (!e.isUpdated()) {
+                                //console.log("calculating for " + e.getName());
+                                Mareframe.DST.Tools.calculateValues(p_model, e);
+                                e.setUpdated(true);
+                            }
+                        });
+                    }
+                }; //End of web worker code
+                //Create the worker
+                var worker = null, URL = window.URL || (window.webkitURL); // simple polyfill
+                window.URL = URL;
+                var workerData = new Blob(['(' + myworker.toString() + ')()'], {
+                    type: "text/javascript"
+                });
+                if (typeof (Worker) !== "undefined") {
+                    worker = new Worker(window.URL.createObjectURL(workerData));
+                    worker.onmessage = function (event) {
                         console.log(event.data);
                     };
+                    worker.postMessage({ url: document.location.href }); //Load scripts
                 }
                 else {
                     console.log("Sorry! No Web Worker support.");
                 }
-                return w;
+                return worker;
             };
             Tools.stopWorker = function (p_worker) {
                 p_worker.terminate();
