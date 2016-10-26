@@ -23,7 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="BBN.html" />
-    <Content Include="Calculator.js" />
+    <Content Include="calculator.js" />
     <Content Include="css\body.css" />
     <Content Include="css\dialog.css" />
     <Content Include="css\DST.css" />

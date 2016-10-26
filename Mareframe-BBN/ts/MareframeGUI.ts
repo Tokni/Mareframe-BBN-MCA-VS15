@@ -204,7 +204,7 @@ module Mareframe {
                 $("#modeStatus").hide();
                 this.m_mcaContainer.addChild(this.m_drawingCont);
 
-                //this.createProgressbarDialog();
+                this.createProgressbarDialog();//Comment out if not using web workers
             }
 
             private createProgressbarDialog() {
@@ -316,18 +316,114 @@ module Mareframe {
                 this.gotToVOICalcMode(false);
             }
             public updateModel() {
-                $("#updateMdl").removeClass("ui-state-focus");
+                /*$("#updateMdl").removeClass("ui-state-focus");
                 this.goToUpdateMode(true);
                 this.m_model.update();
                 this.updateMiniTables(this.m_model.getElementArr());
                 this.updateOpenDialogs();
-                this.goToUpdateMode(false);
+                this.goToUpdateMode(false);*/
+                this.updateModelUsingWebWorkers();
             }
             public updateModelUsingWebWorkers() {
                 //this.updateModelParallel();
                 var gui: GUIHandler = this;
                 $("#updateMdl").removeClass("ui-state-focus");
-                var worker: Worker = Tools.startWorker("../Calculator.js",true);
+                var myworker = function () {
+
+
+                    function start() {
+                        debugger
+                        postMessage("web worker started")
+                        //importScripts("ts/Model.js", "ts/Element.js", "ts/Connection.js", "ts/Tools.js", "js/math.min.js");
+                    }
+                    start();
+
+                    self.addEventListener('message', function (e) {
+                        debugger
+                        if (e.data.model) {
+                            var model = new Mareframe.DST.Model(true);
+                            model.fromJSON(JSON.parse(e.data.model), false);
+                            var iterations = model.getmumOfIteraions();
+                            update(model);
+
+                            var mdlString = JSON.stringify(model.toJSON());
+
+                            self.postMessage({ command: "finnished", model: mdlString });
+                        }
+                        if (e.data.url) {
+                            var url = e.data.url;
+                            var index = url.indexOf('DST.html');
+                            if (index != -1) {
+                                url = url.substring(0, index);
+                            }
+                            importScripts(url + "/ts/Model.js", url + "/ts/Element.js", url + "/ts/Connection.js", url + "/ts/Tools.js", url + "/js/math.min.js");
+                        }
+                    }, false);
+
+                    function update(p_model) {
+                        p_model.getElementArr().forEach(function (e) {
+                            if (!e.isUpdated()) {
+                                e.update();
+                            }
+                        });
+                        var n = 0;
+                        p_model.getElementArr().forEach(function (e) {//This is needed to make sure values and decisions are updated in the right order
+                            if (e.getType() !== 0) {
+                                e.setUpdated(false);
+                            }
+                            n++;
+                        });
+                        calcValuesLikelihoodSampling(p_model, p_model.m_numOfIteraions, n);
+                    }
+
+                    function calcValuesLikelihoodSampling(p_model, p_numOfIterations, p_noOfElmts) {
+                        //console.log("calculating values with evidence");
+                        var table = Mareframe.DST.Tools.createLikelihoodTable(p_model, p_numOfIterations);
+                        var weightSum = 0;
+                        /*for (var i = 0; i < table.length; i++) {
+                            //console.log("weight: " + table[i][1]);
+                            weightSum += table[i][1];
+                        }*/
+                        //console.log("weightSum " + weightSum);
+                        p_model.getElementArr().forEach(function (e) {
+                            if (!e.isUpdated()) {
+                                status = 100 / p_noOfElmts;
+                                self.postMessage({ command: "progress", progress: status })
+                                Mareframe.DST.Tools.calcValuesLikelihoodSamplingElmt(e, table);
+                            }
+
+                        });
+                        //Update concerning decisions. It is important that this is done before decision values are calculated
+                        p_model.getElementArr().forEach(function (p_elmt) {
+                            Mareframe.DST.Tools.updateConcerningDecisions(p_elmt);
+                        });
+                        console.log("done updating concerning decisions");
+                        p_model.getElementArr().forEach(function (e) {//This recalculates all values of decision elements
+                            if (!e.isUpdated()) {
+                                //console.log("calculating for " + e.getName());
+                                Mareframe.DST.Tools.calculateValues(p_model, e);
+                                e.setUpdated(true);
+                            }
+                        });
+                    }
+                };
+                //Create the worker
+                var worker = null,
+                    URL = window.URL || (window.webkitURL); // simple polyfill
+
+                window.URL = URL;
+                var workerData = new Blob(['('+myworker.toString() + ')()'], {
+                    type: "text/javascript"
+                });
+                //worker = new Worker(window.URL.createObjectURL(workerData));
+                //Done creating the worker
+
+
+                worker = Tools.startWorker(window.URL.createObjectURL(workerData),true);
+                worker.postMessage({ url: document.location.href });
+
+
+
                 this.goToUpdateMode(true);
                 $("#progressText").text("Updating model");
                 $("#cancelProgress").click({ worker: worker }, this.cancelWorker);
@@ -1553,7 +1649,8 @@ module Mareframe {
                 button.classList.add("notAllowedDuringVOI");
                 
 
-                $("#voiButton").click(this.updateVOI)
+                //$("#voiButton").click(this.updateVOI)
+                $("#voiButton").click(this.updateVOIUsingWebWorkers)
 
                 
 
