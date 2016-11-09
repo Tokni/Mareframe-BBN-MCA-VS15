@@ -70,14 +70,13 @@
                             for (var i = 0; i < elmt.getData().length; i++) {
                                 dataStream += '<state id="' + elmt.getData(i) + '" />\n';
                             }
-                            //For some reason this is causing an infinite loop when uploading
-                            /*if (elmt.getParentElements().length > 0) {
+                            if (elmt.getParentElements().length > 0) {
                                 dataStream += '<parents>'
                                 elmt.getParentElements().forEach(function (parElmt) {
                                     dataStream += parElmt.getID() + ' ';
                                 });
                                 dataStream = dataStream.slice(0, dataStream.length-1) + '</parents>\n';
-                            }*/
+                            }
                             dataStream += '</decision>\n';
                             break;
                         case 2:
