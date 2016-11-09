@@ -1921,14 +1921,12 @@
                 //Web worker code. Not pretty to have it here, but it did not work if it was in a seperate file
                 var myworker = function () {
                     function start() {
-                        debugger
                         postMessage("web worker started")
                         //importScripts("ts/Model.js", "ts/Element.js", "ts/Connection.js", "ts/Tools.js", "js/math.min.js");
                     }
                     start();
 
                     self.addEventListener('message', function (e) {
-                        debugger
                         if (e.data.model) {
                             var model = new Mareframe.DST.Model(true);
                             model.fromJSON(JSON.parse(e.data.model), false);
@@ -1974,9 +1972,10 @@
                             weightSum += table[i][1];
                         }*/
                         //console.log("weightSum " + weightSum);
+                        var status: number;
                         p_model.getElementArr().forEach(function (e) {
                             if (!e.isUpdated()) {
-                                status = 100 / p_noOfElmts;
+                                status = (100 / p_noOfElmts);
                                 self.postMessage({ command: "progress", progress: status })
                                 Mareframe.DST.Tools.calcValuesLikelihoodSamplingElmt(e, table);
                             }
@@ -1999,9 +1998,10 @@
 
                 //Create the worker
                 var worker = null,
-                    URL = window.URL || (window.webkitURL); // simple polyfill
+                    URL = window.URL || (window.webkitURL); 
 
                 window.URL = URL;
+                //Create javascript for worker
                 var workerData = new Blob(['(' + myworker.toString() + ')()'], {
                     type: "text/javascript"
                 });
@@ -2013,7 +2013,7 @@
                     };
                     worker.postMessage({ url: document.location.href });//Load scripts
                 } else {
-                    console.log("Sorry! No Web Worker support.");
+                    alert("Cannot update as your browser does not support Web Workers. Update your current browser or try again using another browser.");
                 }
                 return worker;
             }

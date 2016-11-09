@@ -204,7 +204,7 @@ module Mareframe {
                 $("#modeStatus").hide();
                 this.m_mcaContainer.addChild(this.m_drawingCont);
 
-                this.createProgressbarDialog();//Comment out if not using web workers
+                
             }
 
             private createProgressbarDialog() {
@@ -325,12 +325,15 @@ module Mareframe {
                 this.updateModelUsingWebWorkers();
             }
             public updateModelUsingWebWorkers() {
+                if ($("#progressbarDialog").length == 0) {
+                    //Create progressbar if it has not been created
+                    this.createProgressbarDialog();
+                }
                 //this.updateModelParallel();
                 var gui: GUIHandler = this;
                 $("#updateMdl").removeClass("ui-state-focus");
 
                 var worker = Tools.startWorker(true);
-
                 this.goToUpdateMode(true);
                 $("#progressText").text("Updating model");
                 $("#cancelProgress").click({ worker: worker }, this.cancelWorker);
@@ -361,7 +364,7 @@ module Mareframe {
                             gui.goToUpdateMode(false);
                             break;
                         case "progress":
-                           status += evt.data.progress;
+                            status += evt.data.progress;
                             $("#progressBar").progressbar({
                                 value: status
                             });
@@ -538,6 +541,7 @@ module Mareframe {
                 $("#newDcmt").removeClass("ui-state-focus");
                 $("#selectModel").prop("selectedIndex", 0);
                 console.log("new document clicked");
+                this.clearSelection();
                 this.m_model = this.m_handler.addNewModel();
                 this.importStage();
             }
@@ -979,13 +983,14 @@ module Mareframe {
                 $(".autoUpdate").removeClass("ui-state-focus");
                 this.m_model.setAutoUpdate(cb.currentTarget.checked);
                 if (cb.currentTarget.checked) {
-                    $("#autoUpdateStatus").html("Updating automatically");
+                    //$("#autoUpdateStatus").html("Updating automatically");
                     $("#updateMdl").hide();
                 }
                 else {
                     $("#autoUpdateStatus").html("");
                     $("#updateMdl").show();
                 }
+
                 //console.log("auto update: " + this.m_model.m_autoUpdate);
             }
             private fullscreen(p_evt: Event) {
@@ -1608,6 +1613,11 @@ module Mareframe {
                     this.gotToVOICalcMode(true);
                     var worker1: Worker = Tools.startWorker(true);
                     var worker2: Worker = Tools.startWorker(false);
+                    if ($("#progressbarDialog").length == 0) {
+                        //Create progress bar dialog if it has not been created
+                        this.createProgressbarDialog();
+                    }
+                    $("#progressbarDialog").dialog();
                     $("#progressText").text("Calculating value of information");
                     $("#cancelProgress").click({ worker1: worker1, worker2: worker2 }, this.cancelTwoWorkers);
                     $("#progressbarDialog").on("dialogclose", { worker1: worker1, worker2: worker2 }, this.cancelTwoWorkers);
@@ -1921,8 +1931,6 @@ module Mareframe {
                 return newDialog.id;
             }
             private populateElmtDetails(p_elmt: Element): void {
-              //  Tools.calcValueOfInformation(this.m_model.getElement("elmtDecsion"), p_elmt, this.m_model,10); //This is just a test for VOI
-
                  var id: String = p_elmt.getID();
                 if (p_elmt.getDialog() == null) {
                     console.log("creating new dialog");

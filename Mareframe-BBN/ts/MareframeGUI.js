@@ -79,7 +79,7 @@ var Mareframe;
                     $(".autoUpdate").removeClass("ui-state-focus");
                     this.m_model.setAutoUpdate(cb.currentTarget.checked);
                     if (cb.currentTarget.checked) {
-                        $("#autoUpdateStatus").html("Updating automatically");
+                        //$("#autoUpdateStatus").html("Updating automatically");
                         $("#updateMdl").hide();
                     }
                     else {
@@ -131,6 +131,11 @@ var Mareframe;
                         _this.gotToVOICalcMode(true);
                         var worker1 = DST.Tools.startWorker(true);
                         var worker2 = DST.Tools.startWorker(false);
+                        if ($("#progressbarDialog").length == 0) {
+                            //Create progress bar dialog if it has not been created
+                            _this.createProgressbarDialog();
+                        }
+                        $("#progressbarDialog").dialog();
                         $("#progressText").text("Calculating value of information");
                         $("#cancelProgress").click({ worker1: worker1, worker2: worker2 }, _this.cancelTwoWorkers);
                         $("#progressbarDialog").on("dialogclose", { worker1: worker1, worker2: worker2 }, _this.cancelTwoWorkers);
@@ -339,7 +344,6 @@ var Mareframe;
                 $("#settings").show();
                 $("#modeStatus").hide();
                 this.m_mcaContainer.addChild(this.m_drawingCont);
-                this.createProgressbarDialog(); //Comment out if not using web workers
             }
             GUIHandler.prototype.createProgressbarDialog = function () {
                 var progressBarDialog = document.createElement("div");
@@ -437,6 +441,10 @@ var Mareframe;
                 this.updateModelUsingWebWorkers();
             };
             GUIHandler.prototype.updateModelUsingWebWorkers = function () {
+                if ($("#progressbarDialog").length == 0) {
+                    //Create progressbar if it has not been created
+                    this.createProgressbarDialog();
+                }
                 //this.updateModelParallel();
                 var gui = this;
                 $("#updateMdl").removeClass("ui-state-focus");
@@ -643,6 +651,7 @@ var Mareframe;
                 $("#newDcmt").removeClass("ui-state-focus");
                 $("#selectModel").prop("selectedIndex", 0);
                 console.log("new document clicked");
+                this.clearSelection();
                 this.m_model = this.m_handler.addNewModel();
                 this.importStage();
             };
@@ -1790,7 +1799,6 @@ var Mareframe;
                 return newDialog.id;
             };
             GUIHandler.prototype.populateElmtDetails = function (p_elmt) {
-                //  Tools.calcValueOfInformation(this.m_model.getElement("elmtDecsion"), p_elmt, this.m_model,10); //This is just a test for VOI
                 var id = p_elmt.getID();
                 if (p_elmt.getDialog() == null) {
                     console.log("creating new dialog");

@@ -13,19 +13,19 @@
 	cursor: pointer;
 	opacity: 0;
 	filter: alpha(opacity=0);
-}/*
-input[type="checkbox"] {
+}
+/*input[type="checkbox"] {
     display:none;
 }
 input[type="checkbox"] + label span {
     display:inline-block;
     width:249px;
     height:19px;
-    /*background:url(check_radio_sheet.png) left top no-repeat;*/
+    /*background:url(check_radio_sheet.png) left top no-repeat;
 }*/
 .advButton {
     margin:0;
-    float:left;
+   /* float:left;*/
 }
 
 .button {
@@ -36,4 +36,9 @@ input[type="checkbox"] + label span {
     text-align: center;
     font-size: 2em;
 
+}
+.ui-icon-background,
+.ui-state-active .ui-icon-background {
+	border: #aaaaaa;
+	background-color: #888888;
 }
