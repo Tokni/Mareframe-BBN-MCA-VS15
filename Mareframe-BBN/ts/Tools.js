@@ -917,9 +917,14 @@ var Mareframe;
                         var temp = Tools.createSubMatrices(p_utilityNode, valueMatrix, elmt, valueHeaders);
                         valueHeaders = temp[1];
                         valueMatrix = [];
+                        var first = true;
                         temp[0].forEach(function (matrix) {
                             //Multiply each submatrix with probabilities
-                            valueMatrix = valueMatrix.concat(math.multiply(matrix, Tools.getMatrixWithoutHeader(elmt.getValues())));
+                            var t = Tools.getMatrixWithoutHeader(elmt.getValues());
+                            var t2 = math.multiply(matrix, Tools.getMatrixWithoutHeader(elmt.getValues()));
+                            valueMatrix.push(t2[0][0]);
+                            //valueMatrix = valueMatrix.concat(math.multiply(matrix, Tools.getMatrixWithoutHeader(elmt.getValues())));
+                            //This has been changed beacause we got a [[],[],[],...] matrix out where we wanted [..,..,..,...]
                         });
                     }
                 }
