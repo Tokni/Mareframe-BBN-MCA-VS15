@@ -511,7 +511,10 @@ var Mareframe;
                     if (conn === p_connection) {
                         validConn = false;
                     }
-                    else if ((p_connection.getOutputElement().getID() === conn.getOutputElement().getID() && p_connection.getInputElement().getID() === conn.getInputElement().getID()) || (p_connection.getOutputElement().getID() === conn.getInputElement().getID() && p_connection.getInputElement().getID() === conn.getOutputElement().getID())) {
+                    else if ((p_connection.getOutputElement().getID() === conn.getOutputElement().getID() &&
+                        p_connection.getInputElement().getID() === conn.getInputElement().getID()) ||
+                        (p_connection.getOutputElement().getID() === conn.getInputElement().getID() &&
+                            p_connection.getInputElement().getID() === conn.getOutputElement().getID())) {
                         validConn = false;
                     }
                 });

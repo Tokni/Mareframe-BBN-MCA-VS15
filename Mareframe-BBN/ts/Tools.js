@@ -1379,12 +1379,17 @@ var Mareframe;
                 var model1 = $.extend(true, {}, p_model.toJSON());
                 //Create connection from each of the selected chance nodes to the selected for decision
                 p_chanceElmts.forEach(function (e) {
-                    var c = p_model.createNewConnection(e, p_forDec);
-                    if (!p_model.addConnection(c)) {
+                    if (!Tools.validConnection(e, p_forDec)) {
                         isPossible = false;
                     }
                     else {
-                        tempConnections.push(c);
+                        var c = p_model.createNewConnection(e, p_forDec);
+                        if (!p_model.addConnection(c)) {
+                            isPossible = false;
+                        }
+                        else {
+                            tempConnections.push(c);
+                        }
                     }
                     p_forDec.setUpdated(false);
                     p_forDec.getAllDescendants().forEach(function (e) {
