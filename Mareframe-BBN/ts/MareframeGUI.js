@@ -1525,13 +1525,19 @@ var Mareframe;
                 var select = document.createElement("select");
                 select.setAttribute("id", "forDec");
                 fieldset.appendChild(select);
+                var decNodesExist = false;
+                var valueNodeExist = false;
                 this.m_model.getElementArr().forEach(function (e) {
                     if (e.getType() === 1) {
+                        decNodesExist = true;
                         var option = document.createElement("option");
                         option.setAttribute("selected", "selected");
                         option.setAttribute("value", e.getID());
                         option.innerHTML = e.getName();
                         select.appendChild(option);
+                    }
+                    else if (e.getType() === 2) {
+                        valueNodeExist = true;
                     }
                 });
                 //Create dropdown for point of view
@@ -1584,8 +1590,15 @@ var Mareframe;
                 button.innerHTML = "Value of Information";
                 button.setAttribute("title", "Click to show the value of information for the selected nodes");
                 button.classList.add("notAllowedDuringVOI");
-                //$("#voiButton").click(this.updateVOI)
-                $("#voiButton").click(this.updateVOIUsingWebWorkers);
+                if (valueNodeExist && decNodesExist) {
+                    //$("#voiButton").click(this.updateVOI)
+                    $("#voiButton").click(this.updateVOIUsingWebWorkers);
+                }
+                else {
+                    $("#voiButton").prop("disabled", true);
+                    $("#voiButton").text("Cannot calculate");
+                    $("#voiButton").prop("title", "Cannot calculate because decision or utility node missing");
+                }
                 return "voiDialog";
             };
             GUIHandler.prototype.updateVOIVisual = function (p_result) {
