@@ -220,6 +220,7 @@ var Mareframe;
                     //        currentMax = tempMatrix[j][i + 1];
                     //    }
                     //}
+                    //
                     for (var j = 1; j < tempMatrix.length - 1; j++) {
                         tempMatrix[j][i + 1] = Mareframe.DST.Tools.getValueFn(Math.abs(elmtData[3] - ((tempMatrix[j][i + 1] - minVal) / (maxVal - minVal))), Math.abs(elmtData[3] - ((elmtData[1] / 100))), 1 - (elmtData[2] / 100));
                         ////console.log(getValueFn(tempMatrix[j][i + 1] / currentMax, elmtData[1]/100, elmtData[2]/100));
