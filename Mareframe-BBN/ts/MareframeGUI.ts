@@ -2004,6 +2004,7 @@ module Mareframe {
                        // var s = Tools.htmlTableFromArray("Definition", p_elmt, this.m_model, this.m_editorMode, $("#detailsDialog_" + id).data("defTable"));
                         // $("#defTable_div_" + id).html(s);
                         $("#defTable_div_" + id).empty();
+                        var ty = $("#detailsDialog_" + id).data("defTable");
                         document.getElementById("defTable_div_" + id).appendChild(this.htmlTableFromArray("Definition", p_elmt, this.m_model, this.m_editorMode, $("#detailsDialog_" + id).data("defTable")));
 
 

@@ -39,7 +39,8 @@ var Mareframe;
                 return dataStream;
             };
             Model.prototype.getBBNDataStream = function () {
-                var dataStream = '<?xml version="1.0" encoding="ISO-8859-1"?>\n<smile version="1.0" id="' + this.m_modelIdent + '" numsamples="1000">\n<nodes>\n';
+                var dataStream = '<?xml version="1.0" encoding="ISO-8859-1"?>\n<smile version="1.0" id="' + this.m_modelIdent + '" numsamples="1000">\n';
+                dataStream += "<mareFrame>true</mareFrame>\n<nodes>\n";
                 this.m_elementArr.forEach(function (elmt) {
                     switch (elmt.getType()) {
                         case 0:
@@ -95,7 +96,7 @@ var Mareframe;
                             dataStream += '</utility>\n';
                             break;
                         case 3:
-                            dataStream += '<superValue id="' + elmt.getID() + '">\n';
+                            dataStream += '<mau id="' + elmt.getID() + '">\n';
                             if (elmt.getParentElements().length > 0) {
                                 dataStream += '<parents>';
                                 elmt.getParentElements().forEach(function (parElmt) {
@@ -103,12 +104,16 @@ var Mareframe;
                                 });
                                 dataStream = dataStream.slice(0, dataStream.length - 1) + '</parents>\n';
                             }
-                            dataStream += '<utilities>';
-                            for (var i = 1; i < elmt.getData(0).length; i++) {
-                                dataStream += elmt.getData(elmt.getData().length - 1, i) + ' ';
+                            dataStream += '<weights>';
+                            var tweigth = "";
+                            var t = elmt.getData();
+                            for (var i = 0; i < elmt.getData().length; i++) {
+                                tweigth += elmt.getData(i, 1) + ' ';
+                                dataStream += elmt.getData(i, 1) + ' ';
                             }
-                            dataStream = dataStream.slice(0, dataStream.length - 1) + '</utilities>\n';
-                            dataStream += '</superValue>\n';
+                            //var t2 = 
+                            dataStream = dataStream.slice(0, dataStream.length - 1) + '</weights>\n';
+                            dataStream += '</mau>\n';
                             break;
                     }
                 });

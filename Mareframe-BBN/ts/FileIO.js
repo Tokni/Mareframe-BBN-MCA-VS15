@@ -35,6 +35,7 @@ var Mareframe;
                             var connCounter = 1;
                             var JSONObj = { elements: [], connections: [], mdlName: "", dataMat: [], mdlIdent: "", mdlDesc: "" };
                             var xml = $($.parseXML(file)), $title = xml.find("smile"), $nodes = xml.find("nodes"), $extensions = xml.find("genie");
+                            var mareFrame = xml.find("mareFrame");
                             //console.log($nodes[0].childNodes);
                             JSONObj.mdlIdent = $title[0].id;
                             JSONObj.mdlName = $extensions[0].attributes["name"].nodeValue;
@@ -43,13 +44,16 @@ var Mareframe;
                                     var node = $($nodes[0].childNodes)[i];
                                     ////console.log(node.childNodes);
                                     var elmt = { posX: 0, posY: 0, elmtID: "", elmtName: "", elmtDesc: "", elmtType: 0, elmtData: [] };
-                                    elmt.elmtID = node.id;
+                                    elmt.elmtID = "elmt" + node.id;
                                     var extensionNode = $($extensions.find("#" + node.id)[0]);
                                     //console.log(extensionNode);
                                     //console.log(extensionNode.find("name")[0].innerHTML);
                                     elmt.elmtName = extensionNode.find("name")[0].innerHTML;
                                     var position = extensionNode.find("position")[0].innerHTML.split(" ");
-                                    elmt.posX = (parseInt(position[0]) + parseInt(position[2])) / 2;
+                                    if (mareFrame.length)
+                                        elmt.posX = (parseInt(position[0]) + parseInt(position[2])) / 2;
+                                    else
+                                        elmt.posX = (parseInt(position[0]) + parseInt(position[2]));
                                     elmt.posY = (parseInt(position[1]) + parseInt(position[3])) / 2;
                                     switch (node.tagName) {
                                         case "cpt":
@@ -61,7 +65,8 @@ var Mareframe;
                                         case "utility":
                                             elmt.elmtType = 2;
                                             break;
-                                        case "superValue":
+                                        //case "superValue":
+                                        case "mau":
                                             elmt.elmtType = 3;
                                             break;
                                         default:
@@ -72,14 +77,21 @@ var Mareframe;
                                         ////console.log($(node.children));
                                         switch (subnode.nodeName) {
                                             case "parents":
+                                                if (elmt.elmtType == 3) {
+                                                    elmt.elmtData = [];
+                                                }
                                                 var parentsList = subnode.innerHTML.split(" ");
                                                 for (var k = 0; k < parentsList.length; k++) {
                                                     var conn = { connInput: "", connOutput: "", connID: "" };
                                                     conn.connID = "conn" + connCounter;
                                                     connCounter++;
-                                                    conn.connInput = parentsList[k];
+                                                    conn.connInput = "elmt" + parentsList[k];
                                                     conn.connOutput = elmt.elmtID;
                                                     JSONObj.connections.unshift(conn);
+                                                    if (elmt.elmtType == 3) {
+                                                        elmt.elmtData[k] = [];
+                                                        elmt.elmtData[k].push(parentsList[k]);
+                                                    }
                                                 }
                                                 break;
                                             case "state":
@@ -94,6 +106,7 @@ var Mareframe;
                                                 }
                                                 elmt.elmtData.push(valueData);
                                                 break;
+                                                l;
                                             case "probabilities":
                                                 var probData = subnode.innerHTML.split(" ");
                                                 for (var o = 0; o < probData.length; o++) {
@@ -106,7 +119,18 @@ var Mareframe;
                                                     ////console.log(elmt.elmtData);
                                                     elmt.elmtData[m].push(probData[l]);
                                                 }
-                                                ////console.log(probData);
+                                                break;
+                                            case "weights":
+                                                var weightData = subnode.innerHTML.split(" ");
+                                                for (var o = 0; o < weightData.length; o++) {
+                                                    weightData[o] = parseFloat(weightData[o]);
+                                                }
+                                                for (var l = 0, m = 0; l < weightData.length; l++, m++) {
+                                                    if (m == elmt.elmtData.length) {
+                                                        m = 0;
+                                                    }
+                                                    elmt.elmtData[l].push(weightData[l]);
+                                                }
                                                 break;
                                         }
                                     }
