@@ -389,13 +389,14 @@
                 return tempMatrix;
             }
             createNewElement(p_type: number): Element {
-                this.m_counter++;
+                
                 if (this.m_bbnMode === false) {
                     var e = new Element("elmt" + this.m_counter, this, p_type, 1);
                 } else {
                     var e = new Element("elmt" + this.m_counter, this, p_type);
                 }
                 this.m_elementArr.push(e);
+                this.m_counter++;
                 switch (p_type) {
                     case 0:
                         e.setData([["state0", 0.5], ["state1", 0.5]]);
@@ -624,6 +625,7 @@
                 for (var i = 0; i < p_jsonObject.connections.length; i++) {
                     var conn = p_jsonObject.connections[i];
                     var inpt = this.getElement(conn.connInput);
+                    var tmp34 = this.getElement(conn.connOutput);
                     var c = this.createNewConnection(inpt, this.getElement(conn.connOutput));
                     c.fromJSON(conn);
                     if (parseInt(c.getID().substr(4)) !== NaN && parseInt(c.getID().substr(4)) > this.m_counter)

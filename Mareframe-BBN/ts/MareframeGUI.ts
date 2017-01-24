@@ -512,7 +512,7 @@ module Mareframe {
                         break;
                     default:
                 }
-                var tm = $("#MCAelmtType").val();
+                var tm67 = $("#MCAelmtType").val();
                 switch ( $("#MCAelmtType").val() ) {
                     case "100":
                         elmt.setName("Attribute " + this.m_idCounter);
@@ -3198,7 +3198,7 @@ module Mareframe {
                 var alternativeData = google.visualization.arrayToDataTable(this.m_altData);
 
                 this.m_SAScatterChart.draw(pwlData, this.m_lineOptions);
-                this.m_SATableChart.draw(alternativeData, this.m_tableOptions);
+                //this.m_SATableChart.draw(alternativeData, this.m_tableOptions);
             }
             setSliderValue() {
                 if (this.m_SAChosenElement.getType() !== 100) {
