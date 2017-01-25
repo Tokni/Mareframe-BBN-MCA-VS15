@@ -90,11 +90,16 @@ module Mareframe {
             private m_altId;
             public m_finalScoreChosenObjective: Element;
             private m_finalScoreSegment: any;
+            private m_finalScoreShadow: createjs.Shadow = new createjs.Shadow("#000000", 5, 5, 10);
 
             constructor(p_model: Model, p_handler: Handler) {
                 this.m_handler = p_handler;
                 this.saveChanges = this.saveChanges.bind(this);
                 $("#tabs").tabs();
+                $(window).resize(function () {
+                    $("#elementSelect").selectmenu("option", "width", $("#dropdownControl_div").width());
+                    $("#elementSubSelect").selectmenu("option", "width", $("#dropdownControl_div").width());
+                });
                 $("#finalScoreObjectiveOverview_select").selectmenu({
                     select: this.handleFinalScoreObjectiveSelect,
                     width: 150
@@ -104,15 +109,17 @@ module Mareframe {
                     value: 0,
                     width: 150
                 });
+                var t234 = $("#dropdownControl_div").width();
                 $("#elementSelect").selectmenu({
                     select: this.selectElementChange,
                     value: 0,
-                    width: 150
+                    width: $("#dropdownControl_div").width()
+                    
                 });
                 $("#elementSubSelect").selectmenu({
                     select: this.selectSubElementChange,
                     value: 0,
-                    width: 150
+                    width: $("#dropdownControl_div").width()
                 });
                
                 //Change layout if it is not in marefram mode
@@ -2230,7 +2237,7 @@ module Mareframe {
                             //}
                             //tableHTML = tableHTML + "<td contenteditable=true style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle\" id='dataTable" + i + j + "' class='tableEdit' >" + row[i] + "</td>";
                             if (i === 0 && j === 0) {
-                                tableHTML = tableHTML + "<td style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle\" id='dataTable" + i + "x" + j + "' class='tableEdit' ><b></b></td>";
+                                tableHTML = tableHTML + "<td style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle\" id='dataTable" + i + "x" + j + "' class='tableEdit' title='corner'><b></b></td>";
                             }
                             if (j === 0 && i !== 0) {
 
@@ -2256,7 +2263,8 @@ module Mareframe {
                                         }
                                     }
                                 }
-                                tableHTML = tableHTML + "<td style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle" + t + "\" id='dataTable" + i + "x" + j + "' class='tableEdit' >" + row[i] + "</td>";
+                                tableHTML = tableHTML + "<td style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle" + t + "\" id='dataTable" + i + "x" + j +
+                                    "' class='tableEdit' title='Alt: " + p_matrix[j][0] + ", Attr: " + p_matrix[0][i] + " , Unit: " + p_matrix[p_matrix.length -2][i] + "'>" + row[i] + "</td>";
                             }
 
                         }
@@ -3058,7 +3066,8 @@ module Mareframe {
                 
                 //this.updateChartData(this.m_SAChosenElement);
                 this.setSliderValue();
-                this.updateSATableData();            
+                this.updateSATableData();
+                e.m_easelElmt.shadow = tthis.m_finalScoreShadow;        
             }
             private updateChartData(p_elmt: Element) {
                 this.m_pointOld = null;
@@ -3239,7 +3248,7 @@ module Mareframe {
                 $("#finalScoreObjectiveTab_select > option").remove();
                 if (this.m_model !== undefined) {
                     for (var e of this.m_model.getElementArr()) {
-                        if (e.getType() == 103 || e.getType() == 101) {
+                        if (e.getType() != 102) {
 
                             $("#finalScoreObjectiveOverview_select").append("<option id='es" + e.getID() + "'>" + e.getName() + "</option>");
                             //$("#finalScoreObjectiveTab_select").append("<option id='es" + e.getID() + "'>" + e.getName() + "</option>");
@@ -3249,6 +3258,7 @@ module Mareframe {
                 }
                 this.updateFinalScoreSegmentSelect();
                 this.updateFinalScoreBarsSelect();
+                
             }
             updateFinalScoreSegmentSelect = () => {
                 this.determineMaxCriteriaLevel();
@@ -3282,10 +3292,19 @@ module Mareframe {
                 this.updateFinalScoreSegmentSelect();
                 this.m_finalScoreChosenObjective = e;
                 this.updateFinalScores(e, this.getCritSelected());
+                this.removeAllShadows();
+                this.addShadowsToParents(e);
+                e.m_easelElmt.shadow = this.m_finalScoreShadow;
+                this.m_updateMCAStage = true;
             }
             handleFinalScoreSegmentSelect = () => {  
+                var e = this.m_model.getElement($("#finalScoreObjectiveOverview_select > option:selected").attr('id').substring(2)); //id of the element selected in the dropdown
                 var tmp = this.getCritSelected();
                 this.updateFinalScores(this.m_finalScoreChosenObjective, this.getCritSelected());
+                this.removeAllShadows();
+                e.m_easelElmt.shadow = this.m_finalScoreShadow;
+                this.addShadowsToParents(e);
+                this.m_updateMCAStage = true;
             }
 
             handleFinalScoreBarsSelect = () => {
@@ -3298,6 +3317,23 @@ module Mareframe {
                     critSelected = parseInt(segmentSelectedId.substring(8));
                 }
                 return critSelected;
+            }
+            removeAllShadows() {
+                for (var elmt of this.m_model.getElementArr()) {
+                    elmt.m_easelElmt.shadow = null;
+                }
+            }
+            addShadowsToParents(p_elmt: Element) {
+                var tchld = p_elmt.getChildrenElements();
+                var tpar = p_elmt.getParentElements();
+                var tcs = this.getCritSelected();
+                var tcl = p_elmt.m_criteriaLevel;
+                if (this.getCritSelected() > p_elmt.m_criteriaLevel) {
+                    for (var chld of p_elmt.getChildrenElements()) {
+                        this.addShadowsToParents(chld);
+                        chld.m_easelElmt.shadow = this.m_finalScoreShadow;
+                    }
+                }
             }
         }
     }

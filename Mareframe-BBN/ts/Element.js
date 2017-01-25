@@ -18,6 +18,7 @@ var Mareframe;
                 this.m_easelElmt = new createjs.Container();
                 this.m_minitableEaselElmt = new createjs.Container();
                 this.m_disregard = false;
+                this.m_shadowVisible = false;
                 //private m_swingWeightsArr: number[] = [];
                 this.m_swingWeightsArr = [];
                 this.m_dataArr = [];
@@ -53,6 +54,7 @@ var Mareframe;
                     this.m_dstType = 0;
                 this.getChildrenElements = this.getChildrenElements.bind(this);
                 this.m_swingWeightsArr = [];
+                //this.m_easelElmt.shadow = new createjs.Shadow("#000000", 5, 5, 10);
             }
             Element.prototype.setPwlVF = function (p_vf) {
                 this.m_pwlVF = p_vf;

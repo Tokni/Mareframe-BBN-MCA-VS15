@@ -29,15 +29,31 @@ display: inline-block;
   width: 200px;
   float: right;
 }*/
-
+.ui-selectmenu-button{width:100%}
+select {width: 100%}
+#SenanaTitle_div {
+    overflow-x: auto;
+    overflow-y: auto;
+    width: 48%;
+    height: 3%;
+    position: absolute;
+    left: 50%;
+    top: 70%;
+    /*border:red solid 3px;*/
+    /*border-radius:13px;*/
+    border: black solid 1px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 #SenAna {
   overflow-x: auto;
     overflow-y: auto;
     width: 48%;
-    height: 30%;
+    height: 27%;
   border:black solid 2px;
   position: absolute;
-  top : 66%;
+  top : 73%;
   left : 50%;
   display: inline-block;
   

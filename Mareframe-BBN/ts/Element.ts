@@ -13,12 +13,14 @@
             private m_values: number[][] = [];
             private m_updated: boolean = false;
             public m_easelElmt: createjs.Container = new createjs.Container();
+            
             public m_minitableEaselElmt: createjs.Container = new createjs.Container();
             private m_model: Model;
             private m_decision: number;
             public m_dstType: number;
             public m_criteriaLevel;
             public m_disregard = false;
+            public m_shadowVisible = false;
 
             //private m_swingWeightsArr: number[] = [];
             public m_swingWeightsArr: any[] = [];
@@ -72,7 +74,9 @@
                     this.m_dstType = 0;
                 this.getChildrenElements = this.getChildrenElements.bind(this);
                 this.m_swingWeightsArr = [];
+                //this.m_easelElmt.shadow = new createjs.Shadow("#000000", 5, 5, 10);
             }
+
             setPwlVF(p_vf: PiecewiseLinear) {
                 this.m_pwlVF = p_vf;
             }
