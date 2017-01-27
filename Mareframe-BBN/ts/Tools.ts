@@ -140,7 +140,8 @@
                 } else {
                     //var tmp = p_elmt.getDataArr[0];
                     //weightsArr.push([p_elmt.getDataArr[0], 1]);
-                    weightsArr.push([p_elmt.getID(), 1]);
+                    
+                        weightsArr.push([p_elmt.getID(), 1]);
                 }
                              
                 return weightsArr;

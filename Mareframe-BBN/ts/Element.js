@@ -18,7 +18,6 @@ var Mareframe;
                 this.m_easelElmt = new createjs.Container();
                 this.m_minitableEaselElmt = new createjs.Container();
                 this.m_disregard = false;
-                this.m_shadowVisible = false;
                 //private m_swingWeightsArr: number[] = [];
                 this.m_swingWeightsArr = [];
                 this.m_dataArr = [];
@@ -54,7 +53,6 @@ var Mareframe;
                     this.m_dstType = 0;
                 this.getChildrenElements = this.getChildrenElements.bind(this);
                 this.m_swingWeightsArr = [];
-                //this.m_easelElmt.shadow = new createjs.Shadow("#000000", 5, 5, 10);
             }
             Element.prototype.setPwlVF = function (p_vf) {
                 this.m_pwlVF = p_vf;
@@ -202,7 +200,7 @@ var Mareframe;
                         children.push(c.getInputElement());
                     }
                 });
-                //   //console.log(this.getName() + " chilxxdren: " + children);
+                console.log(this.getName() + " chilxxdren: " + children);
                 return children;
             };
             Element.prototype.getAllAncestors = function () {
@@ -483,8 +481,8 @@ var Mareframe;
             };
             Element.prototype.addConnection = function (p_conn) {
                 this.m_connections.push(p_conn);
-                if (p_conn.getInputElement().m_criteriaLevel != null)
-                    p_conn.getOutputElement().setCriteriaLevel(p_conn.getInputElement().m_criteriaLevel + 1);
+                if (p_conn.getOutputElement().m_criteriaLevel != null)
+                    p_conn.getInputElement().setCriteriaLevel(p_conn.getOutputElement().m_criteriaLevel + 1);
             };
             Element.prototype.getConnections = function () {
                 return this.m_connections;

@@ -29,7 +29,8 @@
                 this.m_altIndex = [];
                 for (var e in this.m_elementArr) {
                     if (this.m_elementArr[e].getType() === 102)
-                        this.m_altIndex.push(e);
+                        if (!this.m_elementArr[e].m_disregard)
+                            this.m_altIndex.push(e);
                 }
             }
             saveModel(): string {
@@ -537,7 +538,8 @@
                     });
                 } else {
                     ////console.log(p_objectStringId + " not found");
-                    throw DOMException.NOT_FOUND_ERR;
+                    //throw DOMException.NOT_FOUND_ERR;
+                    return null;
                 }
                 ////console.log("returned key: " + key);
                 return key;
@@ -601,7 +603,8 @@
             deleteConnection(p_connID: string): boolean {
                 var key = 0;
                 //finding the index 'key' in the connection array
-                this.m_connectionArr.every(function (p_conn: Connection) {
+                this.m_connectionArr.every(
+                    function (p_conn: Connection) {
                     if (p_conn.getID() === p_connID)
                         return false;
                     else {

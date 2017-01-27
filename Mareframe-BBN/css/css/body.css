@@ -1,0 +1,66 @@
+
+.map {
+    position: relative;
+    width: 100%;
+}
+.europe-map {
+    left: 0;
+    position: absolute;
+    right: 0;
+    width: 100%;
+}
+.europe-map-back {
+    float: left;
+    margin: 0 10px 5px 0;
+    width: 20%;
+}
+.europe-map-zoom {
+    border-bottom: medium none;
+    height: 200px;
+}
+.europe-map-zoom img {
+    height: 200px;
+}
+.europe-map-hidden {
+    width: 100%;
+}
+.marker {
+    height: 30px;
+    position: absolute;
+    width: 30px;
+}
+.marker-symbol {
+    background-color: rgb(105, 170, 252);
+    border: 3px solid white;
+    border-radius: 100%;
+    color: #000;
+    cursor: pointer;
+    font-weight: bold;
+    height: 30px;
+    left: -15px;
+    padding-top: 2px;
+    position: absolute;
+    text-align: center;
+    top: -15px;
+    width: 30px;
+}
+@media (min-width: 1170px) {
+.marker {
+    height: 50px;
+    width: 50px;
+}
+.marker-symbol {
+    font-size: 20px;
+    height: 50px;
+    left: -25px;
+    padding-top: 8px;
+    top: -25px;
+    width: 50px;
+}
+}
+.map .popover {
+    width: 250px;
+}
+.studies {
+    cursor: pointer;
+}

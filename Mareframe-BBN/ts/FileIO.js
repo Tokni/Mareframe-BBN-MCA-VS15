@@ -6,7 +6,48 @@ var Mareframe;
             //constructor(p_handler: Handler) {
             function FileIO() {
                 //this.m_handler = p_handler;
+                var _this = this;
                 this.m_lastPath = "";
+                this.importAttributesAndAlternativesFromCSV = function (p_activeModelInstance, p_updateGui) {
+                    var fileInputElement = $("#import").get(0);
+                    fileInputElement.files[0];
+                    var file = fileInputElement.files[0];
+                    var fileReader = new FileReader();
+                    fileReader.readAsText(file); // calls onload when loaded
+                    fileReader.onload = function (p_evt) {
+                        var text = fileReader.result;
+                        var textLineByLine = text.split('\n');
+                        var textWordByWord = [];
+                        var index = 0;
+                        for (var _i = 0, textLineByLine_1 = textLineByLine; _i < textLineByLine_1.length; _i++) {
+                            var word = textLineByLine_1[_i];
+                            textWordByWord[index] = [];
+                            textWordByWord[index++] = word.split(',');
+                        }
+                        var idCounter = 0;
+                        var jsonText = '{ "elements": [';
+                        for (var alt = 3; alt < textWordByWord.length - 4; alt++) {
+                            jsonText = _this.addAlternativeToJson(1200, 100 + (alt - 3) * 60, jsonText, textWordByWord[alt][0], idCounter++, textWordByWord[alt][textWordByWord[alt].length - 2]);
+                            //var t = JSON.parse(jsonText + ']}');
+                            if (alt != textWordByWord.length - 5)
+                                jsonText += ',';
+                        }
+                        jsonText += ', ';
+                        for (var atr = 1; atr < textWordByWord[0].length - 2; atr++) {
+                            var dataArr = [];
+                            for (var i = 0; i < textWordByWord.length - 7; i++) {
+                                dataArr[i] = parseFloat(textWordByWord[i + 3][atr]);
+                            }
+                            jsonText = _this.addAtributeToJson(1000, atr * 35, jsonText, textWordByWord[0][atr], idCounter++, textWordByWord[textWordByWord.length - 1][atr], textWordByWord[1][atr], textWordByWord[2][atr], dataArr, textWordByWord[textWordByWord.length - 4][atr], textWordByWord[textWordByWord.length - 3][atr]);
+                            if (atr != textWordByWord[0].length - 3)
+                                jsonText += ',';
+                        }
+                        jsonText = jsonText.concat('], "connections": [], "mdlName": "untitled", "mainObj": "", "dataMat": [], "mdlIdent": "temp" }');
+                        p_activeModelInstance.fromJSON(JSON.parse(jsonText));
+                        p_updateGui();
+                        $("#import").val(""); // this will change the import, so it is possible to import the same file again
+                    };
+                };
                 this.reset = this.reset.bind(this);
             }
             FileIO.prototype.saveModel = function (p_model, p_filename) {
@@ -247,6 +288,10 @@ var Mareframe;
                     case "sfsCampaign001":
                         path += "sfsCampaign001.json";
                         break;
+		    case "sfsPalermo":
+                        path += "sfsPalermo.json";
+                        break;
+
                     default:
                         //console.log("NO such file exists!!   " + p_modelStringIdent);
                         break;
@@ -259,6 +304,16 @@ var Mareframe;
                     p_updateGui();
                 });
             };
+            FileIO.prototype.loadMCAAtributesAndAlternativesFromCSVFile = function (p_model, p_updateGUI) {
+                var fileReader = new FileReader();
+                var fileInputElement = $("#lodDcmt").get(0);
+                fileInputElement.files[0];
+                var file = fileInputElement.files[0];
+                fileReader.readAsText(file); // calls onload when loaded
+                fileReader.onload = function (p_evt) {
+                    var text = fileReader.result;
+                };
+            };
             FileIO.prototype.loadMCAModelFromFile = function (p_activeModelInstance, p_updateGui) {
                 ////console.log("Loading MCA model from file");
                 var fileInputElement = $("#lodDcmt").get(0);
@@ -267,6 +322,7 @@ var Mareframe;
                 ////console.log("file: " + file);
                 ////console.log("filename: " + file.name);
                 var fileReader = new FileReader();
+                fileReader.readAsText(file);
                 fileReader.onload = function (p_evt) {
                     var text = fileReader.result;
                     ////console.log("loaded file: " + text);
@@ -275,7 +331,6 @@ var Mareframe;
                     p_activeModelInstance.fromJSON(jsonObj);
                     p_updateGui();
                 };
-                fileReader.readAsText(file);
                 ////console.log("Result: " + fileReader.result);
             };
             FileIO.prototype.loadValueFunctionFromFile = function () {
@@ -307,15 +362,53 @@ var Mareframe;
             FileIO.prototype.saveValueFunctionToFile = function (p_vfn) {
                 throw ("Not imp yet");
             };
-            FileIO.prototype.importAttributesAndAlternativesFromCSV = function (p_activeModelInstance, p_updateGui) {
-                var fileInputElement = $("#loadFromFile").get(0);
-                fileInputElement.files[0];
-                var file = fileInputElement.files[0];
-                var fileReader = new FileReader();
-                fileReader.onload = function (p_evt) {
-                    var text = fileReader.result;
-                    p_updateGui();
-                };
+            FileIO.prototype.addAtributeToJson = function (p_posX, p_posY, p_jsonText, p_name, p_id, p_desc, p_base, p_min, p_data, p_unit, p_max) {
+                var posX = 100;
+                var posY = 100;
+                var base;
+                var desc;
+                var id = "elmt" + p_id;
+                if (p_base == "")
+                    base = (parseFloat(p_min) + parseFloat(p_max)) / 2;
+                else
+                    base = p_base;
+                //if (p_desc == "") 
+                return p_jsonText.concat('{'
+                    + '"posX":' + p_posX
+                    + ',"posY":' + p_posY
+                    + ',"elmtValueFnX":' + 50
+                    + ',"elmtValueFnY":' + 50
+                    + ',"elmtValueFnFlip":' + 0
+                    + ',"elmtID": "' + id + '"'
+                    + ',"elmtName": "' + p_name + '"'
+                    + ',"elmtDesciption":' + '"write description here"'
+                    + ',"elmtType":' + 100
+                    + ',"elmtWghtMthd":' + 2
+                    + ',"elmtDstType":' + 1
+                    + ',"elmtDataMin":' + p_min
+                    + ',"elmtDataMax":' + p_max
+                    + ',"elmtDataUnit": "' + p_unit + '"'
+                    + ',"elmtDataBaseLine":' + base
+                    + ',"elmtDataArr": [' + p_data + ']'
+                    + ',"pwl":{"points":[{"x":' + p_min + ', "y":0},{"x":' + p_max + ', "y":1}]}'
+                    + ',"pwlFlipVertical":' + false
+                    + ',"pwlFlipHorizontal":' + false
+                    + '}');
+            };
+            FileIO.prototype.addAlternativeToJson = function (p_posX, p_posY, p_json, p_name, p_id, p_desc) {
+                var posX = 1200;
+                var posY = 600;
+                var id = "elmt" + p_id;
+                return p_json.concat('{'
+                    + '"posX":' + p_posX
+                    + ',"posY":' + p_posY
+                    + ',"elmtID": "' + id + '"'
+                    + ',"elmtName": "' + p_name + '"'
+                    + ',"elmtDesc": "' + p_desc + '"'
+                    + ',"elmtType":' + 102
+                    + ',"elmtWghtMthd":' + 0
+                    + ',"elmtDstType:":' + 1
+                    + '}');
             };
             return FileIO;
         }());

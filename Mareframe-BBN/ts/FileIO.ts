@@ -299,6 +299,10 @@
                     case "sfsCampaign001":
                         path += "sfsCampaign001.json";
                         break;
+	    case "sfsPalermo":
+                        path += "sfsPalermo.json";
+                        break;
+
                     default:
                         //console.log("NO such file exists!!   " + p_modelStringIdent);
                         break;
@@ -312,6 +316,17 @@
                 });
 
             }
+            loadMCAAtributesAndAlternativesFromCSVFile(p_model: Model, p_updateGUI: Function) {
+                var fileReader = new FileReader();
+                var fileInputElement: any = $("#lodDcmt").get(0);
+                fileInputElement.files[0];
+                var file = fileInputElement.files[0];
+                fileReader.readAsText(file); // calls onload when loaded
+                fileReader.onload = function (p_evt) {
+                    var text = fileReader.result;
+                }
+
+            }
             loadMCAModelFromFile(p_activeModelInstance: Model, p_updateGui: Function) {
                 ////console.log("Loading MCA model from file");
                 var fileInputElement: any = $("#lodDcmt").get(0);
@@ -320,7 +335,7 @@
                 ////console.log("file: " + file);
                 ////console.log("filename: " + file.name);
                 var fileReader = new FileReader();
-
+                fileReader.readAsText(file);
                 fileReader.onload = function (p_evt) {
                     var text = fileReader.result;
                     ////console.log("loaded file: " + text);
@@ -331,7 +346,7 @@
                     p_updateGui();
                 }
 
-                fileReader.readAsText(file); 
+                
                 ////console.log("Result: " + fileReader.result);
 
             }
@@ -371,18 +386,89 @@
                 throw ("Not imp yet");
             }
 
-            importAttributesAndAlternativesFromCSV(p_activeModelInstance: Model, p_updateGui: Function) {
-                var fileInputElement: any = $("#loadFromFile").get(0);
+            importAttributesAndAlternativesFromCSV = (p_activeModelInstance: Model, p_updateGui: Function) => {
+                var fileInputElement: any = $("#import").get(0);
                 fileInputElement.files[0];
                 var file = fileInputElement.files[0];
                 var fileReader = new FileReader();
-
-                fileReader.onload = function (p_evt) {
+                fileReader.readAsText(file); // calls onload when loaded
+                fileReader.onload = (p_evt) => {
                     var text = fileReader.result;
-                                  
+                    var textLineByLine: string[] = text.split('\n');
+                    var textWordByWord: string[][] = [];
+                    var index = 0;
+                    for (var word of textLineByLine) {
+                        textWordByWord[index] = [];
+                        textWordByWord[index++] = word.split(',');
+                    }
+                    var idCounter = 0;
+                    var jsonText: string = '{ "elements": [';
+                    for (var alt = 3; alt < textWordByWord.length - 4; alt++) {
+                        jsonText = this.addAlternativeToJson(1200, 100+(alt-3)*60, jsonText, textWordByWord[alt][0], idCounter++, textWordByWord[alt][textWordByWord[alt].length - 2]);
+                        //var t = JSON.parse(jsonText + ']}');
+                        if (alt != textWordByWord.length - 5) jsonText += ',';
+                    }
+                    jsonText += ', ';
+                    for (var atr = 1; atr < textWordByWord[0].length-2; atr++) {
+                        var dataArr: number[] = [];
+                        for (var i = 0; i < textWordByWord.length - 7; i++) {
+                            dataArr[i] = parseFloat( textWordByWord[i + 3][atr] );
+                        }
+                        jsonText = this.addAtributeToJson(1000, atr*35,jsonText, textWordByWord[0][atr], idCounter++, textWordByWord[textWordByWord.length - 1][atr], textWordByWord[1][atr], textWordByWord[2][atr], dataArr, textWordByWord[textWordByWord.length - 4][atr], textWordByWord[textWordByWord.length - 3][atr]);
+                        if (atr != textWordByWord[0].length - 3) jsonText += ',';
+                    }
+                    jsonText = jsonText.concat('], "connections": [], "mdlName": "untitled", "mainObj": "", "dataMat": [], "mdlIdent": "temp" }');
+                    p_activeModelInstance.fromJSON(JSON.parse(jsonText)); 
                     p_updateGui();
-
+                    $("#import").val(""); // this will change the import, so it is possible to import the same file again
                 }
+            }
+            addAtributeToJson(p_posX, p_posY, p_jsonText: string, p_name: string, p_id: number, p_desc: string, p_base:string, p_min: string, p_data: number[], p_unit: string, p_max: string): string {
+                var posX = 100;
+                var posY = 100;
+                var base;
+                var desc;
+                var id: string = "elmt" + p_id;
+                if (p_base == "") base = (parseFloat(p_min) + parseFloat(p_max)) / 2;
+                else base = p_base;
+                //if (p_desc == "") 
+                return p_jsonText.concat('{'
+                    + '"posX":' + p_posX
+                    + ',"posY":' +p_posY
+                    + ',"elmtValueFnX":' + 50
+                    + ',"elmtValueFnY":' + 50
+                    + ',"elmtValueFnFlip":' + 0
+                    + ',"elmtID": "' + id + '"'
+                    + ',"elmtName": "' + p_name + '"'
+                    + ',"elmtDesciption":' + '"write description here"'
+                    + ',"elmtType":' + 100
+                    + ',"elmtWghtMthd":' + 2
+                    + ',"elmtDstType":' + 1
+                    + ',"elmtDataMin":' + p_min
+                    + ',"elmtDataMax":' + p_max
+                    + ',"elmtDataUnit": "' + p_unit + '"'
+                    + ',"elmtDataBaseLine":' + base
+                    + ',"elmtDataArr": [' + p_data + ']'
+                    + ',"pwl":{"points":[{"x":' + p_min + ', "y":0},{"x":' + p_max + ', "y":1}]}'
+                    + ',"pwlFlipVertical":' + false
+                    + ',"pwlFlipHorizontal":' + false
+                    + '}');
+            }
+            
+            addAlternativeToJson(p_posX, p_posY, p_json: string, p_name: string, p_id: number, p_desc: string): string {
+                var posX = 1200;
+                var posY = 600;
+                var id: string = "elmt" + p_id;
+                return p_json.concat('{' 
+                    + '"posX":' + p_posX
+                    + ',"posY":' + p_posY
+                    + ',"elmtID": "' + id + '"'
+                    + ',"elmtName": "' + p_name + '"'
+                    + ',"elmtDesc": "' + p_desc + '"'
+                    + ',"elmtType":' + 102
+                    + ',"elmtWghtMthd":' + 0
+                    + ',"elmtDstType:":' + 1                                             
+                    + '}');
             }
         }
     }

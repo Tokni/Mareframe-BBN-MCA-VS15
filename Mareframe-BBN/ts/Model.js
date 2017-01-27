@@ -29,7 +29,8 @@ var Mareframe;
                 this.m_altIndex = [];
                 for (var e in this.m_elementArr) {
                     if (this.m_elementArr[e].getType() === 102)
-                        this.m_altIndex.push(e);
+                        if (!this.m_elementArr[e].m_disregard)
+                            this.m_altIndex.push(e);
                 }
             };
             Model.prototype.saveModel = function () {
@@ -486,7 +487,8 @@ var Mareframe;
                 }
                 else {
                     ////console.log(p_objectStringId + " not found");
-                    throw DOMException.NOT_FOUND_ERR;
+                    //throw DOMException.NOT_FOUND_ERR;
+                    return null;
                 }
                 ////console.log("returned key: " + key);
                 return key;

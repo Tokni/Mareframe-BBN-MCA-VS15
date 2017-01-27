@@ -60,9 +60,9 @@
                     </div>
                 </div>
             </div>
-            <!--<div class="col-lg-4 page-header europe-map-zoom">
+            <div class="col-lg-4 page-header europe-map-zoom">
                 <img src="img/locations/west-coast-of-scotland.jpg" class="center-block img-responsive img-rounded">
-            </div>-->
+            </div>
         </div>
     </div>
     <div class="ui-widget ui-dialog ui-corner-all ui-widget-content header-bar" style="position: static">
@@ -78,25 +78,30 @@
                     <option value="investment"> Investment Decision</option>
                 </select>
             </div>
-            <button class="advButton" id="newDcmt" title="">New Document</button>
+            <button class="advButton" id="newDcmt">New Document</button>
 
-            <div class="LoadFileBtn" id="lodDcmtDiv" title="Opens file from client machine">
+            <div class="LoadFileBtn" id="lodDcmtDiv">
                 <input class="upload" type="file" id="lodDcmt" />
                 <span>Open Document</span>
             </div>
 
-            <button id="savDcmt" title="Save the current document. Use the download link to move the document the client machine">Save Document</button>
+            <button id="savDcmt">Save Document</button>
+            <!--<button class="advButton" id="import">Import</button>-->
+            <div class="LoadFileBtn" id="importDiv">
+                <input class="upload" type="file" id="import" />
+                <span>Import</span>
+            </div>
             <button class="advButton" id="resetDcmt">Reset</button>
-            <button class="advButton" id="newElmt" title="Adds a new element to the workspace">New Element</button>
+            <button class="advButton" id="newElmt">New Element</button>
             <button class="advButton" id="newChance">New Chance</button>
             <button class="advButton" id="newDec">New Decision</button>
             <button class="advButton" id="newValue">New Value</button>
-            <button class="advButton" id="deleteElmt" title="Deletes all selected elements">Delete Element</button>
-            <button class="advButton" id="selectAllElmt" title="Selects all elements">Select All</button>
+            <button class="advButton" id="deleteElmt">Delete Element</button>
+            <button class="advButton" id="selectAllElmt">Select All</button>
             <input class="advButton" type="checkbox" id="cnctTool" style="display: inline-block">
             <label for="cnctTool" class="advButton">Connect Tool</label>
             <input class="button" type="checkbox" id="editorMode" style="float: left; display: inline-block">
-            <label for="editorMode" class="button" style="float: right" title="Toggleling Editor mode enables a user to change everything, use with caution">Editor Mode</label>
+            <label for="editorMode" class="button" style="float: right">Editor Mode</label>
         </div>
         <!--<div style="float:right">
             <input class="button" type="checkbox" id="fullscreen">
@@ -110,14 +115,13 @@
     </div>
 
             <div id="MCAContainer" style="text-align:center">
-                <div id="MCAToolTitle_div" class="header-bar ui-corner-all ui-widget-content ui-dialog-titlebar">Work Area</div>
+
                 <!--MCA Tool canvas-->
                 <!--<canvas id="MCATool" width="800" height="600" style="display:inline-block; min-height: 400px; min-width: 600px" ></canvas>-->
-                <canvas id="MCATool" width="1500" height="1000" style="display:inline-block;"></canvas>
+                <canvas id="MCATool" width="1500" height="1200" style="display:inline-block;"></canvas>
 
                 <!--Data Table-->
-                <div id="finalScoreTitle_div">FinalScore</div>
-                <div id="finalScoreOverview_div" style="display:inline-block" title="FinalScore">
+                <div id="finalScoreOverview_div" style="display:inline-block">
                     <div id="finalScoreChartOverview_div">Scores</div>
                     <div id="finalScoreObjectiveOverview_div">
                         Objective
@@ -126,8 +130,8 @@
                             <option> 2 </option>
                         </select>
                     </div>
-                    <div id="finalScoreSegmentsOverview_div" title="Segment">
-                       
+                    <div id="finalScoreSegmentsOverview_div">
+                        Segments<br />
                         <select id="finalScoreSegmentOverview_select">
                             <option> 3 </option>
                             <option> 4 </option>
@@ -142,9 +146,7 @@
                     </div>
                     <button id="finalScoreSetAsText_button">As text</button>-->
                 </div>
-                <div id="consequenceTableTitle_div">Consequence Table</div>
-                <div id="MCADataTable" class="table-editable" style="display:inline-block" title="Consequence Table">
-
+                <div id="MCADataTable" class="table-editable" style="display:inline-block">
                     <!--<table id="editableDataTable" class="table" style="border: 2px solid #ffffff;border-collapse:collapse;">-->
                     <table id="editableDataTable" class="table">
                         <tr id="table_header">
@@ -163,8 +165,7 @@
                 </div>
 
                 <!--Sensitivity analysis Start   -->
-                <div id="SenanaTitle_div">Sensitivity Analysis</div>
-                <div id="SenAna" title="Sensitivity Analysis">
+                <div id="SenAna">
                     <!--<div class="senana" id="sliderControl_div"></div>-->
                     <div class="senana" id="dropdownControl_div">
                         <select id="elementSelect"></select>
@@ -269,7 +270,7 @@
                 </form>
             </div> <!--end elementType-->
             <div id="DisregardAlternative">
-                <label for="disAlt_check">Exclude Alternatives</label>
+                <label for="disAlt_check">Exclude Alternative</label>
                 <input type="checkbox" id="disAlt_check" name="disAlt_check" />
                 
             </div>
@@ -356,6 +357,7 @@
             $("#lodDcmtDiv").button({ icons: "ui-icon-folder-open" });
             $("#lodDcmtDiv").button({ icon: "ui-icon-folder-open", iconPosition: "beginning" });
             $("#savDcmt").button({ icon: "ui-icon-disk" });
+            $("#importDiv").button({ icon: "ui-icon-disk" });
             $("#newElmt").button({ icon: "ui-icon-plus" });
             $("#newDec").button({ icon: "ui-icon-plus" });
             $("#newChance").button({ icon: "ui-icon-plus" });
@@ -412,7 +414,6 @@
             $("#addDataRow").hide();
             $("#values").hide();
             $(document).ready(function () {
-                $(document).tooltip();
                 var MareFrame = MareFrame || {};
                 MareFrame.DST = MareFrame.DST || {};
                 new Mareframe.DST.Handler();
