@@ -868,7 +868,7 @@ module Mareframe {
                     this.updateMiniTables(elmts);
                 }
                 if (this.m_attributeCount > 0)
-                    $("#MCADataTable").show();
+                    $("#MCADataTable").show();//
                 else
                     $("#MCADataTable").hide();
 
