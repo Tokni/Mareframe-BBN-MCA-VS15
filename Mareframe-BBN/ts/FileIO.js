@@ -288,10 +288,9 @@ var Mareframe;
                     case "sfsCampaign001":
                         path += "sfsCampaign001.json";
                         break;
-		    case "sfsPalermo":
+                    case "sfsPalermo":
                         path += "sfsPalermo.json";
                         break;
-
                     default:
                         //console.log("NO such file exists!!   " + p_modelStringIdent);
                         break;

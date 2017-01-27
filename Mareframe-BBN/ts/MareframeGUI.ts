@@ -91,11 +91,16 @@ module Mareframe {
             private m_altId;
             public m_finalScoreChosenObjective: Element;
             private m_finalScoreSegment: any;
+            private m_finalScoreShadow: createjs.Shadow = new createjs.Shadow("#000000", 5, 5, 10);
 
             constructor(p_model: Model, p_handler: Handler) {
                 this.m_handler = p_handler;
                 this.saveChanges = this.saveChanges.bind(this);
                 $("#tabs").tabs();
+                $(window).resize(function () {
+                    $("#elementSelect").selectmenu("option", "width", $("#dropdownControl_div").width());
+                    $("#elementSubSelect").selectmenu("option", "width", $("#dropdownControl_div").width());
+                });
                 $("#finalScoreObjectiveOverview_select").selectmenu({
                     select: this.handleFinalScoreObjectiveSelect,
                     width: 150
@@ -108,12 +113,12 @@ module Mareframe {
                 $("#elementSelect").selectmenu({
                     select: this.selectElementChange,
                     value: 0,
-                    width: 150
+                    width: $("#dropdownControl_div").width()
                 });
                 $("#elementSubSelect").selectmenu({
                     select: this.selectSubElementChange,
                     value: 0,
-                    width: 150
+                    width: $("#dropdownControl_div").width()
                 });
                
                 //Change layout if it is not in marefram mode
@@ -3320,7 +3325,7 @@ module Mareframe {
                 $("#finalScoreObjectiveTab_select > option").remove();
                 if (this.m_model !== undefined) {
                     for (var e of this.m_model.getElementArr()) {
-                        if (e.getType() == 103 || e.getType() == 101) {
+                        if (e.getType() != 102) {
 
                             $("#finalScoreObjectiveOverview_select").append("<option id='es" + e.getID() + "'>" + e.getName() + "</option>");
                             //$("#finalScoreObjectiveTab_select").append("<option id='es" + e.getID() + "'>" + e.getName() + "</option>");
@@ -3363,10 +3368,19 @@ module Mareframe {
                 this.updateFinalScoreSegmentSelect();
                 this.m_finalScoreChosenObjective = e;
                 this.updateFinalScores(e, this.getCritSelected());
+                this.removeAllShadows();
+                this.addShadowsToParents(e);
+                e.m_easelElmt.shadow = this.m_finalScoreShadow;
+                this.m_updateMCAStage = true;
             }
-            handleFinalScoreSegmentSelect = () => {  
+            handleFinalScoreSegmentSelect = () => { 
+                var e = this.m_model.getElement($("#finalScoreObjectiveOverview_select > option:selected").attr('id').substring(2)); //id of the element selected in the dropdown
                 var tmp = this.getCritSelected();
                 this.updateFinalScores(this.m_finalScoreChosenObjective, this.getCritSelected());
+                this.removeAllShadows();
+                e.m_easelElmt.shadow = this.m_finalScoreShadow;
+                this.addShadowsToParents(e);
+                this.m_updateMCAStage = true;
             }
 
             handleFinalScoreBarsSelect = () => {
@@ -3379,6 +3393,23 @@ module Mareframe {
                     critSelected = parseInt(segmentSelectedId.substring(8));
                 }
                 return critSelected;
+            }
+            removeAllShadows() {
+                for (var elmt of this.m_model.getElementArr()) {
+                    elmt.m_easelElmt.shadow = null;
+                }
+            }
+            addShadowsToParents(p_elmt: Element) {
+                var tchld = p_elmt.getChildrenElements();
+                var tpar = p_elmt.getParentElements();
+                var tcs = this.getCritSelected();
+                var tcl = p_elmt.m_criteriaLevel;
+                if (this.getCritSelected() > p_elmt.m_criteriaLevel) {
+                    for (var chld of p_elmt.getChildrenElements()) {
+                        this.addShadowsToParents(chld);
+                        chld.m_easelElmt.shadow = this.m_finalScoreShadow;
+                    }
+                }
             }
         }
     }
