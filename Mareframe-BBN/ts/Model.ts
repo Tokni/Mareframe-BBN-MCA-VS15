@@ -99,7 +99,7 @@
                             dataStream += '</utility>\n';
                             break;
                         case 3:
-                            dataStream += '<superValue id="' + elmt.getID() + '">\n';
+                            dataStream += '<mau id="' + elmt.getID() + '">\n';
                             if (elmt.getParentElements().length > 0) {
                                 dataStream += '<parents>'
                                 elmt.getParentElements().forEach(function (parElmt) {
@@ -107,14 +107,14 @@
                                 });
                                 dataStream = dataStream.slice(0, dataStream.length - 1) + '</parents>\n';
                             }
-                            dataStream += '<utilities>'
+                            dataStream += '<weights>'
                             for (var i = 1; i < elmt.getData(0).length; i++) {
 
                                 dataStream += elmt.getData(elmt.getData().length - 1, i) + ' ';
                             }
-                            dataStream = dataStream.slice(0, dataStream.length - 1) + '</utilities>\n';
+                            dataStream = dataStream.slice(0, dataStream.length - 1) + '</weights>\n';
 
-                            dataStream += '</superValue>\n';
+                            dataStream += '</mau>\n';
                             break;
                     }
                     
