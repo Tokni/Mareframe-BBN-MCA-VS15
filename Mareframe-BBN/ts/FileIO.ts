@@ -60,7 +60,7 @@
                                     var node = $($nodes[0].childNodes)[i]
                                     ////console.log(node.childNodes);
                                     var elmt = { posX: 0, posY: 0, elmtID: "", elmtName: "", elmtDesc: "", elmtType: 0, elmtData: [] };
-                                    elmt.elmtID = node.id;
+                                    elmt.elmtID = "elmt" + node.id;
                                     
                                     var extensionNode = $($extensions.find("#" + node.id)[0]);
                                     //console.log(extensionNode);
@@ -83,7 +83,8 @@
                                         case "utility":
                                             elmt.elmtType = 2;
                                             break;
-                                        case "superValue":
+                                        //case "superValue":
+                                            case "mau":
                                             elmt.elmtType = 3;
                                             break;
                                         default:
@@ -101,10 +102,14 @@
                                                     var conn = { connInput: "", connOutput: "", connID: "" };
                                                     conn.connID = "conn" + connCounter;
                                                     connCounter++;
-                                                    conn.connInput = parentsList[k];
+                                                    conn.connInput = "elmt" + parentsList[k];
                                                     conn.connOutput = elmt.elmtID;
 
                                                     JSONObj.connections.unshift(conn);
+                                                    if (elmt.elmtType == 3) {
+                                                        elmt.elmtData[k] = [];
+                                                        elmt.elmtData[k].push(parentsList[k]);
+                                                    }
                                                 }
                                                 break;
                                             case "state":
@@ -139,6 +144,18 @@
 
 
                                                 ////console.log(probData);
+                                                break;
+                                            case "weights":
+                                                var weightData: any[] = subnode.innerHTML.split(" ");
+                                                for (var o = 0; o < weightData.length; o++) {
+                                                    weightData[o] = parseFloat(weightData[o]);
+                                                }
+                                                for (var l = 0, m = 0; l < weightData.length; l++ , m++) {
+                                                    if (m == elmt.elmtData.length) {
+                                                        m = 0;
+                                                    }
+                                                    elmt.elmtData[l].push(weightData[l]);
+                                                }
                                                 break;
                                         }
                                     }
