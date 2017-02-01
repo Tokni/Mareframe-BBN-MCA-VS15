@@ -879,7 +879,8 @@
                         if (!hasSuperUtilityDescendant) {
                             //If the node is not updated, update
                             if (!elmt.isUpdated()) {
-                                elmt.update();
+                                Tools.calculateValues(p_model, elmt);
+                                elmt.setUpdated(true);
                             }
                             var utilityValues: any[] = Tools.removeDecisionsFromValues(p_model, elmt, p_elmt);
                             utilityValues = Tools.removeChancesFromValues(p_model, elmt, utilityValues, p_elmt);
@@ -2005,7 +2006,7 @@
                         console.log("done updating concerning decisions");
                         p_model.getElementArr().forEach(function (e) {//This recalculates all values of decision elements
                             if (!e.isUpdated()) {
-                                //console.log("calculating for " + e.getName());
+                                console.log("calculating for " + e.getName());
                                 Mareframe.DST.Tools.calculateValues(p_model, e);
                                 e.setUpdated(true);
                             }
