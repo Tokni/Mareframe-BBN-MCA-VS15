@@ -108,9 +108,9 @@
                                 dataStream = dataStream.slice(0, dataStream.length - 1) + '</parents>\n';
                             }
                             dataStream += '<weights>'
-                            for (var i = 1; i < elmt.getData(0).length; i++) {
+                            for (var i = 0; i < elmt.getData().length; i++) {//For each row
 
-                                dataStream += elmt.getData(elmt.getData().length - 1, i) + ' ';
+                                dataStream += elmt.getData( i, 1) + ' ';
                             }
                             dataStream = dataStream.slice(0, dataStream.length - 1) + '</weights>\n';
 

@@ -103,8 +103,8 @@ var Mareframe;
                                 dataStream = dataStream.slice(0, dataStream.length - 1) + '</parents>\n';
                             }
                             dataStream += '<weights>';
-                            for (var i = 1; i < elmt.getData(0).length; i++) {
-                                dataStream += elmt.getData(elmt.getData().length - 1, i) + ' ';
+                            for (var i = 0; i < elmt.getData().length; i++) {
+                                dataStream += elmt.getData(i, 1) + ' ';
                             }
                             dataStream = dataStream.slice(0, dataStream.length - 1) + '</weights>\n';
                             dataStream += '</mau>\n';
