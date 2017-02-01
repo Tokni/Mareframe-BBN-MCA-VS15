@@ -797,7 +797,8 @@ var Mareframe;
                     var decisionCont = elmt.m_minitableEaselElmt;
                     decisionCont.removeAllChildren();
                     var max = elmt.getData().length - DST.Tools.numOfHeaderRows(elmt.getData());
-                    if ((elmt.getType() === 2 || elmt.getType() === 3) && DST.Tools.numOfHeaderRows(elmt.getValues()) === 1) {
+                    var temp = DST.Tools.numOfHeaderRows(elmt.getValues());
+                    if ((elmt.getType() === 2 || elmt.getType() === 3) && DST.Tools.numOfHeaderRows(elmt.getValues()) <= 1) {
                         max = elmt.getValues()[0].length - 1;
                     }
                     for (var i = 0; i < max; i++) {

@@ -697,7 +697,8 @@ module Mareframe {
 
                     decisionCont.removeAllChildren();
                     var max = elmt.getData().length - Tools.numOfHeaderRows(elmt.getData());
-                    if ((elmt.getType() === 2 || elmt.getType() === 3) && Tools.numOfHeaderRows(elmt.getValues()) === 1) {// Values can be shown vertically in utility nodes with only one headerrow
+                    var temp = Tools.numOfHeaderRows(elmt.getValues());
+                    if ((elmt.getType() === 2 || elmt.getType() === 3) && Tools.numOfHeaderRows(elmt.getValues()) <= 1) {// Values can be shown vertically in utility nodes with only one headerrow
                         max = elmt.getValues()[0].length-1;
                     }
                     for (var i = 0; i < max; i++) {
