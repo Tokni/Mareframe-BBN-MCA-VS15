@@ -869,15 +869,22 @@
                 //First calculate the utility tables to use
                 var utilityTables: any[] = [];
                 p_model.getElementArr().forEach(function (elmt) {
-                    if (elmt.getType() === 2) {
-                        //console.log("value: " + elmt.getName());
-                        //If the node is not updated, update
-                        if (!elmt.isUpdated()) {
-                            elmt.update();
+                    if (elmt.getType() === 2 || elmt.getType() === 3) {
+                        var hasSuperUtilityDescendant: boolean = false;
+                        elmt.getAllDescendants().forEach(function (d) {
+                            if (d.getType() === 3) {
+                                hasSuperUtilityDescendant = true;
+                            }
+                        });
+                        if (!hasSuperUtilityDescendant) {
+                            //If the node is not updated, update
+                            if (!elmt.isUpdated()) {
+                                elmt.update();
+                            }
+                            var utilityValues: any[] = Tools.removeDecisionsFromValues(p_model, elmt, p_elmt);
+                            utilityValues = Tools.removeChancesFromValues(p_model, elmt, utilityValues, p_elmt);
+                            utilityTables.push(utilityValues);
                         }
-                        var utilityValues: any[] = Tools.removeDecisionsFromValues(p_model, elmt, p_elmt);
-                        utilityValues = Tools.removeChancesFromValues(p_model, elmt, utilityValues, p_elmt);
-                        utilityTables.push(utilityValues);
                     }
                 });
                 //For each value row
