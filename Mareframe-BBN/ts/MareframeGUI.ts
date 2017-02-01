@@ -179,6 +179,7 @@ module Mareframe {
                 $("#lodDcmt").on("change", this.loadModel);
                 $("#lodDcmt").on("click", function () {
                     console.log("click");
+                    $("#saveFile_div").hide();
                     this.value = null;
                 });
                
@@ -538,6 +539,7 @@ module Mareframe {
                 this.m_mcaStageCanvas.width += p_x;
             }
             private newDcmt() {
+                $("#saveFile_div").hide();
                 $("#newDcmt").removeClass("ui-state-focus");
                 $("#selectModel").prop("selectedIndex", 0);
                 console.log("new document clicked");
@@ -2021,7 +2023,7 @@ module Mareframe {
                                 typeText = "Value";
                                 break;
                             case 3:
-                                typeText = "Super Value";
+                                typeText = "ALU - Additive Linear Utility";
                                 break;
                             default:
                                 break;

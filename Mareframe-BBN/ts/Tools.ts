@@ -1177,7 +1177,7 @@
                     for (var i = 0; i < p_dataTable.length; i++) {
                         if (p_dataTable[i][1] === undefined) {//copy first column and insert 0 in second column
                             newDataTable.push([p_dataTable[i][0]]);
-                            newDataTable[i].push(0);
+                            newDataTable[i].push(1);
                         }
                         else {//copy row
                             newDataTable.push(p_dataTable[i]);

@@ -279,7 +279,8 @@
                 //console.log("data: " + p_originalData);
                 var data: any[][] = [];
                 var parents: Element[] = this.getParentElements();
-                if (this.m_type === 3) {
+                if (this.m_type === 3 && parents.length > 0) {
+                    //If this is a super utility node with at least one parent
                     for (var i = 0; i < parents.length; i++) {
                         data.push([parents[i].m_id]);
                     }

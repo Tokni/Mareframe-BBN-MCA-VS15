@@ -323,6 +323,7 @@ var Mareframe;
                 $("#lodDcmt").on("change", this.loadModel);
                 $("#lodDcmt").on("click", function () {
                     console.log("click");
+                    $("#saveFile_div").hide();
                     this.value = null;
                 });
                 this.m_mcaStage.addChild(this.m_mcaBackground);
@@ -648,6 +649,7 @@ var Mareframe;
                 this.m_mcaStageCanvas.width += p_x;
             };
             GUIHandler.prototype.newDcmt = function () {
+                $("#saveFile_div").hide();
                 $("#newDcmt").removeClass("ui-state-focus");
                 $("#selectModel").prop("selectedIndex", 0);
                 console.log("new document clicked");
@@ -1883,7 +1885,7 @@ var Mareframe;
                                 typeText = "Value";
                                 break;
                             case 3:
-                                typeText = "Super Value";
+                                typeText = "ALU - Additive Linear Utility";
                                 break;
                             default:
                                 break;

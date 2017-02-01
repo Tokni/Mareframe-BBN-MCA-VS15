@@ -1128,7 +1128,7 @@ var Mareframe;
                     for (var i = 0; i < p_dataTable.length; i++) {
                         if (p_dataTable[i][1] === undefined) {
                             newDataTable.push([p_dataTable[i][0]]);
-                            newDataTable[i].push(0);
+                            newDataTable[i].push(1);
                         }
                         else {
                             newDataTable.push(p_dataTable[i]);
