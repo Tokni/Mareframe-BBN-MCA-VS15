@@ -372,7 +372,7 @@ module Mareframe {
                             $("#progressBar").progressbar({
                                 value: status
                             });
-                            console.log("status: " + status);
+                            //console.log("status: " + status);
                             break;
                     }
                 };

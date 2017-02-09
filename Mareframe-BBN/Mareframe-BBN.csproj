@@ -42,7 +42,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include=".settings\settings.json" />
-    <Content Include="JSON\BBN\baltic.json" />
     <Content Include="JSON\BBN\blackSea.json" />
     <Content Include="JSON\BBN\cadiz.json" />
     <Content Include="JSON\BBN\iceland.json" />
@@ -61,6 +60,7 @@
     <Content Include="JSON\BBN\HappinessExample.json" />
     <Content Include="JSON\BBN\InvestmentExample.json" />
     <Content Include="JSON\BBN\ResturantExample.json" />
+    <Content Include="JSON\BBN\baltic.json" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

@@ -312,7 +312,7 @@
             }
 
             static getValueWithCondition(p_values: any[][], p_elmt: Element, p_condition: String): number[] {
-                console.log("getting value with condition " + p_condition + " elmt: " + p_elmt.getName() + " from " + p_values);
+               // console.log("getting value with condition " + p_condition + " elmt: " + p_elmt.getName() + " from " + p_values);
                 var values: any[][] = Tools.makeSureItsTwoDimensional(p_values);
                 // //console.log("values table : \n " + values);
                 var valuesFound = [];
@@ -1122,7 +1122,7 @@
                         var values: any[][] = element.getValues();
                         var decision: String = elmt.getData()[elmt.getDecision()][0];
                         //console.log("choice is made: " + decision + " in elemnent " + elmt.getName());
-                        // console.log("values: " + values + " size: " + math.size(values));
+                         //console.log("values: " + values + " size: " + math.size(values));
                         var newValues: any[][] = [];
                         var rowNumber: number = Tools.getRowNumber(element.getValues(), elmt);
                         //console.log("rownumber: " + rowNumber);
@@ -2021,7 +2021,12 @@
                             if (!e.isUpdated()) {
                                 status = (15 / p_noOfElmts);//Calculating elements is 15% of the progress
                                 self.postMessage({ command: "progress", progress: status })
-                                Mareframe.DST.Tools.calcValuesLikelihoodSamplingElmt(e, table);
+                                if (e.getType() !== 3) {//Super utility nodes are not updating using likelyhood sampling
+                                    Mareframe.DST.Tools.calcValuesLikelihoodSamplingElmt(e, table);
+                                } else {
+                                    Mareframe.DST.Tools.calculateValues(p_model, e);
+                                    e.setUpdated(true);
+                                }
                             }
 
                         });
@@ -2029,10 +2034,10 @@
                         p_model.getElementArr().forEach(function (p_elmt) {
                             Mareframe.DST.Tools.updateConcerningDecisions(p_elmt);
                         });
-                        console.log("done updating concerning decisions");
+                        //console.log("done updating concerning decisions");
                         p_model.getElementArr().forEach(function (e) {//This recalculates all values of decision elements
                             if (!e.isUpdated()) {
-                                console.log("calculating for " + e.getName());
+                                //console.log("calculating for " + e.getName());
                                 Mareframe.DST.Tools.calculateValues(p_model, e);
                                 e.setUpdated(true);
                             }
@@ -2040,7 +2045,7 @@
                     }
 
                     function createLikelihoodTable(p_model: Model, p_numOfIterations: number): any[] {
-                        console.log("creating table");
+                        //console.log("creating table");
                         var numberOfRuns = p_numOfIterations;
                         var table = [];//contains all cases
                         var evidenceElmts: Element[] = p_model.getElmtsWithEvidence();
@@ -2050,12 +2055,11 @@
                         for (var n = 0; n < numberOfRuns; n++) {
                             if (n % (Math.round(numberOfRuns / noIncrements)) === 0 && n > 0) {
                                 status = 85 / noIncrements;//Creating the table is 85% of the progress
-                                console.log("increment status by: " + status);
                                 self.postMessage({ command: "progress", progress: status })
                             }
                             table.push(Mareframe.DST.Tools.createLikelihoodRow(p_model, evidenceElmts));
                         }
-                        console.log("done creating table");
+                        //console.log("done creating table");
                         return table;
                     }
 

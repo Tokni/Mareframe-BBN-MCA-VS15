@@ -4,7 +4,7 @@ var Mareframe;
     (function (DST) {
         var Model = (function () {
             function Model(p_bbnMode) {
-                this.m_numOfIteraions = 10000;
+                this.m_numOfIteraions = 500;
                 this.m_bbnMode = false;
                 this.m_modelIdent = "temp";
                 this.m_elmtCounter = 0;
@@ -302,7 +302,7 @@ var Mareframe;
                 return tempMatrix;
             };
             Model.prototype.createNewElement = function (p_type, p_notVisual) {
-                console.log("number of elements: " + this.m_elmtCounter);
+                //  console.log("number of elements: " + this.m_elmtCounter);
                 //This loop makes sure that no two elements have the same id
                 do {
                     var name = "elmt" + this.m_elmtCounter;
