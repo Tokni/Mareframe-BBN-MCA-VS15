@@ -174,7 +174,10 @@
                         if (ancestors.indexOf(e) === -1) {
                             //   console.log("pushing " + e.getName());
                             ancestors.push(e);
-                            ancestors = ancestors.concat(e.getAllAncestors());
+                            if (e.getType() !== 1) {
+                                //ancestor of a decision node aren't real ancestors
+                                ancestors = ancestors.concat(e.getAllAncestors());
+                            }
                         }
                     });
                 }

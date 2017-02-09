@@ -620,9 +620,11 @@
                     });
                     p_elmt.getAllAncestors().forEach(function (ancestor: Element) {
                         ancestor.getParentElements().forEach(function (parent: Element) {
-                            //If one of the ancestor has a influencing chance parent, this should be added too
-                            if (parent.getType() === 0 && parent.isInfluencing()) {
-                                headerRows = Tools.addNewHeaderRow(parent.getMainValues(), headerRows);
+                            if (!ancestor.isInformative()) {
+                                //If one of the ancestor has a influencing chance parent, this should be added too, butonly if ancestor is not informative
+                                if (parent.getType() === 0 && parent.isInfluencing()) {
+                                    headerRows = Tools.addNewHeaderRow(parent.getMainValues(), headerRows);
+                                }
                             }
                         });
                     });
