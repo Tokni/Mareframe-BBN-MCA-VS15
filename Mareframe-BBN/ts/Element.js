@@ -200,7 +200,7 @@ var Mareframe;
                         children.push(c.getInputElement());
                     }
                 });
-                console.log(this.getName() + " chilxxdren: " + children);
+                //console.log(this.getName() + " chilxxdren: " + children);
                 return children;
             };
             Element.prototype.getAllAncestors = function () {

@@ -223,7 +223,7 @@
                         children.push(c.getInputElement());
                     }
                 })
-             console.log(this.getName() + " chilxxdren: " + children);
+             //console.log(this.getName() + " chilxxdren: " + children);
                 return children;
             }
             getAllAncestors(): Element[] {

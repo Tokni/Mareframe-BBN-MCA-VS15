@@ -722,7 +722,7 @@ module Mareframe {
                 else {
                     //$("#modeStatus").html("Editor Mode");
                 }
-                $("#cnctTool").button('refresh').blur();
+                $("#cnctTool").button('refresh').blur();//
 
             }
             private selectModel(p_evt: Event) {

@@ -16,7 +16,7 @@ module Mareframe {
             private m_mareframeMode: Boolean;
             constructor() {
                 //console.log("handler started");
-                this.m_mareframeMode = true; 
+                this.m_mareframeMode = true; //
                 var testPage = true;
                     ; 
                 if (testPage === false) {
