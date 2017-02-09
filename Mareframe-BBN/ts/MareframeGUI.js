@@ -205,6 +205,7 @@ var Mareframe;
                     else {
                         _this.updateVOIVisual([[0]]);
                     }
+                    console.log("done calculating vio");
                 };
                 this.m_handler = p_handler;
                 this.saveChanges = this.saveChanges.bind(this);

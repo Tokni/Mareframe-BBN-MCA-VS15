@@ -373,7 +373,7 @@
                 //   console.log("columns: " + columns);
                 var added = [];  
                 //    console.log("size of data: " + math.size(data));
-                if (p_currentElement.getType() !== 3) {
+                if (p_currentElement.getType() !== 3 || (math.size(p_dataHeaders)).length > 1) {
                     //For each column
                     for (var n = 1; n <= columns; n++) {
                         //  console.log("n: " + n);
@@ -450,8 +450,9 @@
                 }
                 else {//In super value nodes each value should be its own submatrix
                     //console.log("super value node");
-                    for (var i = 0; i < p_matrix.length; i++) {
-                        subMatrices.push(Tools.makeSureItsTwoDimensional([p_matrix[i][0]]));
+                    debugger
+                    for (var i = 0; i < p_matrix[0].length; i++) {
+                        subMatrices.push(Tools.makeSureItsTwoDimensional([p_matrix[0][i]]));
                         //console.log(subMatrices);
                     }
                     newDataHeaders = p_dataHeaders;//Because data headers do not get updated in super value nodes
@@ -858,6 +859,7 @@
                 //console.log("done calculatint values for " + p_element.getName());
             }
             static calculateDecisionValues(p_elmt: Element, p_model: Model) {
+                debugger
                 if (p_elmt.getType() !== 1) {
                     throw "ERROR Trying to use calculateDecisionValues on non decision element";
                 }
@@ -972,19 +974,26 @@
                             var t2 = math.multiply(matrix, Tools.getMatrixWithoutHeader(elmt.getValues()));
                             valueMatrix.push(t2[0][0]);
                             //valueMatrix = valueMatrix.concat(math.multiply(matrix, Tools.getMatrixWithoutHeader(elmt.getValues())));
-                            //This has been changed beacause we got a [[],[],[],...] matrix out where we wanted [..,..,..,...]
+                            //his has been changed beacause we got a [[],[],[],...] matrix out where we wanted [..,..,..,...]
                         });
                     }
                 }
                 //Put headers and matrix back together
                 valueMatrix.unshift(["value"]);
-                valueHeaders.push(math.flatten(valueMatrix));
+                if (valueHeaders.length > 0 && valueHeaders[0].length > 0) {
+                    //Only keep valueheaders if it is not empty
+                    valueHeaders.push(math.flatten(valueMatrix));
+                } else {
+                    //If valuheaders is an empty array it should not be part of the return value
+                    valueHeaders = math.flatten(valueMatrix);
+                }
                 return valueHeaders;
 
             }
             static isOneDimensional(p_array: any[][]): Boolean {
                 //console.log(p_array.length);
-                return (p_array.length === 1 || !($.isArray((p_array)[0])) || p_array[1] === undefined);
+                return (p_array.length === 1 || /*!($.isArray((p_array)[0])) ||*/ p_array[1] === undefined) || ((p_array)[0]).constructor === Array;
+                //*!($.isArray((p_array)[0])) is commented out because jQuery cannot be used through the webWorker
             }
 
             static fillEmptySpaces(p_table: any[][]): any[][] {
@@ -1930,6 +1939,7 @@
                 return averageLikelihood;
             }
             static startWorker(p_showProgress: boolean): Worker {
+                console.log("starting web worker");
                 if (p_showProgress) {
                     $("#progressbarDialog").dialog();
                     $("#progressBar").progressbar({

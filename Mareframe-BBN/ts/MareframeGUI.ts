@@ -1702,6 +1702,7 @@ module Mareframe {
                 else {
                     this.updateVOIVisual([[0]]);
                 }
+                console.log("done calculating vio");
             }
             private updateVOIVisual(p_result): void {
                 $("#voiTable").empty();//First remove the previous table
