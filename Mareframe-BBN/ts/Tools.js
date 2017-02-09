@@ -1344,6 +1344,9 @@ var Mareframe;
                             newData.push(p_oldData[row]);
                         }
                     }
+                    if (newData.length === 0) {
+                        newData.push([]);
+                    }
                 }
                 return newData;
             };

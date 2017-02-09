@@ -3476,11 +3476,11 @@ module Mareframe {
                 }
                 cellPlaceholder.innerHTML = p_header;
                 rowPlaceholder.appendChild(cellPlaceholder);
-                if (p_elmt.getType() === 3 && math.size(data)[1] < 1) {//The data table is empty in the super value node
+                if (p_elmt.getType() === 3 && math.size(data)[1] < 1) {//The data table is empty in the super utility node
                     //console.log("super value with empty def");
                     rowPlaceholder = table.insertRow(-1);
                     cellPlaceholder = rowPlaceholder.insertCell(-1);
-                    cellPlaceholder.innerHTML = "This super value node has no parents";
+                    cellPlaceholder.innerHTML = "This super utility node has no parents";
                 }
                 else {
 

@@ -3224,7 +3224,7 @@ var Mareframe;
                     //console.log("super value with empty def");
                     rowPlaceholder = table.insertRow(-1);
                     cellPlaceholder = rowPlaceholder.insertCell(-1);
-                    cellPlaceholder.innerHTML = "This super value node has no parents";
+                    cellPlaceholder.innerHTML = "This super utility node has no parents";
                 }
                 else {
                     //Create the header rows
