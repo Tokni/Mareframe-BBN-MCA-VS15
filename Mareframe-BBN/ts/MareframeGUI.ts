@@ -109,7 +109,7 @@ module Mareframe {
                 this.updateConnection = this.updateConnection.bind(this);
                 this.createNewChance = this.createNewChance.bind(this);
                 this.createNewDec = this.createNewDec.bind(this);
-                this.createNewValue = this.createNewValue.bind(this);
+                this.createNewUtility = this.createNewUtility.bind(this);
                 this.createNewElement = this.createNewElement.bind(this);
                 this.deleteSelected = this.deleteSelected.bind(this);
                 this.resetDcmt = this.resetDcmt.bind(this); 
@@ -155,7 +155,7 @@ module Mareframe {
                 $("#newElmt").on("click", this.createNewElement);
                 $("#newChance").on("click", this.createNewChance);
                 $("#newDec").on("click", this.createNewDec);
-                $("#newValue").on("click", this.createNewValue);
+                $("#newValue").on("click", this.createNewUtility);
                 $("#deleteElmt").on("click", this.deleteSelected);
                 $("#editorMode").on("click", this.setEditorMode);
 
@@ -266,6 +266,7 @@ module Mareframe {
                      
             }
             private cnctStatus(p_evt: Event) {
+                $("#saveFile_div").hide();
                     $(".cnctTool").removeClass("ui-state-focus"); 
                 if ($("#cnctTool").prop("checked")) {
                     $("#modeStatus").html("Connect Mode");
@@ -282,6 +283,7 @@ module Mareframe {
                 this.m_handler.getFileIO().loadModel($("#selectModel").val(), this.m_model, this.importStage);
             }
             private loadModel(p_evt: Event) {
+                this.uncheckConnectTool();
                 $("#lodDcmt").removeClass("ui-state-focus");
                 $("#selectModel").prop("selectedIndex", 0);
                 this.m_model.closeDown();
@@ -290,6 +292,7 @@ module Mareframe {
                 this.updateSize();
             }
             private saveModel(p_evt: Event) {
+                this.uncheckConnectTool();
                 $("#savDcmt").removeClass("ui-state-focus");
                 $("#saveFile_div").show();
                 this.m_handler.getFileIO().saveModel(this.m_model);
@@ -369,6 +372,7 @@ module Mareframe {
                             $("#progressBar").progressbar({
                                 value: status
                             });
+                            console.log("status: " + status);
                             break;
                     }
                 };
@@ -539,6 +543,7 @@ module Mareframe {
                 this.m_mcaStageCanvas.width += p_x;
             }
             private newDcmt() {
+                this.uncheckConnectTool();
                 $("#saveFile_div").hide();
                 $("#newDcmt").removeClass("ui-state-focus");
                 $("#selectModel").prop("selectedIndex", 0);
@@ -973,6 +978,7 @@ module Mareframe {
                     }
                 }
                 else {
+                    this.uncheckConnectTool();
                     $("#modeStatus").html("");
                 }
 
@@ -1121,8 +1127,17 @@ module Mareframe {
                 // console.log("highest: " + highestElement + " lowest: " + lowestElement + " leftmost: " + leftmostElement + " rightmost: " + rightmostElement);
                 return [lowestElement, highestElement, leftmostElement, rightmostElement];
             }
+            private uncheckConnectTool() {
+                if ($("#cnctTool").prop("checked")) {
+                    $("#cnctTool").prop("checked", false);
+                    $('#cnctTool').button("refresh")
+                    this.cnctStatus(null);
+                }
+            }
             private createNewChance(p_evt: Event) {
                 $("#newChance").removeClass("ui-state-focus");
+                this.uncheckConnectTool();
+                $("#saveFile_div").hide();
                 var elmt = this.m_model.createNewElement(0)
                 this.addElementToStage(elmt);
                 elmt.update();
@@ -1130,13 +1145,17 @@ module Mareframe {
             }
             private createNewDec(p_evt: Event) {
                 $("#newDec").removeClass("ui-state-focus");
+                this.uncheckConnectTool();
+                $("#saveFile_div").hide();
                 var elmt = this.m_model.createNewElement(1)
                 this.addElementToStage(elmt);
                 elmt.update();
                 this.updateMiniTables([elmt]);
             }
-            private createNewValue(p_evt: Event) {
+            private createNewUtility(p_evt: Event) {
                 $("#newValue").removeClass("ui-state-focus");
+                this.uncheckConnectTool();
+                $("#saveFile_div").hide();
                 var elmt = this.m_model.createNewElement(2)
                 this.addElementToStage(elmt);
                 elmt.update();
@@ -1150,6 +1169,8 @@ module Mareframe {
                 this.updateMiniTables([elmt]);
             }
             public deleteSelected(p_evt: Event, selectedElmts?: Element[], selectedCon?: Connection[]) {
+                this.uncheckConnectTool();
+                $("#saveFile_div").hide();
                 $("#deleteElmt").removeClass("ui-state-focus");
                 console.log("deleting");
                 if (selectedElmts) {
@@ -1386,6 +1407,8 @@ module Mareframe {
                 return settingsDiv.id;
             }
             private openSettings() {
+                this.uncheckConnectTool();
+                $("#saveFile_div").hide();
                 var gui:GUIHandler = this;
                 if (this.m_settingsDiv === undefined) {
                     var settingsID: String = "#" + this.createSettingsDiv();
@@ -1423,6 +1446,7 @@ module Mareframe {
                 }
             }
             private openVIO(): void {
+                this.uncheckConnectTool();
                 var voiID: String = "#" + this.createVOIDialog();
                 var voi = $(voiID).dialog(opt);
                 var opt = {
