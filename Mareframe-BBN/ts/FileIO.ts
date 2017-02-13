@@ -273,7 +273,7 @@
                         path += "northSea.json";
                         break;
                     case "scotland":
-                        path += "scotland.json";
+                        path += "palermo.json";
                         break;
                     case "sicily":
                         path += "sicily.json";

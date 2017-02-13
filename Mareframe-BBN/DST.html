@@ -60,9 +60,9 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4 page-header europe-map-zoom">
+            <!--<div class="col-lg-4 page-header europe-map-zoom">
                 <img src="img/locations/west-coast-of-scotland.jpg" class="center-block img-responsive img-rounded">
-            </div>
+            </div>-->
         </div>
     </div>
     <div class="ui-widget ui-dialog ui-corner-all ui-widget-content header-bar" style="position: static">
@@ -78,30 +78,25 @@
                     <option value="investment"> Investment Decision</option>
                 </select>
             </div>
-            <button class="advButton" id="newDcmt">New Document</button>
+            <button class="advButton" id="newDcmt" title="">New Document</button>
 
-            <div class="LoadFileBtn" id="lodDcmtDiv">
+            <div class="LoadFileBtn" id="lodDcmtDiv" title="Opens file from client machine">
                 <input class="upload" type="file" id="lodDcmt" />
                 <span>Open Document</span>
             </div>
 
-            <button id="savDcmt">Save Document</button>
-            <!--<button class="advButton" id="import">Import</button>-->
-            <div class="LoadFileBtn" id="importDiv">
-                <input class="upload" type="file" id="import" />
-                <span>Import</span>
-            </div>
+            <button id="savDcmt" title="Save the current document. Use the download link at the bottom to move the document the client machine">Save Document</button>
             <button class="advButton" id="resetDcmt">Reset</button>
-            <button class="advButton" id="newElmt">New Element</button>
+            <button class="advButton" id="newElmt" title="Adds a new element to the workspace">New Element</button>
             <button class="advButton" id="newChance">New Chance</button>
             <button class="advButton" id="newDec">New Decision</button>
             <button class="advButton" id="newValue">New Value</button>
-            <button class="advButton" id="deleteElmt">Delete Element</button>
-            <button class="advButton" id="selectAllElmt">Select All</button>
+            <button class="advButton" id="deleteElmt" title="Deletes all selected elements">Delete Element</button>
+            <button class="advButton" id="selectAllElmt" title="Selects all elements">Select All</button>
             <input class="advButton" type="checkbox" id="cnctTool" style="display: inline-block">
             <label for="cnctTool" class="advButton">Connect Tool</label>
             <input class="button" type="checkbox" id="editorMode" style="float: left; display: inline-block">
-            <label for="editorMode" class="button" style="float: right">Editor Mode</label>
+            <label for="editorMode" class="button" style="float: right" title="Toggleling Editor mode enables a user to change everything, use with caution">Editor Mode</label>
         </div>
         <!--<div style="float:right">
             <input class="button" type="checkbox" id="fullscreen">
@@ -115,13 +110,15 @@
     </div>
 
             <div id="MCAContainer" style="text-align:center">
-
+                <div id="MCAToolTitle_div" class="header-bar ui-corner-all ui-widget-content ui-dialog-titlebar" title="Double click any goal (green) or objective(red) to change weights, Double click any attribute(blue) to inspect data or to change the utility function, Double click any alternative(yellow) to exclude or include the alternative
+">Graph Area</div>
                 <!--MCA Tool canvas-->
                 <!--<canvas id="MCATool" width="800" height="600" style="display:inline-block; min-height: 400px; min-width: 600px" ></canvas>-->
                 <canvas id="MCATool" width="1500" height="1200" style="display:inline-block;"></canvas>
 
                 <!--Data Table-->
-                <div id="finalScoreOverview_div" style="display:inline-block">
+                <div id="finalScoreTitle_div" title="Choose an element to inspect the finalscore of the element">FinalScore</div>
+                <div id="finalScoreOverview_div" style="display:inline-block" title="FinalScore">
                     <div id="finalScoreChartOverview_div">Scores</div>
                     <div id="finalScoreObjectiveOverview_div">
                         Objective
@@ -130,8 +127,8 @@
                             <option> 2 </option>
                         </select>
                     </div>
-                    <div id="finalScoreSegmentsOverview_div">
-                        Segments<br />
+                    <div id="finalScoreSegmentsOverview_div" title="Choose the degree of detail by choosing a higher criteria">
+                       
                         <select id="finalScoreSegmentOverview_select">
                             <option> 3 </option>
                             <option> 4 </option>
@@ -146,7 +143,9 @@
                     </div>
                     <button id="finalScoreSetAsText_button">As text</button>-->
                 </div>
-                <div id="MCADataTable" class="table-editable" style="display:inline-block">
+                <div id="consequenceTableTitle_div" title="Overview of data of each attribute and alternative">Consequence Table</div>
+                <div id="MCADataTable" class="table-editable" style="display:inline-block" title="Consequence Table">
+
                     <!--<table id="editableDataTable" class="table" style="border: 2px solid #ffffff;border-collapse:collapse;">-->
                     <table id="editableDataTable" class="table">
                         <tr id="table_header">
@@ -165,20 +164,21 @@
                 </div>
 
                 <!--Sensitivity analysis Start   -->
-                <div id="SenAna">
+                <div id="SenanaTitle_div" title="Choose a connection to analyze by choosing end and start elements in the drop down menus">Sensitivity Analysis</div>
+                <div id="SenAna" title="Inspect the change in finalscore, when the weight of the connection is changed">
                     <!--<div class="senana" id="sliderControl_div"></div>-->
-                    <div class="senana" id="dropdownControl_div">
+                    <div class="senana" id="dropdownControl_div" title="Choose the element where the connection analyzed ends">
                         <select id="elementSelect"></select>
                     </div>
-                    <div class="senana" id="dropdownControlSub_div">
+                    <div class="senana" id="dropdownControlSub_div" title="Choose the element where the connection analyzed starts">
                         <select id="elementSubSelect"></select>
                     </div>
                     <div class="senana" id="lineChart_div">Line Chart</div>
                     <div class="senana" id="tableChart_div">Table Chart</div>
 
                     <div class="senana" id="sliderControl_div"></div>
-                    <div class="senana" id="sliderValNormDebug">---</div>
-                    <div class="senana" id="sliderValDebug">---</div>
+                    <div class="senana" id="sliderValNormDebug" title="Value of the slide">---</div>
+                    <div class="senana" id="sliderValDebug" title="Value of the weight of the chosen connection">---</div>
                 </div>
                 <!--Sensitivity analysis End     -->
             </div> <!--MCAContainer End-->
@@ -270,7 +270,7 @@
                 </form>
             </div> <!--end elementType-->
             <div id="DisregardAlternative">
-                <label for="disAlt_check">Exclude Alternative</label>
+                <label for="disAlt_check">Exclude Alternatives</label>
                 <input type="checkbox" id="disAlt_check" name="disAlt_check" />
                 
             </div>
@@ -357,7 +357,6 @@
             $("#lodDcmtDiv").button({ icons: "ui-icon-folder-open" });
             $("#lodDcmtDiv").button({ icon: "ui-icon-folder-open", iconPosition: "beginning" });
             $("#savDcmt").button({ icon: "ui-icon-disk" });
-            $("#importDiv").button({ icon: "ui-icon-disk" });
             $("#newElmt").button({ icon: "ui-icon-plus" });
             $("#newDec").button({ icon: "ui-icon-plus" });
             $("#newChance").button({ icon: "ui-icon-plus" });

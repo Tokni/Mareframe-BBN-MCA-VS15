@@ -29,8 +29,7 @@ var Mareframe;
                 this.m_altIndex = [];
                 for (var e in this.m_elementArr) {
                     if (this.m_elementArr[e].getType() === 102)
-                        if (!this.m_elementArr[e].m_disregard)
-                            this.m_altIndex.push(e);
+                        this.m_altIndex.push(e);
                 }
             };
             Model.prototype.saveModel = function () {
@@ -106,12 +105,12 @@ var Mareframe;
             };
             Model.prototype.getMCADataStream = function () {
                 ////console.log("MCADataStream: " + JSON.stringify(this));
-                var ret = JSON.stringify(this);
+                //var ret = JSON.stringify(this);
                 return JSON.stringify(this);
             };
             Model.prototype.update = function () {
                 var m = this;
-                //console.log("updating model");
+                console.log("updating model");
                 this.m_elementArr.forEach(function (p_elmt) {
                     //console.log(p_elmt.getID() + " has been updated: " + p_elmt.isUpdated());
                     if (!p_elmt.isUpdated()) {
@@ -177,7 +176,7 @@ var Mareframe;
                         else
                             retDataMatrix[0][column] = this.m_elementArr[e1].getID();
                         retDataMatrix[1][column] = this.m_elementArr[e1].getDataMin();
-                        retDataMatrix[2][column] = this.m_elementArr[e1].getDataBaseLine();
+                        retDataMatrix[2][column] = Math.round(this.m_elementArr[e1].getDataBaseLine() * 1000) / 1000.0;
                         for (var val in this.m_elementArr) {
                             if (this.m_elementArr[val].getType() === 102) {
                                 retDataMatrix[j][column] = this.m_elementArr[e1].getDataArrAtIndex((j++) - 3);
@@ -212,19 +211,29 @@ var Mareframe;
                 if (p_element.getChildrenElements().length !== 0 && p_criteria > 0) {
                     var index = 0;
                     for (var c in p_element.getChildrenElements()) {
-                        var score = this.getScore2(p_element.getChildrenElements()[c], w[index++][1] * p_weight, p_criteria - 1);
+                        if (p_element.m_disregard == false)
+                            var score = this.getScore2(p_element.getChildrenElements()[c], w[index++][1] * p_weight, p_criteria - 1);
                         for (var s in score) {
                             retMatrix.push(score[s]);
                         }
                     }
                 }
                 else {
+                    var ret;
                     retMatrix[0] = [];
                     retMatrix[0][0] = p_element.getName();
                     retMatrix[0] = retMatrix[0].concat(p_element.getScore());
+                    for (var i = 0; i < retMatrix[0].length - 1; i++) {
+                        if (!this.m_elementArr[this.m_altIndex[i]].m_disregard)
+                            retMatrix.slice(i);
+                    }
                     for (var r in retMatrix[0]) {
-                        if (r != '0')
-                            retMatrix[0][parseInt(r)] *= p_weight;
+                        if (r != '0') {
+                            for (var _i = 0, _a = this.m_altIndex; _i < _a.length; _i++) {
+                                var alt = _a[_i];
+                                retMatrix[0][parseInt(r)] *= p_weight;
+                            }
+                        }
                     }
                 }
                 return retMatrix;

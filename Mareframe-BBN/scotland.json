@@ -1,0 +1,602 @@
+{
+  "elements": [
+    {
+      "posX": 710,
+      "posY": 96,
+      "elmtID": "elmtCurPath",
+      "elmtName": "Current Path",
+      "elmtDesc": "Business as usual",
+      "elmtType": 102,
+      "elmtData": [ 1 ],
+      "elmtWghtMthd": 0
+    },
+    {
+      "posX": 710,
+      "posY": 160,
+      "elmtID": "elmtMMEY",
+      "elmtName": "Mixed MEY",
+      "elmtDesc": "Management alternative A",
+      "elmtType": 102,
+      "elmtData": [ 2 ],
+      "elmtWghtMthd": 0
+    },
+    {
+      "posX": 710,
+      "posY": 224,
+      "elmtID": "elmtDifCod",
+      "elmtName": "Different Cod D",
+      "elmtDesc": "Management alternative B",
+      "elmtType": 102,
+      "elmtData": [ 3 ],
+      "elmtWghtMthd": 0
+    },
+    {
+      "posX": 500,
+      "posY": 18,
+      "elmtID": "elmtAttr1",
+      "elmtName": "Dem. Trawl",
+      "elmtDesc": "",
+      "elmtType": 100,
+      "elmtData": [ 1, 50, 50, 0, 0, 100 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 500,
+      "posY": 55,
+      "elmtID": "elmtAttr2",
+      "elmtName": "Nephr. Trawl",
+      "elmtDesc": "Demersal trawl fleet profit (best proxy of econmical peformance)",
+      "elmtType": 100,
+      "elmtData": [ 2, 50, 50, 0, 0, 100 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 500,
+      "posY": 92,
+      "elmtID": "elmtAttr3",
+      "elmtName": "Other Trawl",
+      "elmtDesc": "Nephrops trawl fleet profit  (best proxy of economical peformance)",
+      "elmtType": 100,
+      "elmtData": [ 3, 50, 50, 0, 0, 100 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 500,
+      "posY": 129,
+      "elmtID": "elmtAttr4",
+      "elmtName": "Pots",
+      "elmtDesc": "Pair trawl fleet profit  (best proxy of economical peformance)",
+      "elmtType": 100,
+      "elmtData": [ 4, 50, 50, 0, 0, 100 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 500,
+      "posY": 166,
+      "elmtID": "elmtAttr5",
+      "elmtName": "Pel. Trawl",
+      "elmtDesc": "Lobster fleet profit  (best proxy of economical peformance)",
+      "elmtType": 100,
+      "elmtData": [ 5, 50, 50, 0, 0, 100 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 500,
+      "posY": 203,
+      "elmtID": "elmtAttr6",
+      "elmtName": "Crustaceans",
+      "elmtDesc": "",
+      "elmtType": 100,
+      "elmtData": [ 6, 50, 50, 0, 0, 100 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 500,
+      "posY": 240,
+      "elmtID": "elmtAttr7",
+      "elmtName": "Gadoids",
+      "elmtDesc": "Cod, whiting and haddock",
+      "elmtType": 100,
+      "elmtData": [ 7, 50, 50, 0, 0, 22 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 500,
+      "posY": 277,
+      "elmtID": "elmtAttr8",
+      "elmtName": "Demersals",
+      "elmtDesc": "Mixed demersal fish stocks except 'gadoids'",
+      "elmtType": 100,
+      "elmtData": [ 8, 50, 50, 0, 0, 22 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 500,
+      "posY": 314,
+      "elmtID": "elmtAttr9",
+      "elmtName": "Pelagic",
+      "elmtDesc": "",
+      "elmtType": 100,
+      "elmtData": [ 9, 50, 50, 0, 0, 100 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 500,
+      "posY": 351,
+      "elmtID": "elmtAttrA",
+      "elmtName": "Large Fish",
+      "elmtDesc": "Either Mean Maximum Lenght or Large Fish Indicator",
+      "elmtType": 100,
+      "elmtData": [ 10, 50, 50, 0, 0, 1 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 500,
+      "posY": 388,
+      "elmtID": "elmtAttrB",
+      "elmtName": "Trophic",
+      "elmtDesc": "Indicator of the structure of the foodweb ",
+      "elmtType": 100,
+      "elmtData": [ 11, 50, 50, 0, 0, 100 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 500,
+      "posY": 425,
+      "elmtID": "elmtAttrC",
+      "elmtName": "Diversity",
+      "elmtDesc": "Indicator of the diversity of species in the ecosystem",
+      "elmtType": 100,
+      "elmtData": [ 12, 50, 50, 0, 0, 100 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 290,
+      "posY": 18,
+      "elmtID": "elmtEco20",
+      "elmtName": "Economy",
+      "elmtDesc": "Best available proxy of employment in the fisheries",
+      "elmtType": 101,
+      "elmtData": [
+        [ "conn4", "conn5", "conn6", "conn7", "conn8" ],
+        [ 80, 10, 80, 10, 10 ]
+      ],
+      "elmtWghtMthd": 1
+    },
+    {
+      "posX": 200,
+      "posY": 110,
+      "elmtID": "elmtEnv20",
+      "elmtName": "Ecology",
+      "elmtDesc": "Natural aspects of the fisheries",
+      "elmtType": 101,
+      "elmtData": [
+        [ "conn9", "conn10" ],
+        [ 90, 10 ]
+      ],
+      "elmtWghtMthd": 1
+    },
+    {
+      "posX": 300,
+      "posY": 64,
+      "elmtID": "elmtStock20",
+      "elmtName": "Stocks",
+      "elmtDesc": "",
+      "elmtType": 101,
+      "elmtData": [
+        [ "conn11", "conn12", "conn13", "conn14" ],
+        [ 90, 10, 20, 30 ]
+      ],
+      "elmtWghtMthd": 1
+    },
+    {
+      "posX": 300,
+      "posY": 156,
+      "elmtID": "elmtFoodweb20",
+      "elmtName": "Foodweb",
+      "elmtDesc": "",
+      "elmtType": 101,
+      "elmtData": [
+        [ "conn15", "conn16", "conn17" ],
+        [ 90, 10, 20 ]
+      ],
+      "elmtWghtMthd": 1
+    },
+    {
+      "posX": 90,
+      "posY": 64,
+      "elmtID": "elmt2020",
+      "elmtName": "2020",
+      "elmtDesc": "Status by the year 2020",
+      "elmtType": 101,
+      "elmtData": [
+        [ "conn2", "conn3" ],
+        [ 90, 10 ]
+      ],
+      "elmtWghtMthd": 1
+    },
+    {
+      "posX": 500,
+      "posY": 18,
+      "elmtID": "elmtAttr11",
+      "elmtName": "Dem. Trawl",
+      "elmtDesc": "",
+      "elmtType": 100,
+      "elmtData": [ 13, 50, 50, 0, 0, 100 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 500,
+      "posY": 55,
+      "elmtID": "elmtAttr12",
+      "elmtName": "Nephr. Trawl",
+      "elmtDesc": "Demersal trawl fleet profit (best proxy of econmical peformance)",
+      "elmtType": 100,
+      "elmtData": [ 14, 50, 50, 0, 0, 100 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 500,
+      "posY": 92,
+      "elmtID": "elmtAttr13",
+      "elmtName": "Other Trawl",
+      "elmtDesc": "Nephrops trawl fleet profit  (best proxy of economical peformance)",
+      "elmtType": 100,
+      "elmtData": [ 15, 50, 50, 0, 0, 100 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 500,
+      "posY": 129,
+      "elmtID": "elmtAttr14",
+      "elmtName": "Pots",
+      "elmtDesc": "Pair trawl fleet profit  (best proxy of economical peformance)",
+      "elmtType": 100,
+      "elmtData": [ 16, 50, 50, 0, 0, 100 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 500,
+      "posY": 166,
+      "elmtID": "elmtAttr15",
+      "elmtName": "Pel. Trawl",
+      "elmtDesc": "Lobster fleet profit  (best proxy of economical peformance)",
+      "elmtType": 100,
+      "elmtData": [ 17, 50, 50, 0, 0, 100 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 500,
+      "posY": 203,
+      "elmtID": "elmtAttr16",
+      "elmtName": "Crustaceans",
+      "elmtDesc": "",
+      "elmtType": 100,
+      "elmtData": [ 18, 50, 50, 0, 0, 100 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 500,
+      "posY": 240,
+      "elmtID": "elmtAttr17",
+      "elmtName": "Gadoids",
+      "elmtDesc": "Cod, whiting and haddock",
+      "elmtType": 100,
+      "elmtData": [ 19, 50, 50, 0, 0, 100 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 500,
+      "posY": 277,
+      "elmtID": "elmtAttr18",
+      "elmtName": "Demersals",
+      "elmtDesc": "Mixed demersal fish stocks except 'gadoids'",
+      "elmtType": 100,
+      "elmtData": [ 20, 50, 50, 0, 0, 100 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 500,
+      "posY": 314,
+      "elmtID": "elmtAttr19",
+      "elmtName": "Pelagics",
+      "elmtDesc": "Pelagic fisheries",
+      "elmtType": 100,
+      "elmtData": [ 21, 50, 50, 0, 0, 100 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 500,
+      "posY": 351,
+      "elmtID": "elmtAttr1A",
+      "elmtName": "Large Fish",
+      "elmtDesc": "Either Mean Maximum Lenght or Large Fish Indicator",
+      "elmtType": 100,
+      "elmtData": [ 22, 50, 50, 0, 0, 100 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 500,
+      "posY": 388,
+      "elmtID": "elmtAttr1B",
+      "elmtName": "Trophic",
+      "elmtDesc": "Indicator of the structure of the foodweb ",
+      "elmtType": 100,
+      "elmtData": [ 23, 50, 50, 0, 0, 100 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 500,
+      "posY": 425,
+      "elmtID": "elmtAttr1C",
+      "elmtName": "Diversity",
+      "elmtDesc": "Indicator of the diversity of species in the ecosystem",
+      "elmtType": 100,
+      "elmtData": [ 24, 50, 50, 0, 0, 100 ],
+      "elmtWghtMthd": 2
+    },
+    {
+      "posX": 290,
+      "posY": 242,
+      "elmtID": "elmtEco30",
+      "elmtName": "Economy",
+      "elmtDesc": "Best proxy of economical peformance",
+      "elmtType": 101,
+      "elmtData": [
+        [ "conn21", "conn22", "conn23", "conn24", "conn25" ],
+        [ 80, 10, 10, 10, 10 ]
+      ],
+      "elmtWghtMthd": 1
+    },
+    {
+      "posX": 200,
+      "posY": 334,
+      "elmtID": "elmtEnv30",
+      "elmtName": "Ecology",
+      "elmtDesc": "Natural aspects of the fisheries",
+      "elmtType": 101,
+      "elmtData": [
+        [ "conn26", "conn27" ],
+        [ 90, 10 ]
+      ],
+      "elmtWghtMthd": 1
+    },
+    {
+      "posX": 300,
+      "posY": 288,
+      "elmtID": "elmtStock30",
+      "elmtName": "Stocks",
+      "elmtDesc": "",
+      "elmtType": 101,
+      "elmtData": [
+        [ "conn28", "conn29", "conn30", "conn31" ],
+        [ 60, 10, 10, 20 ]
+      ],
+      "elmtWghtMthd": 1
+    },
+    {
+      "posX": 300,
+      "posY": 380,
+      "elmtID": "elmtFoodweb30",
+      "elmtName": "Foodweb",
+      "elmtDesc": "",
+      "elmtType": 101,
+      "elmtData": [
+        [ "conn32", "conn33", "conn34" ],
+        [ 90, 10, 0 ]
+      ],
+      "elmtWghtMthd": 1
+    },
+    {
+      "posX": 90,
+      "posY": 288,
+      "elmtID": "elmt2030",
+      "elmtName": "2030",
+      "elmtDesc": "Status by the year 2030",
+      "elmtType": 101,
+      "elmtData": [
+        [ "conn19", "conn20" ],
+        [ 90, 10 ]
+      ],
+      "elmtWghtMthd": 1
+    },
+    {
+      "posX": 80,
+      "posY": 176,
+      "elmtID": "elmtGoal",
+      "elmtName": "Sustainable Fisheries",
+      "elmtDesc": "Short formulation of the overall objective of the management approach",
+      "elmtType": 103,
+      "elmtData": [
+        [ "conn1", "conn18" ],
+        [ 90, 80 ]
+      ],
+      "elmtWghtMthd": 1
+    }
+  ],
+  "connections": [
+    {
+      "connInput": "elmt2020",
+      "connOutput": "elmtGoal",
+      "connID": "conn1"
+    },
+    {
+      "connInput": "elmtEco20",
+      "connOutput": "elmt2020",
+      "connID": "conn2"
+    },
+    {
+      "connInput": "elmtEnv20",
+      "connOutput": "elmt2020",
+      "connID": "conn3"
+    },
+    {
+      "connInput": "elmtAttr1",
+      "connOutput": "elmtEco20",
+      "connID": "conn4"
+    },
+    {
+      "connInput": "elmtAttr2",
+      "connOutput": "elmtEco20",
+      "connID": "conn5"
+    },
+    {
+      "connInput": "elmtAttr3",
+      "connOutput": "elmtEco20",
+      "connID": "conn6"
+    },
+    {
+      "connInput": "elmtAttr4",
+      "connOutput": "elmtEco20",
+      "connID": "conn7"
+    },
+    {
+      "connInput": "elmtAttr5",
+      "connOutput": "elmtEco20",
+      "connID": "conn8"
+    },
+    {
+      "connInput": "elmtStock20",
+      "connOutput": "elmtEnv20",
+      "connID": "conn9"
+    },
+    {
+      "connInput": "elmtFoodweb20",
+      "connOutput": "elmtEnv20",
+      "connID": "conn10"
+    },
+    {
+      "connInput": "elmtAttr6",
+      "connOutput": "elmtStock20",
+      "connID": "conn11"
+    },
+    {
+      "connInput": "elmtAttr7",
+      "connOutput": "elmtStock20",
+      "connID": "conn12"
+    },
+    {
+      "connInput": "elmtAttr8",
+      "connOutput": "elmtStock20",
+      "connID": "conn13"
+    },
+    {
+      "connInput": "elmtAttr9",
+      "connOutput": "elmtStock20",
+      "connID": "conn14"
+    },
+    {
+      "connInput": "elmtAttrA",
+      "connOutput": "elmtFoodweb20",
+      "connID": "conn15"
+    },
+    {
+      "connInput": "elmtAttrB",
+      "connOutput": "elmtFoodweb20",
+      "connID": "conn16"
+    },
+    {
+      "connInput": "elmtAttrC",
+      "connOutput": "elmtFoodweb20",
+      "connID": "conn17"
+    },
+    {
+      "connInput": "elmt2030",
+      "connOutput": "elmtGoal",
+      "connID": "conn18"
+    },
+    {
+      "connInput": "elmtEco30",
+      "connOutput": "elmt2030",
+      "connID": "conn19"
+    },
+    {
+      "connInput": "elmtEnv30",
+      "connOutput": "elmt2030",
+      "connID": "conn20"
+    },
+    {
+      "connInput": "elmtAttr11",
+      "connOutput": "elmtEco30",
+      "connID": "conn21"
+    },
+    {
+      "connInput": "elmtAttr12",
+      "connOutput": "elmtEco30",
+      "connID": "conn22"
+    },
+    {
+      "connInput": "elmtAttr13",
+      "connOutput": "elmtEco30",
+      "connID": "conn23"
+    },
+    {
+      "connInput": "elmtAttr14",
+      "connOutput": "elmtEco30",
+      "connID": "conn24"
+    },
+    {
+      "connInput": "elmtAttr15",
+      "connOutput": "elmtEco30",
+      "connID": "conn25"
+    },
+    {
+      "connInput": "elmtStock30",
+      "connOutput": "elmtEnv30",
+      "connID": "conn26"
+    },
+    {
+      "connInput": "elmtFoodweb30",
+      "connOutput": "elmtEnv30",
+      "connID": "conn27"
+    },
+    {
+      "connInput": "elmtAttr16",
+      "connOutput": "elmtStock30",
+      "connID": "conn28"
+    },
+    {
+      "connInput": "elmtAttr17",
+      "connOutput": "elmtStock30",
+      "connID": "conn29"
+    },
+    {
+      "connInput": "elmtAttr18",
+      "connOutput": "elmtStock30",
+      "connID": "conn30"
+    },
+    {
+      "connInput": "elmtAttr19",
+      "connOutput": "elmtStock30",
+      "connID": "conn31"
+    },
+    {
+      "connInput": "elmtAttr1A",
+      "connOutput": "elmtFoodweb30",
+      "connID": "conn32"
+    },
+    {
+      "connInput": "elmtAttr1B",
+      "connOutput": "elmtFoodweb30",
+      "connID": "conn33"
+    },
+    {
+      "connInput": "elmtAttr1C",
+      "connOutput": "elmtFoodweb30",
+      "connID": "conn34"
+    }
+  ],
+  "mdlName": "The West Coast of Scotland",
+  "mdlIdent": "scotland",
+
+  "mdlDesc": "",
+  "mainObj": "elmtGoal",
+  "dataMat": [
+    [ "leaveblank", "elmtAttr1", "elmtAttr2", "elmtAttr3", "elmtAttr4", "elmtAttr5", "elmtAttr6", "elmtAttr7", "elmtAttr8", "elmtAttr9", "elmtAttrA", "elmtAttrB", "elmtAttrC", "elmtAttr11", "elmtAttr12", "elmtAttr13", "elmtAttr14", "elmtAttr15", "elmtAttr16", "elmtAttr17", "elmtAttr18", "elmtAttr19", "elmtAttr1A", "elmtAttr1B", "elmtAttr1C" ],
+    [ "elmtCurPath", 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
+    [ "elmtMMEY", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    [ "elmtDifCod", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    [ "units", "", "Euro Revenue", "Euro Revenue", "Euro Revenue", "Euro Revenue", "", "SSB", "SSB", "", "Indicator Value", "", "", "", "Full time jobs", "Full time jobs", "Full time jobs", "Full time jobs", "", "", "", "", "", "", "" ]
+
+  ]
+}
