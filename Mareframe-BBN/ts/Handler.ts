@@ -19,7 +19,7 @@ module Mareframe {
                 this.m_mareframeMode = true; //
                 var testPage = true;
                     ; 
-                if (testPage === false) {
+                if (!testPage) {
 
                     //var m = new Model(true);
                     this.m_fileHandler = new FileIO();

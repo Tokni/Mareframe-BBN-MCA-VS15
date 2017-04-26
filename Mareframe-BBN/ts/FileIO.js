@@ -71,6 +71,7 @@ var Mareframe;
                 var a = $("#downloadLink").get(0);
                 //a.href = 'data:application/octet-stream;base64,' + base64;
                 a.href = 'data:application/octet-stream,' + savedContent;
+                console.log("Saved Content: " + savedContent);
                 if (p_filename == undefined) {
                     a.download = "test.xdsl";
                 }
@@ -237,7 +238,7 @@ var Mareframe;
                 }
             };
             FileIO.prototype.loadModel = function (p_modelStringIdent, p_activeModelInstance, p_updateGui) {
-                ////console.log("attempting to load " + p_modelStringIdent);
+                console.log("attempting to load " + p_modelStringIdent);
                 var path = "JSON/";
                 if (p_activeModelInstance.m_bbnMode) {
                     path += "BBN/";
@@ -262,7 +263,7 @@ var Mareframe;
                         path += "northSea.json";
                         break;
                     case "scotland":
-                        path += "palermo.json";
+                        path += "scotland3.json";
                         break;
                     case "sicily":
                         path += "sicily.json";
@@ -319,7 +320,8 @@ var Mareframe;
                 fileInputElement.files[0];
                 var file = fileInputElement.files[0];
                 ////console.log("file: " + file);
-                ////console.log("filename: " + file.name);
+                //console.log("filename: " + file.name);
+                $("#modelHeader").html(file.name);
                 var fileReader = new FileReader();
                 fileReader.readAsText(file);
                 fileReader.onload = function (p_evt) {

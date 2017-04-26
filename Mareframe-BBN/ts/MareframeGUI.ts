@@ -2306,7 +2306,7 @@ module Mareframe {
 
                             }
 
-                            if (i === 0 && j !== 0) {
+                            if (i === 0 && j !== 0 && j!=2) {
                                 var tmp123 = p_matrix[j][0];
                                 var e = this.m_model.getElement(p_matrix[j][0]);
                                 if (e) {
@@ -2316,7 +2316,7 @@ module Mareframe {
                                 else 
                                     tableHTML = tableHTML + "<td style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle\" id='dataTable" + i + "x" + j + "' class='tableEdit' ><b>" + row[i] + "</b></td>";
                             }
-                            if (i !== 0 && j !== 0) {
+                            if (i !== 0 && j!=2  && j !== 0) {
                                 var tmp123 = p_matrix[j][0];
                                 var e = this.m_model.getElement(p_matrix[j][0]);
 

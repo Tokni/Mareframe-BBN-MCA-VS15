@@ -104,8 +104,8 @@ var Mareframe;
                 return dataStream;
             };
             Model.prototype.getMCADataStream = function () {
-                ////console.log("MCADataStream: " + JSON.stringify(this));
-                //var ret = JSON.stringify(this);
+                console.log("MCADataStream: " + JSON.stringify(this));
+                var ret = JSON.stringify(this);
                 return JSON.stringify(this);
             };
             Model.prototype.update = function () {
@@ -229,13 +229,13 @@ var Mareframe;
                     }
                     for (var r in retMatrix[0]) {
                         if (r != '0') {
-                            for (var _i = 0, _a = this.m_altIndex; _i < _a.length; _i++) {
-                                var alt = _a[_i];
-                                retMatrix[0][parseInt(r)] *= p_weight;
-                            }
+                            //for (var alt of this.m_altIndex) {
+                            retMatrix[0][parseInt(r)] *= p_weight;
+                            console.log("retMatrix[0][parseInt(r)] : " + retMatrix[0][parseInt(r)] + "  r: " + r);
                         }
                     }
                 }
+                console.log("retMatrix: " + retMatrix);
                 return retMatrix;
             };
             Model.prototype.getScore = function (p_element, p_criteria, p_element1Replace, p_element2Replace, p_elementIgnoreValue) {
@@ -429,7 +429,7 @@ var Mareframe;
                 //tempMatrix = [["a", "b", "d"], ["c", 50, 100]];
                 //tempMatrix = [["a", 15, 45], ["c", 50, 100]];
                 //tempMatrix = [10, 20, 30, 50];
-                ////console.log("WeigthedData: " + tempMatrix);
+                console.log("WeigthedData: " + tempMatrix);
                 return tempMatrix;
             };
             Model.prototype.createNewElement = function (p_type) {
@@ -681,7 +681,8 @@ var Mareframe;
             };
             Model.prototype.fromJSON = function (p_jsonObject) {
                 ////console.log("from json: p_jsonObject = " + p_jsonObject);
-                $("#modelHeader").html(p_jsonObject.mdlName);
+                console.log("from json: " + p_jsonObject.mdlName);
+                //$("#modelHeader").html(p_jsonObject.mdlName);
                 var header = $("#model_header").html();
                 //Only append if model name has not been added
                 if (header.indexOf(">", header.length - 1) !== -1) {

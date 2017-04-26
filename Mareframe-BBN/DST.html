@@ -111,15 +111,15 @@
 
             <div id="MCAContainer" style="text-align:center">
                 <div id="MCAToolTitle_div" class="header-bar ui-corner-all ui-widget-content ui-dialog-titlebar" title="Double click any goal (green) or objective(red) to change weights, Double click any attribute(blue) to inspect data or to change the utility function, Double click any alternative(yellow) to exclude or include the alternative
-">Graph Area</div>
+">Value Tree</div>
                 <!--MCA Tool canvas-->
                 <!--<canvas id="MCATool" width="800" height="600" style="display:inline-block; min-height: 400px; min-width: 600px" ></canvas>-->
                 <canvas id="MCATool" width="1500" height="1200" style="display:inline-block;"></canvas>
 
                 <!--Data Table-->
-                <div id="finalScoreTitle_div" title="Choose an element to inspect the finalscore of the element">FinalScore</div>
+                <div id="finalScoreTitle_div" title="The scores and the weights are combined to form a finalscore. The finalscore is based on the given data and the weighting of the sub-objectives, and is a measure of the combined value of the alternative.">Score</div>
                 <div id="finalScoreOverview_div" style="display:inline-block" title="FinalScore">
-                    <div id="finalScoreChartOverview_div">Scores</div>
+                    <div id="finalScoreChartOverview_div" title="Choose an element to inspect the finalscore of the element">Scores</div>
                     <div id="finalScoreObjectiveOverview_div">
                         Objective
                         <select id="finalScoreObjectiveOverview_select">
@@ -242,7 +242,7 @@
         </div>
 
 
-        <div id="saveFile_div"><a id="downloadLink"></a></div>
+        <!--<div id="saveFile_div"><a id="downloadLink"></a></div>-->
 
         <!--Popup Dialog-->
         <div id="detailsDialog">
@@ -413,7 +413,7 @@
             $("#addDataRow").hide();
             $("#values").hide();
             $(document).ready(function () {
-                $(document).tooltip();
+                $(document).tooltip({ position: { my: "left bottom-15", at: "left top" } });
                 var MareFrame = MareFrame || {};
                 MareFrame.DST = MareFrame.DST || {};
                 new Mareframe.DST.Handler();

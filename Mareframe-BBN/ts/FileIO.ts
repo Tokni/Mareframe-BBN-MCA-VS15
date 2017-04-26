@@ -33,6 +33,7 @@
 
                 //a.href = 'data:application/octet-stream;base64,' + base64;
                 a.href = 'data:application/octet-stream,' + savedContent;
+                console.log("Saved Content: " + savedContent);
                 if (p_filename == undefined) {
                     a.download = "test.xdsl";
                 } else {
@@ -249,7 +250,7 @@
                 }
             }
             loadModel(p_modelStringIdent: string, p_activeModelInstance: Model, p_updateGui: Function): any {
-                ////console.log("attempting to load " + p_modelStringIdent);
+                console.log("attempting to load " + p_modelStringIdent);
                 var path: string = "JSON/";
                 if (p_activeModelInstance.m_bbnMode) {
                     path += "BBN/";
@@ -273,7 +274,7 @@
                         path += "northSea.json";
                         break;
                     case "scotland":
-                        path += "palermo.json";
+                        path += "scotland3.json";
                         break;
                     case "sicily":
                         path += "sicily.json";
@@ -333,7 +334,8 @@
                 fileInputElement.files[0];
                 var file = fileInputElement.files[0];
                 ////console.log("file: " + file);
-                ////console.log("filename: " + file.name);
+                //console.log("filename: " + file.name);
+                $("#modelHeader").html(file.name);
                 var fileReader = new FileReader();
                 fileReader.readAsText(file);
                 fileReader.onload = function (p_evt) {

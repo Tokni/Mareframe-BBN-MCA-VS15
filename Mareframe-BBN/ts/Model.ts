@@ -114,8 +114,8 @@
                 return dataStream;
             }
             private getMCADataStream(): string {
-                ////console.log("MCADataStream: " + JSON.stringify(this));
-                //var ret = JSON.stringify(this);
+                console.log("MCADataStream: " + JSON.stringify(this));
+                var ret = JSON.stringify(this);
                 return JSON.stringify(this);
             }
             update() {
@@ -245,14 +245,16 @@
 
                     for (var r in retMatrix[0]) {
                         if (r != '0') {
-                            for (var alt of this.m_altIndex) {
+                            //for (var alt of this.m_altIndex) {
 
                                 retMatrix[0][parseInt(r)] *= p_weight;
-                            }
+                                console.log("retMatrix[0][parseInt(r)] : " + retMatrix[0][parseInt(r)] + "  r: " + r );
+                            //}
                         }
                     }
                     ////console.log("weight: " + p_weight + "  " + "weighted score: " + retMatrix);
                 }
+                console.log("retMatrix: " + retMatrix);
                 return retMatrix;
             }
             getScore(p_element: Element, p_criteria?: number, p_element1Replace?: Element, p_element2Replace?: Element, p_elementIgnoreValue?: number): number[][] {
@@ -478,7 +480,7 @@
                 //tempMatrix = [["a", "b", "d"], ["c", 50, 100]];
                 //tempMatrix = [["a", 15, 45], ["c", 50, 100]];
                 //tempMatrix = [10, 20, 30, 50];
-                ////console.log("WeigthedData: " + tempMatrix);
+                console.log("WeigthedData: " + tempMatrix);
                 return tempMatrix;
             }
             createNewElement(p_type: number): Element {
@@ -741,7 +743,8 @@
             }
             fromJSON(p_jsonObject: any): void {
                 ////console.log("from json: p_jsonObject = " + p_jsonObject);
-                $("#modelHeader").html(p_jsonObject.mdlName);
+                console.log("from json: " + p_jsonObject.mdlName);
+                //$("#modelHeader").html(p_jsonObject.mdlName);
                 var header = $("#model_header").html();
                 //Only append if model name has not been added
                 if (header.indexOf(">", header.length - 1) !== -1) {
