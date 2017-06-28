@@ -87,6 +87,7 @@ var Mareframe;
                     if (this.m_dataArr[i] > p_max)
                         this.m_dataMax = this.m_dataArr[i];
                 }
+                this.m_pwlVF.setEndPoint(p_max, 1);
             };
             Element.prototype.getDataMin = function () {
                 return this.m_dataMin;
@@ -97,6 +98,7 @@ var Mareframe;
                     if (this.m_dataArr[i] < p_min)
                         this.m_dataMin = this.m_dataArr[i];
                 }
+                this.m_pwlVF.setStartPoint(p_min, 0);
             };
             Element.prototype.getDataArrAtIndex = function (p_index) {
                 if (p_index >= 0 || p_index < this.m_dataArr.length)

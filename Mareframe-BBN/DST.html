@@ -15,6 +15,7 @@
     <link href="css/dialog.css" rel="stylesheet" />
     <link href="css/debug.css" rel="stylesheet" />
     <link href="css/SA.css" rel="stylesheet" />
+    <link href="css/defaultTheme.css" rel="stylesheet" />
 
     <!--<link id="ui_css" href="jQueryUI/jquery-ui_original.css" rel="stylesheet" />-->
     <link href="css/DST.css" rel="stylesheet" />
@@ -30,6 +31,8 @@
     <script>google.load("visualization", "1.0", { "packages": ["corechart", "table"] });</script>
 
     <script src="js/math.min.js" type="text/javascript"></script>
+    <script src="js/jquery.fixedheadertable.js" type="text/javascript"></script>
+
     <script src="ts/Model.js" type="text/javascript"></script>
     <script src="ts/MareframeGUI.js" type="text/javascript"></script>
     <script src="ts/FileIO.js" type="text/javascript"></script>
@@ -86,7 +89,12 @@
             </div>
 
             <button id="savDcmt" title="Save the current document. Use the download link at the bottom to move the document the client machine">Save Document</button>
-            <button class="advButton" id="resetDcmt">Reset</button>
+            <div class="LoadFileBtn" id="importDiv" title="Import Attribute and Alternatives from a csv file">
+                <input class="upload" type="file" id="import" />
+                <span>Import</span>
+            </div>
+
+            <!--<button class="advButton" id="resetDcmt">Reset</button>-->
             <button class="advButton" id="newElmt" title="Adds a new element to the workspace">New Element</button>
             <button class="advButton" id="newChance">New Chance</button>
             <button class="advButton" id="newDec">New Decision</button>
@@ -347,7 +355,9 @@
             };
 
             
-            
+            //$('#editableDataTable').fixedHeaderTable({
+            //    fixedColumns: 1
+            //});
             $("debugButton").button({ icons: { primary: "ui-icon-document" } });
             $("debugConnect").button({ icons: { primary: "ui-icon-document" } });
 
@@ -357,6 +367,7 @@
             $("#lodDcmtDiv").button({ icons: "ui-icon-folder-open" });
             $("#lodDcmtDiv").button({ icon: "ui-icon-folder-open", iconPosition: "beginning" });
             $("#savDcmt").button({ icon: "ui-icon-disk" });
+            $("#importDiv").button({ icon: "ui-icon-disk" });
             $("#newElmt").button({ icon: "ui-icon-plus" });
             $("#newDec").button({ icon: "ui-icon-plus" });
             $("#newChance").button({ icon: "ui-icon-plus" });

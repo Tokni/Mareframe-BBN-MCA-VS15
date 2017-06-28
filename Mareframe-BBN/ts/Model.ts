@@ -159,7 +159,7 @@
                 retDataMatrix[0] = [];
                 retDataMatrix[0][0] = "leave empty";
                 retDataMatrix[1] = [];
-                retDataMatrix[1][0] = "Minimum rating";
+                retDataMatrix[1][0] = "Minimum";
                 retDataMatrix[2] = [];
                 retDataMatrix[2][0] = "Baseline";
                 var j = 3;

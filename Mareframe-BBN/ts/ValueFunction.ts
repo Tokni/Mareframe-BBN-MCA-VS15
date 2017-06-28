@@ -133,7 +133,7 @@
                         var tnp = tmp[p].x;
                         var tnp2 = tmp[minIndex].x;
                         if (tmp[p].x < tmp[minIndex].x)
-                            minIndex = p;
+                            minIndex = parseInt( p);
                     }
                     this.m_middlepoints[index++] = tmp[minIndex];
                     tmp.splice(minIndex, 1);

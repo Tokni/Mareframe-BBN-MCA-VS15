@@ -36,6 +36,9 @@ declare module JQueryUI {
         beforeActivate?: AccordionEvent;
         create?: AccordionEvent;
     }
+    interface Selectmenu {
+
+    }
 
     interface Accordion extends Widget, AccordionOptions, AccordionEvents {
     }

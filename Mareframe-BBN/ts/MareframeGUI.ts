@@ -62,7 +62,10 @@ module Mareframe {
             private m_finalScoreChartOptions: Object = {
                 //width: 200,
                 //height: 100,
-                vAxis: { minValue: 0 },
+                vAxis: { minValue: 0, title: 'Cumulative Value' },
+                hAxis: {
+                    
+                },
                 legend: { position: 'top', maxLines: 3 },
                 bar: { groupWidth: '75%' },
                 animation: { duration: 500, easing: "out" },
@@ -308,7 +311,7 @@ module Mareframe {
 
                 });
                 $("#disAlt_check").on("click", this.changeAlt);
-                //$("#disAlt_check").checkboxradio();
+                $("#disAlt_check").checkboxradio();
 
                 this.m_mcaStage.addChild(this.m_mcaBackground);
                 this.m_mcaStage.addChild(this.m_mcaContainer);
@@ -419,12 +422,15 @@ module Mareframe {
             private updateAtributeIndex() {
                 this.m_attributeIndex.splice(0, this.m_attributeIndex.length)
                 for (var i in this.m_model.getElementArr()) {
-                    if (this.m_model.getElementArr()[i].getType() === 100)
-                        if (this.m_model.getElementArr()[i].m_disregard == true)
+                    console.log("Type:" + this.m_model.getElementArr()[i].getType());
+                    if (this.m_model.getElementArr()[i].getType() == 100) ////
+                        //console.log("Type:" + this.m_model.getElementArr()[i].getType());
+                        if (this.m_model.getElementArr()[i].m_disregard != true)
                             this.m_attributeIndex.push(i);
                 }
             }
-            private editTableData(p_evt: createjs.MouseEvent) {
+            private editTableData(p_evt: JQueryEventObject) {
+            //private editTableData(p_evt: createjs.MouseEvent) {
                 this.updateAtributeIndex();
                 var gui = this;
                 var id: string = "#" + p_evt.target.id;
@@ -449,6 +455,7 @@ module Mareframe {
                         var tableX = id.slice(10).split("x")[0];
                         var tableY = id.slice(10).split("x")[1];
                         if (parseInt(tableX) !== 0) {
+
                             var elmt: Element = gui.m_model.getElementArr()[gui.m_attributeIndex[parseInt(tableX) - 1]];
                             if (parseInt(tableY) === 0) {
                                 elmt.setName(gui.m_originalName);
@@ -469,6 +476,7 @@ module Mareframe {
                                 elmt.setDataMax(parseFloat(gui.m_originalName));
                             }
                         }
+                        var tmp34 = gui.m_model.getDataMatrix(true);
                         gui.updateTable(gui.m_model.getDataMatrix(true));
                         if (gui.m_readyForSA) {
                             gui.updateFinalScores(gui.m_finalScoreChosenObjective, gui.getCritSelected());
@@ -476,6 +484,7 @@ module Mareframe {
                                 gui.updateChartData(gui.m_SAChosenElement);
                                 gui.updateSA();
                             }
+                            gui.m_updateMCAStage = true;
                         }
                     }
                     $(this).parent().removeClass("editable");
@@ -559,7 +568,8 @@ module Mareframe {
                                 altKeyes[index++] = e;
                             }
                         }
-
+                        var vf: PiecewiseLinear = new PiecewiseLinear(0, 0, 1, 1, 0, 1);
+                        elmt.setPwlVF(vf);
                         elmt.setDataMin(0);
                         elmt.setDataMax(100);
                         elmt.setDataBaseLine(50)
@@ -607,7 +617,7 @@ module Mareframe {
                         this.m_model.updateAltIndex();
                         this.m_readyForSA = this.isReadyForSA();
                         if (this.m_readyForSA) {
-                            this.updateFinalScores(this.m_finalScoreChosenObjective);
+                            this.updateFinalScores(this.m_finalScoreChosenObjective, this.getCritSelected());
                             this.updateSATableData();
                             this.updateChartData(this.m_SAChosenElement);
                             this.updateSA();
@@ -724,7 +734,7 @@ module Mareframe {
                 else {
                     //$("#modeStatus").html("Editor Mode");
                 }
-                $("#cnctTool").button('refresh').blur();//
+                //$("#cnctTool").button('refresh').blur();//
 
             }
             private selectModel(p_evt: Event) {
@@ -1107,6 +1117,7 @@ module Mareframe {
                     }
                     this.updateModel();
                 }
+                this.updateTable(this.m_model.getDataMatrix(true));
             }
             private setShowDescription = function (cb) {
                 this.m_showDescription = cb.currentTarget.checked;
@@ -1537,31 +1548,8 @@ module Mareframe {
                                         $("#slid_" + id).slider({
                                             min: 0,
                                             max: 100,
-                                            //value: p_elmt.getDataArr(1, count),
                                             value: p_elmt.m_swingWeightsArr[count][1],
-                                            //slide: function (event, ui) {
-                                            //    var tmp12 = event.target
-                                            //    //p_elmt.setData(ui.value, 1, count);
-                                            //    var slideTotal = 0;
-                                            //    var slideSubTotal = 0;
-                                                
-                                            //        p_elmt.m_swingWeightsArr[count][1] = ui.value;
-                                            //        ////console.log("slideTotal: " + slideTotal);
-                                            //    for (var k = 0; k < p_elmt.m_swingWeightsArr.length; k++) {
-                                            //        slideTotal += p_elmt.m_swingWeightsArr[k][1];
-                                            //        ////console.log("swing: " + k + ": " + ui.value);
-                                            //        }
-                                            //    if (slideTotal === 0) {   
-                                            //        p_elmt.m_swingWeightsArr[count][1] = 1;
-                                            //        ui.value = 1;                                                                                                   
-                                            //    }
-                                            //    var tmp11 = slideTotal - ui.value;
-                                            //    if ((slideTotal - ui.value) === 0) this.m_lineOptions.hAxis.minValue = 1;  
-                                                                                           
-                                            //    ////console.log("Slide: " + ui.value);
-                                            //    $("#inp_" + id).val(ui.value);
-                                            //    this.updateFinalScores();
-                                            //}.bind(_this1)
+                                            
                                         });
                                         //$("#inp_" + id).val(p_elmt.getDataArr(1, count));
                                         $("#inp_" + id).val(p_elmt.m_swingWeightsArr[count][1]);
@@ -1572,7 +1560,7 @@ module Mareframe {
                                                 //p_elmt.setData(val, 1, count);
                                                 p_elmt.m_swingWeightsArr[count][1] = val;
                                                 $("#slid_" + id).slider("option", "value", val);
-                                                _this1.updateFinalScores(_this1.m_finalScoreChosenObjective);
+                                                _this1.updateFinalScores(_this1.m_finalScoreChosenObjective, _this1.getCritSelected());
                                             } else if (val > 100) {
                                                 val = 100;
                                             } else {
@@ -1621,7 +1609,7 @@ module Mareframe {
                                             }
                                             //_this1.updateSATableData();
                                                 //_this1.updateSA();
-                                            this.updateFinalScores(this.m_finalScoreChosenObjective);
+                                            this.updateFinalScores(this.m_finalScoreChosenObjective, this.getCritSelected());
                                         }.bind(_this1)
                                         );
                                     } // end makeSlider
@@ -1716,7 +1704,7 @@ module Mareframe {
                         }
                     }
                     this.m_updateMCAStage = true;
-                    this.m_updateMCATables = true;
+                    //this.m_updateMCATables = true;
                     this.m_skipUpdateDropDowns = true;  
                     //set editor description
                     document.getElementById("description_div").innerHTML = p_elmt.getDescription();
@@ -2273,15 +2261,38 @@ module Mareframe {
                     var tableHTML = "";
 
                     var topRow = true;
-                    for (var j = 0; j < p_matrix.length; j++) {
+                    var row: any[] = p_matrix[0];
+                    var e = this.m_model.getElement(p_matrix[0][0]);
+                    tableHTML = tableHTML + "<thead><tr style=\"border:1px solid black;height:32px\">";
+                    for (var i = 0; i < row.length; i++) {
+                        
+                        if (i === 0) {
+                            tableHTML += "<th style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle\" id='dataTable" + i + "x" + 0 + "' class='tableEdit' ><b></b></th>";
+                        }
+                        if (i !== 0) {
+                            var tmp123 = p_matrix[0][i];
+                            var e = this.m_model.getElement(p_matrix[0][i]);
+                            if (e)
+                                tableHTML += "<th style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle\" id='dataTable" + i + "x" + 0 + "' class='tableEdit' ><b>" + e.getName() + "</b></th>";
+                            else
+                                tableHTML += "<th style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle\" id='dataTable" + i + "x" + 0 + "' class='tableEdit' ><b>" + row[i] + "</b></th>";
+
+                        }
+                    }
+                    tableHTML += "</thead> <tbody>";
+
+                    for (var j = 1; j < p_matrix.length; j++) {
                         var row: any[] = p_matrix[j];
                         var e = this.m_model.getElement(p_matrix[j][0]);
+                        
+                        
                         if (e) {
                             if (!e.m_disregard)
                                 tableHTML = tableHTML + "<tr style=\"border:1px solid black;height:32px\">";
                         }
                         else {
-                            tableHTML = tableHTML + "<tr style=\"border:1px solid black;height:32px\">";
+                            if( j!=2)
+                                tableHTML = tableHTML + "<tr style=\"border:1px solid black;height:32px\">";
                         }
                         for (var i = 0; i < row.length; i++) {
                             //if (topRow) {
@@ -2293,18 +2304,7 @@ module Mareframe {
                         
                             //}
                             //tableHTML = tableHTML + "<td contenteditable=true style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle\" id='dataTable" + i + j + "' class='tableEdit' >" + row[i] + "</td>";
-                            if (i === 0 && j === 0) {
-                                tableHTML = tableHTML + "<td style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle\" id='dataTable" + i + "x" + j + "' class='tableEdit' ><b></b></td>";
-                            }
-                            if (j === 0 && i !== 0) {
-                                var tmp123 = p_matrix[0][i];
-                                var e = this.m_model.getElement(p_matrix[0][i]);
-                                if (e)
-                                    tableHTML = tableHTML + "<td style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle\" id='dataTable" + i + "x" + j + "' class='tableEdit' ><b>" + e.getName() + "</b></td>";
-                                else
-                                    tableHTML = tableHTML + "<td style=\"padding-right:10px;padding-left:5px;text-align:center;vertical-align:middle\" id='dataTable" + i + "x" + j + "' class='tableEdit' ><b>" + row[i] + "</b></td>";
-
-                            }
+                            
 
                             if (i === 0 && j !== 0 && j!=2) {
                                 var tmp123 = p_matrix[j][0];
@@ -2350,11 +2350,22 @@ module Mareframe {
 
 
                     }
+                    tableHTML += "</tbody>";
                     ////console.log("tableHtML: " + tableHTML);
+                    $('#editableDataTable').fixedHeaderTable('destroy');
                     $("#editableDataTable").html(tableHTML);
 
-                    $("#MCADataTable").on("dblclick", "td", this.editTableData);
-                    
+                    $('#editableDataTable').fixedHeaderTable({
+                        fixedColumns: 1
+                    });
+                    $(".fht-fixed-column > .fht-tbody").css("opacity", 1).css('background-color', 'white');
+                    $(".fht-fixed-column > .fht-thead").css("opacity", 1).css('background-color', 'white');
+                    var thWidth = $("#editableDataTable th").css('width');
+                    var tdWidth = $("#editableDataTable td").css('width');
+                    if (this.m_editorMode)
+                        $("#MCADataTable").on("dblclick", "td", this.editTableData);
+                    else
+                        $("#MCADataTable").off("dblclick", "td", this.editTableData);
                     //$(".tableEdit").on("click", this.editTableData);
                     ////console.log("original datamatrix" + this.m_model.getDataMatrix());
                     //////console.log(this.m_model.getDataMatrix());
@@ -2543,7 +2554,7 @@ module Mareframe {
                             
                             this.m_skipUpdateDropDowns = true;
                         }
-                        this.updateFinalScores(this.m_finalScoreChosenObjective);
+                        this.updateFinalScores(this.m_finalScoreChosenObjective, this.getCritSelected());
                         this.updateSATableData();
                         this.updateChartData(this.m_SAChosenElement);
                         this.updateSA();
@@ -2600,14 +2611,15 @@ module Mareframe {
                             connected = true;
                             switch (outputElmt.getType()) {
                                 case 101:
-                                    outputElmt.m_swingWeightsArr[outputElmt.m_swingWeightsArr.length] = [newConnection.getID(), 50];
+                                    outputElmt.m_swingWeightsArr[outputElmt.m_swingWeightsArr.length] = [newConnection.getID(), 1];
                                     break;
                                 case 103:
-                                    outputElmt.m_swingWeightsArr[outputElmt.m_swingWeightsArr.length] = [newConnection.getID(), 50];
+                                    outputElmt.m_swingWeightsArr[outputElmt.m_swingWeightsArr.length] = [newConnection.getID(), 1];
                                     break;
                             }
                         }                   
                     }
+                    $("#cnctTool").prop("checked", false).button('refresh');
                 }
                 if (!connected) {
                     this.select(p_evt);
@@ -3058,7 +3070,8 @@ module Mareframe {
                 if (this.m_SAChosenElement.getType() === 100) {
                     $("#sliderControl_div").slider('option', 'min', this.m_SAChosenElement.getDataMin())
                         .slider('option', 'max', this.m_SAChosenElement.getDataMax())
-                        .slider('value', this.m_SASliderValue); 
+                        .slider('option', 'value', this.m_SASliderValue)
+                        .slider('option', 'step', (this.m_SAChosenElement.getDataMax() - this.m_SAChosenElement.getDataMin()) / 100); 
                     $("#sliderValNormDebug").html(' ' + this.m_SASliderValue); 
                     var tmp11 = this.m_SAChosenElement.getDataMax();
                     var tmp12 = this.m_SAChosenElement.getDataMin();
@@ -3067,7 +3080,10 @@ module Mareframe {
                 }
                 else {
                    // if
-                    $("#sliderControl_div").slider('option', 'min', 0).slider('option', 'max', 100).slider('value', this.m_SASliderValue); //.slider('option', 'value', this.m_SAChosenElement.getDataMin());                 
+                    $("#sliderControl_div").slider('option', 'min', 0)
+                        .slider('option', 'max', 100)
+                        .slider('option', 'value', this.m_SASliderValue)
+                        .slider('option', 'step', 1); //.slider('option', 'value', this.m_SAChosenElement.getDataMin());                 
 
                     this.m_lineOptions.hAxis.maxValue = 100;
                     this.m_lineOptions.hAxis.minValue = 0;
@@ -3110,14 +3126,29 @@ module Mareframe {
             private updateSADropdown() {
                 $("#elementSelect > option").remove();
                 if (this.m_model !== undefined) {
+                    //for (var e of this.m_model.getElementArr()) {
+                    //    if (e.getType() !== 102 && e.getType() != 100) {
+                    //        //var tmp333 = "<option id='es" + e.getID() + "'>" + e.getName() + "</option>";
+                    //        //var tm12 = this.m_model.getMainObj();
+                    //        if (e == this.m_model.getMainObj())
+                    //            $("#elementSelect").append("<option id='es" + e.getID() + "' selected >" + e.getName() + "</option>");
+                    //        else
+                    //            $("#elementSelect").append("<option id='es" + e.getID() + "'>" + e.getName() + "</option>");
+                    //    }
+                    //}
                     for (var e of this.m_model.getElementArr()) {
-                        if (e.getType() !== 102 && e.getType() != 100) {
-                            var tmp333 = "<option id='es" + e.getID() + "'>" + e.getName() + "</option>";
-                            var tm12 = this.m_model.getMainObj();
-                            if (e == this.m_model.getMainObj())
-                                $("#elementSelect").append("<option id='es" + e.getID() + "' selected >" + e.getName() + "</option>");
-                            else
-                                $("#elementSelect").append("<option id='es" + e.getID() + "'>" + e.getName() + "</option>");
+                        if (e.getType() === 103) {
+                             $("#elementSelect").append("<option id='es" + e.getID() + "'>" + e.getName() + "</option>");
+                        }
+                    }
+                    for (var e of this.m_model.getElementArr()) {
+                        if (e.getType() === 101) {
+                            $("#elementSelect").append("<option id='es" + e.getID() + "'>" + e.getName() + "</option>");
+                        }
+                    }
+                    for (var e of this.m_model.getElementArr()) {
+                        if (e.getType() === 100) {
+                            $("#elementSelect").append("<option id='es" + e.getID() + "'>" + e.getName() + "</option>");
                         }
                     }
                     this.updateSASubDropdown();
@@ -3152,7 +3183,7 @@ module Mareframe {
                 }
                 $("#elementSubSelect").selectmenu('refresh');
                 
-                //this.updateChartData(this.m_SAChosenElement);
+                this.updateChartData(this.m_SAChosenElement);
                 this.setSliderValue();
                 this.updateSATableData();            
             }
@@ -3229,12 +3260,14 @@ module Mareframe {
                     var tmp5 = this.m_pwlDataArray;
                     
                     this.m_lineOptions.hAxis.title = p_elmt.m_dataUnit;
+                    //this.m_lineOptions.hAxis.minValue = p_elmt.getDataMin();
+                    //this.m_lineOptions.hAxis.maxValue = p_elmt.getDataMax();
                 }
                 else if (p_elmt.getType() === 101 || p_elmt.getType() === 103) {                   
                     for (var l = 1; l < 3; l++) {
                         this.m_pwlDataArray[l] = [];
                         //this.m_pwlDataArray[l][0] = l.toString();
-                    }                    
+                    }
                     this.m_pwlDataArray[1][0] = 0;
                     this.m_pwlDataArray[2][0] = 100;
                     ////console.log(this.m_pwlDataArray);
@@ -3293,8 +3326,8 @@ module Mareframe {
                 //var tmp7 = this.m_pwlDataArray[2][0];
                 
                 
-                //this.m_lineOptions.hAxis.minValue = this.m_pwlDataArray[1][0];
-                //this.m_lineOptions.hAxis.maxValue = this.m_pwlDataArray[2][0];
+                this.m_lineOptions.hAxis.minValue = this.m_pwlDataArray[1][0];
+                this.m_lineOptions.hAxis.maxValue = this.m_pwlDataArray[2][0];
                 
             }
             updateSATableData() {
@@ -3370,7 +3403,9 @@ module Mareframe {
                     }
                 }
                 $("#sliderControl_div").slider('value', this.m_SASliderValue);
+                $("#sliderValDebug").html('' + this.m_SASliderValue); 
                 $("#sliderValNormDebug").html('' + this.m_SASliderValue); 
+                
             }
             updateFinalScoresDropDowns = () => {
                 this.updateFinalScoreObejctiveSelect();
@@ -3381,13 +3416,19 @@ module Mareframe {
                 $("#finalScoreObjectiveTab_select > option").remove();
                 if (this.m_model !== undefined) {
                     for (var e of this.m_model.getElementArr()) {
-                        
-                        if (e.getType() != 102) {
-
+                        if (e.getType() == 103) {
                             $("#finalScoreObjectiveOverview_select").append("<option id='es" + e.getID() + "'>" + e.getName() + "</option>");
-                            //$("#finalScoreObjectiveTab_select").append("<option id='es" + e.getID() + "'>" + e.getName() + "</option>");
                         }
-                        
+                    }
+                    for (var e of this.m_model.getElementArr()) {
+                        if (e.getType() == 101) {
+                            $("#finalScoreObjectiveOverview_select").append("<option id='es" + e.getID() + "'>" + e.getName() + "</option>");
+                        }
+                    }
+                    for (var e of this.m_model.getElementArr()) {
+                        if (e.getType() == 100) {
+                            $("#finalScoreObjectiveOverview_select").append("<option id='es" + e.getID() + "'>" + e.getName() + "</option>");
+                        }
                     }
                     $("#finalScoreObjectiveOverview_select").selectmenu('refresh');
                 }

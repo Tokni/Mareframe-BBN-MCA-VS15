@@ -43,6 +43,7 @@ var Mareframe;
                                 jsonText += ',';
                         }
                         jsonText = jsonText.concat('], "connections": [], "mdlName": "untitled", "mainObj": "", "dataMat": [], "mdlIdent": "temp" }');
+                        console.log("ParsedJSON: " + jsonText);
                         p_activeModelInstance.fromJSON(JSON.parse(jsonText));
                         p_updateGui();
                         $("#import").val(""); // this will change the import, so it is possible to import the same file again
@@ -257,7 +258,7 @@ var Mareframe;
                         path += "cadiz.json";
                         break;
                     case "iceland":
-                        path += "iceland.json";
+                        path += "Iceland.json";
                         break;
                     case "northSea":
                         path += "northSea.json";
@@ -291,6 +292,12 @@ var Mareframe;
                         break;
                     case "sfsPalermo":
                         path += "sfsPalermo.json";
+                        break;
+                    case "atlantos":
+                        path += "Atlantos.json";
+                        break;
+                    case "testcase":
+                        path += "Atlantos.json";
                         break;
                     default:
                         //console.log("NO such file exists!!   " + p_modelStringIdent);
