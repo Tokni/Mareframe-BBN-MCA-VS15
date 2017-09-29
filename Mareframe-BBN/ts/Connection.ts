@@ -6,6 +6,7 @@
             private m_id: string;
             public m_easelElmt: createjs.Container;
             private m_color = "black";
+            
 
 
 

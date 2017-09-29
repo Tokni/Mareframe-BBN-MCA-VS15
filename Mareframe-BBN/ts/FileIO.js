@@ -220,6 +220,18 @@ var Mareframe;
                     case "test":
                         path += "test.json";
                         break;
+                    case "testcase":
+                        path += "BalticSea3.json";
+                        break;
+                    case "baltic_a":
+                        path += "BalticSea_stkhld_A.json";
+                        break;
+                    case "baltic_b":
+                        path += "BalticSea_stkhld_B.json";
+                        break;
+                    case "baltic_c":
+                        path += "BalticSea_stkhld_C.json";
+                        break;
                     default:
                         console.log("NO such file exists!");
                         break;

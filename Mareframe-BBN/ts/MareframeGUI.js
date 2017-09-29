@@ -2861,6 +2861,7 @@ var Mareframe;
                 if (p_connection.getInputElement().m_easelElmt.x < p_connection.getOutputElement().m_easelElmt.x) {
                     p_connection.m_easelElmt.getChildAt(0).rotation = 180 + p_connection.m_easelElmt.getChildAt(0).rotation;
                 }
+                temp.alpha = 0.5;
                 //stage.addChildAt(c.easelElmt, 0);
                 //update = true;
             };
