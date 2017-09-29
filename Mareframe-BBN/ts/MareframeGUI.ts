@@ -3260,6 +3260,7 @@ module Mareframe {
                     var tmp5 = this.m_pwlDataArray;
                     
                     this.m_lineOptions.hAxis.title = p_elmt.m_dataUnit;
+                    this.m_lineOptions.title = this.m_SAChosenElement.getName();
                     //this.m_lineOptions.hAxis.minValue = p_elmt.getDataMin();
                     //this.m_lineOptions.hAxis.maxValue = p_elmt.getDataMax();
                 }
@@ -3365,7 +3366,7 @@ module Mareframe {
             }
             updateSA() {
                 var pwlData = google.visualization.arrayToDataTable(this.m_pwlDataArray);
-                var alternativeData = google.visualization.arrayToDataTable(this.m_altData);
+                var alternativeData: google.visualization.DataTable = google.visualization.arrayToDataTable(this.m_altData);
 
                 this.m_SAScatterChart.draw(pwlData, this.m_lineOptions);
                 this.m_SATableChart.draw(alternativeData, this.m_tableOptions);

@@ -300,15 +300,23 @@
                     case "sfsCampaign001":
                         path += "sfsCampaign001.json";
                         break;
-	    case "sfsPalermo":
+	                case "sfsPalermo":
                         path += "sfsPalermo.json";
                         break;
-        case "atlantos":
-            path += "Atlantos.json";
-            break;
-        case "testcase":
-            path += "Atlantos.json";
-            break;
+                    case "atlantos":
+                        path += "Atlantos.json";
+                        break;
+                    case "testcase2":
+                        path += "Atlantos.json";
+                        break;
+                    case "testcase":
+                        path += "BalticWeights.json";
+                        break;
+                    case "balticweights":
+                        path += "BalticWeights.json";
+                        break;
+
+
 
                     default:
                         //console.log("NO such file exists!!   " + p_modelStringIdent);
