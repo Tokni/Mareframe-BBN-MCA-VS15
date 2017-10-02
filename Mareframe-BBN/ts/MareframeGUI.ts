@@ -2358,10 +2358,27 @@ module Mareframe {
                     $('#editableDataTable').fixedHeaderTable({
                         fixedColumns: 1
                     });
+                    for (var i = 0; i < row.length; i++) {
+                        var selector = ".fht-tbody #dataTable" + i + "x0 div";
+                        var selector4 = ".fht-tbody";
+                        var selector5 = "#dataTable" + i + "x0";
+                        var widthBody = $(selector).width();
+                        var tmp3 = $(selector);
+                        var tmp4 = $(selector4);
+                        var tmp6 = $(selector5);
+                        var selector2 = ".fht-thead #dataTable" + i + "x0 div";
+                        var tmp = $(selector2);
+
+                        $(selector2).width(widthBody);
+                        var tmp = $(selector2);
+                        var widthHead = $(selector2).width();
+                    }
+                    //$(".fht-thead th").css("border", "black solid 5px");
+                    //$(".fht-thead th").hide();
                     $(".fht-fixed-column > .fht-tbody").css("opacity", 1).css('background-color', 'white');
                     $(".fht-fixed-column > .fht-thead").css("opacity", 1).css('background-color', 'white');
-                    var thWidth = $("#editableDataTable th").css('width');
-                    var tdWidth = $("#editableDataTable td").css('width');
+                    var thWidth = $(".fht-thead th").css('width');
+                    var tdWidth = $(".fht-tbody th").css('width');
                     if (this.m_editorMode)
                         $("#MCADataTable").on("dblclick", "td", this.editTableData);
                     else

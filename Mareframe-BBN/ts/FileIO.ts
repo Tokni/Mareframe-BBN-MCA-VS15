@@ -312,10 +312,15 @@
                     case "testcase":
                         path += "BalticWeights.json";
                         break;
-                    case "balticweights":
-                        path += "BalticWeights.json";
+                    case "baltic_a":
+                        path += "DSTv2_weights_stakeholder_A.json";
                         break;
-
+                    case "baltic_b":
+                        path += "DSTv2_weights_stakeholder_B.json";
+                        break;
+                    case "baltic_c":
+                        path += "DSTv2_weights_stakeholder_C.json";
+                        break;
 
 
                     default:

@@ -296,8 +296,20 @@ var Mareframe;
                     case "atlantos":
                         path += "Atlantos.json";
                         break;
-                    case "testcase":
+                    case "testcase2":
                         path += "Atlantos.json";
+                        break;
+                    case "testcase":
+                        path += "BalticWeights.json";
+                        break;
+                    case "baltic_a":
+                        path += "DSTv2_weights_stakeholder_A.json";
+                        break;
+                    case "baltic_b":
+                        path += "DSTv2_weights_stakeholder_B.json";
+                        break;
+                    case "baltic_c":
+                        path += "DSTv2_weights_stakeholder_C.json";
                         break;
                     default:
                         //console.log("NO such file exists!!   " + p_modelStringIdent);
