@@ -1071,8 +1071,9 @@
                     //For each row
                     for (var i = 0; i < p_table.length; i++) {
                         //For each different value in new row
+                        newRow = p_table[i];
                         for (var n = 0; n < numOfDiffValues - 1; n++) {
-                            newRow = p_table[i];
+                            
 
                             //  console.log(newRow);
                             //For each column
