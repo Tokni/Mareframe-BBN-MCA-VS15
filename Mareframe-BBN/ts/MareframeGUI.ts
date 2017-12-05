@@ -58,7 +58,7 @@ module Mareframe {
                     $("#logo").attr("style", "height:80px");
                     $("#webpage").attr("href", "http://www.tokni.com");
                     $(".europe-map-back").hide();
-                    $("#model_description").text("This is the BBN tool. Yellow nodes represent decision nodes, blue nodes represent chance nodes, and red nodes represent utility nodes. You may doubleclick on each node below, to access the properties tables for that node. To set a decision click on a choice in the table next to decision nodes.");
+                    $("#model_description").html("This is the BBN tool. Yellow nodes represent decision nodes, blue nodes represent chance nodes, and red nodes represent utility nodes. You may doubleclick on each node below, to access the properties tables for that node. To set a decision click on a choice in the table next to decision nodes.<a href='BBN_instructions.pdf'> BBN Instructions</a>");
                     $(".europe-map-zoom").hide();
                     $(".col-md-2").hide();
                     $(".col-md-6").hide();
@@ -66,6 +66,8 @@ module Mareframe {
                     $("#dialog_css").attr("href", "css/dialog_tokni.css");
                 }
                 else {
+                    $("#model_description").html("This is the BBN tool. Yellow nodes represent decision nodes, blue nodes represent chance nodes, and red nodes represent utility nodes. You may doubleclick on each node below, to access the properties tables for that node. To set a decision click on a choice in the table next to decision nodes.<a href='BBN_instructions.pdf'> BBN Instructions</a>");
+
                     $("#selectModel").hide();
                     $("#selectModelLabel").hide();
                 }

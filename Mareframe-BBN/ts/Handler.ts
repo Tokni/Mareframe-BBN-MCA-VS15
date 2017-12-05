@@ -45,7 +45,7 @@ module Mareframe {
                 if (this.m_mareframeMode) {
                     //loadModel = "scotland";
                     //loadModel = "sicily";
-                    loadModel = "baltic";
+                    //loadModel = "baltic";
                     //loadModel = "northSea";
                     //loadModel = "blackSea";
                     //loadModel = "iceland";
