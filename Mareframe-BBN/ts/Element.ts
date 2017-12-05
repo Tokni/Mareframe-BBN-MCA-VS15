@@ -410,7 +410,7 @@
             setUserDescription(p_description: string): void {
                 this.m_userDescription = p_description
             }
-            getType(): number {
+            getType(): number { //0 Chance, 1 decision, 2 value
                 return this.m_type;
             }
             setType(p_type: number): void {

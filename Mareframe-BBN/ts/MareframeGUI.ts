@@ -1494,18 +1494,29 @@ module Mareframe {
                 fieldset.appendChild(table);
                 this.m_model.getElementArr().forEach(function (e: Element) {
                     if (e.getType() === 0) {//Chance
-                        var row: HTMLTableRowElement = table.insertRow();
-                        var cell = row.insertCell();
-                        var input = document.createElement("input");
-                        input.setAttribute("type", "checkbox");
-                        input.setAttribute("id", "voiCB_" + e.getID());
-                        input.setAttribute("name", "voiCB_" + e.getID());
-                        cell.appendChild(input);
-                        cell = row.insertCell();
-                        var label = document.createElement("label");
-                        label.htmlFor = "voiCB_" + e.getID();
-                        label.innerHTML = e.getName();
-                        cell.appendChild(label);
+                        var parentIsValueNode = false;
+                        e.getParentElements().forEach((p: Element) => {
+                            var tmp = p.getType();
+                            var tmp2 = p.getName();
+                            if (p.getName() == "scenarios") {
+                                var tmp3 = p.getName();
+                            }
+                            if (p.getType() == 1) parentIsValueNode = true;
+                        });
+                        if (!parentIsValueNode) {
+                            var row: HTMLTableRowElement = table.insertRow();
+                            var cell = row.insertCell();
+                            var input = document.createElement("input");
+                            input.setAttribute("type", "checkbox");
+                            input.setAttribute("id", "voiCB_" + e.getID());
+                            input.setAttribute("name", "voiCB_" + e.getID());
+                            cell.appendChild(input);
+                            cell = row.insertCell();
+                            var label = document.createElement("label");
+                            label.htmlFor = "voiCB_" + e.getID();
+                            label.innerHTML = e.getName();
+                            cell.appendChild(label);
+                        }
                     }
                 });
                 var div = document.createElement("div");
@@ -1744,7 +1755,11 @@ module Mareframe {
                         var cell = row.insertCell();
                         var div = document.createElement("div");
                         cell.appendChild(div);
-                        div.innerHTML = p_result[i][j].toPrecision(4);
+                        if (p_result[i][j] < 0) {
+                            div.innerHTML = '0';
+                        } else {
+                            div.innerHTML = p_result[i][j].toPrecision(4);
+                        }
                     }
                 }
                 $("#voiTable").append(table);

@@ -61,8 +61,8 @@ min-width:50px
 .buttonFooter {
     display : table-row;
     vertical-align : bottom;
-    height : 1px;
-    bottom: 0;
+    height : 60px;
+    bottom: 0px;
     position: absolute;
 }
 .dialogDiv {
